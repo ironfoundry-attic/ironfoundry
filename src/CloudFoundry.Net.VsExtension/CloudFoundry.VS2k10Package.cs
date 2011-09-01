@@ -1,15 +1,12 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.ComponentModel.Design;
-using Microsoft.Win32;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
-using System.Windows.Forms;
-using EnvDTE;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace CloudFoundry.CloudFoundry_VS2k10
 {
@@ -19,7 +16,7 @@ namespace CloudFoundry.CloudFoundry_VS2k10
     [Guid(GuidList.guidCloudFoundry_VS2k10PkgString)]
     public sealed class CloudFoundry_VS2k10Package : Package
     {
-        private DTE _dte;
+        // private DTE _dte;
         private IVsMonitorSelection _vsMonitorSelection;
 
         public CloudFoundry_VS2k10Package()

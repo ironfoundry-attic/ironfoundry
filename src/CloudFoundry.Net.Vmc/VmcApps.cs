@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using RestSharp;
-using Newtonsoft.Json;
-using ICSharpCode.SharpZipLib.Zip;
-using System.IO;
-using System.Web.Script.Serialization;
-using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
-using System.Threading;
-
-namespace CloudFoundry.Net.Vmc
+﻿namespace CloudFoundry.Net.Vmc
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Security.Cryptography;
+    using System.Threading;
+    using ICSharpCode.SharpZipLib.Zip;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using RestSharp;
+
     internal class VmcApps
     {
         public string StartApp (string appname, string url, string accesstoken) 
@@ -134,7 +131,6 @@ namespace CloudFoundry.Net.Vmc
 
 
                 JsonSerializer js = new JsonSerializer();
-                JavaScriptSerializer jss = new JavaScriptSerializer();
                 request.Method = Method.POST;
                 request.RequestFormat = DataFormat.Json;
                 request.AddBody(appdetails);
