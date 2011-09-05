@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using NLog;
-
-namespace CloudFoundry.Net.Dea.Service
+﻿namespace CloudFoundry.Net.Dea.Service
 {
+    using System;
+    using System.ServiceProcess;
+    using NLog;
+
     [System.ComponentModel.DesignerCategory(@"Code")]
     partial class DeaWindowsService : ServiceBase
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly IAgent agent;
 
         public DeaWindowsService()
         {
             CanPauseAndContinue = false;
 
             InitializeEventLog();
+
+            ServiceName = "DeaWindowsService";
+
+            agent = new Agent();
         }
 
         private void InitializeEventLog()
@@ -31,7 +30,7 @@ namespace CloudFoundry.Net.Dea.Service
             }
             catch (Exception ex)
             {
-                Logger.ErrorException("Unable to setup event log.", ex);
+                logger.ErrorException("Unable to setup event log.", ex);
                 AutoLog = true;
             }
         }
@@ -48,10 +47,12 @@ namespace CloudFoundry.Net.Dea.Service
 
         protected override void OnStart(string[] args)
         {
+            agent.Start();
         }
 
         protected override void OnStop()
         {
+            agent.Stop();
         }
     }
 }

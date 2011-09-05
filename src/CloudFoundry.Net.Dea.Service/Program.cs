@@ -1,18 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Dea.Providers;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Net.Dea.Service
+﻿namespace CloudFoundry.Net.Dea.Service
 {
-    class Program
+    using System;
+    using System.ServiceProcess;
+    using NLog;
+
+    static class Program
     {
-        public static void Main(string[] args)
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        static void Main()
         {
-            Agent agent = new Agent();
-            agent.Run();                        
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            IAgent agent = new Agent();
+
+            if (Environment.UserInteractive)
+            {
+                agent.Start();
+                Console.WriteLine("Hit enter to stop ...");
+                Console.ReadLine();
+                agent.Stop();
+            }
+            else
+            {
+                ServiceBase.Run((ServiceBase)agent);
+            }
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            logger.Error("Unhandled exception in AppDomain '{0}'", AppDomain.CurrentDomain.FriendlyName);
+            var ex = e.ExceptionObject as Exception;
+            if (null != ex)
+            {
+                logger.Error("Exception:", ex);
+            }
         }
     }
 }

@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.Script.Serialization;
-using System.Reflection;
-using System.Linq.Expressions;
-using System.IO;
-
-namespace CloudFoundry.Net.Dea
+﻿namespace CloudFoundry.Net.Dea
 {
+    using System;
+    using System.IO;
+    using System.Web.Script.Serialization;
+
     public static class Utility
     {
-        private static JavaScriptSerializer jsonSerializer;
+        private static readonly JavaScriptSerializer jsonSerializer;
         
         static Utility() 
         {
@@ -28,7 +23,7 @@ namespace CloudFoundry.Net.Dea
             return jsonSerializer.Deserialize<T>(jsonString);
         }     
    
-        public static int GetEnochTimestamp()
+        public static int GetEpochTimestamp()
         {
             return (int)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds);
         }

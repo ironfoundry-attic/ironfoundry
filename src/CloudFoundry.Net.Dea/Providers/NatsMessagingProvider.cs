@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Sockets;
-using NLog;
-using System.Threading;
-using CloudFoundry.Net.Dea.Providers.Interfaces;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Net.Dea.Providers
+﻿namespace CloudFoundry.Net.Dea.Providers
 {    
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Sockets;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using CloudFoundry.Net.Dea.Providers.Interfaces;
+    using NLog;
+
     public class NatsMessagingProvider : IMessagingProvider
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -22,13 +21,13 @@ namespace CloudFoundry.Net.Dea.Providers
         public int Port { get; private set; }
         public string UniqueIdentifier { get; private set; }
         public int Sequence { get; private set; }
-        public bool CurrentlyPolling { get; private set; }
+
+        private bool currentlyPolling;
         private TcpClient client;
         private NetworkStream stream;
-        private Dictionary<string,Dictionary<int, Action<string,string>>>Subscriptions;
-        private Object lockObject = new Object();
+        private Dictionary<string,Dictionary<int, Action<string,string>>> subscriptions;
+        private readonly Object lockObject = new Object();
         private bool disposing = false;
-        
 
         public NatsMessagingProvider(string host, int port)
         {
@@ -37,8 +36,8 @@ namespace CloudFoundry.Net.Dea.Providers
             Sequence = 1;
             UniqueIdentifier = Guid.NewGuid().ToString("N");   
             Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, Host, Port);
-            Subscriptions = new Dictionary<string, Dictionary<int, Action<string,string>>>();
-            CurrentlyPolling = false;
+            subscriptions = new Dictionary<string, Dictionary<int, Action<string, string>>>();
+            currentlyPolling = false;
         }
 
         public void Publish(string subject, string message)
@@ -49,7 +48,7 @@ namespace CloudFoundry.Net.Dea.Providers
             Write(formattedMessage);
         }        
 
-        public void Subscribe(string subject, Action<string,string> replyCallback)
+        public void Subscribe(string subject, Action<string, string> replyCallback)
         {
             lock (lockObject) { Sequence++; }
 
@@ -59,15 +58,15 @@ namespace CloudFoundry.Net.Dea.Providers
             Write(formattedMessage);
             
             lock (lockObject) { 
-                if (!Subscriptions.ContainsKey(subject))
-                    Subscriptions.Add(subject, new Dictionary<int,Action<string,string>>());
-                Subscriptions[subject].Add(Sequence, replyCallback);
+                if (!subscriptions.ContainsKey(subject))
+                    subscriptions.Add(subject, new Dictionary<int,Action<string,string>>());
+                subscriptions[subject].Add(Sequence, replyCallback);
             }
         }
         
         public void Poll()
         {
-            CurrentlyPolling = true;
+            currentlyPolling = true;
             string response = string.Empty;
             while (!disposing)
             {
@@ -106,12 +105,12 @@ namespace CloudFoundry.Net.Dea.Providers
                     {
                         var nextLine = messages[++counter];
                         var receivedMessage = new ReceivedMessage(message + CRLF + nextLine);
-                        if (!Subscriptions.ContainsKey(receivedMessage.Subject))
+                        if (!subscriptions.ContainsKey(receivedMessage.Subject))
                         {
                             Logger.Debug("NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1},{2}.", receivedMessage.Subject, receivedMessage.SubscriptionID, receivedMessage.RawMessage);
                             continue;
                         }
-                        var subjectCollection = Subscriptions[receivedMessage.Subject];
+                        var subjectCollection = subscriptions[receivedMessage.Subject];
                         if (!subjectCollection.ContainsKey(receivedMessage.SubscriptionID))
                         {
                             Logger.Debug("NATS Message Subscription ID: {0} not found to be subscribed for subject {1}. Ignoring received message {2}.", receivedMessage.SubscriptionID, receivedMessage.Subject, receivedMessage.RawMessage);
@@ -123,7 +122,7 @@ namespace CloudFoundry.Net.Dea.Providers
                     }
                 }                                              
             }
-            CurrentlyPolling = false;
+            currentlyPolling = false;
         }
 
         public void Connect()
@@ -139,9 +138,10 @@ namespace CloudFoundry.Net.Dea.Providers
             {
                 disposing = true;
                 Logger.Debug("NATS Waiting for polling to cease.");
-                while (CurrentlyPolling) {}
+                while (currentlyPolling) {}
                  
                 Logger.Debug("NATS Disconnected.");
+                stream.Close();
                 stream.Dispose();
                 client.Close();
             }

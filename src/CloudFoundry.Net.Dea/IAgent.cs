@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CloudFoundry.Net.Dea
+﻿namespace CloudFoundry.Net.Dea
 {
     public interface IAgent
     {
-        void Run();
+        void Start();
+        void Stop();
         void ProcessDropletStatus(string message, string reply);
         void ProcessDeaFindDroplet(string message, string reply);
         void ProcessDeaStatus(string message, string reply);

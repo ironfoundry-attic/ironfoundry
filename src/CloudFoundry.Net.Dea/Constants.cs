@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace CloudFoundry.Net.Dea
 {
     public static class Constants
@@ -12,25 +8,24 @@ namespace CloudFoundry.Net.Dea
 
         public static class AppSettings
         {
-            public static string StagingDirectory = "StagingDirectory";
-            public static string ApplicationsDirectory = "ApplicationsDirectory";
-            public static string DropletsDirectory = "DropletsDirectory";
-            public static string NatsHost = "NatsHost";
-            public static string NatsPort = "NatsPort";
-            public static string IISHost = "IISHost";
-            
+            public const string StagingDirectory = "StagingDirectory";
+            public const string ApplicationsDirectory = "ApplicationsDirectory";
+            public const string DropletsDirectory = "DropletsDirectory";
+            public const string NatsHost = "NatsHost";
+            public const string NatsPort = "NatsPort";
+            public const string IISHost = "IISHost";
         }
 
         public static class NatsCommands
         {
-            public static string Ok = "+OK";
-            public static string Error = "-ERR";
-            public static string Ping = "PING";
-            public static string Pong = "PONG";
-            public static string Information = "INFO";
-            public static string Message = "MSG";
-            public static string Publish = "PUB";
-            public static string Subscribe = "SUB";
+            public const string Ok = "+OK";
+            public const string Error = "-ERR";
+            public const string Ping = "PING";
+            public const string Pong = "PONG";
+            public const string Information = "INFO";
+            public const string Message = "MSG";
+            public const string Publish = "PUB";
+            public const string Subscribe = "SUB";
         }
 
         public static class NatsCommandFormats
@@ -42,7 +37,7 @@ namespace CloudFoundry.Net.Dea
             /// the byte array length that's produced), 
             /// third parameter is the actual message (should be in JSON format).
             /// </summary>
-            public static string Publish = NatsCommands.Publish + " {0}  {1}\r\n{2}\r\n";
+            public const string Publish = NatsCommands.Publish + " {0}  {1}\r\n{2}\r\n";
 
             /// <summary>
             /// Format for sending subscribe message. First parameter is the subject,
@@ -50,38 +45,38 @@ namespace CloudFoundry.Net.Dea
             /// a running tally of unique integers is used in order to reply back to the 
             /// subscribed message.
             /// </summary>
-            public static string Subscribe = NatsCommands.Subscribe + " {0}  {1}\r\n";
+            public const string Subscribe = NatsCommands.Subscribe + " {0}  {1}\r\n";
         }
 
         public static class Messages
         {
-            public static string DeaStart = "dea.start";
-            public static string DeaHeartbeat = "dea.heartbeat";
-            public static string RouterRegister = "router.register";
-            public static string RouterUnregister = "router.unregister";
-            public static string DropletExited = "droplet.exited";
-            public static string DeaInstanceStart = "dea.{0}.start";
-            public static string DeaStop = "dea.stop";
-            public static string VcapComponentAnnounce = "vcap.component.announce";
-            public static string VcapComponentDiscover = "vcap.component.discover";
-            public static string DeaStatus = "dea.status";
-            public static string DropletStatus = "droplet.status";
-            public static string DeaDiscover = "dea.discover";
-            public static string DeaFindDroplet = "dea.find.droplet";
-            public static string DeaUpdate = "dea.update";
-            public static string RouterStart = "router.start";
-            public static string HealthManagerStart = "healthmanager.start";
+            public const string DeaStart = "dea.start";
+            public const string DeaHeartbeat = "dea.heartbeat";
+            public const string RouterRegister = "router.register";
+            public const string RouterUnregister = "router.unregister";
+            public const string DropletExited = "droplet.exited";
+            public const string DeaInstanceStart = "dea.{0}.start";
+            public const string DeaStop = "dea.stop";
+            public const string VcapComponentAnnounce = "vcap.component.announce";
+            public const string VcapComponentDiscover = "vcap.component.discover";
+            public const string DeaStatus = "dea.status";
+            public const string DropletStatus = "droplet.status";
+            public const string DeaDiscover = "dea.discover";
+            public const string DeaFindDroplet = "dea.find.droplet";
+            public const string DeaUpdate = "dea.update";
+            public const string RouterStart = "router.start";
+            public const string HealthManagerStart = "healthmanager.start";
 
         }
 
         public static class InstanceState
         {
-            public static string STARTING = "STARTING";
-            public static string STOPPED = "STOPPED";
-            public static string RUNNING = "RUNNING";
-            public static string SHUTTING_DOWN = "SHUTTING_DOWN";
-            public static string CRASHED = "CRASHED";
-            public static string DELETED = "DELETED";
+            public const string STARTING = "STARTING";
+            public const string STOPPED = "STOPPED";
+            public const string RUNNING = "RUNNING";
+            public const string SHUTTING_DOWN = "SHUTTING_DOWN";
+            public const string CRASHED = "CRASHED";
+            public const string DELETED = "DELETED";
         }
     }
 }

@@ -53,25 +53,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeaService.cs" />
     <Compile Include="DeaWindowsService.cs" />
-    <Compile Include="DeaWindowsService.Designer.cs">
-      <DependentUpon>DeaWindowsService.cs</DependentUpon>
-    </Compile>
     <Compile Include="EventLogger.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="DeaWindowsServiceInstaller.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="DeaWindowsServiceInstaller.Designer.cs">
-      <DependentUpon>DeaWindowsServiceInstaller.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DeaWindowsServiceInstaller.resx">
-      <DependentUpon>DeaWindowsServiceInstaller.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -81,9 +66,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CloudFoundry.Net.Dea\CloudFoundry.Net.Dea.csproj">

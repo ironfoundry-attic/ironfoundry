@@ -1,48 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Dea.Providers.Interfaces;
-using CloudFoundry.Net.Dea.Providers;
-using System.Threading.Tasks;
-using NLog;
-using System.Diagnostics;
-using System.Runtime.Serialization;
-using CloudFoundry.Net.Dea.Entities;
-using System.Threading;
-using System.Net;
-using System.Configuration;
-using System.IO;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Tar;
-using ICSharpCode.SharpZipLib.GZip;
-using System.Globalization;
-
-namespace CloudFoundry.Net.Dea
+﻿namespace CloudFoundry.Net.Dea
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using CloudFoundry.Net.Dea.Entities;
+    using CloudFoundry.Net.Dea.Providers;
+    using CloudFoundry.Net.Dea.Providers.Interfaces;
+    using ICSharpCode.SharpZipLib.GZip;
+    using ICSharpCode.SharpZipLib.Tar;
+    using NLog;
+
     public class Agent : IAgent
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private IMessagingProvider NATS;
-        private IWebServerAdministrationProvider IIS;
-        private Dictionary<int, Dictionary<string, Instance>> Droplets = new Dictionary<int, Dictionary<string, Instance>>();        
-        private Hello helloMessage;
-        private VcapComponentDiscover vcapComponentDiscoverMessage;
-        private string IISHost;
-        private string snapshotFile;
-        private Object lockObject = new object();
+        private readonly IMessagingProvider NATS;
+        private readonly IWebServerAdministrationProvider IIS;
+        private readonly Dictionary<int, Dictionary<string, Instance>> Droplets = new Dictionary<int, Dictionary<string, Instance>>();        
+        private readonly Hello helloMessage;
+        private readonly VcapComponentDiscover vcapComponentDiscoverMessage;
+        private readonly string IISHost;
+        private readonly string snapshotFile;
+        private readonly object lockObject = new object();
+        private readonly IList<Task> tasks = new List<Task>();
+
+        private bool stopping = false; // TODO: cancellation tokens
 
         public Agent()
         {
             var providerFactory = new ProviderFactory();
-            NATS = providerFactory.CreateMessagingProvider(ConfigurationManager.AppSettings[Constants.AppSettings.NatsHost],
-                                                           Convert.ToInt32(ConfigurationManager.AppSettings[Constants.AppSettings.NatsPort]));
-            IIS = providerFactory.CreateWebServerAdministrationProvider();
-            Initialize();            
-        }
 
-        private void Initialize()
-        {
+            NATS = providerFactory.CreateMessagingProvider(
+                ConfigurationManager.AppSettings[Constants.AppSettings.NatsHost],
+                Convert.ToInt32(ConfigurationManager.AppSettings[Constants.AppSettings.NatsPort]));
+
+            IIS = providerFactory.CreateWebServerAdministrationProvider();
+
             IISHost = ConfigurationManager.AppSettings[Constants.AppSettings.IISHost];
 
             helloMessage = new Hello()
@@ -62,13 +62,16 @@ namespace CloudFoundry.Net.Dea
                 credentials = NATS.UniqueIdentifier,
                 start = DateTime.Now.ToString(Constants.JsonDateFormat)
             };
+
             snapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
         }
 
-        public void Run()
+        public void Start()
         {
             NATS.Connect();
-            Task.Factory.StartNew(NATS.Poll);
+
+            tasks.Add(Task.Factory.StartNew(NATS.Poll));
+
             NATS.Subscribe(Constants.Messages.VcapComponentDiscover, (msg,reply) => { });
             NATS.Publish(Constants.NatsCommands.Ok, vcapComponentDiscoverMessage.ToJson());
             NATS.Publish(Constants.Messages.VcapComponentAnnounce, vcapComponentDiscoverMessage.ToJson());
@@ -78,29 +81,32 @@ namespace CloudFoundry.Net.Dea
             NATS.Subscribe(Constants.Messages.DeaFindDroplet, ProcessDeaFindDroplet);
             NATS.Subscribe(Constants.Messages.DeaUpdate, ProcessDeaUpdate);
             NATS.Subscribe(Constants.Messages.DeaStop, ProcessDeaStop);
-            NATS.Subscribe(string.Format(Constants.Messages.DeaInstanceStart, NATS.UniqueIdentifier), ProcessDeaStart);
+            NATS.Subscribe(String.Format(Constants.Messages.DeaInstanceStart, NATS.UniqueIdentifier), ProcessDeaStart);
             NATS.Subscribe(Constants.Messages.RouterStart, ProcessRouterStart);
             NATS.Subscribe(Constants.Messages.HealthManagerStart, ProcessHealthManagerStart);
             NATS.Publish(Constants.Messages.DeaStart, helloMessage.ToJson());
 
-            RecoverExistingDroplets();
+            recoverExistingDroplets();
+
             // Turn on Heartbeat Loop
-            Task.Factory.StartNew(HeartbeatsLoop);
+            tasks.Add(Task.Factory.StartNew(HeartbeatsLoop));
 
-            // Currently we're running as a program
-            // This is the kill method 
             // TODO: Refactor ALL of the threading
-            Console.ReadLine();
+        }
 
+        public void Stop()
+        {
             // USING NATS to KILL threads
+            stopping = true;
             NATS.Dispose();
+            Task.WaitAll(tasks.ToArray(), TimeSpan.FromMinutes(1));
         }
 
         public void HeartbeatsLoop()
         {
-            while (true)
+            while (false == stopping)
             {
-                SendHeartbeat();
+                sendHeartbeat();
                 Thread.Sleep(10 * 1000);
             }
         }
@@ -115,6 +121,7 @@ namespace CloudFoundry.Net.Dea
                 Logger.Debug("This DEA does not support non-aspdotnet frameworks");
                 return;
             }
+
             var instance = new Instance()
             {
                 droplet_id = droplet.droplet,
@@ -132,16 +139,16 @@ namespace CloudFoundry.Net.Dea
                 runtime = droplet.runtime,
                 framework = droplet.framework,
                 start = DateTime.Now.ToString(Constants.JsonDateFormat),
-                state_timestamp = Utility.GetEnochTimestamp(),
+                state_timestamp = Utility.GetEpochTimestamp(),
                 log_id = string.Format("(name={0} app_id={1} instance={2} index={3})",droplet.name,droplet.droplet,droplet.sha1,droplet.index),                
                 staged = droplet.name,
                 sha1 = droplet.sha1
             };
 
             
-            var gzipMemoryStream = GetStagedApplicationFile(droplet.executableUri);
-            var dropletsPath = ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory] + @"\" + instance.sha1;
-            var applicationPath = ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory] + @"\" + instance.sha1;
+            MemoryStream gzipMemoryStream = getStagedApplicationFile(droplet.executableUri);
+            string dropletsPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], instance.sha1);
+            string applicationPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory], instance.sha1);
             Directory.CreateDirectory(dropletsPath);
             Directory.CreateDirectory(applicationPath);
 
@@ -153,15 +160,15 @@ namespace CloudFoundry.Net.Dea
                 tarArchive.Close();
             }
             Utility.CopyDirectory(new DirectoryInfo(dropletsPath + @"/app"), new DirectoryInfo(applicationPath));
-            var binding = IIS.InstallWebApp(applicationPath, instance.sha1);
+            WebServerAdministrationBinding binding = IIS.InstallWebApp(applicationPath, instance.sha1);
             instance.host = binding.Host;
             instance.port = binding.Port;
 
-            RegisterWithRouter(instance, instance.uris);
+            registerWithRouter(instance, instance.uris);
 
             instance.state = Constants.InstanceState.STARTING;
-            instance.state_timestamp = Utility.GetEnochTimestamp();
-            SendSingleHeartbeat(GenerateHeartbeat(instance));
+            instance.state_timestamp = Utility.GetEpochTimestamp();
+            sendSingleHeartbeat(generateHeartbeat(instance));
             
             Dictionary<string, Instance> instances;
             lock (lockObject)
@@ -170,14 +177,14 @@ namespace CloudFoundry.Net.Dea
                 instances.Add(instance.instance_id, instance);
                 Droplets.Add(droplet.droplet, instances);
             }
-            TakeSnapshot();
+            takeSnapshot();
         }
 
         public void ProcessDeaUpdate(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
             var droplet = message.FromJson<Droplet>();
-            var instance = GetInstance(droplet.droplet);
+            var instance = getInstance(droplet.droplet);
             string[] current_uris = new string[instance.uris.Length];
             Array.Copy(instance.uris, current_uris, instance.uris.Length);
             instance.uris = droplet.uris;
@@ -185,9 +192,9 @@ namespace CloudFoundry.Net.Dea
             var toRemove = current_uris.Except(droplet.uris);
             var toAdd = droplet.uris.Except(current_uris);
             
-            UnregisterWithRouter(instance, toRemove.ToArray());
-            RegisterWithRouter(instance, toAdd.ToArray());
-            TakeSnapshot();
+            unregisterWithRouter(instance, toRemove.ToArray());
+            registerWithRouter(instance, toAdd.ToArray());
+            takeSnapshot();
         }
 
         public void ProcessDeaDiscover(string message, string reply)
@@ -201,13 +208,13 @@ namespace CloudFoundry.Net.Dea
         {            
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
             var droplet = message.FromJson<Droplet>();
-            var instance = GetInstance(droplet.droplet);
+            var instance = getInstance(droplet.droplet);
             if (instance != null)
             {
                 IIS.UninstallWebApp(instance.sha1);
-                UnregisterWithRouter(instance, instance.uris);
+                unregisterWithRouter(instance, instance.uris);
                 Droplets.Remove(droplet.droplet);                
-                TakeSnapshot();
+                takeSnapshot();
                 NATS.Publish(Constants.NatsCommands.Ok, message);
             }
         }
@@ -233,7 +240,7 @@ namespace CloudFoundry.Net.Dea
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
             var findDroplet = message.FromJson<FindDroplet>();
-            ForAllInstances((instance) =>
+            forAllInstances((instance) =>
             {
                 if (instance.droplet_id == findDroplet.droplet)
                 {
@@ -281,7 +288,7 @@ namespace CloudFoundry.Net.Dea
         public void ProcessDropletStatus(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
-            ForAllInstances((instance) =>
+            forAllInstances((instance) =>
             {
                 var startDate = DateTime.ParseExact(instance.start,Constants.JsonDateFormat,CultureInfo.InvariantCulture);
                 var span = DateTime.Now - startDate;
@@ -304,19 +311,20 @@ namespace CloudFoundry.Net.Dea
         public void ProcessRouterStart(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name,message);
-            ForAllInstances((instance) => RegisterWithRouter(instance,instance.uris));
+            forAllInstances((instance) => registerWithRouter(instance,instance.uris));
         }
 
         public void ProcessHealthManagerStart(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
-            SendHeartbeat();
+            sendHeartbeat();
         }
 
-        private string GetApplicationState(string name)
+        private string getApplicationState(string name)
         {
             if (!IIS.DoesApplicationExist(name))
                 return Constants.InstanceState.DELETED;
+
             var status = IIS.GetStatus(name);
             switch (status)
             {
@@ -335,7 +343,7 @@ namespace CloudFoundry.Net.Dea
             }
         }
 
-        private MemoryStream GetStagedApplicationFile(string executableUri)
+        private MemoryStream getStagedApplicationFile(string executableUri)
         {
             MemoryStream returnStream = null;
             using (WebClient client = new WebClient())
@@ -343,7 +351,7 @@ namespace CloudFoundry.Net.Dea
             return returnStream;
         }
 
-        private void RegisterWithRouter(Instance instance, string[] uris)
+        private void registerWithRouter(Instance instance, string[] uris)
         {
             if (uris.Length == 0)
                 return;
@@ -358,7 +366,7 @@ namespace CloudFoundry.Net.Dea
             NATS.Publish(Constants.Messages.RouterRegister, routerRegister.ToJson());
         }
 
-        private void UnregisterWithRouter(Instance instance, string[] uris)
+        private void unregisterWithRouter(Instance instance, string[] uris)
         {
             if (uris.Length == 0)
                 return;
@@ -372,18 +380,18 @@ namespace CloudFoundry.Net.Dea
             NATS.Publish(Constants.Messages.RouterUnregister, routerRegister.ToJson());
         }
 
-        private void SendHeartbeat()
+        private void sendHeartbeat()
         {
             if (Droplets.Count == 0)
                 return;
 
-            List<Heartbeat> heartbeats = new List<Heartbeat>();
+            var heartbeats = new List<Heartbeat>();
 
-            ForAllInstances((instance) =>
+            forAllInstances((instance) =>
             {
-                instance.state = GetApplicationState(instance.sha1);
-                instance.state_timestamp = Utility.GetEnochTimestamp();
-                heartbeats.Add(GenerateHeartbeat(instance));
+                instance.state = getApplicationState(instance.sha1);
+                instance.state_timestamp = Utility.GetEpochTimestamp();
+                heartbeats.Add(generateHeartbeat(instance));
             });
 
             var dropletHeartbeats = new
@@ -393,12 +401,12 @@ namespace CloudFoundry.Net.Dea
             NATS.Publish(Constants.Messages.DeaHeartbeat, dropletHeartbeats.ToJson());
         }
 
-        private void TakeSnapshot()
+        private void takeSnapshot()
         {
-            List<DropletEntry> dropletEntries = new List<DropletEntry>();
+            var dropletEntries = new List<DropletEntry>();
             foreach(var droplet in Droplets)
             {
-                List<InstanceEntry> instanceEntries = new List<InstanceEntry>();
+                var instanceEntries = new List<InstanceEntry>();
                 foreach(var instance in droplet.Value)
                 {
                     InstanceEntry i = new InstanceEntry() {
@@ -408,7 +416,7 @@ namespace CloudFoundry.Net.Dea
                     instanceEntries.Add(i);
                 }
 
-                DropletEntry d = new DropletEntry() {
+                var d = new DropletEntry() {
                     droplet = droplet.Key,
                     instances = instanceEntries.ToArray()
                 };
@@ -422,7 +430,7 @@ namespace CloudFoundry.Net.Dea
             File.WriteAllText(snapshotFile,snapshot.ToJson(), new ASCIIEncoding());
         }
 
-        private void RecoverExistingDroplets()
+        private void recoverExistingDroplets()
         {
             if (File.Exists(snapshotFile))
             {
@@ -435,12 +443,12 @@ namespace CloudFoundry.Net.Dea
                         instances.Add(instanceEntry.instance_id, instanceEntry.instance);
                         Droplets.Add(dropletEntry.droplet, instances);
                     }
-                SendHeartbeat();
-                TakeSnapshot();
+                sendHeartbeat();
+                takeSnapshot();
             }
         }
 
-        private void ForAllInstances(Action<Instance> action)
+        private void forAllInstances(Action<Instance> action)
         {
             lock (lockObject)
             {
@@ -452,14 +460,14 @@ namespace CloudFoundry.Net.Dea
             }
         }
 
-        private Instance GetInstance(int dropletId)
+        private Instance getInstance(int dropletId)
         {
             if (!Droplets.Keys.Contains(dropletId))
                 return null;
             return Droplets[dropletId].First().Value;
         }
 
-        private void SendSingleHeartbeat(Heartbeat heartbeat)
+        private void sendSingleHeartbeat(Heartbeat heartbeat)
         {
             var dropletHeartbeats = new
             {
@@ -468,7 +476,7 @@ namespace CloudFoundry.Net.Dea
             NATS.Publish(Constants.Messages.DeaHeartbeat, dropletHeartbeats.ToJson());
         }
 
-        private Heartbeat GenerateHeartbeat(Instance instance)
+        private Heartbeat generateHeartbeat(Instance instance)
         {
             var heartbeat = new Heartbeat()
             {
