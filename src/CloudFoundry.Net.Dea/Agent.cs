@@ -30,7 +30,7 @@
         private readonly object lockObject = new object();
         private readonly IList<Task> tasks = new List<Task>();
 
-        private bool stopping = false; // TODO: cancellation tokens
+        private bool shutting_down = false; // TODO: cancellation tokens
 
         public Agent()
         {
@@ -99,14 +99,14 @@
         public void Stop()
         {
             // USING NATS to KILL threads
-            stopping = true;
+            shutting_down = true;
             NATS.Dispose();
             Task.WaitAll(tasks.ToArray(), TimeSpan.FromMinutes(1));
         }
 
         public void HeartbeatsLoop()
         {
-            while (false == stopping)
+            while (false == shutting_down)
             {
                 sendHeartbeat();
                 Thread.Sleep(TimeSpan.FromSeconds(10));
@@ -115,6 +115,9 @@
 
         public void ProcessDeaStart(string message, string reply)
         {
+            if (shutting_down)
+                return;
+
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);            
             
             Droplet droplet = Message.FromJson<Droplet>(message);
@@ -146,19 +149,29 @@
                 instance.Host = binding.Host;
                 instance.Port = binding.Port;
 
-                registerWithRouter(instance, instance.Uris);
-
                 instance.State = Instance.InstanceState.STARTING;
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
                 sendSingleHeartbeat(generateHeartbeat(instance));
 
-                Dictionary<string, Instance> instances;
+                registerWithRouter(instance, instance.Uris);
+
                 lock (lockObject)
                 {
-                    instances = new Dictionary<string, Instance>();
-                    instances.Add(instance.InstanceID, instance);
-                    Droplets.Add(droplet.ID, instances);
+                    Dictionary<string, Instance> instances;
+                    if (Droplets.TryGetValue(droplet.ID, out instances))
+                    {
+                        instances.Add(instance.InstanceID, instance);
+                    }
+                    else
+                    {
+                        instances = new Dictionary<string, Instance>
+                        {
+                            { instance.InstanceID, instance }
+                        };
+                        Droplets.Add(droplet.ID, instances);
+                    }
                 }
+
                 takeSnapshot();
             }
         }
@@ -288,8 +301,18 @@
 
         public void ProcessRouterStart(string message, string reply)
         {
+            if (shutting_down)
+                return;
+
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name,message);
-            forAllInstances((instance) => registerWithRouter(instance, instance.Uris));
+
+            forAllInstances((instance) =>
+                {
+                    if (instance.IsRunning)
+                    {
+                        registerWithRouter(instance, instance.Uris);
+                    }
+                });
         }
 
         public void ProcessHealthManagerStart(string message, string reply)
@@ -383,7 +406,7 @@
 
             forAllInstances((instance) =>
             {
-                instance.State = getApplicationState(instance.Sha1);
+                instance.State = getApplicationState(instance.IIsName);
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
                 heartbeats.Add(generateHeartbeat(instance));
             });
