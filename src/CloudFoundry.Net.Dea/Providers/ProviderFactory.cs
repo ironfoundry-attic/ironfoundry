@@ -4,9 +4,9 @@
 
     public class ProviderFactory : IProviderFactory
     {
-        public IMessagingProvider CreateMessagingProvider(string host, int port)
+        public IMessagingProvider CreateMessagingProvider(string argHost, ushort argPort)
         {
-            return new NatsMessagingProvider(host, port);
+            return new NatsMessagingProvider(argHost, argPort);
         }
 
         public IWebServerAdministrationProvider CreateWebServerAdministrationProvider()

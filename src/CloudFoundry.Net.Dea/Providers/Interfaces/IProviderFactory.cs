@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CloudFoundry.Net.Dea.Providers.Interfaces
+﻿namespace CloudFoundry.Net.Dea.Providers.Interfaces
 {
     public interface IProviderFactory
     {
-        IMessagingProvider CreateMessagingProvider(string host, int port);
+        IMessagingProvider CreateMessagingProvider(string argHost, ushort argPort);
         IWebServerAdministrationProvider CreateWebServerAdministrationProvider();
     }
 }

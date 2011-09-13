@@ -26,7 +26,6 @@
         private readonly Dictionary<uint, Dictionary<string, Instance>> Droplets = new Dictionary<uint, Dictionary<string, Instance>>();        
         private readonly Hello helloMessage;
         private readonly VcapComponentDiscover vcapComponentDiscoverMessage;
-        private readonly string IISHost;
         private readonly string snapshotFile;
         private readonly object lockObject = new object();
         private readonly IList<Task> tasks = new List<Task>();
@@ -39,16 +38,14 @@
 
             NATS = providerFactory.CreateMessagingProvider(
                 ConfigurationManager.AppSettings[Constants.AppSettings.NatsHost],
-                Convert.ToInt32(ConfigurationManager.AppSettings[Constants.AppSettings.NatsPort]));
+                Convert.ToUInt16(ConfigurationManager.AppSettings[Constants.AppSettings.NatsPort]));
 
             IIS = providerFactory.CreateWebServerAdministrationProvider();
-
-            IISHost = ConfigurationManager.AppSettings[Constants.AppSettings.IISHost];
 
             helloMessage = new Hello
             {
                 ID = NATS.UniqueIdentifier,
-                IPAddress = Constants.LocalhostIP,
+                IPAddress = Utility.LocalIPAddress,
                 Port = 12345,
                 Version = 0.99M,
             };
@@ -58,9 +55,9 @@
                 Type        = "DEA",
                 Index       = 1,
                 Uuid        = NATS.UniqueIdentifier,
-                Host        = String.Format("{0}:{1}", Constants.LocalhostIP, 9999), // TODO
+                Host        = Utility.LocalIPAddress.ToString(),
                 Credentials = NATS.UniqueIdentifier,
-                Start       = DateTime.Now, // TODO .ToString(Constants.JsonDateFormat)
+                Start       = DateTime.Now, // TODO UTC?
             };
 
             snapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
@@ -132,8 +129,8 @@
             MemoryStream gzipMemoryStream = getStagedApplicationFile(droplet.ExecutableUri);
             if (null != gzipMemoryStream)
             {
-                string dropletsPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], instance.Sha1);
-                string applicationPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory], instance.Sha1);
+                string dropletsPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], instance.Dir);
+                string applicationPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory], instance.Dir);
                 Directory.CreateDirectory(dropletsPath);
                 Directory.CreateDirectory(applicationPath);
 
@@ -145,7 +142,7 @@
                     tarArchive.Close();
                 }
                 Utility.CopyDirectory(new DirectoryInfo(dropletsPath + @"/app"), new DirectoryInfo(applicationPath));
-                WebServerAdministrationBinding binding = IIS.InstallWebApp(applicationPath, instance.Sha1);
+                WebServerAdministrationBinding binding = IIS.InstallWebApp(applicationPath, instance.IIsName);
                 instance.Host = binding.Host;
                 instance.Port = binding.Port;
 
@@ -194,10 +191,10 @@
         {            
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
             Droplet droplet = Message.FromJson<Droplet>(message);
-            var instance = getInstance(droplet.ID);
+            Instance instance = getInstance(droplet.ID);
             if (instance != null)
             {
-                IIS.UninstallWebApp(instance.Sha1);
+                IIS.UninstallWebApp(instance.IIsName);
                 unregisterWithRouter(instance, instance.Uris);
                 Droplets.Remove(droplet.ID);                
                 takeSnapshot();

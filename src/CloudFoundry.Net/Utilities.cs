@@ -1,7 +1,11 @@
 ﻿namespace CloudFoundry.Net
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
 
     public static class Utility
     {
@@ -21,6 +25,36 @@
                 DirectoryInfo nextDirectory = target.CreateSubdirectory(directory.Name);
                 CopyDirectory(directory,nextDirectory);
             }
-        } 
+        }
+
+        public static IPAddress LocalIPAddress
+        {
+            get { return getLocalIPAddresses().Last(); }
+        }
+
+        public static ushort FindNextAvailablePortAfter(ushort argStartingPort)
+        {
+            for (ushort port = argStartingPort; port < 65535; port++)
+            {
+                try
+                {
+                    var ep = new IPEndPoint(IPAddress.Any, port);
+                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                    socket.Bind(ep);
+                    socket.Close();
+                    // Port available
+                    return port;
+                }
+                catch (SocketException) { }
+            }
+
+            return ushort.MinValue;
+        }
+
+        private static IEnumerable<IPAddress> getLocalIPAddresses()
+        {
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToListOrNull();
+        }
     }
 }

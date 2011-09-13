@@ -9,5 +9,13 @@
         {
             return null == argThis || false == argThis.Any();
         }
+
+        public static IList<T> ToListOrNull<T>(this IEnumerable<T> argThis)
+        {
+            if (null == argThis)
+                return null;
+
+            return argThis.ToList();
+        }
     }
 }

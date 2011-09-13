@@ -15,7 +15,7 @@
                 InstanceID     = argDroplet.Sha1;
                 InstanceIndex  = argDroplet.Index;
                 Name           = argDroplet.Name;
-                Dir            = "/" + argDroplet.Name;
+                Dir            = IIsName;
                 Uris           = argDroplet.Uris;
                 Users          = argDroplet.Users;
                 Version        = argDroplet.Version;
@@ -110,6 +110,12 @@
         public bool IsRunning
         {
             get { return null != State && State == InstanceState.RUNNING; }
+        }
+
+        [JsonIgnore]
+        public string IIsName
+        {
+            get { return String.Format("{0}-{1}-{2}", Name, InstanceIndex, InstanceID); }
         }
 
         public static class InstanceState

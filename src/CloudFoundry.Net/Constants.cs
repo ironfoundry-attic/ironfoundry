@@ -21,7 +21,6 @@
             public const string DropletsDirectory = "DropletsDirectory";
             public const string NatsHost = "NatsHost";
             public const string NatsPort = "NatsPort";
-            public const string IISHost = "IISHost";
         }
 
         public static class NatsCommands

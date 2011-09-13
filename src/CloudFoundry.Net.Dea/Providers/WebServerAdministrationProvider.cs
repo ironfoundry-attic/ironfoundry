@@ -1,39 +1,34 @@
 ﻿namespace CloudFoundry.Net.Dea.Providers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.Linq;
-    using CloudFoundry.Net.Dea.Providers.Interfaces;
+    using System.Net;
+    using Interfaces;
     using Microsoft.Web.Administration;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
-    {        
-        private Dictionary<string, bool> iptable = new Dictionary<string, bool>();
-
-        public WebServerAdministrationProvider()
-        {
-            string availableIps = ConfigurationManager.AppSettings["AvailableIps"] as string;
-            string[] ips = availableIps.Split(';');
-            foreach (var ip in ips)
-                iptable.Add(ip, false);
-        }
+    {
+        /*
+         * TODO 
+         * DEA connects to root DNS server via UDP and picks the last address.
+         * Probably should figure out a way to specify the IP.
+         */
+        private readonly IPAddress localIPAddress = Utility.LocalIPAddress;
 
         public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
         {
             using (var manager = new ServerManager())
             {
-                ApplicationPool cloudFoundryPool = GetApplicationPool(manager, applicationInstanceName);
+                ApplicationPool cloudFoundryPool = getApplicationPool(manager, applicationInstanceName);
 
                 if (cloudFoundryPool == null)
                     cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
 
-                ushort applicationPort = findNextAvailablePort(manager);
+                ushort applicationPort = findNextAvailablePort();
 
-                var availableIp = iptable.Where((i) => i.Value == false).FirstOrDefault();
-                iptable[availableIp.Key] = true;
-
-                // manager.Sites.Add(applicationInstanceName, "http", availableIp.Key, localDirectory);
+                /*
+                 * NB: for now, listen on all local IPs, a specific port, and any domain.
+                 * TODO: should we limit by host header here?
+                 * TODO: use local IP here?
+                 */
                 manager.Sites.Add(applicationInstanceName, "http", "*:" + applicationPort.ToString() + ":", localDirectory);
 
                 manager.Sites[applicationInstanceName].Applications[0].ApplicationPoolName = applicationInstanceName;
@@ -42,7 +37,7 @@
 
                 manager.CommitChanges();
 
-                return new WebServerAdministrationBinding() { Host = availableIp.Key, Port = applicationPort };
+                return new WebServerAdministrationBinding() { Host = localIPAddress.ToString(), Port = applicationPort };
             }
         }
 
@@ -50,13 +45,13 @@
         {
             using (var manager = new ServerManager())
             {
-                var site = GetSite(manager, applicationInstanceName);
+                var site = getSite(manager, applicationInstanceName);
                 if (site != null)
                 {
                     manager.Sites.Remove(site);
                     manager.CommitChanges();
                 }
-                var deletePool = GetApplicationPool(manager, applicationInstanceName);
+                var deletePool = getApplicationPool(manager, applicationInstanceName);
                 if (deletePool != null)
                 {
                     manager.ApplicationPools.Remove(deletePool);
@@ -69,7 +64,7 @@
         {
             using (var manager = new ServerManager())
             {
-                var site = GetSite(manager, applicationInstanceName);
+                var site = getSite(manager, applicationInstanceName);
                 return site != null;
             }
         }
@@ -78,7 +73,7 @@
         {
             using (var manager = new ServerManager())
             {
-                var applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                var applicationPool = getApplicationPool(manager, applicationInstanceName);
                 applicationPool.Start();
             }
         }
@@ -87,7 +82,7 @@
         {
             using (var manager = new ServerManager())
             {
-                var applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                var applicationPool = getApplicationPool(manager, applicationInstanceName);
                 applicationPool.Stop();
             }
         }
@@ -96,7 +91,7 @@
         {
             using (var manager = new ServerManager())
             {
-                var applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                var applicationPool = getApplicationPool(manager, applicationInstanceName);
                 applicationPool.Recycle();
             }
         }
@@ -107,8 +102,8 @@
             {
                 try
                 {
-                    var applicationPool = GetApplicationPool(manager, applicationInstanceName);
-                    var applicationSite = GetSite(manager, applicationInstanceName);
+                    var applicationPool = getApplicationPool(manager, applicationInstanceName);
+                    var applicationSite = getSite(manager, applicationInstanceName);
                     if (applicationSite.State == ObjectState.Stopped ||
                         applicationPool.State == ObjectState.Stopped)
                         return ApplicationInstanceStatus.Stopped;
@@ -131,7 +126,7 @@
         }
 
 
-        private static ApplicationPool GetApplicationPool(ServerManager argManager, string name)
+        private static ApplicationPool getApplicationPool(ServerManager argManager, string name)
         {
             ApplicationPool returnPool = null;
             foreach (var pool in argManager.ApplicationPools)
@@ -145,30 +140,12 @@
             return returnPool;
         }
 
-        private static ushort findNextAvailablePort(ServerManager argManager)
+        private static ushort findNextAvailablePort()
         {
-            var portsInUse = new List<ushort>();
-            foreach (var site in argManager.Sites)
-            {
-                foreach (var binding in site.Bindings)
-                {
-                    ushort inUsePort;
-                    var bindingInformation = binding.BindingInformation;
-                    bindingInformation = bindingInformation.Replace(":", String.Empty).Replace("*", "");
-                    if (UInt16.TryParse(bindingInformation, out inUsePort))
-                        portsInUse.Add(inUsePort);
-                }
-            }
-
-            ushort applicationPort = 9000;
-            for (; applicationPort < 10000; applicationPort++)
-                if (!portsInUse.Contains(applicationPort))
-                    break;
-
-            return applicationPort;
+            return Utility.FindNextAvailablePortAfter(9000);
         }
 
-        private static Site GetSite(ServerManager argManager, string name)
+        private static Site getSite(ServerManager argManager, string name)
         {
             Site returnSite = null;
             foreach (var site in argManager.Sites)

@@ -17,10 +17,8 @@
         private const string LogReceivedFormat = "NATS Msg Recv: {0}";
         private const string CRLF = "\r\n";
 
-        public string Host { get; private set; }
-        public int Port { get; private set; }
-        public string UniqueIdentifier { get; private set; }
-        public int Sequence { get; private set; }
+        private string host;
+        private ushort port;
 
         private bool currentlyPolling;
         private TcpClient client;
@@ -29,16 +27,20 @@
         private readonly Object lockObject = new Object();
         private bool disposing = false;
 
-        public NatsMessagingProvider(string host, int port)
+        public NatsMessagingProvider(string argHost, ushort argPort)
         {
-            Host = host;
-            Port = port;
+            host = argHost;
+            port = argPort;
             Sequence = 1;
             UniqueIdentifier = Guid.NewGuid().ToString("N");   
-            Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, Host, Port);
+            Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, argHost, port);
             subscriptions = new Dictionary<string, Dictionary<int, Action<string, string>>>();
             currentlyPolling = false;
         }
+
+        public string UniqueIdentifier { get; private set; }
+
+        public int Sequence { get; private set; }
 
         public void Publish(string argSubject, Message argMessage)
         {
@@ -127,6 +129,7 @@
                         // TODO
                         /*
                          * The rate with which we're listening for messages can cause us to try and process the same message twice
+                         * Plus, the ruby code is not multithreaded either.
                          */
                         // Task.Factory.StartNew(() => callback(receivedMessage.RawMessage, receivedMessage.InboxID));
                         callback(receivedMessage.RawMessage, receivedMessage.InboxID);
@@ -138,8 +141,8 @@
 
         public void Connect()
         {            
-            client = new TcpClient(Host, Port);
-            Logger.Debug("NATS Connected on Host: {0}, Port: {1}", Host, Port);
+            client = new TcpClient(host, port);
+            Logger.Debug("NATS Connected on Host: {0}, Port: {1}", host, port);
             stream = client.GetStream();            
         }        
 
