@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.Types.Messages
+﻿namespace CloudFoundry.Net.Types
 {
     using Newtonsoft.Json;
 

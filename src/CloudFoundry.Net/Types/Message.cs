@@ -1,5 +1,4 @@
-﻿namespace CloudFoundry.Net.Types.Messages
+﻿namespace CloudFoundry.Net.Types
 {
-
     public abstract class Message : JsonBase { }
 }

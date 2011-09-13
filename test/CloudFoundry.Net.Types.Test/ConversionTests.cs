@@ -2,7 +2,6 @@
 {
     using System;
     using System.Net;
-    using Types.Messages;
     using Xunit;
 
     public class ConversionTests

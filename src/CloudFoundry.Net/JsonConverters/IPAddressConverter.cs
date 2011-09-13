@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.Types.JsonConverters
+﻿namespace CloudFoundry.Net.JsonConverters
 {
     using System;
     using System.Globalization;

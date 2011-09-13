@@ -11,14 +11,12 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using CloudFoundry.Net.Dea.Providers;
-    using CloudFoundry.Net.Dea.Providers.Interfaces;
-    using CloudFoundry.Net.Types.Entities;
-    using CloudFoundry.Net.Types.Messages;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using NLog;
-    using CloudFoundry.Net.Types;
+    using Providers;
+    using Providers.Interfaces;
+    using Types;
 
     public class Agent : IAgent
     {
@@ -129,7 +127,7 @@
                 return;
             }
 
-            var instance = new Instance // TODO ctor arg
+            var instance = new Instance(droplet)
             {
                 DropletID       = droplet.ID,
                 InstanceID      = droplet.Sha1,
@@ -142,7 +140,7 @@
                 MemQuota        = droplet.Limits.Mem * (1024*1024),
                 DiskQuota       = droplet.Limits.Disk * (1024*1024),
                 FdsQuota        = droplet.Limits.FDs,
-                State           = Constants.InstanceState.STARTING,
+                State           = Instance.InstanceState.STARTING,
                 Runtime         = droplet.Runtime,
                 Framework       = droplet.Framework,
                 Start           = DateTime.Now.ToString(Constants.JsonDateFormat),
@@ -175,7 +173,7 @@
 
                 registerWithRouter(instance, instance.Uris);
 
-                instance.State = Constants.InstanceState.STARTING;
+                instance.State = Instance.InstanceState.STARTING;
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
                 sendSingleHeartbeat(generateHeartbeat(instance));
 
@@ -286,7 +284,7 @@
                                     Usage     = 20
                                 }
                             };
-                            if (response.State != Constants.InstanceState.RUNNING)
+                            if (response.State != Instance.InstanceState.RUNNING)
                                 response.Stats = null;
                             NATS.Publish(reply, response.ToJson());
                         }
@@ -304,19 +302,10 @@
                 {
                     var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
                     var span = DateTime.Now - startDate;
-                    var response = new Stats // TODO ctor arg
+                    var response = new Stats(instance, span)
                     {
-                        Name = instance.Name,
-                        Host = instance.Host,
-                        Port = instance.Port,
-                        Uris = instance.Uris,
-                        Uptime = span.TotalSeconds,
-                        MemQuota = instance.MemQuota,
-                        DiskQuota = instance.DiskQuota,
-                        FdsQuota = instance.FdsQuota,
                         Usage = 20
                     };
-                    // NATS.Publish(reply, message); TODO this used to send back message?
                     NATS.Publish(reply, response);
                 }
             });
@@ -337,23 +326,23 @@
         private string getApplicationState(string name)
         {
             if (!IIS.DoesApplicationExist(name))
-                return Constants.InstanceState.DELETED;
+                return Instance.InstanceState.DELETED;
 
             var status = IIS.GetStatus(name);
             switch (status)
             {
                 case ApplicationInstanceStatus.Started:
-                    return Constants.InstanceState.RUNNING;
+                    return Instance.InstanceState.RUNNING;
                 case ApplicationInstanceStatus.Starting:
-                    return Constants.InstanceState.STARTING;
+                    return Instance.InstanceState.STARTING;
                 case ApplicationInstanceStatus.Stopping:
-                    return Constants.InstanceState.SHUTTING_DOWN;
+                    return Instance.InstanceState.SHUTTING_DOWN;
                 case ApplicationInstanceStatus.Stopped:
-                    return Constants.InstanceState.STOPPED;
+                    return Instance.InstanceState.STOPPED;
                 case ApplicationInstanceStatus.Unknown:
-                    return Constants.InstanceState.CRASHED;
+                    return Instance.InstanceState.CRASHED;
                 default:
-                    return Constants.InstanceState.CRASHED;
+                    return Instance.InstanceState.CRASHED;
             }
         }
 

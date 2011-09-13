@@ -1,6 +1,5 @@
-﻿namespace CloudFoundry.Net.Types.Messages
+﻿namespace CloudFoundry.Net.Types
 {
-    using Entities;
     using Newtonsoft.Json;
 
     public class Discover : JsonBase

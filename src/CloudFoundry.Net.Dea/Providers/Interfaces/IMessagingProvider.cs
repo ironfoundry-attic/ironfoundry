@@ -1,7 +1,7 @@
 ﻿namespace CloudFoundry.Net.Dea.Providers.Interfaces
 {
     using System;
-    using Types.Messages;
+    using Types;
 
     public interface IMessagingProvider : IDisposable
     {

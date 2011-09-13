@@ -1,8 +1,6 @@
 ﻿namespace CloudFoundry.Net.Types.Test
 {
     using System;
-    using Entities;
-    using Messages;
     using Xunit;
 
     public class JsonSerializationTests
@@ -23,13 +21,10 @@
                             new InstanceEntry
                             {
                                 InstanceID = randomString(),
-                                Instance = new Instance
+                                Instance = new Instance(new Droplet
                                 {
-                                    InstanceID = randomString(),
-                                    Dir = randomString(),
-                                    DiskQuota = r.Next(),
-                                    DropletID = (uint)r.Next()
-                                }
+                                    ID = (uint)r.Next(),
+                                })
                             }
                         }
                     },
@@ -40,13 +35,10 @@
                             new InstanceEntry
                             {
                                 InstanceID = randomString(),
-                                Instance = new Instance
+                                Instance = new Instance(new Droplet
                                 {
-                                    InstanceID = randomString(),
-                                    Dir = randomString(),
-                                    DiskQuota = r.Next(),
-                                    DropletID = (uint)r.Next()
-                                }
+                                    ID = (uint)r.Next(),
+                                })
                             }
                         }
                     },

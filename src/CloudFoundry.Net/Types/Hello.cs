@@ -1,7 +1,7 @@
-﻿namespace CloudFoundry.Net.Types.Messages
+﻿namespace CloudFoundry.Net.Types
 {
     using System.Net;
-    using CloudFoundry.Net.Types.JsonConverters;
+    using CloudFoundry.Net.JsonConverters;
     using Newtonsoft.Json;
     
     public class Hello : Message

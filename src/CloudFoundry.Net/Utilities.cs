@@ -1,27 +1,10 @@
-﻿namespace CloudFoundry.Net.Dea
+﻿namespace CloudFoundry.Net
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
 
-    /*
-     * TODO break out into common dll or other better place for ex methods
-     */
     public static class Utility
     {
-        /*
-        public static string ToJson(this object obj)
-        {
-            return JsonConvert.ToString(obj);
-        }  
-      
-        public static T FromJson<T>(this string argJson)
-        {
-            return JsonConvert.DeserializeObject<T>(argJson);
-        }     
-         */
-   
         public static int GetEpochTimestamp()
         {
             return (int)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds);
@@ -39,13 +22,5 @@
                 CopyDirectory(directory,nextDirectory);
             }
         } 
-    }
-
-    public static class IEnumerableExtensionMethods
-    {
-        public static bool IsNullOrEmpty<T>(this IEnumerable<T> argThis)
-        {
-            return null == argThis || false == argThis.Any();
-        }
     }
 }

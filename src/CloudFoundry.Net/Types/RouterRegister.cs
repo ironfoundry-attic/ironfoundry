@@ -1,7 +1,6 @@
-﻿namespace CloudFoundry.Net.Types.Messages
+﻿namespace CloudFoundry.Net.Types
 {
     using Newtonsoft.Json;
-    using Entities;
 
     public class RouterRegister : Message
     {

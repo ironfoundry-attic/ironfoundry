@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.Dea
+﻿namespace CloudFoundry.Net
 {
     using System.Net;
 
@@ -75,16 +75,6 @@
             public const string RouterStart = "router.start";
             public const string HealthManagerStart = "healthmanager.start";
 
-        }
-
-        public static class InstanceState
-        {
-            public const string STARTING = "STARTING";
-            public const string STOPPED = "STOPPED";
-            public const string RUNNING = "RUNNING";
-            public const string SHUTTING_DOWN = "SHUTTING_DOWN";
-            public const string CRASHED = "CRASHED";
-            public const string DELETED = "DELETED";
         }
     }
 }

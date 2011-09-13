@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.VS2k10_Integra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.VS2k10_UnitTests", "test\CloudFoundry.Net.VsExtension.UnitTests\CloudFoundry.VS2k10_UnitTests.csproj", "{053EA5DD-4BBB-417A-8314-589A9C48413A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.Types", "src\CloudFoundry.Net.Types\CloudFoundry.Net.Types.csproj", "{506CCDF4-11FE-4138-8061-25495EEBF8E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net", "src\CloudFoundry.Net\CloudFoundry.Net.csproj", "{506CCDF4-11FE-4138-8061-25495EEBF8E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.Types.Test", "test\CloudFoundry.Net.Types.Test\CloudFoundry.Net.Types.Test.csproj", "{196F323E-74FE-4EA6-9344-D4BFB98BEA7C}"
 EndProject

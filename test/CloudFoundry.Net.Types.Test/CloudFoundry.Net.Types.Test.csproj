@@ -51,9 +51,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CloudFoundry.Net.Types\CloudFoundry.Net.Types.csproj">
+    <ProjectReference Include="..\..\src\CloudFoundry.Net\CloudFoundry.Net.csproj">
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
-      <Name>CloudFoundry.Net.Types</Name>
+      <Name>CloudFoundry.Net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.Types.Converters
+﻿namespace CloudFoundry.Net.Converters
 {
     using System;
     using System.Globalization;

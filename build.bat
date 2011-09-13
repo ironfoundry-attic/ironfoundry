@@ -19,4 +19,4 @@ call %VCVARSALL% x86
 
 msbuild /t:build /p:Configuration=Release %SLN%
 
-exit %ERRORLEVEL%
+exit /b %ERRORLEVEL%

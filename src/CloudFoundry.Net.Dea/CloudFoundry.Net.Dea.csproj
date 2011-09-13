@@ -41,9 +41,6 @@
     <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\Windows\System32\inetsrv\Microsoft.Web.Administration.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.0.2.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.4.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="NLog">
       <HintPath>..\..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
     </Reference>
@@ -58,8 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Entities.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="Providers\Interfaces\IMessagingProvider.cs" />
     <Compile Include="Providers\Interfaces\IProviderFactory.cs" />
@@ -68,15 +63,14 @@
     <Compile Include="Providers\NatsMessagingProvider.cs" />
     <Compile Include="Providers\ProviderFactory.cs" />
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />
-    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CloudFoundry.Net.Types\CloudFoundry.Net.Types.csproj">
+    <ProjectReference Include="..\CloudFoundry.Net\CloudFoundry.Net.csproj">
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
-      <Name>CloudFoundry.Net.Types</Name>
+      <Name>CloudFoundry.Net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

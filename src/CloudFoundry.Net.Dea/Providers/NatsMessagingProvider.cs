@@ -6,10 +6,9 @@
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
-    using System.Threading.Tasks;
-    using CloudFoundry.Net.Dea.Providers.Interfaces;
-    using CloudFoundry.Net.Types.Messages;
+    using Interfaces;
     using NLog;
+    using Types;
 
     public class NatsMessagingProvider : IMessagingProvider
     {

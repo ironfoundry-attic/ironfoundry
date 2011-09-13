@@ -1,7 +1,7 @@
-﻿namespace CloudFoundry.Net.Types.Messages
+﻿namespace CloudFoundry.Net.Types
 {
     using System;
-    using CloudFoundry.Net.Types.Converters;
+    using CloudFoundry.Net.Converters;
     using Newtonsoft.Json;
 
     public class VcapComponentDiscover : Message
