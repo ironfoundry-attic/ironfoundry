@@ -1,0 +1,13 @@
+﻿<Window x:Class="CloudFoundry.Net.VsExtension.Ui.Application.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="725" Width="1100" xmlns:my="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls;assembly=CloudFoundry.Net.VsExtension.Ui.Controls">
+    <Grid>
+    	<Grid.ColumnDefinitions>
+    		<ColumnDefinition Width="200"/>
+    		<ColumnDefinition Width="290*"/>
+    	</Grid.ColumnDefinitions>
+		<my:CloudExplorer Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <my:FoundryProperties Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+    </Grid>
+</Window>
