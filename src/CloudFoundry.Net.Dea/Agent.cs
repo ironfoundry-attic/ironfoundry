@@ -11,19 +11,21 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using CloudFoundry.Net.Dea.Entities;
     using CloudFoundry.Net.Dea.Providers;
     using CloudFoundry.Net.Dea.Providers.Interfaces;
+    using CloudFoundry.Net.Types.Entities;
+    using CloudFoundry.Net.Types.Messages;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using NLog;
+    using CloudFoundry.Net.Types;
 
     public class Agent : IAgent
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly IMessagingProvider NATS;
         private readonly IWebServerAdministrationProvider IIS;
-        private readonly Dictionary<int, Dictionary<string, Instance>> Droplets = new Dictionary<int, Dictionary<string, Instance>>();        
+        private readonly Dictionary<uint, Dictionary<string, Instance>> Droplets = new Dictionary<uint, Dictionary<string, Instance>>();        
         private readonly Hello helloMessage;
         private readonly VcapComponentDiscover vcapComponentDiscoverMessage;
         private readonly string IISHost;
@@ -45,22 +47,22 @@
 
             IISHost = ConfigurationManager.AppSettings[Constants.AppSettings.IISHost];
 
-            helloMessage = new Hello()
+            helloMessage = new Hello
             {
-                id = NATS.UniqueIdentifier,
-                ip = Constants.LocalhostIP,
-                port = 12345,
-                version = 0.99
+                ID = NATS.UniqueIdentifier,
+                IPAddress = Constants.LocalhostIP,
+                Port = 12345,
+                Version = 0.99M,
             };
 
-            vcapComponentDiscoverMessage = new VcapComponentDiscover()
+            vcapComponentDiscoverMessage = new VcapComponentDiscover
             {
-                type = "DEA",
-                index = 1,
-                uuid = NATS.UniqueIdentifier,
-                host = string.Format("{0}:{1}", Constants.LocalhostIP, 9999),
-                credentials = NATS.UniqueIdentifier,
-                start = DateTime.Now.ToString(Constants.JsonDateFormat)
+                Type        = "DEA",
+                Index       = 1,
+                Uuid        = NATS.UniqueIdentifier,
+                Host        = String.Format("{0}:{1}", Constants.LocalhostIP, 9999), // TODO
+                Credentials = NATS.UniqueIdentifier,
+                Start       = DateTime.Now, // TODO .ToString(Constants.JsonDateFormat)
             };
 
             snapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
@@ -72,9 +74,14 @@
 
             tasks.Add(Task.Factory.StartNew(NATS.Poll));
 
-            NATS.Subscribe(Constants.Messages.VcapComponentDiscover, (msg,reply) => { });
-            NATS.Publish(Constants.NatsCommands.Ok, vcapComponentDiscoverMessage.ToJson());
-            NATS.Publish(Constants.Messages.VcapComponentAnnounce, vcapComponentDiscoverMessage.ToJson());
+            // TODO do we have to wait for poll to start?
+
+            NATS.Subscribe(Constants.Messages.VcapComponentDiscover, (msg, reply) => { }); // TODO subscribe to message types instead
+
+            NATS.Publish(Constants.NatsCommands.Ok, vcapComponentDiscoverMessage);
+
+            NATS.Publish(Constants.Messages.VcapComponentAnnounce, vcapComponentDiscoverMessage);
+
             NATS.Subscribe(Constants.Messages.DeaStatus, ProcessDeaStatus);
             NATS.Subscribe(Constants.Messages.DropletStatus, ProcessDropletStatus);
             NATS.Subscribe(Constants.Messages.DeaDiscover, ProcessDeaDiscover);
@@ -84,14 +91,14 @@
             NATS.Subscribe(String.Format(Constants.Messages.DeaInstanceStart, NATS.UniqueIdentifier), ProcessDeaStart);
             NATS.Subscribe(Constants.Messages.RouterStart, ProcessRouterStart);
             NATS.Subscribe(Constants.Messages.HealthManagerStart, ProcessHealthManagerStart);
-            NATS.Publish(Constants.Messages.DeaStart, helloMessage.ToJson());
+
+            NATS.Publish(Constants.Messages.DeaStart, helloMessage);
 
             recoverExistingDroplets();
 
-            // Turn on Heartbeat Loop
             tasks.Add(Task.Factory.StartNew(HeartbeatsLoop));
 
-            // TODO: Refactor ALL of the threading
+            // TODO refactor threading?
         }
 
         public void Stop()
@@ -107,7 +114,7 @@
             while (false == stopping)
             {
                 sendHeartbeat();
-                Thread.Sleep(10 * 1000);
+                Thread.Sleep(TimeSpan.FromSeconds(10));
             }
         }
 
@@ -115,82 +122,85 @@
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);            
             
-            Droplet droplet = message.FromJson<Droplet>();
-            if (droplet.framework != "aspdotnet")
+            Droplet droplet = Message.FromJson<Droplet>(message);
+            if (droplet.Framework != "aspdotnet")
             {
                 Logger.Debug("This DEA does not support non-aspdotnet frameworks");
                 return;
             }
 
-            var instance = new Instance()
+            var instance = new Instance // TODO ctor arg
             {
-                droplet_id = droplet.droplet,
-                instance_id = droplet.sha1,
-                instance_index = droplet.index,
-                name = droplet.name,
-                dir = "/" + droplet.name,
-                uris = droplet.uris,
-                users = droplet.users,
-                version = droplet.version,
-                mem_quota = droplet.limits.mem * (1024*1024),
-                disk_quota = droplet.limits.disk * (1024*1024),
-                fds_quota = droplet.limits.fds,
-                state = Constants.InstanceState.STARTING,
-                runtime = droplet.runtime,
-                framework = droplet.framework,
-                start = DateTime.Now.ToString(Constants.JsonDateFormat),
-                state_timestamp = Utility.GetEpochTimestamp(),
-                log_id = string.Format("(name={0} app_id={1} instance={2} index={3})",droplet.name,droplet.droplet,droplet.sha1,droplet.index),                
-                staged = droplet.name,
-                sha1 = droplet.sha1
+                DropletID       = droplet.ID,
+                InstanceID      = droplet.Sha1,
+                InstanceIndex   = droplet.Index,
+                Name            = droplet.Name,
+                Dir             = "/" + droplet.Name,
+                Uris            = droplet.Uris,
+                Users           = droplet.Users,
+                Version         = droplet.Version,
+                MemQuota        = droplet.Limits.Mem * (1024*1024),
+                DiskQuota       = droplet.Limits.Disk * (1024*1024),
+                FdsQuota        = droplet.Limits.FDs,
+                State           = Constants.InstanceState.STARTING,
+                Runtime         = droplet.Runtime,
+                Framework       = droplet.Framework,
+                Start           = DateTime.Now.ToString(Constants.JsonDateFormat),
+                StateTimestamp  = Utility.GetEpochTimestamp(),
+                LogID           = String.Format("(name={0} app_id={1} instance={2} index={3})",droplet.Name,droplet.ID,droplet.Sha1,droplet.Index),                
+                Staged          = droplet.Name,
+                Sha1            = droplet.Sha1
             };
 
             
-            MemoryStream gzipMemoryStream = getStagedApplicationFile(droplet.executableUri);
-            string dropletsPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], instance.sha1);
-            string applicationPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory], instance.sha1);
-            Directory.CreateDirectory(dropletsPath);
-            Directory.CreateDirectory(applicationPath);
-
-            byte[] dataBuffer = new byte[4096];
-            using (GZipInputStream gzipStream = new GZipInputStream(gzipMemoryStream))
+            MemoryStream gzipMemoryStream = getStagedApplicationFile(droplet.ExecutableUri);
+            if (null != gzipMemoryStream)
             {
-                TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
-                tarArchive.ExtractContents(dropletsPath);
-                tarArchive.Close();
-            }
-            Utility.CopyDirectory(new DirectoryInfo(dropletsPath + @"/app"), new DirectoryInfo(applicationPath));
-            WebServerAdministrationBinding binding = IIS.InstallWebApp(applicationPath, instance.sha1);
-            instance.host = binding.Host;
-            instance.port = binding.Port;
+                string dropletsPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], instance.Sha1);
+                string applicationPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory], instance.Sha1);
+                Directory.CreateDirectory(dropletsPath);
+                Directory.CreateDirectory(applicationPath);
 
-            registerWithRouter(instance, instance.uris);
+                byte[] dataBuffer = new byte[4096];
+                using (GZipInputStream gzipStream = new GZipInputStream(gzipMemoryStream))
+                {
+                    TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
+                    tarArchive.ExtractContents(dropletsPath);
+                    tarArchive.Close();
+                }
+                Utility.CopyDirectory(new DirectoryInfo(dropletsPath + @"/app"), new DirectoryInfo(applicationPath));
+                WebServerAdministrationBinding binding = IIS.InstallWebApp(applicationPath, instance.Sha1);
+                instance.Host = binding.Host;
+                instance.Port = binding.Port;
 
-            instance.state = Constants.InstanceState.STARTING;
-            instance.state_timestamp = Utility.GetEpochTimestamp();
-            sendSingleHeartbeat(generateHeartbeat(instance));
-            
-            Dictionary<string, Instance> instances;
-            lock (lockObject)
-            {
-                instances = new Dictionary<string, Instance>();
-                instances.Add(instance.instance_id, instance);
-                Droplets.Add(droplet.droplet, instances);
+                registerWithRouter(instance, instance.Uris);
+
+                instance.State = Constants.InstanceState.STARTING;
+                instance.StateTimestamp = Utility.GetEpochTimestamp();
+                sendSingleHeartbeat(generateHeartbeat(instance));
+
+                Dictionary<string, Instance> instances;
+                lock (lockObject)
+                {
+                    instances = new Dictionary<string, Instance>();
+                    instances.Add(instance.InstanceID, instance);
+                    Droplets.Add(droplet.ID, instances);
+                }
+                takeSnapshot();
             }
-            takeSnapshot();
         }
 
         public void ProcessDeaUpdate(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
-            var droplet = message.FromJson<Droplet>();
-            var instance = getInstance(droplet.droplet);
-            string[] current_uris = new string[instance.uris.Length];
-            Array.Copy(instance.uris, current_uris, instance.uris.Length);
-            instance.uris = droplet.uris;
+            Droplet droplet = Message.FromJson<Droplet>(message);
+            var instance = getInstance(droplet.ID);
+            string[] current_uris = new string[instance.Uris.Length];
+            Array.Copy(instance.Uris, current_uris, instance.Uris.Length);
+            instance.Uris = droplet.Uris;
 
-            var toRemove = current_uris.Except(droplet.uris);
-            var toAdd = droplet.uris.Except(current_uris);
+            var toRemove = current_uris.Except(droplet.Uris);
+            var toAdd = droplet.Uris.Except(current_uris);
             
             unregisterWithRouter(instance, toRemove.ToArray());
             registerWithRouter(instance, toAdd.ToArray());
@@ -200,20 +210,20 @@
         public void ProcessDeaDiscover(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
-            var discover = message.FromJson<DiscoverMessage>();
+            Discover discover = Message.FromJson<Discover>(message);
             NATS.Publish(reply, helloMessage.ToJson());
         }  
       
         public void ProcessDeaStop(string message, string reply)
         {            
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
-            var droplet = message.FromJson<Droplet>();
-            var instance = getInstance(droplet.droplet);
+            Droplet droplet = Message.FromJson<Droplet>(message);
+            var instance = getInstance(droplet.ID);
             if (instance != null)
             {
-                IIS.UninstallWebApp(instance.sha1);
-                unregisterWithRouter(instance, instance.uris);
-                Droplets.Remove(droplet.droplet);                
+                IIS.UninstallWebApp(instance.Sha1);
+                unregisterWithRouter(instance, instance.Uris);
+                Droplets.Remove(droplet.ID);                
                 takeSnapshot();
                 NATS.Publish(Constants.NatsCommands.Ok, message);
             }
@@ -222,16 +232,16 @@
         public void ProcessDeaStatus(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
-            Status statusMessage = new Status()
+            var statusMessage = new Status
             {
-                id = helloMessage.id,
-                ip = helloMessage.ip,
-                port = helloMessage.port,
-                version = helloMessage.version,
-                max_memory = 4096,
-                used_memory = 0,
-                reserved_memory = 0,
-                num_clients = 20
+                ID             = helloMessage.ID,
+                IPAddress      = helloMessage.IPAddress,
+                Port           = helloMessage.Port,
+                Version        = helloMessage.Version,
+                MaxMemory      = 4096,
+                UsedMemory     = 0,
+                ReservedMemory = 0,
+                NumClients     = 20
             };
             NATS.Publish(reply, statusMessage.ToJson());
         }
@@ -239,45 +249,45 @@
         public void ProcessDeaFindDroplet(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
-            var findDroplet = message.FromJson<FindDroplet>();
+            FindDroplet findDroplet = Message.FromJson<FindDroplet>(message);
             forAllInstances((instance) =>
             {
-                if (instance.droplet_id == findDroplet.droplet)
+                if (instance.DropletID == findDroplet.DropletID)
                 {
-                    if (instance.version == findDroplet.version)
+                    if (instance.Version == findDroplet.Version)
                     {
-                        if (findDroplet.states.Contains(instance.state))
+                        if (findDroplet.States.Contains(instance.State))
                         {
-                            var startDate = DateTime.ParseExact(instance.start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
+                            var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
                             var span = DateTime.Now - startDate;
                             var response = new FindDropletResponse()
                             {
-                                dea = NATS.UniqueIdentifier,
-                                version = instance.version,
-                                droplet = instance.droplet_id,
-                                instance = instance.instance_id,
-                                index = instance.instance_index,
-                                state = instance.state,
-                                state_timestamp = instance.state_timestamp,
-                                file_uri = string.Empty,
-                                credentials = string.Empty,
-                                staged = instance.staged,
-                                stats = new Stats()
+                                Dea            = NATS.UniqueIdentifier,
+                                Version        = instance.Version,
+                                Droplet        = instance.DropletID,
+                                Instance       = instance.InstanceID,
+                                Index          = instance.InstanceIndex,
+                                State          = instance.State,
+                                StateTimestamp = instance.StateTimestamp,
+                                FileUri        = string.Empty,
+                                Credentials    = string.Empty,
+                                Staged         = instance.Staged,
+                                Stats          = new Stats()
                                 {
-                                    name = instance.name,
-                                    host = instance.host,
-                                    port = instance.port,
-                                    uris = instance.uris,
-                                    uptime = span.TotalSeconds,
-                                    mem_quota = instance.mem_quota,
-                                    disk_quota = instance.disk_quota,
-                                    fds_quota = instance.fds_quota,
-                                    cores = 1,
-                                    usage = 20
+                                    Name      = instance.Name,
+                                    Host      = instance.Host,
+                                    Port      = instance.Port,
+                                    Uris      = instance.Uris,
+                                    Uptime    = span.TotalSeconds,
+                                    MemQuota  = instance.MemQuota,
+                                    DiskQuota = instance.DiskQuota,
+                                    FdsQuota  = instance.FdsQuota,
+                                    Cores     = 1,
+                                    Usage     = 20
                                 }
                             };
-                            if (response.state != Constants.InstanceState.RUNNING)
-                                response.stats = null;
+                            if (response.State != Constants.InstanceState.RUNNING)
+                                response.Stats = null;
                             NATS.Publish(reply, response.ToJson());
                         }
                     }
@@ -290,28 +300,32 @@
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
             forAllInstances((instance) =>
             {
-                var startDate = DateTime.ParseExact(instance.start,Constants.JsonDateFormat,CultureInfo.InvariantCulture);
-                var span = DateTime.Now - startDate;
-                var response = new Stats()
+                if (instance.IsStarting || instance.IsRunning)
                 {
-                    name = instance.name,
-                    host = instance.host,
-                    port = instance.port,
-                    uris = instance.uris,
-                    uptime = span.TotalSeconds,
-                    mem_quota = instance.mem_quota,
-                    disk_quota = instance.disk_quota,
-                    fds_quota = instance.fds_quota,
-                    usage = 20
-                };
-                NATS.Publish(reply, message);
+                    var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
+                    var span = DateTime.Now - startDate;
+                    var response = new Stats // TODO ctor arg
+                    {
+                        Name = instance.Name,
+                        Host = instance.Host,
+                        Port = instance.Port,
+                        Uris = instance.Uris,
+                        Uptime = span.TotalSeconds,
+                        MemQuota = instance.MemQuota,
+                        DiskQuota = instance.DiskQuota,
+                        FdsQuota = instance.FdsQuota,
+                        Usage = 20
+                    };
+                    // NATS.Publish(reply, message); TODO this used to send back message?
+                    NATS.Publish(reply, response);
+                }
             });
         }
 
         public void ProcessRouterStart(string message, string reply)
         {
             Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name,message);
-            forAllInstances((instance) => registerWithRouter(instance,instance.uris));
+            forAllInstances((instance) => registerWithRouter(instance, instance.Uris));
         }
 
         public void ProcessHealthManagerStart(string message, string reply)
@@ -343,26 +357,42 @@
             }
         }
 
-        private MemoryStream getStagedApplicationFile(string executableUri)
+        private static MemoryStream getStagedApplicationFile(string executableUri)
         {
             MemoryStream returnStream = null;
-            using (WebClient client = new WebClient())
-                returnStream = new MemoryStream(client.DownloadData(executableUri));
+
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    /*
+                     * TODO: probably shouldn't download into memory
+                     */
+                    returnStream = new MemoryStream(client.DownloadData(executableUri));
+                }
+            }
+            catch
+            {
+                // TODO
+                // Can happen if there's a 404 or something.
+            }
             return returnStream;
         }
 
         private void registerWithRouter(Instance instance, string[] uris)
         {
-            if (uris.Length == 0)
+            if (uris.IsNullOrEmpty())
                 return;
-            var routerRegister = new RouterRegister()
+
+            var routerRegister = new RouterRegister
             {
-                dea = NATS.UniqueIdentifier,
-                host = instance.host,
-                port = instance.port,
-                uris = uris,
-                tags = new Tag() { framework = instance.framework, runtime = instance.runtime }
+                Dea  = NATS.UniqueIdentifier,
+                Host = instance.Host,
+                Port = instance.Port,
+                Uris = uris,
+                Tag  = new Tag { Framework = instance.Framework, Runtime = instance.Runtime }
             };
+
             NATS.Publish(Constants.Messages.RouterRegister, routerRegister.ToJson());
         }
 
@@ -370,12 +400,12 @@
         {
             if (uris.Length == 0)
                 return;
-            var routerRegister = new RouterRegister()
+            var routerRegister = new RouterRegister
             {
-                dea = NATS.UniqueIdentifier,
-                host = instance.host,
-                port = instance.port,
-                uris = uris
+                Dea  = NATS.UniqueIdentifier,
+                Host = instance.Host,
+                Port = instance.Port,
+                Uris = uris
             };
             NATS.Publish(Constants.Messages.RouterUnregister, routerRegister.ToJson());
         }
@@ -389,16 +419,17 @@
 
             forAllInstances((instance) =>
             {
-                instance.state = getApplicationState(instance.sha1);
-                instance.state_timestamp = Utility.GetEpochTimestamp();
+                instance.State = getApplicationState(instance.Sha1);
+                instance.StateTimestamp = Utility.GetEpochTimestamp();
                 heartbeats.Add(generateHeartbeat(instance));
             });
 
-            var dropletHeartbeats = new
+            var message = new DropletHeartbeat
             {
-                droplets = heartbeats.ToArray()
+                Droplets = heartbeats.ToArray()
             };
-            NATS.Publish(Constants.Messages.DeaHeartbeat, dropletHeartbeats.ToJson());
+
+            NATS.Publish(Constants.Messages.DeaHeartbeat, message);
         }
 
         private void takeSnapshot()
@@ -407,27 +438,31 @@
             foreach(var droplet in Droplets)
             {
                 var instanceEntries = new List<InstanceEntry>();
+
                 foreach(var instance in droplet.Value)
                 {
-                    InstanceEntry i = new InstanceEntry() {
-                        instance_id = instance.Key,
-                        instance = instance.Value
+                    var instanceEntry = new InstanceEntry
+                    {
+                        InstanceID = instance.Key,
+                        Instance = instance.Value
                     };
-                    instanceEntries.Add(i);
+                    instanceEntries.Add(instanceEntry);
                 }
 
-                var d = new DropletEntry() {
-                    droplet = droplet.Key,
-                    instances = instanceEntries.ToArray()
+                var d = new DropletEntry
+                {
+                    Droplet = droplet.Key,
+                    Instances = instanceEntries.ToArray()
                 };
+
                 dropletEntries.Add(d);
             }
             var snapshot = new Snapshot()
             {
-                entries = dropletEntries.ToArray()
+                Entries = dropletEntries.ToArray()
             };
 
-            File.WriteAllText(snapshotFile,snapshot.ToJson(), new ASCIIEncoding());
+            File.WriteAllText(snapshotFile, snapshot.ToJson(), new ASCIIEncoding());
         }
 
         private void recoverExistingDroplets()
@@ -435,13 +470,13 @@
             if (File.Exists(snapshotFile))
             {
                 string dropletsJson = File.ReadAllText(snapshotFile, new ASCIIEncoding());
-                var snapshot = dropletsJson.FromJson<Snapshot>();
-                foreach (var dropletEntry in snapshot.entries)
-                    foreach (var instanceEntry in dropletEntry.instances)
+                Snapshot snapshot = JsonBase.FromJson<Snapshot>(dropletsJson);
+                foreach (var dropletEntry in snapshot.Entries)
+                    foreach (var instanceEntry in dropletEntry.Instances)
                     {
                         var instances = new Dictionary<string, Instance>();
-                        instances.Add(instanceEntry.instance_id, instanceEntry.instance);
-                        Droplets.Add(dropletEntry.droplet, instances);
+                        instances.Add(instanceEntry.InstanceID, instanceEntry.Instance);
+                        Droplets.Add(dropletEntry.Droplet, instances);
                     }
                 sendHeartbeat();
                 takeSnapshot();
@@ -460,35 +495,33 @@
             }
         }
 
-        private Instance getInstance(int dropletId)
+        private Instance getInstance(uint dropletId)
         {
             if (!Droplets.Keys.Contains(dropletId))
                 return null;
             return Droplets[dropletId].First().Value;
         }
 
-        private void sendSingleHeartbeat(Heartbeat heartbeat)
+        private void sendSingleHeartbeat(Heartbeat argHeartbeat)
         {
-            var dropletHeartbeats = new
+            var message = new DropletHeartbeat
             {
-                droplets = new Heartbeat[] { heartbeat }
+                Droplets = new[] { argHeartbeat }
             };
-            NATS.Publish(Constants.Messages.DeaHeartbeat, dropletHeartbeats.ToJson());
+            NATS.Publish(Constants.Messages.DeaHeartbeat, message);
         }
 
         private Heartbeat generateHeartbeat(Instance instance)
         {
-            var heartbeat = new Heartbeat()
+            return new Heartbeat // TODO instance ctor arg
             {
-                droplet = instance.droplet_id,
-                version = instance.version,
-                instance = instance.instance_id,
-                index = instance.instance_index,
-                state = instance.state,
-                state_timestamp = instance.state_timestamp
+                Droplet        = instance.DropletID,
+                Version        = instance.Version,
+                Instance       = instance.InstanceID,
+                Index          = instance.InstanceIndex,
+                State          = instance.State,
+                StateTimestamp = instance.StateTimestamp
             };
-
-            return heartbeat;
         }
     }
 }

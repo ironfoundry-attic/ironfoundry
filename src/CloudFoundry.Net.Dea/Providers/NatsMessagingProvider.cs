@@ -1,5 +1,5 @@
 ﻿namespace CloudFoundry.Net.Dea.Providers
-{    
+{
     using System;
     using System.Collections.Generic;
     using System.Net.Sockets;
@@ -8,6 +8,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using CloudFoundry.Net.Dea.Providers.Interfaces;
+    using CloudFoundry.Net.Types.Messages;
     using NLog;
 
     public class NatsMessagingProvider : IMessagingProvider
@@ -25,7 +26,7 @@
         private bool currentlyPolling;
         private TcpClient client;
         private NetworkStream stream;
-        private Dictionary<string,Dictionary<int, Action<string,string>>> subscriptions;
+        private Dictionary<string, Dictionary<int, Action<string, string>>> subscriptions;
         private readonly Object lockObject = new Object();
         private bool disposing = false;
 
@@ -38,6 +39,11 @@
             Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, Host, Port);
             subscriptions = new Dictionary<string, Dictionary<int, Action<string, string>>>();
             currentlyPolling = false;
+        }
+
+        public void Publish(string argSubject, Message argMessage)
+        {
+            Publish(argSubject, argMessage.ToJson());
         }
 
         public void Publish(string subject, string message)
@@ -70,7 +76,7 @@
             string response = string.Empty;
             while (!disposing)
             {
-                Thread.Sleep(50);
+                Thread.Sleep(TimeSpan.FromMilliseconds(50));
 
                 int receivedDataLength;
                 byte[] data = new byte[1024];                
@@ -78,7 +84,8 @@
                 stream.Flush();
                 response += Encoding.ASCII.GetString(data, 0, receivedDataLength);
                 if (!response.Contains(CRLF))
-                    continue;
+                    continue; // More to read
+
                 string[] messages = Regex.Split(response, CRLF);                
                 if (!response.EndsWith(CRLF))
                     response = messages[messages.Length - 1];
@@ -87,7 +94,7 @@
 
                 for (int counter = 0; counter < messages.Length; counter++)
                 {
-                    var message = messages[counter];
+                    string message = messages[counter];
                     if (String.IsNullOrEmpty(message))
                         continue;
 
@@ -103,7 +110,7 @@
                     }
                     if (message.StartsWith(Constants.NatsCommands.Message))
                     {
-                        var nextLine = messages[++counter];
+                        string nextLine = messages[++counter];
                         var receivedMessage = new ReceivedMessage(message + CRLF + nextLine);
                         if (!subscriptions.ContainsKey(receivedMessage.Subject))
                         {
@@ -118,7 +125,12 @@
                         }
 
                         Action<string, string> callback = subjectCollection[receivedMessage.SubscriptionID];
-                        Task.Factory.StartNew(() => callback(receivedMessage.RawMessage, receivedMessage.InboxID));
+                        // TODO
+                        /*
+                         * The rate with which we're listening for messages can cause us to try and process the same message twice
+                         */
+                        // Task.Factory.StartNew(() => callback(receivedMessage.RawMessage, receivedMessage.InboxID));
+                        callback(receivedMessage.RawMessage, receivedMessage.InboxID);
                     }
                 }                                              
             }

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Dea.Providers.Interfaces;
-using Microsoft.Web.Administration;
-using System.Configuration;
-
-namespace CloudFoundry.Net.Dea.Providers
+﻿namespace CloudFoundry.Net.Dea.Providers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.Linq;
+    using CloudFoundry.Net.Dea.Providers.Interfaces;
+    using Microsoft.Web.Administration;
+
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {        
-        private ServerManager manager;
         private Dictionary<string, bool> iptable = new Dictionary<string, bool>();
 
         public WebServerAdministrationProvider()
@@ -23,95 +21,120 @@ namespace CloudFoundry.Net.Dea.Providers
 
         public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
         {
-            manager = new ServerManager();
-            ApplicationPool cloudFoundryPool = GetApplicationPool(applicationInstanceName);
-            if (cloudFoundryPool == null)
-                cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
-            var applicationPort = FindNextAvailablePort();
+            using (var manager = new ServerManager())
+            {
+                ApplicationPool cloudFoundryPool = GetApplicationPool(manager, applicationInstanceName);
 
-            var availableIp = iptable.Where((i) => i.Value == false).FirstOrDefault();
-            iptable[availableIp.Key] = true;            
-            manager.Sites.Add(applicationInstanceName, "http",availableIp.Key,localDirectory);            
-            manager.Sites[applicationInstanceName].Applications[0].ApplicationPoolName = applicationInstanceName;
-            cloudFoundryPool.ManagedRuntimeVersion = "v4.0";
-            manager.CommitChanges();
-            var binding = new WebServerAdministrationBinding() { Host = availableIp.Key, Port = 80 };
-            return binding;
+                if (cloudFoundryPool == null)
+                    cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
+
+                ushort applicationPort = findNextAvailablePort(manager);
+
+                var availableIp = iptable.Where((i) => i.Value == false).FirstOrDefault();
+                iptable[availableIp.Key] = true;
+
+                // manager.Sites.Add(applicationInstanceName, "http", availableIp.Key, localDirectory);
+                manager.Sites.Add(applicationInstanceName, "http", "*:" + applicationPort.ToString() + ":", localDirectory);
+
+                manager.Sites[applicationInstanceName].Applications[0].ApplicationPoolName = applicationInstanceName;
+
+                cloudFoundryPool.ManagedRuntimeVersion = "v4.0";
+
+                manager.CommitChanges();
+
+                return new WebServerAdministrationBinding() { Host = availableIp.Key, Port = applicationPort };
+            }
         }
 
         public void UninstallWebApp(string applicationInstanceName)
         {
-            manager = new ServerManager();
-            var site = GetSite(applicationInstanceName);
-            if (site != null)
+            using (var manager = new ServerManager())
             {
-                manager.Sites.Remove(site);
-                manager.CommitChanges();
-            }
-            var deletePool = GetApplicationPool(applicationInstanceName);
-            if (deletePool != null)
-            {
-                manager.ApplicationPools.Remove(deletePool);
-                manager.CommitChanges();
+                var site = GetSite(manager, applicationInstanceName);
+                if (site != null)
+                {
+                    manager.Sites.Remove(site);
+                    manager.CommitChanges();
+                }
+                var deletePool = GetApplicationPool(manager, applicationInstanceName);
+                if (deletePool != null)
+                {
+                    manager.ApplicationPools.Remove(deletePool);
+                    manager.CommitChanges();
+                }
             }
         }
 
         public bool DoesApplicationExist(string applicationInstanceName)
         {
-            manager = new ServerManager();
-            var site = GetSite(applicationInstanceName);
-            return site != null;
+            using (var manager = new ServerManager())
+            {
+                var site = GetSite(manager, applicationInstanceName);
+                return site != null;
+            }
         }
 
         public void Start(string applicationInstanceName)
         {
-            manager = new ServerManager();
-            var applicationPool = GetApplicationPool(applicationInstanceName);
-            applicationPool.Start();
+            using (var manager = new ServerManager())
+            {
+                var applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                applicationPool.Start();
+            }
         }
 
         public void Stop(string applicationInstanceName)
         {
-            manager = new ServerManager();
-            var applicationPool = GetApplicationPool(applicationInstanceName);
-            applicationPool.Stop();
+            using (var manager = new ServerManager())
+            {
+                var applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                applicationPool.Stop();
+            }
         }
 
         public void Restart(string applicationInstanceName)
         {
-            manager = new ServerManager();
-            var applicationPool = GetApplicationPool(applicationInstanceName);
-            applicationPool.Recycle();
+            using (var manager = new ServerManager())
+            {
+                var applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                applicationPool.Recycle();
+            }
         }
 
         public ApplicationInstanceStatus GetStatus(string applicationInstanceName)
         {
-            try
+            using (var manager = new ServerManager())
             {
-                var applicationPool = GetApplicationPool(applicationInstanceName);
-                var applicationSite = GetSite(applicationInstanceName);
-                if (applicationSite.State == ObjectState.Stopped ||
-                    applicationPool.State == ObjectState.Stopped)
-                    return ApplicationInstanceStatus.Stopped;
-                if (applicationSite.State == ObjectState.Stopping ||
-                    applicationPool.State == ObjectState.Stopping)
-                    return ApplicationInstanceStatus.Stopping;
-                if (applicationSite.State == ObjectState.Starting ||
-                    applicationPool.State == ObjectState.Starting)
-                    return ApplicationInstanceStatus.Starting;
-                if (applicationSite.State == ObjectState.Started ||
-                    applicationPool.State == ObjectState.Started)
-                    return ApplicationInstanceStatus.Started;
+                try
+                {
+                    var applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                    var applicationSite = GetSite(manager, applicationInstanceName);
+                    if (applicationSite.State == ObjectState.Stopped ||
+                        applicationPool.State == ObjectState.Stopped)
+                        return ApplicationInstanceStatus.Stopped;
+                    if (applicationSite.State == ObjectState.Stopping ||
+                        applicationPool.State == ObjectState.Stopping)
+                        return ApplicationInstanceStatus.Stopping;
+                    if (applicationSite.State == ObjectState.Starting ||
+                        applicationPool.State == ObjectState.Starting)
+                        return ApplicationInstanceStatus.Starting;
+                    if (applicationSite.State == ObjectState.Started ||
+                        applicationPool.State == ObjectState.Started)
+                        return ApplicationInstanceStatus.Started;
+                }
+                catch
+                {
+                    // TODO
+                }
+                return ApplicationInstanceStatus.Unknown;
             }
-            catch (Exception) { }
-            return ApplicationInstanceStatus.Unknown;
         }
 
 
-        private ApplicationPool GetApplicationPool(string name)
+        private static ApplicationPool GetApplicationPool(ServerManager argManager, string name)
         {
             ApplicationPool returnPool = null;
-            foreach (var pool in manager.ApplicationPools)
+            foreach (var pool in argManager.ApplicationPools)
             {
                 if (pool.Name.Equals(name))
                 {
@@ -122,20 +145,22 @@ namespace CloudFoundry.Net.Dea.Providers
             return returnPool;
         }
 
-        private int FindNextAvailablePort()
+        private static ushort findNextAvailablePort(ServerManager argManager)
         {
-            var portsInUse = new List<int>();
-            foreach (var site in manager.Sites)
+            var portsInUse = new List<ushort>();
+            foreach (var site in argManager.Sites)
+            {
                 foreach (var binding in site.Bindings)
                 {
-                    int inUsePort;
+                    ushort inUsePort;
                     var bindingInformation = binding.BindingInformation;
-                    bindingInformation = bindingInformation.Replace(":", string.Empty).Replace("*", "");
-                    if (Int32.TryParse(bindingInformation, out inUsePort))
+                    bindingInformation = bindingInformation.Replace(":", String.Empty).Replace("*", "");
+                    if (UInt16.TryParse(bindingInformation, out inUsePort))
                         portsInUse.Add(inUsePort);
                 }
+            }
 
-            var applicationPort = 9000;
+            ushort applicationPort = 9000;
             for (; applicationPort < 10000; applicationPort++)
                 if (!portsInUse.Contains(applicationPort))
                     break;
@@ -143,10 +168,10 @@ namespace CloudFoundry.Net.Dea.Providers
             return applicationPort;
         }
 
-        private Site GetSite(string name)
+        private static Site GetSite(ServerManager argManager, string name)
         {
             Site returnSite = null;
-            foreach (var site in manager.Sites)
+            foreach (var site in argManager.Sites)
             {
                 if (site.Name.Equals(name))
                 {

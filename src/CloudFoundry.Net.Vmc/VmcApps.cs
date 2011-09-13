@@ -200,7 +200,7 @@
                 {
                     info = GetAppInfo(Appname, Url, Accesstoken);
                     var crash = GetAppCrash(Appname, Url, Accesstoken);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
 
                 return info;

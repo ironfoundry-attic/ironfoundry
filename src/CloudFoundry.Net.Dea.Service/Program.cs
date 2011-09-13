@@ -14,6 +14,7 @@
 
             IAgent agent = new Agent();
 
+#if DEBUG
             if (Environment.UserInteractive)
             {
                 agent.Start();
@@ -22,9 +23,8 @@
                 agent.Stop();
             }
             else
-            {
+#endif
                 ServiceBase.Run((ServiceBase)agent);
-            }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

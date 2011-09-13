@@ -1,10 +1,18 @@
-﻿
-namespace CloudFoundry.Net.Dea
+﻿namespace CloudFoundry.Net.Dea
 {
+    using System.Net;
+
     public static class Constants
     {
         public const string JsonDateFormat = "yyyy-MM-dd HH:mm:ss zz00";
-        public const string LocalhostIP = "127.0.0.1";
+        public static readonly IPAddress LocalhostIP;
+
+        private const string localhostStr = "127.0.0.1";
+
+        static Constants()
+        {
+            IPAddress.TryParse(localhostStr, out LocalhostIP);
+        }
 
         public static class AppSettings
         {

@@ -1,27 +1,26 @@
 ﻿namespace CloudFoundry.Net.Dea
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
-    using System.Web.Script.Serialization;
+    using System.Linq;
 
+    /*
+     * TODO break out into common dll or other better place for ex methods
+     */
     public static class Utility
     {
-        private static readonly JavaScriptSerializer jsonSerializer;
-        
-        static Utility() 
-        {
-            jsonSerializer = new JavaScriptSerializer();
-        }
-
+        /*
         public static string ToJson(this object obj)
         {
-            return jsonSerializer.Serialize(obj);
+            return JsonConvert.ToString(obj);
         }  
       
-        public static T FromJson<T>(this string jsonString)
+        public static T FromJson<T>(this string argJson)
         {
-            return jsonSerializer.Deserialize<T>(jsonString);
+            return JsonConvert.DeserializeObject<T>(argJson);
         }     
+         */
    
         public static int GetEpochTimestamp()
         {
@@ -40,5 +39,13 @@
                 CopyDirectory(directory,nextDirectory);
             }
         } 
+    }
+
+    public static class IEnumerableExtensionMethods
+    {
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> argThis)
+        {
+            return null == argThis || false == argThis.Any();
+        }
     }
 }

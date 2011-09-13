@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CloudFoundry.Net.Dea.Providers.Interfaces
+﻿namespace CloudFoundry.Net.Dea.Providers.Interfaces
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     public enum ApplicationInstanceStatus
     {
         Started,
@@ -17,7 +17,7 @@ namespace CloudFoundry.Net.Dea.Providers.Interfaces
     public class WebServerAdministrationBinding
     {
         public string Host;
-        public int Port;
+        public ushort Port;
     }
 
     public interface IWebServerAdministrationProvider

@@ -76,7 +76,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\CloudFoundry.Net.VsExtension\CloudFoundry.Net.VsExtension.csproj">
       <Project>{8393BB9D-7606-46AA-A399-8008F686CB7D}</Project>
-      <Name>CloudFoundry.VS2k10</Name>
+      <Name>CloudFoundry.Net.VsExtension</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

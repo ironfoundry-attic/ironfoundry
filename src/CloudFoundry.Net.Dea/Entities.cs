@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.Serialization;
-
-namespace CloudFoundry.Net.Dea.Entities
+﻿namespace CloudFoundry.Net.Dea.Entities
 {
+
+    /*
     [DataContract]
     public class Limits
     {
@@ -18,7 +14,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public int fds;
     }    
+     */
 
+    /*
     [DataContract]
     public class DiscoverMessage
     {
@@ -33,7 +31,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public Limits limits;
     }
+     */
 
+    /*
     [DataContract]
     public class Stats
     {
@@ -58,8 +58,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public int usage;
     }
+     */
 
-
+    /*
     [DataContract]
     public class Status : Hello
     {
@@ -74,7 +75,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public string state;
     }
+     */
 
+    /*
     [DataContract]
     public class VcapComponentDiscover
     {
@@ -96,12 +99,14 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public string start;
     }
+     */
 
+    /*
     [DataContract]
     public class Droplet
     {
         [DataMember]
-        public int droplet;
+        public uint droplet;
 
         [DataMember]
         public string name;
@@ -142,12 +147,14 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public string index;
     }
+     */
 
+    /*
     [DataContract]
     public class Instance
     {
         [DataMember]
-        public int droplet_id;
+        public uint droplet_id;
         [DataMember]
         public string instance_id;
         [DataMember]
@@ -181,7 +188,7 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public string log_id;
         [DataMember]
-        public int port;
+        public ushort port;
         [DataMember]
         public string staged;
         [DataMember]
@@ -192,7 +199,9 @@ namespace CloudFoundry.Net.Dea.Entities
         public string host;
         
     }
+     */
 
+    /*
     [DataContract]
     public class Heartbeat
     {
@@ -209,7 +218,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public int state_timestamp;
     }
+     */
 
+    /*
     [DataContract]
     public class Tag
     {
@@ -218,7 +229,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public string runtime;
     }
+     */
 
+    /*
     [DataContract]
     public class RouterRegister
     {
@@ -237,7 +250,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public Tag tags;
     }
+*/
 
+    /*
     [DataContract]
     public class Hello
     {
@@ -253,7 +268,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public double version;
     }
+     */
 
+    /*
     [DataContract]
     public class FindDroplet
     {
@@ -266,7 +283,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public string version;
     }
+     */
 
+    /*
     [DataContract]
     public class FindDropletResponse
     {
@@ -275,7 +294,7 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public string version;
         [DataMember]
-        public int droplet;
+        public uint droplet;
         [DataMember]
         public string instance;
         [DataMember]
@@ -293,7 +312,9 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public Stats stats;
     }
+     */
 
+    /*
     [DataContract]
     public class InstanceEntry
     {
@@ -302,20 +323,25 @@ namespace CloudFoundry.Net.Dea.Entities
         [DataMember]
         public Instance instance;
     }
+     */
 
+    /*
     [DataContract]
     public class DropletEntry
     {
         [DataMember]
-        public int droplet;
+        public uint droplet;
         [DataMember]
         public InstanceEntry[] instances;
     }
+     */
 
+    /*
     [DataContract]
     public class Snapshot
     {
         [DataMember]
         public DropletEntry[] entries;
     }
+     */
 }
