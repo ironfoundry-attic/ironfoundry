@@ -60,9 +60,23 @@ namespace CloudFoundry.Net.VsExtension {
             }
         }
         
-        internal static System.Drawing.Icon cloud_foundry_icon {
+        internal static System.Drawing.Bitmap cloud_droplet {
             get {
-                object obj = ResourceManager.GetObject("cloud_foundry_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("cloud_droplet", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap cloud_foundry_eclipse_icon {
+            get {
+                object obj = ResourceManager.GetObject("cloud_foundry_eclipse_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon cloud_foundry_icon1 {
+            get {
+                object obj = ResourceManager.GetObject("cloud_foundry_icon1", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -84,6 +98,27 @@ namespace CloudFoundry.Net.VsExtension {
         internal static System.Drawing.Bitmap cloud_foundry_logo_600 {
             get {
                 object obj = ResourceManager.GetObject("cloud_foundry_logo_600", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap cloud_play {
+            get {
+                object obj = ResourceManager.GetObject("cloud_play", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon CloudFoundrySmall {
+            get {
+                object obj = ResourceManager.GetObject("CloudFoundrySmall", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Images_24bit {
+            get {
+                object obj = ResourceManager.GetObject("Images_24bit", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -1,14 +1,11 @@
-﻿// Guids.cs
-// MUST match guids.h
-using System;
+﻿using System;
 
-namespace CloudFoundry.CloudFoundry_VS2k10
+namespace CloudFoundry.Net.VsExtension
 {
     static class GuidList
     {
-        public const string guidCloudFoundry_VS2k10PkgString = "663475cb-7011-44ba-8850-dc0e3e9c736d";
-        public const string guidCloudFoundry_VS2k10CmdSetString = "5dac2535-d60b-4f1e-ab29-68de82e32320";
-
-        public static readonly Guid guidCloudFoundry_VS2k10CmdSet = new Guid(guidCloudFoundry_VS2k10CmdSetString);
+        public const string guidCloudFoundryPkgString = "D11F588D-A83B-40C1-9637-A5F44B65D110";
+        public const string guidCloudFoundryCmdSetString = "05F6013A-8190-4680-9122-69C726FBA0D9";
+        public static readonly Guid guidCloudFoundryCmdSet = new Guid(guidCloudFoundryCmdSetString);
     };
 }

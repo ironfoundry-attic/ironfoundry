@@ -1,11 +1,8 @@
-﻿// PkgCmdID.cs
-// MUST match PkgCmdID.h
-using System;
-
-namespace CloudFoundry.CloudFoundry_VS2k10
+﻿namespace CloudFoundry.Net.VsExtension
 {
     static class PkgCmdIDList
     {
-        public const uint cmdidDeployToCloudFoundryCommand =        0x100;
-    };
+        public const uint cmdidManageCloudFoundry = 0x100;
+        public const uint cmdidEditCloudFoundryProperties = 0x200;
+    }
 }
