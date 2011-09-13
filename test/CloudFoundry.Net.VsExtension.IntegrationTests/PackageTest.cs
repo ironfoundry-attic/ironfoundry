@@ -49,7 +49,7 @@ namespace CloudFoundry.VS2k10_IntegrationTests
 
                 //Validate package load
                 IVsPackage package;
-                Guid packageGuid = new Guid(CloudFoundry.CloudFoundry_VS2k10.GuidList.guidCloudFoundry_VS2k10PkgString);
+                Guid packageGuid = new Guid(CloudFoundry.Net.VsExtension.GuidList.guidCloudFoundryPkgString);
                 Assert.IsTrue(0 == shellService.LoadPackage(ref packageGuid, out package));
                 Assert.IsNotNull(package, "Package failed to load");
 
