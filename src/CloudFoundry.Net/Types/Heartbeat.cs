@@ -4,8 +4,18 @@
 
     public class Heartbeat : Message
     {
+        public Heartbeat(Instance argInstance)
+        {
+            Droplet        = argInstance.DropletID;
+            Version        = argInstance.Version;
+            Instance       = argInstance.InstanceID;
+            Index          = argInstance.InstanceIndex;
+            State          = argInstance.State;
+            StateTimestamp = argInstance.StateTimestamp;
+        }
+
         [JsonProperty(PropertyName = "droplet")]
-        public uint Droplet { get; set; }
+        public uint Droplet { get; set; } // TODO private setters?
 
         [JsonProperty(PropertyName = "version")]
         public string Version { get; set; }

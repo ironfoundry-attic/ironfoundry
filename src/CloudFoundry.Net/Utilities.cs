@@ -14,9 +14,9 @@
         {
             if (!Directory.Exists(target.FullName))
                 Directory.CreateDirectory(target.FullName);
-            foreach(var file in source.GetFiles())
+            foreach (var file in source.GetFiles())
                 file.CopyTo(Path.Combine(target.ToString(),file.Name),true);
-            foreach(var directory in source.GetDirectories())
+            foreach (var directory in source.GetDirectories())
             {
                 DirectoryInfo nextDirectory = target.CreateSubdirectory(directory.Name);
                 CopyDirectory(directory,nextDirectory);

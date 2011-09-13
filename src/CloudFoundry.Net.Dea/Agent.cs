@@ -127,29 +127,7 @@
                 return;
             }
 
-            var instance = new Instance(droplet)
-            {
-                DropletID       = droplet.ID,
-                InstanceID      = droplet.Sha1,
-                InstanceIndex   = droplet.Index,
-                Name            = droplet.Name,
-                Dir             = "/" + droplet.Name,
-                Uris            = droplet.Uris,
-                Users           = droplet.Users,
-                Version         = droplet.Version,
-                MemQuota        = droplet.Limits.Mem * (1024*1024),
-                DiskQuota       = droplet.Limits.Disk * (1024*1024),
-                FdsQuota        = droplet.Limits.FDs,
-                State           = Instance.InstanceState.STARTING,
-                Runtime         = droplet.Runtime,
-                Framework       = droplet.Framework,
-                Start           = DateTime.Now.ToString(Constants.JsonDateFormat),
-                StateTimestamp  = Utility.GetEpochTimestamp(),
-                LogID           = String.Format("(name={0} app_id={1} instance={2} index={3})",droplet.Name,droplet.ID,droplet.Sha1,droplet.Index),                
-                Staged          = droplet.Name,
-                Sha1            = droplet.Sha1
-            };
-
+            var instance = new Instance(droplet);
             
             MemoryStream gzipMemoryStream = getStagedApplicationFile(droplet.ExecutableUri);
             if (null != gzipMemoryStream)
@@ -258,7 +236,7 @@
                         {
                             var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
                             var span = DateTime.Now - startDate;
-                            var response = new FindDropletResponse()
+                            var response = new FindDropletResponse // TODO ctor arg
                             {
                                 Dea            = NATS.UniqueIdentifier,
                                 Version        = instance.Version,
@@ -401,7 +379,7 @@
 
         private void sendHeartbeat()
         {
-            if (Droplets.Count == 0)
+            if (Droplets.IsNullOrEmpty())
                 return;
 
             var heartbeats = new List<Heartbeat>();
@@ -424,11 +402,12 @@
         private void takeSnapshot()
         {
             var dropletEntries = new List<DropletEntry>();
-            foreach(var droplet in Droplets)
+
+            foreach (var droplet in Droplets)
             {
                 var instanceEntries = new List<InstanceEntry>();
 
-                foreach(var instance in droplet.Value)
+                foreach (var instance in droplet.Value)
                 {
                     var instanceEntry = new InstanceEntry
                     {
@@ -446,6 +425,7 @@
 
                 dropletEntries.Add(d);
             }
+
             var snapshot = new Snapshot()
             {
                 Entries = dropletEntries.ToArray()
@@ -500,17 +480,9 @@
             NATS.Publish(Constants.Messages.DeaHeartbeat, message);
         }
 
-        private Heartbeat generateHeartbeat(Instance instance)
+        private static Heartbeat generateHeartbeat(Instance instance)
         {
-            return new Heartbeat // TODO instance ctor arg
-            {
-                Droplet        = instance.DropletID,
-                Version        = instance.Version,
-                Instance       = instance.InstanceID,
-                Index          = instance.InstanceIndex,
-                State          = instance.State,
-                StateTimestamp = instance.StateTimestamp
-            };
+            return new Heartbeat(instance);
         }
     }
 }
