@@ -37,7 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>..\..\dependencies\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.CSharp" />
@@ -56,6 +56,9 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="RestSharp">
+      <HintPath>..\..\dependencies\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -126,11 +129,11 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ManageWindow.xaml.cs">
+    <Compile Include="UserInterface\ManageWindow.xaml.cs">
       <DependentUpon>ManageWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
-    <Compile Include="ProgressDialog.xaml.cs">
+    <Compile Include="UserInterface\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources.Designer.cs">
@@ -138,11 +141,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="CloudFoundry.VS2k10Package.cs" />
+    <Compile Include="CloudFoundryPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
-    <Compile Include="VisualStudio2010Extensions.cs" />
+    <Compile Include="VisualStudioExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -157,38 +159,65 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="cloud_foundry_icon.ico">
+    <Resource Include="..\..\images\CloudFoundrySmall.ico">
+      <Link>Resources\CloudFoundrySmall.ico</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="cloud_foundry_logo.png">
+    </Resource>
+    <Resource Include="..\..\images\cloud_droplet.png">
+      <Link>Resources\cloud_droplet.png</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Resource Include="Resources\deploy.png" />
-    <Resource Include="cloud_foundry_logo_400.png" />
-    <Resource Include="cloud_foundry_logo_600.png" />
-    <Content Include="LICENSE.txt">
+    </Resource>
+    <Resource Include="..\..\images\cloud_foundry_eclipse_icon.png">
+      <Link>Resources\cloud_foundry_eclipse_icon.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="..\..\images\cloud_foundry_icon.ico">
+      <Link>Resources\cloud_foundry_icon.ico</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="..\..\images\cloud_foundry_logo.png">
+      <Link>Resources\cloud_foundry_logo.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="..\..\images\cloud_foundry_logo_400.png">
+      <Link>Resources\cloud_foundry_logo_400.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="..\..\images\cloud_foundry_logo_600.png">
+      <Link>Resources\cloud_foundry_logo_600.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="..\..\images\deploy.png">
+      <Link>Resources\deploy.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="..\..\images\Images_24bit.bmp">
+      <Link>Resources\Images_24bit.bmp</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\cloud_play.png" />
+    <Content Include="Resources\LICENSE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="CloudFoundry.snk" />
+    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="CloudFoundry.VS2k10.vsct">
+    <VSCTCompile Include="CloudFoundryPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="ManageWindow.xaml">
+    <Page Include="UserInterface\ManageWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ProgressDialog.xaml">
+    <Page Include="UserInterface\ProgressDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -199,6 +228,7 @@
       <Name>CloudFoundry.Net.Vmc</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
