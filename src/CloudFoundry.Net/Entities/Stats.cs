@@ -1,24 +1,9 @@
-﻿namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types.Entities
 {
-    using System;
     using Newtonsoft.Json;
 
-    public class Stats : Message
+    public class Stats : JsonBase
     {
-        public Stats() { }
-
-        public Stats(Instance argInstance, TimeSpan argSpan)
-        {
-            Name      = argInstance.Name;
-            Host      = argInstance.Host;
-            Port      = argInstance.Port;
-            Uris      = argInstance.Uris;
-            Uptime    = argSpan.TotalSeconds;
-            MemQuota  = argInstance.MemQuota;
-            DiskQuota = argInstance.DiskQuota;
-            FdsQuota  = argInstance.FdsQuota;
-        }
-
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 

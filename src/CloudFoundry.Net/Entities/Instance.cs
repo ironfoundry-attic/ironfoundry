@@ -1,39 +1,9 @@
-﻿namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types.Entities
 {
-    using System;
     using Newtonsoft.Json;
 
     public class Instance : JsonBase
     {
-        // public Instance() { }
-
-        public Instance(Droplet argDroplet)
-        {
-            if (null != argDroplet)
-            {
-                DropletID      = argDroplet.ID;
-                InstanceID     = argDroplet.Sha1;
-                InstanceIndex  = argDroplet.Index;
-                Name           = argDroplet.Name;
-                Dir            = "/" + argDroplet.Name;
-                Uris           = argDroplet.Uris;
-                Users          = argDroplet.Users;
-                Version        = argDroplet.Version;
-                MemQuota       = argDroplet.Limits.Mem * (1024 * 1024);
-                DiskQuota      = argDroplet.Limits.Disk * (1024 * 1024);
-                FdsQuota       = argDroplet.Limits.FDs;
-                Runtime        = argDroplet.Runtime;
-                Framework      = argDroplet.Framework;
-                LogID          = String.Format("(name={0} app_id={1} instance={2} index={3})", argDroplet.Name, argDroplet.ID, argDroplet.Sha1, argDroplet.Index);
-                Staged         = argDroplet.Name;
-                Sha1           = argDroplet.Sha1;
-            }
-
-            State          = InstanceState.STARTING;
-            Start          = DateTime.Now.ToString(Constants.JsonDateFormat);
-            StateTimestamp = Utility.GetEpochTimestamp();
-        }
-
         [JsonProperty(PropertyName = "droplet_id")]
         public uint DropletID { get; set; }
 
@@ -103,23 +73,19 @@
         [JsonIgnore]
         public bool IsStarting
         {
-            get { return null != State && State == InstanceState.STARTING; }
+            get
+            {
+                return null == State;
+            }
         }
 
         [JsonIgnore]
         public bool IsRunning
         {
-            get { return null != State && State == InstanceState.RUNNING; }
-        }
-
-        public static class InstanceState
-        {
-            public const string STARTING      = "STARTING";
-            public const string STOPPED       = "STOPPED";
-            public const string RUNNING       = "RUNNING";
-            public const string SHUTTING_DOWN = "SHUTTING_DOWN";
-            public const string CRASHED       = "CRASHED";
-            public const string DELETED       = "DELETED";
+            get
+            {
+                return null == State;
+            }
         }
     }
 }
