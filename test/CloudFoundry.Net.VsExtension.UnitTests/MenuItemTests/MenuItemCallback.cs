@@ -18,7 +18,7 @@ using Microsoft.VsSDK.UnitTestLibrary;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Shell;
-using CloudFoundry.CloudFoundry_VS2k10;
+using CloudFoundry.Net.VsExtension;
 
 namespace CloudFoundry.VS2k10_UnitTests.MenuItemTests
 {
@@ -33,7 +33,7 @@ namespace CloudFoundry.VS2k10_UnitTests.MenuItemTests
         public void InitializeMenuCommand()
         {
             // Create the package
-            IVsPackage package = new CloudFoundry_VS2k10Package() as IVsPackage;
+            IVsPackage package = new CloudFoundryPackage() as IVsPackage;
             Assert.IsNotNull(package, "The object does not implement IVsPackage");
 
             // Create a basic service provider
@@ -43,7 +43,7 @@ namespace CloudFoundry.VS2k10_UnitTests.MenuItemTests
             Assert.AreEqual(0, package.SetSite(serviceProvider), "SetSite did not return S_OK");
 
             //Verify that the menu command can be found
-            CommandID menuCommandID = new CommandID(CloudFoundry.CloudFoundry_VS2k10.GuidList.guidCloudFoundry_VS2k10CmdSet, (int)CloudFoundry.CloudFoundry_VS2k10.PkgCmdIDList.cmdidDeployToCloudFoundryCommand);
+            CommandID menuCommandID = new CommandID(CloudFoundry.Net.VsExtension.GuidList.guidCloudFoundryCmdSet, (int)CloudFoundry.Net.VsExtension.PkgCmdIDList.cmdidEditCloudFoundryProperties);
             System.Reflection.MethodInfo info = typeof(Package).GetMethod("GetService", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.IsNotNull(info);
             OleMenuCommandService mcs = info.Invoke(package, new object[] { (typeof(IMenuCommandService)) }) as OleMenuCommandService;
@@ -54,7 +54,7 @@ namespace CloudFoundry.VS2k10_UnitTests.MenuItemTests
         public void MenuItemCallback()
         {
             // Create the package
-            IVsPackage package = new CloudFoundry_VS2k10Package() as IVsPackage;
+            IVsPackage package = new CloudFoundryPackage() as IVsPackage;
             Assert.IsNotNull(package, "The object does not implement IVsPackage");
 
             // Create a basic service provider

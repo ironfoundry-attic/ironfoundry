@@ -16,7 +16,7 @@ using System.Reflection;
 using Microsoft.VsSDK.UnitTestLibrary;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CloudFoundry.CloudFoundry_VS2k10;
+using CloudFoundry.Net.VsExtension;
 
 namespace CloudFoundry.VS2k10_UnitTests
 {
@@ -26,13 +26,13 @@ namespace CloudFoundry.VS2k10_UnitTests
         [TestMethod()]
         public void CreateInstance()
         {
-            CloudFoundry_VS2k10Package package = new CloudFoundry_VS2k10Package();
+            CloudFoundryPackage package = new CloudFoundryPackage();
         }
 
         [TestMethod()]
         public void IsIVsPackage()
         {
-            CloudFoundry_VS2k10Package package = new CloudFoundry_VS2k10Package();
+            CloudFoundryPackage package = new CloudFoundryPackage();
             Assert.IsNotNull(package as IVsPackage, "The object does not implement IVsPackage");
         }
 
@@ -40,7 +40,7 @@ namespace CloudFoundry.VS2k10_UnitTests
         public void SetSite()
         {
             // Create the package
-            IVsPackage package = new CloudFoundry_VS2k10Package() as IVsPackage;
+            IVsPackage package = new CloudFoundryPackage() as IVsPackage;
             Assert.IsNotNull(package, "The object does not implement IVsPackage");
 
             // Create a basic service provider
