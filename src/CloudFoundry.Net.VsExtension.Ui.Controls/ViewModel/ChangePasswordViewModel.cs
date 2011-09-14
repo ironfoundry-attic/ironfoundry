@@ -6,9 +6,11 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    [ExportViewModel("ChangePassword",false)]
     public class ChangePasswordViewModel : ViewModelBase
     {
         private string newPassword = string.Empty;
@@ -35,6 +37,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             {
                 this.NewPassword = "TestPassword";
                 this.VerifyPassword = "TestPassword";
+                this.EMail = "test.email@cloudfoundry.com";
             }
         }
 
@@ -48,9 +51,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        public string Email
+        public string EMail
         {
             get { return eMail; }
+            set
+            {
+                eMail = value;
+                RaisePropertyChanged("EMail");
+            }
         }
 
         public string VerifyPassword

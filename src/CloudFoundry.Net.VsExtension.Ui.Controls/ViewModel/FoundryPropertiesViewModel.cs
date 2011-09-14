@@ -7,9 +7,11 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using System.Windows;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    [ExportViewModel("FoundryProperties", false)]
     public class FoundryPropertiesViewModel : ViewModelBase
     {
         private string serverName = string.Empty;
