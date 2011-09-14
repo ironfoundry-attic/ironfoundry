@@ -82,13 +82,11 @@
 
         private void messageProcessor()
         {
-            Task currentTask = null;
-
             while (false == disposing)
             {
                 Thread.Sleep(DEFAULT_INTERVAL);
 
-                if (false == messageQueue.IsNullOrEmpty() && (null == currentTask || currentTask.IsCompleted))
+                if (false == messageQueue.IsNullOrEmpty())
                 {
                     string message = messageQueue.Dequeue();
                     if (String.IsNullOrEmpty(message))
@@ -126,7 +124,7 @@
                         }
 
                         Action<string, string> callback = subjectCollection[receivedMessage.SubscriptionID];
-                        currentTask = Task.Factory.StartNew(() => callback(receivedMessage.RawMessage, receivedMessage.InboxID));
+                        callback(receivedMessage.RawMessage, receivedMessage.InboxID);
                     }
                 }
             }
