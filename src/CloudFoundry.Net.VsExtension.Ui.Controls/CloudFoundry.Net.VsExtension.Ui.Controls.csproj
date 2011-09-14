@@ -68,13 +68,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\CloudFoundryProvider.cs" />
+    <Compile Include="Model\Application.cs" />
+    <Compile Include="Model\Cloud.cs" />
+    <Compile Include="Model\Instance.cs" />
+    <Compile Include="Model\Service.cs" />
     <Compile Include="Mvvm\ExportViewModel.cs" />
     <Compile Include="Mvvm\ViewModelLocator.cs" />
     <Compile Include="Utilities\Messages.cs" />
     <Compile Include="Utilities\PasswordHelper.cs" />
+    <Compile Include="ViewModel\ApplicationTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModel\CloudExplorerViewModel.cs" />
+    <Compile Include="ViewModel\CloudTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\FoundryPropertiesViewModel.cs" />
+    <Compile Include="ViewModel\InstanceTreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\TreeViewItemViewModel.cs" />
     <Compile Include="Views\ChangePassword.xaml.cs">
       <DependentUpon>ChangePassword.xaml</DependentUpon>
     </Compile>
@@ -102,6 +111,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Model\ModelClasses.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -146,7 +156,12 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\cloud_droplet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\CloudFoundrySmall.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>

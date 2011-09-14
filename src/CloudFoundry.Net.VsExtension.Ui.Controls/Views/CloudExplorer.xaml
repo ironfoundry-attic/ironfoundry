@@ -3,10 +3,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-    	<TreeView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5,0,0">
-    	</TreeView>            
-    </StackPanel>
+             d:DesignHeight="300" d:DesignWidth="300"
+             DataContext="{Binding CloudExplorer, Source={StaticResource Locator}}">
+    <DockPanel>
+        <TreeView ItemsSource="{Binding Clouds}" VerticalAlignment="Stretch">
+            <TreeView.ItemContainerStyle>                
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TreeView.ItemContainerStyle>
+
+            <TreeView.Resources>
+                <HierarchicalDataTemplate 
+          DataType="{x:Type vm:CloudTreeViewItemViewModel}" 
+          ItemsSource="{Binding Children}"
+          >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Margin="3,0" Source="..\Images\CloudFoundrySmall.ico" />
+                        <TextBlock Text="{Binding ServerName}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+
+                <HierarchicalDataTemplate 
+          DataType="{x:Type vm:ApplicationTreeViewItemViewModel}" 
+          ItemsSource="{Binding Children}"
+          >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Margin="3,0" Source="..\Images\cloud_droplet.png" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+
+                <DataTemplate DataType="{x:Type vm:InstanceTreeViewItemViewModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Margin="3,0" Source="..\Images\server.png" />
+                        <TextBlock Text="{Binding Host}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+    </DockPanel>
 </UserControl>

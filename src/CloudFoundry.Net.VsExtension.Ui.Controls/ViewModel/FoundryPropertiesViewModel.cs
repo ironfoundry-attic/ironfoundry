@@ -38,7 +38,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
             if (IsInDesignMode)
             {
-                this.ServerName = "VMWare Cloud Foundry Server";
+                this.ServerName = "VMWare cloud Foundry Server";
                 this.HostName = "api.vcap.me";
                 this.EMail = "user@vcap.me";
                 this.Password = "Password";
