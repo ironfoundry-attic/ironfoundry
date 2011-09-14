@@ -48,7 +48,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void ChangePassword()
         {
-            Messenger.Default.Send(new NotificationMessage<string>(this, this.EMail, Messages.ChangePasswordEmailAddress));
+            // Register to initialize data in dialog
+            Messenger.Default.Register<NotificationMessageAction<string>>(this,
+                message => {
+                    if (message.Notification.Equals(Messages.ChangePasswordEmailAddress))
+                        message.Execute(this.eMail);
+                });
+
+            // Fire message to open dialog
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ChangePassword,
                 (confirmed) =>
                 {
@@ -56,7 +63,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     {
 
                     }
-                }));            
+                }));
         }
         
         private void ValidateAccount()

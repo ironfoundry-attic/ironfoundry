@@ -10,7 +10,7 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("ChangePassword",false)]
+    [ExportViewModel("ChangePassword",true)]
     public class ChangePasswordViewModel : ViewModelBase
     {
         private string newPassword = string.Empty;
@@ -25,14 +25,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             ConfirmedPasswordCommand = new RelayCommand(ConfirmedPassword, () => true);
             CancelledPasswordCommand = new RelayCommand(CancelledPassword, () => true);
             
-            Messenger.Default.Register<NotificationMessage<string>>(
-                this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.ChangePasswordEmailAddress))
-                        this.eMail = message.Content;
-                });
-
+            // Send a message back to the caller, to intialize data
+            // in this case - email address.
+            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.ChangePasswordEmailAddress,
+                (emailAddress) => {
+                    this.EMail = emailAddress;
+                }));
+            
             if (IsInDesignMode)
             {
                 this.NewPassword = "TestPassword";

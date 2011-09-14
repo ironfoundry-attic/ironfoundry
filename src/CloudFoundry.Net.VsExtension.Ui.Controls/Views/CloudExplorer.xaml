@@ -6,8 +6,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-    	<ToolBar HorizontalAlignment="Stretch" VerticalAlignment="Top" IsOverflowOpen="True" Height="32">    		
-    	</ToolBar>
     	<TreeView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5,0,0">
     	</TreeView>            
     </StackPanel>
