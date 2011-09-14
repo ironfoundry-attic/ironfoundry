@@ -36,6 +36,8 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="JsonConverters\VcapGuidArrayConverter.cs" />
+    <Compile Include="JsonConverters\VcapGuidConverter.cs" />
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
     <Compile Include="Types\Droplet.cs" />
     <Compile Include="Types\DropletEntry.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="JsonConverters\IPAddressConverter.cs" />
     <Compile Include="Types\Message.cs" />
     <Compile Include="Types\RouterRegister.cs" />
+    <Compile Include="Types\StopDroplet.cs" />
     <Compile Include="Types\Tag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\Status.cs" />

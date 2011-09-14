@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NLog;
-using System.Diagnostics;
-
+﻿/*
+ * TODO TODO TODO
+ * Have all logging go to file / output / event log
+ */
 namespace CloudFoundry.Net.Dea.Service
 {
+    using System;
+    using System.Diagnostics;
+    using NLog;
+
     public static class EventLogger
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();

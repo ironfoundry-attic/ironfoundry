@@ -55,7 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
-    <Compile Include="IAgent.cs" />
+    <Compile Include="FileData.cs" />
     <Compile Include="Providers\Interfaces\IMessagingProvider.cs" />
     <Compile Include="Providers\Interfaces\IProviderFactory.cs" />
     <Compile Include="Providers\Interfaces\IWebServerAdministrationProvider.cs" />

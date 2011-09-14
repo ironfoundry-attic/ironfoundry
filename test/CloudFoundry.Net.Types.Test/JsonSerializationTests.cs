@@ -16,11 +16,11 @@
                 {
                     new DropletEntry
                     {
-                        Droplet = (uint)r.Next(), Instances = new[]
+                        DropletID = (uint)r.Next(), Instances = new[]
                         {
                             new InstanceEntry
                             {
-                                InstanceID = randomString(),
+                                InstanceID = Guid.NewGuid(),
                                 Instance = new Instance(new Droplet
                                 {
                                     ID = (uint)r.Next(),
@@ -30,11 +30,11 @@
                     },
                     new DropletEntry
                     {
-                        Droplet = (uint)r.Next(), Instances = new[]
+                        DropletID = (uint)r.Next(), Instances = new[]
                         {
                             new InstanceEntry
                             {
-                                InstanceID = randomString(),
+                                InstanceID = Guid.NewGuid(),
                                 Instance = new Instance(new Droplet
                                 {
                                     ID = (uint)r.Next(),

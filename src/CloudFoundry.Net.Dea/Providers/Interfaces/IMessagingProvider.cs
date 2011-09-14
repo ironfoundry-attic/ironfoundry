@@ -13,6 +13,6 @@
         void Subscribe(string subject, Action<string, string> replyCallback);
         // TODO void Subscribe<TMsg>(Action<TMsg> argCallback);
         void Connect();
-        void Poll();
+        void Start();
     }
 }

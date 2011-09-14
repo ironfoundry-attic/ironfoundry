@@ -17,5 +17,13 @@
 
             return argThis.ToList();
         }
+
+        public static T[] ToArrayOrNull<T>(this IEnumerable<T> argThis)
+        {
+            if (null == argThis)
+                return null;
+
+            return argThis.ToArray();
+        }
     }
 }

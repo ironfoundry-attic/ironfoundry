@@ -1,5 +1,7 @@
 ﻿namespace CloudFoundry.Net.Types
 {
+    using System;
+    using Converters;
     using Newtonsoft.Json;
 
     public class FindDropletResponse : JsonBase
@@ -13,8 +15,8 @@
         [JsonProperty(PropertyName = "droplet")]
         public uint Droplet { get; set; }
 
-        [JsonProperty(PropertyName = "instance")]
-        public string Instance { get; set; }
+        [JsonProperty(PropertyName = "instance"), JsonConverter(typeof(VcapGuidConverter))]
+        public Guid InstanceID { get; set; }
 
         [JsonProperty(PropertyName = "index")]
         public string Index { get; set; }

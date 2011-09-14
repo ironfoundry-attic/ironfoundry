@@ -5,7 +5,7 @@
     public class DropletEntry : JsonBase
     {
         [JsonProperty(PropertyName = "droplet")]
-        public uint Droplet { get; set; }
+        public uint DropletID { get; set; }
 
         [JsonProperty(PropertyName = "instances")]
         public InstanceEntry[] Instances;

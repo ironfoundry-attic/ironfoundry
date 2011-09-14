@@ -15,7 +15,10 @@ if not exist %SLN% (
     exit 1
 )
 
-call %VCVARSALL% x86
+rem Prevent this from being run multiple times on a dev machine
+if "%DevEnvDir%"=="" (
+    call %VCVARSALL% x86
+)
 
 msbuild /t:build /p:Configuration=Release %SLN%
 

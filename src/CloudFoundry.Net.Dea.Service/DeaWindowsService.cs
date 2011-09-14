@@ -8,31 +8,14 @@
     partial class DeaWindowsService : ServiceBase
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private readonly IAgent agent;
+        private readonly Agent agent;
 
         public DeaWindowsService()
         {
             CanPauseAndContinue = false;
-
-            InitializeEventLog();
-
+            initializeEventLog();
             ServiceName = "DeaWindowsService";
-
             agent = new Agent();
-        }
-
-        private void InitializeEventLog()
-        {
-            try
-            {
-                AutoLog = false;
-                EventLogger.Info("Init logging.");
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorException("Unable to setup event log.", ex);
-                AutoLog = true;
-            }
         }
 
         public void StartService()
@@ -53,6 +36,20 @@
         protected override void OnStop()
         {
             agent.Stop();
+        }
+
+        private void initializeEventLog()
+        {
+            try
+            {
+                AutoLog = false;
+                EventLogger.Info("Init logging.");
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorException("Unable to setup event log.", ex);
+                AutoLog = true;
+            }
         }
     }
 }

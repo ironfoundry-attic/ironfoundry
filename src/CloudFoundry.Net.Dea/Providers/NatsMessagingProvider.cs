@@ -2,10 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Net.Sockets;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
+    using System.Threading.Tasks;
     using Interfaces;
     using NLog;
     using Types;
@@ -13,6 +16,8 @@
     public class NatsMessagingProvider : IMessagingProvider
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromMilliseconds(50);
+
         private const string LogSentFormat = "NATS Msg Sent: {0}";
         private const string LogReceivedFormat = "NATS Msg Recv: {0}";
         private const string CRLF = "\r\n";
@@ -20,27 +25,30 @@
         private string host;
         private ushort port;
 
-        private bool currentlyPolling;
         private TcpClient client;
         private NetworkStream stream;
         private Dictionary<string, Dictionary<int, Action<string, string>>> subscriptions;
-        private readonly Object lockObject = new Object();
         private bool disposing = false;
+        private int sequence = 1;
+
+        private readonly Queue<string> messageQueue = new Queue<string>();
+
+        private Task queueTask;
+        private Task pollTask;
 
         public NatsMessagingProvider(string argHost, ushort argPort)
         {
             host = argHost;
             port = argPort;
-            Sequence = 1;
+            sequence = 1;
             UniqueIdentifier = Guid.NewGuid().ToString("N");   
             Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, argHost, port);
             subscriptions = new Dictionary<string, Dictionary<int, Action<string, string>>>();
-            currentlyPolling = false;
         }
 
         public string UniqueIdentifier { get; private set; }
 
-        public int Sequence { get; private set; }
+        public int Sequence { get { return sequence; } }
 
         public void Publish(string argSubject, Message argMessage)
         {
@@ -57,103 +65,156 @@
 
         public void Subscribe(string subject, Action<string, string> replyCallback)
         {
-            lock (lockObject) { Sequence++; }
+            Interlocked.Increment(ref sequence);
 
             Logger.Debug("NATS Subscribing to subject: {0}, sequence {1}", subject, Sequence);            
             var formattedMessage = string.Format(Constants.NatsCommandFormats.Subscribe, subject, Sequence);
             Logger.Trace(LogSentFormat,formattedMessage);
             Write(formattedMessage);
             
-            lock (lockObject) { 
+            lock (subscriptions)
+            { 
                 if (!subscriptions.ContainsKey(subject))
                     subscriptions.Add(subject, new Dictionary<int,Action<string,string>>());
                 subscriptions[subject].Add(Sequence, replyCallback);
             }
         }
-        
-        public void Poll()
+
+        private void messageProcessor()
         {
-            currentlyPolling = true;
-            string response = string.Empty;
-            while (!disposing)
+            Task currentTask = null;
+
+            while (false == disposing)
             {
-                Thread.Sleep(TimeSpan.FromMilliseconds(50));
+                Thread.Sleep(DEFAULT_INTERVAL);
 
-                int receivedDataLength;
-                byte[] data = new byte[1024];                
-                receivedDataLength = stream.Read(data, 0, data.Length);
-                stream.Flush();
-                response += Encoding.ASCII.GetString(data, 0, receivedDataLength);
-                if (!response.Contains(CRLF))
-                    continue; // More to read
-
-                string[] messages = Regex.Split(response, CRLF);                
-                if (!response.EndsWith(CRLF))
-                    response = messages[messages.Length - 1];
-                else
-                    response = string.Empty;
-
-                for (int counter = 0; counter < messages.Length; counter++)
+                if (false == messageQueue.IsNullOrEmpty() && (null == currentTask || currentTask.IsCompleted))
                 {
-                    string message = messages[counter];
+                    string message = messageQueue.Dequeue();
                     if (String.IsNullOrEmpty(message))
+                    {
+                        // NB: SHOULD NEVER HAPPEN
                         continue;
+                    }
 
                     Logger.Trace(LogReceivedFormat, message);
 
-                    if (message == Constants.NatsCommands.Ok)
+                    if (Constants.NatsCommands.Ok == message)
                     {
-                        Logger.Trace("MATS Message Acknowledged: {0}", message);
+                        Logger.Trace("NATS Message Acknowledged: {0}", message);
                     }
-                    if (message.StartsWith(Constants.NatsCommands.Information))
+                    else if (message.StartsWith(Constants.NatsCommands.Information))
                     {
                         Logger.Trace("NATS Info Message {0}", message);
                     }
-                    if (message.StartsWith(Constants.NatsCommands.Message))
+                    else if (message.StartsWith(Constants.NatsCommands.Message))
                     {
-                        string nextLine = messages[++counter];
-                        var receivedMessage = new ReceivedMessage(message + CRLF + nextLine);
-                        if (!subscriptions.ContainsKey(receivedMessage.Subject))
+                        string messageContinuation = messageQueue.Dequeue();
+                        var receivedMessage = new ReceivedMessage(message + CRLF + messageContinuation);
+
+                        if (false == subscriptions.ContainsKey(receivedMessage.Subject))
                         {
                             Logger.Debug("NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1},{2}.", receivedMessage.Subject, receivedMessage.SubscriptionID, receivedMessage.RawMessage);
                             continue;
                         }
+
                         var subjectCollection = subscriptions[receivedMessage.Subject];
-                        if (!subjectCollection.ContainsKey(receivedMessage.SubscriptionID))
+                        if (false == subjectCollection.ContainsKey(receivedMessage.SubscriptionID))
                         {
                             Logger.Debug("NATS Message Subscription ID: {0} not found to be subscribed for subject {1}. Ignoring received message {2}.", receivedMessage.SubscriptionID, receivedMessage.Subject, receivedMessage.RawMessage);
                             continue;
                         }
 
                         Action<string, string> callback = subjectCollection[receivedMessage.SubscriptionID];
-                        // TODO
-                        /*
-                         * The rate with which we're listening for messages can cause us to try and process the same message twice
-                         * Plus, the ruby code is not multithreaded either.
-                         */
-                        // Task.Factory.StartNew(() => callback(receivedMessage.RawMessage, receivedMessage.InboxID));
-                        callback(receivedMessage.RawMessage, receivedMessage.InboxID);
+                        currentTask = Task.Factory.StartNew(() => callback(receivedMessage.RawMessage, receivedMessage.InboxID));
                     }
-                }                                              
+                }
             }
-            currentlyPolling = false;
+        }
+
+        [System.Diagnostics.DebuggerStepThrough] // NB: this allows "break on exceptions" to be enabled in VS without having that IOException break all the time
+        private void poll()
+        {
+            string incomingData = String.Empty;
+            byte[] buffer = new byte[1024];
+
+            while (false == disposing)
+            {
+                Thread.Sleep(DEFAULT_INTERVAL);
+
+                if (false == stream.CanRead)
+                {
+                    throw new ApplicationException("Can't read from network stream!");
+                }
+
+                int receivedDataLength = 0;
+                try
+                {
+                    receivedDataLength = stream.Read(buffer, 0, buffer.Length); // NB: blocking
+                }
+                catch (IOException)
+                {
+                    // NB: http://msdn.microsoft.com/en-us/library/bk6w7hs8.aspx
+                }
+                if (receivedDataLength > 0)
+                {
+                    incomingData += Encoding.ASCII.GetString(buffer, 0, receivedDataLength);
+
+                    if (incomingData.Contains(CRLF)) // CRLF == at least one message
+                    {
+                        // Read a complete message
+                        string[] messages = incomingData.Split(new[] { CRLF }, StringSplitOptions.RemoveEmptyEntries);
+
+                        // TODO lock queue?
+                        if (false == incomingData.EndsWith(CRLF))
+                        {
+                            incomingData = messages.Last(); // Last bit of data is incomplete, preserve
+                            for (uint i = 0; i < messages.Length; ++i) // NB: will leave off the last partial message
+                            {
+                                if (false == String.IsNullOrWhiteSpace(messages[i]))
+                                {
+                                    messageQueue.Enqueue(messages[i]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            incomingData = String.Empty;
+                            foreach (string msg in messages.Where(msg => false == String.IsNullOrWhiteSpace(msg)))
+                            {
+                                messageQueue.Enqueue(msg);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Start()
+        {
+            pollTask = Task.Factory.StartNew(poll);
+            queueTask = Task.Factory.StartNew(messageProcessor);
         }
 
         public void Connect()
         {            
             client = new TcpClient(host, port);
             Logger.Debug("NATS Connected on Host: {0}, Port: {1}", host, port);
-            stream = client.GetStream();            
+            stream = client.GetStream();
+            if (stream.CanTimeout)
+            {
+                stream.ReadTimeout = DEFAULT_INTERVAL.Milliseconds;
+            }
         }        
 
         public void Dispose()
         {
             try
             {
+                var tasks = new[] { pollTask, queueTask };
                 disposing = true;
                 Logger.Debug("NATS Waiting for polling to cease.");
-                while (currentlyPolling) {}
-                 
+                Task.WaitAll(tasks);
                 Logger.Debug("NATS Disconnected.");
                 stream.Close();
                 stream.Dispose();

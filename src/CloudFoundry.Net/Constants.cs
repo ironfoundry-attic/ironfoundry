@@ -25,14 +25,14 @@
 
         public static class NatsCommands
         {
-            public const string Ok = "+OK";
-            public const string Error = "-ERR";
-            public const string Ping = "PING";
-            public const string Pong = "PONG";
+            public const string Ok          = "+OK";
+            public const string Error       = "-ERR";
+            public const string Ping        = "PING";
+            public const string Pong        = "PONG";
             public const string Information = "INFO";
-            public const string Message = "MSG";
-            public const string Publish = "PUB";
-            public const string Subscribe = "SUB";
+            public const string Message     = "MSG";
+            public const string Publish     = "PUB";
+            public const string Subscribe   = "SUB";
         }
 
         public static class NatsCommandFormats

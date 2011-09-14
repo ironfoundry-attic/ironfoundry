@@ -39,7 +39,7 @@
                 try
                 {
                     var ep = new IPEndPoint(IPAddress.Any, port);
-                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     socket.Bind(ep);
                     socket.Close();
                     // Port available

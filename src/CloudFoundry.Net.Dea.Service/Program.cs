@@ -11,12 +11,10 @@
         static void Main()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
-            IAgent agent = new Agent();
-
 #if DEBUG
             if (Environment.UserInteractive)
             {
+                var agent = new Agent();
                 agent.Start();
                 Console.WriteLine("Hit enter to stop ...");
                 Console.ReadLine();
@@ -24,7 +22,7 @@
             }
             else
 #endif
-                ServiceBase.Run((ServiceBase)agent);
+                ServiceBase.Run(new DeaWindowsService());
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
