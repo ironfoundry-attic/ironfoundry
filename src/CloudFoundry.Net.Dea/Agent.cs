@@ -14,13 +14,15 @@
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using NLog;
+    using Properties;
     using Providers;
-    using Providers.Interfaces;
     using Types;
 
     public sealed class Agent
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly TimeSpan HEARTBEAT_INTERVAL = TimeSpan.FromSeconds(10);
+
         private readonly IMessagingProvider NATS;
         private readonly IWebServerAdministrationProvider IIS;
         private readonly IDictionary<uint, Dictionary<Guid, Instance>> Droplets = new Dictionary<uint, Dictionary<Guid, Instance>>();        
@@ -52,63 +54,85 @@
             snapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
         }
 
-        public void Start()
+        public bool Error { get; private set; }
+
+        public bool Start()
         {
-            NATS.Connect();
+            bool rv = false;
 
-            tasks.Add(Task.Factory.StartNew(NATS.Start));
-
-            // TODO do we have to wait for poll to start?
-
-            NATS.Subscribe(Constants.Messages.VcapComponentDiscover, (msg, reply) => { }); // TODO subscribe to message types instead
-
-            var vcapComponentDiscoverMessage = new VcapComponentDiscover
+            if (NATS.Connect())
             {
-                Type        = "DEA",
-                Index       = 1,
-                Uuid        = NATS.UniqueIdentifier,
-                Host        = Utility.LocalIPAddress.ToString(),
-                Credentials = NATS.UniqueIdentifier,
-                Start       = DateTime.Now, // TODO UTC?
-            };
+                tasks.Add(Task.Factory.StartNew(NATS.Start));
 
-            NATS.Publish(Constants.NatsCommands.Ok, vcapComponentDiscoverMessage);
+                // TODO do we have to wait for poll to start?
 
-            NATS.Publish(Constants.Messages.VcapComponentAnnounce, vcapComponentDiscoverMessage);
+                NATS.Subscribe(Constants.Messages.VcapComponentDiscover, (msg, reply) => { }); // TODO subscribe to message types instead
 
-            NATS.Subscribe(Constants.Messages.DeaStatus, processDeaStatus);
-            NATS.Subscribe(Constants.Messages.DropletStatus, processDropletStatus);
-            NATS.Subscribe(Constants.Messages.DeaDiscover, processDeaDiscover);
-            NATS.Subscribe(Constants.Messages.DeaFindDroplet, processDeaFindDroplet);
-            NATS.Subscribe(Constants.Messages.DeaUpdate, processDeaUpdate);
-            NATS.Subscribe(Constants.Messages.DeaStop, processDeaStop);
-            NATS.Subscribe(String.Format(Constants.Messages.DeaInstanceStart, NATS.UniqueIdentifier), processDeaStart);
-            NATS.Subscribe(Constants.Messages.RouterStart, processRouterStart);
-            NATS.Subscribe(Constants.Messages.HealthManagerStart, processHealthManagerStart);
+                var vcapComponentDiscoverMessage = new VcapComponentDiscover
+                {
+                    Type = "DEA",
+                    Index = 1,
+                    Uuid = NATS.UniqueIdentifier,
+                    Host = Utility.LocalIPAddress.ToString(),
+                    Credentials = NATS.UniqueIdentifier,
+                    Start = DateTime.Now, // TODO UTC?
+                };
 
-            NATS.Publish(Constants.Messages.DeaStart, helloMessage);
+                NATS.Publish(Constants.NatsCommands.Ok, vcapComponentDiscoverMessage);
 
-            recoverExistingDroplets();
+                NATS.Publish(Constants.Messages.VcapComponentAnnounce, vcapComponentDiscoverMessage);
 
-            tasks.Add(Task.Factory.StartNew(heartbeatsLoop));
+                NATS.Subscribe(Constants.Messages.DeaStatus, processDeaStatus);
+                NATS.Subscribe(Constants.Messages.DropletStatus, processDropletStatus);
+                NATS.Subscribe(Constants.Messages.DeaDiscover, processDeaDiscover);
+                NATS.Subscribe(Constants.Messages.DeaFindDroplet, processDeaFindDroplet);
+                NATS.Subscribe(Constants.Messages.DeaUpdate, processDeaUpdate);
+                NATS.Subscribe(Constants.Messages.DeaStop, processDeaStop);
+                NATS.Subscribe(String.Format(Constants.Messages.DeaInstanceStart, NATS.UniqueIdentifier), processDeaStart);
+                NATS.Subscribe(Constants.Messages.RouterStart, processRouterStart);
+                NATS.Subscribe(Constants.Messages.HealthManagerStart, processHealthManagerStart);
 
-            // TODO refactor threading?
+                NATS.Publish(Constants.Messages.DeaStart, helloMessage);
+
+                recoverExistingDroplets();
+
+                tasks.Add(Task.Factory.StartNew(monitorLoop));
+
+                // TODO refactor threading?
+                // TODO how to indicate problems in threads? Events?
+                rv = true;
+            }
+
+            return rv;
         }
 
         public void Stop()
         {
-            // USING NATS to KILL threads
+            if (shutting_down)
+                return;
+
             shutting_down = true;
             NATS.Dispose();
+            Logger.Debug(Resources.Agent_WaitingForTasksInStop_Message);
             Task.WaitAll(tasks.ToArray(), TimeSpan.FromMinutes(1));
+            Logger.Debug(Resources.Agent_TasksCompletedInStop_Message);
         }
 
-        private void heartbeatsLoop()
+        private void monitorLoop()
         {
             while (false == shutting_down)
             {
-                sendHeartbeat();
-                Thread.Sleep(TimeSpan.FromSeconds(10));
+                if (NatsMessagingStatus.RUNNING != NATS.Status)
+                {
+                    Logger.Error(Resources.Agent_ErrorDetectedInNats_Message);
+                    Error = true;
+                    return;
+                }
+                else
+                {
+                    sendHeartbeat();
+                }
+                Thread.Sleep(HEARTBEAT_INTERVAL);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.Dea.Providers.Interfaces
+﻿namespace CloudFoundry.Net.Dea.Providers
 {
 
     public enum ApplicationInstanceStatus

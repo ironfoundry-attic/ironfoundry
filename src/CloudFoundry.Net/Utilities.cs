@@ -16,22 +16,36 @@
 
         public static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
         {
-            if (!Directory.Exists(target.FullName))
+            if (false == Directory.Exists(target.FullName))
+            {
                 Directory.CreateDirectory(target.FullName);
-            foreach (var file in source.GetFiles())
-                file.CopyTo(Path.Combine(target.ToString(),file.Name),true);
-            foreach (var directory in source.GetDirectories())
+            }
+
+            foreach (FileInfo file in source.GetFiles())
+            {
+                file.CopyTo(Path.Combine(target.ToString(), file.Name), true);
+            }
+
+            foreach (DirectoryInfo directory in source.GetDirectories())
             {
                 DirectoryInfo nextDirectory = target.CreateSubdirectory(directory.Name);
-                CopyDirectory(directory,nextDirectory);
+                CopyDirectory(directory, nextDirectory);
             }
         }
 
+        /// <summary>
+        /// TODO: which one to choose?
+        /// </summary>
         public static IPAddress LocalIPAddress
         {
-            get { return getLocalIPAddresses().Last(); }
+            get
+            {
+                return getLocalIPAddresses().Last();
+            }
         }
 
+        // NB: this allows "break on all exceptions" to be enabled in VS without having the SocketException break
+        [System.Diagnostics.DebuggerStepThrough]
         public static ushort FindNextAvailablePortAfter(ushort argStartingPort)
         {
             for (ushort port = argStartingPort; port < 65535; port++)

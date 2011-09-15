@@ -1,7 +1,6 @@
 ﻿namespace CloudFoundry.Net.Dea.Providers
 {
     using System.Net;
-    using Interfaces;
     using Microsoft.Web.Administration;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider

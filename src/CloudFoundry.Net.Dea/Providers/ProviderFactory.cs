@@ -1,7 +1,5 @@
 ﻿namespace CloudFoundry.Net.Dea.Providers
 {
-    using CloudFoundry.Net.Dea.Providers.Interfaces;
-
     public class ProviderFactory : IProviderFactory
     {
         public IMessagingProvider CreateMessagingProvider(string argHost, ushort argPort)

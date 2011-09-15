@@ -14,11 +14,11 @@
 #if DEBUG
             if (Environment.UserInteractive)
             {
-                var agent = new Agent();
-                agent.Start();
+                var svc = new DeaWindowsService();
+                svc.StartService();
                 Console.WriteLine("Hit enter to stop ...");
                 Console.ReadLine();
-                agent.Stop();
+                svc.StopService();
             }
             else
 #endif
