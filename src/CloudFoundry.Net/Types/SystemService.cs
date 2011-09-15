@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
@@ -17,11 +18,22 @@ namespace CloudFoundry.Net.Types
 
    internal class Datastore : JsonBase
     {
-        string type { get; set; } //Types supported are key/value, generic, database... could potentially be a static class
+       [JsonProperty(PropertyName = "type")]
+        string Type { get; set; } //Types supported are key/value, generic, database... could potentially be a static class or enum
+       
+       [JsonProperty(PropertyName = "version")]
         string Version { get; set; }
+
+       [JsonProperty(PropertyName = "id")]
         int Id { get; set; }
+
+       [JsonProperty(PropertyName = "vendor")]
         string Vendor { get; set; }
+
+       [JsonProperty(PropertyName = "tiers")]
         Tiers Tiers { get; set; }
+
+       [JsonProperty(PropertyName = "description")]
         string Description { get; set; } 
 
         public Datastore () 
@@ -32,11 +44,26 @@ namespace CloudFoundry.Net.Types
 
     internal class Tiers : JsonBase
     {
-        string type { get; set; } //Currently on showing Free but potentially other options in the future
-        int order { get; set; }
-        Options options { get; set; }
+        [JsonProperty(PropertyName = "free")]
+        Type Type { get; set; } //Currently on showing Free but potentially other options in the future
+
+        [JsonProperty(PropertyName = "order")]
+        int Order { get; set; }
+        
+        public Tiers () {
+            Type = new Type();
+        }
     }
 
+    internal class Type : JsonBase
+    {
+        [JsonProperty(PropertyName = "options")]
+        Options Options { get; set; }
+
+        public Type () {
+            Options = new Options();
+        }
+    }
     internal class Options : JsonBase
     {
 
