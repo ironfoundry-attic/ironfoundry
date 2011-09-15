@@ -39,6 +39,7 @@
     <Compile Include="JsonConverters\VcapGuidArrayConverter.cs" />
     <Compile Include="JsonConverters\VcapGuidConverter.cs" />
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
+    <Compile Include="Types\Application.cs" />
     <Compile Include="Types\AppService.cs" />
     <Compile Include="Types\Frameworks.cs" />
     <Compile Include="Types\Info.cs" />
