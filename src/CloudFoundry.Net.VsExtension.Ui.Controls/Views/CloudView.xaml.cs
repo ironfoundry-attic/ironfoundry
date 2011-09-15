@@ -20,9 +20,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
     /// <summary>
     /// Interaction logic for FoundryProperties.xaml
     /// </summary>
-    public partial class FoundryProperties : UserControl
+    public partial class CloudView : UserControl
     {
-        public FoundryProperties()
+        public CloudView()
         {
             InitializeComponent();
 

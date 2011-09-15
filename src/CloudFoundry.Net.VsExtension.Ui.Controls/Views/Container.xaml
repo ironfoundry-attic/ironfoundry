@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Container"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"         
+        xmlns:vw="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls"
+        xmlns:vm="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel"
+        mc:Ignorable="d" 
+        DataContext="{Binding Container, Source={StaticResource Locator}}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="200*" MinWidth="200" />
+        </Grid.ColumnDefinitions>                
+        <vw:CloudExplorer Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                          DataContext="{Binding CloudExplorer}"/>        
+        <GridSplitter ResizeDirection="Columns" Grid.Column="1" Width="5" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"/>
+        <TabControl Grid.Column="2" x:Name="Clouds" ItemsSource="{Binding Clouds}">
+            <TabControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:CloudViewModel}">
+                    <TextBlock Text="{Binding ServerName}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate DataType="{x:Type vm:CloudViewModel}">
+                    <vw:CloudView />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </Grid>
+</UserControl>

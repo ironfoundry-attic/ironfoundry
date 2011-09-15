@@ -9,28 +9,12 @@ using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("CloudExplorer", true)]
     public class CloudExplorerViewModel : ViewModelBase
-    {
+    {      
         readonly ReadOnlyCollection<CloudTreeViewItemViewModel> clouds;
 
-        public CloudExplorerViewModel()
+        public CloudExplorerViewModel(ObservableCollection<Cloud> cloudList)
         {
-            var cloudList = new List<Cloud>()
-            {
-                new Cloud()
-                {
-                    ServerName = "CF Server 01"
-                },
-                new Cloud()
-                {
-                    ServerName = "CF Server 02"                
-                },
-                new Cloud()
-                {
-                    ServerName = "CF Server 03"
-                }
-            };
             this.clouds = new ReadOnlyCollection<CloudTreeViewItemViewModel>(
                 (from cloud in cloudList
                  select new CloudTreeViewItemViewModel(cloud)).ToList());

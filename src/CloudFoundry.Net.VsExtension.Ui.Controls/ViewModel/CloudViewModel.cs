@@ -8,11 +8,12 @@ using GalaSoft.MvvmLight.Messaging;
 using System.Windows;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("FoundryProperties", false)]
-    public class FoundryPropertiesViewModel : ViewModelBase
+    //[ExportViewModel("FoundryProperties", false)]
+    public class CloudViewModel : ViewModelBase
     {
         private string serverName = string.Empty;
         private string hostName = string.Empty;
@@ -29,21 +30,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand ConnectCommand { get; private set; }
         public RelayCommand DisconnectCommand { get; private set; }
 
-        public FoundryPropertiesViewModel()
+        public CloudViewModel(Cloud cloud)
         {
             ChangePasswordCommand = new RelayCommand(ChangePassword, () => true);
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanExecuteValidateAccount);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
             DisconnectCommand = new RelayCommand(Disconnect, CanExecuteDisconnect);
 
-            if (IsInDesignMode)
-            {
-                this.ServerName = "VMWare cloud Foundry Server";
-                this.HostName = "api.vcap.me";
-                this.EMail = "user@vcap.me";
-                this.Password = "Password";
-                this.Url = "http://api.vcap.me";
-            }                       
+            this.ServerName = cloud.ServerName;            
         }
 
         private void ChangePassword()

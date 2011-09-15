@@ -10,31 +10,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     {
         readonly Cloud cloud;
 
-        public CloudTreeViewItemViewModel(Cloud cloud) : base(null,true)
+        public CloudTreeViewItemViewModel(Cloud cloud) : base(null,false)
         {
             this.cloud = cloud;
+            foreach (Application app in cloud.Applications)
+                base.Children.Add(new ApplicationTreeViewItemViewModel(app, this));
         }
 
         public string ServerName
         {
             get { return this.cloud.ServerName; }
-        }
-
-        protected override void LoadChildren()
-        {
-            cloud.Applications.AddRange( new Application[] { 
-                new Application() {
-                    Name = "Application " + Guid.NewGuid().ToString("D")   
-                },
-                new Application() {
-                    Name = "Application " + Guid.NewGuid().ToString("D")
-                },
-                new Application() {
-                    Name = "Application " + Guid.NewGuid().ToString("D")
-                }
-            });
-            foreach (Application app in cloud.Applications)
-                base.Children.Add(new ApplicationTreeViewItemViewModel(app,this));
         }
     }
 }

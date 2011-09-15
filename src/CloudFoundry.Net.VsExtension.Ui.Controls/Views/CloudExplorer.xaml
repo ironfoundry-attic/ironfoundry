@@ -6,7 +6,8 @@
              xmlns:vm="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             DataContext="{Binding CloudExplorer, Source={StaticResource Locator}}">
+             >
+    <!-- DataContext="{Binding CloudExplorer, Source={StaticResource Locator}}" -->
     <DockPanel>
         <TreeView ItemsSource="{Binding Clouds}" VerticalAlignment="Stretch">
             <TreeView.ItemContainerStyle>                
@@ -23,20 +24,14 @@
             </TreeView.ItemContainerStyle>
 
             <TreeView.Resources>
-                <HierarchicalDataTemplate 
-          DataType="{x:Type vm:CloudTreeViewItemViewModel}" 
-          ItemsSource="{Binding Children}"
-          >
+                <HierarchicalDataTemplate DataType="{x:Type vm:CloudTreeViewItemViewModel}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\CloudFoundrySmall.ico" />
                         <TextBlock Text="{Binding ServerName}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
 
-                <HierarchicalDataTemplate 
-          DataType="{x:Type vm:ApplicationTreeViewItemViewModel}" 
-          ItemsSource="{Binding Children}"
-          >
+                <HierarchicalDataTemplate DataType="{x:Type vm:ApplicationTreeViewItemViewModel}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\cloud_droplet.png" />
                         <TextBlock Text="{Binding Name}" />
