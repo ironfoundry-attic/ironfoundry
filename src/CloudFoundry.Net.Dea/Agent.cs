@@ -51,6 +51,11 @@
                 Version = 0.99M,
             };
 
+            string dropletsPath = ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory];
+            string applicationPath = ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory];
+            Directory.CreateDirectory(dropletsPath);
+            Directory.CreateDirectory(applicationPath);
+
             snapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
         }
 
@@ -462,25 +467,36 @@
 
         private string getApplicationState(string name)
         {
-            if (!IIS.DoesApplicationExist(name))
+            if (false == IIS.DoesApplicationExist(name))
                 return Instance.InstanceState.DELETED;
 
-            var status = IIS.GetStatus(name);
+            ApplicationInstanceStatus status = IIS.GetStatus(name);
+
+            string rv;
+
             switch (status)
             {
                 case ApplicationInstanceStatus.Started:
-                    return Instance.InstanceState.RUNNING;
+                    rv = Instance.InstanceState.RUNNING;
+                    break;
                 case ApplicationInstanceStatus.Starting:
-                    return Instance.InstanceState.STARTING;
+                    rv = Instance.InstanceState.STARTING;
+                    break;
                 case ApplicationInstanceStatus.Stopping:
-                    return Instance.InstanceState.SHUTTING_DOWN;
+                    rv = Instance.InstanceState.SHUTTING_DOWN;
+                    break;
                 case ApplicationInstanceStatus.Stopped:
-                    return Instance.InstanceState.STOPPED;
+                    rv = Instance.InstanceState.STOPPED;
+                    break;
                 case ApplicationInstanceStatus.Unknown:
-                    return Instance.InstanceState.CRASHED;
+                    rv = Instance.InstanceState.CRASHED;
+                    break;
                 default:
-                    return Instance.InstanceState.CRASHED;
+                    rv = Instance.InstanceState.CRASHED;
+                    break;
             }
+
+            return rv;
         }
 
         private void takeSnapshot()

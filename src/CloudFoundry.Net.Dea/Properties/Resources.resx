@@ -129,10 +129,22 @@
   <data name="NatsMessagingProvider_AttemptingReconnectTwice_Message" xml:space="preserve">
     <value>Invalid attempt to reconnect twice.</value>
   </data>
+  <data name="NatsMessagingProvider_AttemptingReconnect_Message" xml:space="preserve">
+    <value>Attempting reconnect to server.</value>
+  </data>
   <data name="NatsMessagingProvider_AttemptingStopTwice_Message" xml:space="preserve">
     <value>Invalid attempt to stop twice.</value>
   </data>
+  <data name="NatsMessagingProvider_CantReadFromStream_Message" xml:space="preserve">
+    <value>Can't read from network stream.</value>
+  </data>
   <data name="NatsMessagingProvider_CouldNotReconnect_Message" xml:space="preserve">
-    <value>Could not reconnect to Cloud Controller.</value>
+    <value>Could not reconnect to server.</value>
+  </data>
+  <data name="NatsMessagingProvider_Disconnected_Message" xml:space="preserve">
+    <value>Client disconnected from server.</value>
+  </data>
+  <data name="NatsMessagingProvider_ReconnectSuccess_Message" xml:space="preserve">
+    <value>Successfully reconnected to server.</value>
   </data>
 </root>

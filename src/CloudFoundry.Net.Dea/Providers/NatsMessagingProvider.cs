@@ -19,8 +19,8 @@
 
 #if DEBUG
         private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromMilliseconds(250);
-        private static readonly ushort CONNECTION_ATTEMPT_RETRIES = 1;
-        private static readonly TimeSpan CONNECTION_ATTEMPT_INTERVAL = TimeSpan.FromSeconds(1);
+        private static readonly ushort CONNECTION_ATTEMPT_RETRIES = 5;
+        private static readonly TimeSpan CONNECTION_ATTEMPT_INTERVAL = TimeSpan.FromSeconds(10);
 #else
         private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromMilliseconds(250);
         private static readonly ushort CONNECTION_ATTEMPT_RETRIES = 5;
@@ -40,7 +40,6 @@
         private int sequence = 1;
 
         private bool shutting_down = false;
-        private bool attempting_reconnect = false;
         private bool error_occurred = false;
 
         private readonly Queue<string> messageQueue = new Queue<string>();
@@ -265,7 +264,7 @@
         }
 
         // NB: this allows "break on exceptions" to be enabled in VS without having that IOException break all the time
-        // [System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerStepThrough]
         private void poll()
         {
             string incomingData = String.Empty;
@@ -280,7 +279,7 @@
 
                 if (false == networkStream.CanRead)
                 {
-                    onFatalError("Can't read from network stream!");
+                    onFatalError(Resources.NatsMessagingProvider_CantReadFromStream_Message);
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
@@ -288,7 +287,7 @@
 
                 if (false == StillConnected)
                 {
-                    reconnect();
+                    onFatalError(Resources.NatsMessagingProvider_Disconnected_Message);
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
@@ -352,34 +351,6 @@
             }
         }
 
-        private void reconnect()
-        {
-            if (NatsMessagingStatus.RUNNING != Status)
-            {
-                return;
-            }
-
-            if (attempting_reconnect)
-            {
-                throw new InvalidOperationException(Resources.NatsMessagingProvider_AttemptingReconnectTwice_Message);
-            }
-
-            try
-            {
-                attempting_reconnect = true;
-                closeNetworking();
-                bool success = Connect();
-                if (false == success && NatsMessagingStatus.RUNNING == Status)
-                {
-                    onFatalError(Resources.NatsMessagingProvider_CouldNotReconnect_Message);
-                }
-            }
-            finally
-            {
-                attempting_reconnect = false;
-            }
-        }
-
         private void closeNetworking()
         {
             try
@@ -396,29 +367,29 @@
             if (NatsMessagingStatus.RUNNING != Status)
                 return;
 
-        Retry:
-            try
+            while (NatsMessagingStatus.RUNNING == Status)
             {
-                Byte[] data = ASCIIEncoding.ASCII.GetBytes(message);
-                networkStream.Write(data, 0, data.Length);
-                /*
-                 * NB: Flush () not necessary
-                 * http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.flush.aspx
-                 */
-            }
-            catch (IOException ex)
-            {
-                bool shouldRethrow = dealWithException(ex);
-                if (shouldRethrow)
+                try
                 {
-                    throw;
+                    Byte[] data = ASCIIEncoding.ASCII.GetBytes(message);
+                    networkStream.Write(data, 0, data.Length);
+                    /*
+                     * NB: Flush () not necessary
+                     * http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.flush.aspx
+                     */
+                    return;
                 }
-                else
+                catch (IOException ex)
                 {
-                    // Give it another shot
-                    Thread.Sleep(DEFAULT_INTERVAL);
-                    goto Retry;
+                    bool shouldRethrow = dealWithException(ex);
+                    if (shouldRethrow)
+                    {
+                        throw;
+                    }
                 }
+
+                // Give it another shot
+                Thread.Sleep(DEFAULT_INTERVAL);
             }
         }
 
@@ -437,7 +408,7 @@
                         // NB: http://msdn.microsoft.com/en-us/library/bk6w7hs8.aspx
                         break;
                     case SocketErrorCode.ConnectionAborted :
-                        reconnect();
+                        onFatalError(Resources.NatsMessagingProvider_Disconnected_Message);
                         break;
                     default :
                         rethrow = true;

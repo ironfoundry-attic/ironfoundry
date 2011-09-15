@@ -72,7 +72,7 @@
         {
             using (var manager = new ServerManager())
             {
-                var applicationPool = getApplicationPool(manager, applicationInstanceName);
+                ApplicationPool applicationPool = getApplicationPool(manager, applicationInstanceName);
                 applicationPool.Start();
             }
         }
@@ -101,8 +101,8 @@
             {
                 try
                 {
-                    var applicationPool = getApplicationPool(manager, applicationInstanceName);
-                    var applicationSite = getSite(manager, applicationInstanceName);
+                    ApplicationPool applicationPool = getApplicationPool(manager, applicationInstanceName);
+                    Site applicationSite = getSite(manager, applicationInstanceName);
                     if (applicationSite.State == ObjectState.Stopped ||
                         applicationPool.State == ObjectState.Stopped)
                         return ApplicationInstanceStatus.Stopped;

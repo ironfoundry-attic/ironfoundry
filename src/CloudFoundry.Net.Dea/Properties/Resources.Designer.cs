@@ -88,6 +88,15 @@ namespace CloudFoundry.Net.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempting reconnect to server..
+        /// </summary>
+        internal static string NatsMessagingProvider_AttemptingReconnect_Message {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_AttemptingReconnect_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid attempt to reconnect twice..
         /// </summary>
         internal static string NatsMessagingProvider_AttemptingReconnectTwice_Message {
@@ -106,11 +115,38 @@ namespace CloudFoundry.Net.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not reconnect to Cloud Controller..
+        ///   Looks up a localized string similar to Can&apos;t read from network stream..
+        /// </summary>
+        internal static string NatsMessagingProvider_CantReadFromStream_Message {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_CantReadFromStream_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not reconnect to server..
         /// </summary>
         internal static string NatsMessagingProvider_CouldNotReconnect_Message {
             get {
                 return ResourceManager.GetString("NatsMessagingProvider_CouldNotReconnect_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Client disconnected from server..
+        /// </summary>
+        internal static string NatsMessagingProvider_Disconnected_Message {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_Disconnected_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully reconnected to server..
+        /// </summary>
+        internal static string NatsMessagingProvider_ReconnectSuccess_Message {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_ReconnectSuccess_Message", resourceCulture);
             }
         }
     }
