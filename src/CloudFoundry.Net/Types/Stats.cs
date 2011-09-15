@@ -5,7 +5,9 @@
 
     public class Stats : Message
     {
-        public Stats() { }
+        public Stats() {
+            Usage = new Usage();
+        }
 
         public Stats(Instance argInstance, TimeSpan argSpan)
         {
@@ -17,6 +19,7 @@
             MemQuota  = argInstance.MemQuota;
             DiskQuota = argInstance.DiskQuota;
             FdsQuota  = argInstance.FdsQuota;
+            Usage = new Usage();
         }
 
         [JsonProperty(PropertyName = "name")]
@@ -47,6 +50,21 @@
         public int Cores { get; set; }
 
         [JsonProperty(PropertyName = "usage")]
-        public int Usage { get; set; }
+        public Usage Usage { get; set; }
+    }
+
+     public class Usage {
+        
+        [JsonProperty(PropertyName="time")]
+        DateTime CurrentTime { get; set; }
+
+        [JsonProperty(PropertyName="cpu")]
+        float CpuTime { get; set; }
+
+        [JsonProperty(PropertyName="mem")]
+        float MemoryUsage { get; set; }
+
+        [JsonProperty(PropertyName="disk")]
+        float DisKUsage { get; set; }
     }
 }

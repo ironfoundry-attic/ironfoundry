@@ -39,9 +39,13 @@
     <Compile Include="JsonConverters\VcapGuidArrayConverter.cs" />
     <Compile Include="JsonConverters\VcapGuidConverter.cs" />
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
+    <Compile Include="Types\AppService.cs" />
+    <Compile Include="Types\Frameworks.cs" />
+    <Compile Include="Types\Info.cs" />
     <Compile Include="Types\Droplet.cs" />
     <Compile Include="Types\DropletEntry.cs" />
     <Compile Include="Types\FindDropletResponse.cs" />
+    <Compile Include="Types\Framework.cs" />
     <Compile Include="Types\Instance.cs" />
     <Compile Include="Types\InstanceEntry.cs" />
     <Compile Include="Types\Limits.cs" />
@@ -56,6 +60,7 @@
     <Compile Include="JsonConverters\IPAddressConverter.cs" />
     <Compile Include="Types\Message.cs" />
     <Compile Include="Types\RouterRegister.cs" />
+    <Compile Include="Types\SystemService.cs" />
     <Compile Include="Types\StopDroplet.cs" />
     <Compile Include="Types\Tag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

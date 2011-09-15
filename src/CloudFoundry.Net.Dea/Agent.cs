@@ -325,8 +325,8 @@
                                     MemQuota  = instance.MemQuota,
                                     DiskQuota = instance.DiskQuota,
                                     FdsQuota  = instance.FdsQuota,
-                                    Cores     = 1,
-                                    Usage     = 20
+                                    Cores     = 1
+                                    //,Usage     = 20
                                 }
                             };
                             if (response.State != Instance.InstanceState.RUNNING)
@@ -352,7 +352,7 @@
                     var span = DateTime.Now - startDate;
                     var response = new Stats(instance, span)
                     {
-                        Usage = 20
+                        //Usage = 20
                     };
                     NATS.Publish(reply, response);
                 }
