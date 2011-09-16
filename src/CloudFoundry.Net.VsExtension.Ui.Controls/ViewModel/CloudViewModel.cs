@@ -14,16 +14,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     //[ExportViewModel("FoundryProperties", false)]
     public class CloudViewModel : ViewModelBase
-    {
-        private string serverName = string.Empty;
-        private string hostName = string.Empty;
-        private string eMail = string.Empty;
-        private string password = string.Empty;
-        private string changedPassword = string.Empty;
-        private string url = string.Empty;
-        private int timeoutStart = 0;
-        private int timeoutEnd = 60;
-        private bool isConnected = false;
+    {       
+        private Cloud cloud;
 
         public RelayCommand ChangePasswordCommand { get; private set; }
         public RelayCommand ValidateAccountCommand { get; private set; }
@@ -37,7 +29,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
             DisconnectCommand = new RelayCommand(Disconnect, CanExecuteDisconnect);
 
-            this.ServerName = cloud.ServerName;            
+            this.cloud = cloud;
         }
 
         private void ChangePassword()
@@ -46,7 +38,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Register<NotificationMessageAction<string>>(this,
                 message => {
                     if (message.Notification.Equals(Messages.ChangePasswordEmailAddress))
-                        message.Execute(this.eMail);
+                        message.Execute(this.EMail);
                 });
 
             // Fire message to open dialog
@@ -74,91 +66,124 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void Connect()
         {
-            isConnected = true;
+            this.cloud.Connected = true;
         }
 
         private bool CanExecuteConnect()
         {
-            return !isConnected;
+            return !this.cloud.Connected;
         }
 
         private void Disconnect()
         {
-            isConnected = false;
+            this.cloud.Connected = false;
         }
 
         private bool CanExecuteDisconnect()
         {
-            return isConnected;
+            return this.cloud.Connected;
         }
         
         public string ServerName
         {
-            get { return serverName; }
+            get { return this.cloud.ServerName; }
             set
             {
-                serverName = value;
+                this.cloud.ServerName = value;
                 RaisePropertyChanged("ServerName");
             }
         }
 
         public string HostName
         {
-            get { return hostName; }
+            get { return this.cloud.HostName; }
             set
             {
-                hostName = value;
+                this.cloud.HostName = value;
                 RaisePropertyChanged("HostName");
             }
         }
 
         public string EMail
         {
-            get { return eMail; }
+            get { return this.cloud.Email; }
             set
             {
-                eMail = value;
+                this.cloud.Email = value;
                 RaisePropertyChanged("EMail");
             }
         }
 
         public string Password
         {
-            get { return password; }
+            get { return this.cloud.Password; }
             set
             {
-                password = value;
+                this.cloud.Password = value;
                 RaisePropertyChanged("Password");
             }
         }
 
         public string Url
         {
-            get { return url; }
+            get { return this.cloud.Url; }
             set
             {
-                url = value;
+                this.cloud.Url = value;
                 RaisePropertyChanged("Url");
             }
         }
 
         public int TimeoutStart
         {
-            get { return timeoutStart; }
+            get { return this.cloud.TimeoutStart; }
             set
             {
-                timeoutStart = value;
+                this.cloud.TimeoutStart = value;
                 RaisePropertyChanged("TimeoutStart");
             }
         }
 
-        public int TimeoutEnd
+        public int TimeoutStop
         {
-            get { return timeoutEnd; }
+            get { return this.cloud.TimeoutStop; }
             set
             {
-                timeoutEnd = value;
+                this.cloud.TimeoutStop = value;
                 RaisePropertyChanged("TimeoutEnd");
+            }
+        }
+
+        public List<CloudFoundry.Net.VsExtension.Ui.Controls.Model.Application> Applications
+        {
+            get { return this.cloud.Applications; }
+        }
+
+        private CloudFoundry.Net.VsExtension.Ui.Controls.Model.Application selectedApplication;
+        public CloudFoundry.Net.VsExtension.Ui.Controls.Model.Application SelectedApplication
+        {
+            get { return this.selectedApplication; }
+            set
+            {
+                this.selectedApplication = value;
+                this.Instances = this.selectedApplication.Instances;
+                RaisePropertyChanged("SelectedApplication");
+            }
+        }
+
+        public List<CloudFoundry.Net.VsExtension.Ui.Controls.Model.Service> Services
+        {
+            get { return this.cloud.Services; }
+        }
+
+        private List<Instance> instances;
+        public List<Instance> Instances
+        {
+            get { return this.instances; }
+            set
+            {
+                this.instances = value;
+                RaisePropertyChanged("Instances");
             }
         }
     }

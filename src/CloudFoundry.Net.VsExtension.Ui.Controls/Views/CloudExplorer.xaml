@@ -4,17 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
-             >
-    <!-- DataContext="{Binding CloudExplorer, Source={StaticResource Locator}}" -->
+             d:DesignHeight="300" d:DesignWidth="300">
     <DockPanel>
         <TreeView ItemsSource="{Binding Clouds}" VerticalAlignment="Stretch">
             <TreeView.ItemContainerStyle>                
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                    <Setter Property="FontWeight" Value="Normal" />
+                    <Setter Property="FontWeight" Value="Normal" />                   
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="FontWeight" Value="Bold" />
@@ -24,8 +24,15 @@
             </TreeView.ItemContainerStyle>
 
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type vm:CloudTreeViewItemViewModel}" ItemsSource="{Binding Children}">
+                <HierarchicalDataTemplate DataType="{x:Type vm:CloudTreeViewItemViewModel}" 
+                                          ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <cmd:EventToCommand Command="{Binding OpenCloudCommand, Mode=OneWay}"
+                                                    PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\CloudFoundrySmall.ico" />
                         <TextBlock Text="{Binding ServerName}" />
                     </StackPanel>

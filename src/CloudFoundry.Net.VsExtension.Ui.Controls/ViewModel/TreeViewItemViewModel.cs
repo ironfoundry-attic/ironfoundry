@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
+using GalaSoft.MvvmLight.Command;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {

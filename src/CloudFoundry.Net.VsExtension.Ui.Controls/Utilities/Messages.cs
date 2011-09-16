@@ -10,5 +10,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string ChangePassword = "ChangePassword";
         public const string ChangePasswordDialogResult = "ChangePasswordDialogResult";
         public const string ChangePasswordEmailAddress = "ChangePasswordEmailAddress";
+        public const string OpenCloud = "OpenCloud";
     }
 }

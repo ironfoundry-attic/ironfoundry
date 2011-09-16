@@ -9,8 +9,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
     {
         public Cloud() {
             Applications = new List<Application>();
+            ID = Guid.NewGuid();
         }
 
+        public Guid ID { get; set; }
         public string ServerName { get; set; }
         public string HostName { get; set; }
         public string Email { get; set; }
@@ -20,5 +22,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public int TimeoutStart { get; set; }
         public int TimeoutStop { get; set; }
         public List<Application> Applications { get; set; }
+        public List<Service> Services { get; set; }
     }
 }
