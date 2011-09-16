@@ -32,8 +32,8 @@
             /// <summary>
             /// Format for sending publish messages. First parameter is the subject,
             /// second parameter is the actual byte length of the message (you should
-            /// retrieve this by converting the string to an ascii message than retrieving 
-            /// the byte array length that's produced), 
+            /// retrieve this by converting the string to an ascii message than retrieving
+            /// the byte array length that's produced),
             /// third parameter is the actual message (should be in JSON format).
             /// </summary>
             public static readonly string Publish = NatsCommand.Publish.Command + " {0}  {1}\r\n{2}\r\n";
@@ -41,7 +41,7 @@
             /// <summary>
             /// Format for sending subscribe message. First parameter is the subject,
             /// second parameter is a sequential integer identifier. For every subscribe message
-            /// a running tally of unique integers is used in order to reply back to the 
+            /// a running tally of unique integers is used in order to reply back to the
             /// subscribed message.
             /// </summary>
             public static readonly string Subscribe = NatsCommand.Subscribe.Command + " {0}  {1}\r\n";
@@ -51,14 +51,15 @@
         private const string LogReceivedFormat = "NATS Msg Recv: {0}";
         private const string CRLF = "\r\n";
 
-        private string host;
-        private ushort port;
+        private readonly string host;
+        private readonly ushort port;
+        private readonly IDictionary<string, IDictionary<int, Action<string, string>>> subscriptions
+            = new Dictionary<string, IDictionary<int, Action<string, string>>>();
+        private readonly Guid uniqueIdentifier;
 
+        private int sequence = 1;
         private TcpClient tcpClient;
         private NetworkStream networkStream;
-        private Dictionary<string, Dictionary<int, Action<string, string>>> subscriptions;
-        private int sequence = 1;
-
         private bool shutting_down = false;
         private bool error_occurred = false;
 
@@ -71,17 +72,16 @@
         {
             host = argHost;
             port = argPort;
+            uniqueIdentifier = Guid.NewGuid();
             sequence = 1;
-            UniqueIdentifier = Guid.NewGuid();
             Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0:N}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, argHost, port);
-            subscriptions = new Dictionary<string, Dictionary<int, Action<string, string>>>();
         }
 
         public NatsMessagingStatus Status { get; private set; }
 
         public string StatusMessage { get; private set; }
 
-        public Guid UniqueIdentifier { get; private set; }
+        public Guid UniqueIdentifier { get { return uniqueIdentifier; } }
 
         public int Sequence { get { return sequence; } }
 
@@ -115,26 +115,28 @@
             doPublish(argCommand.Command, argMessage);
         }
 
-        public void Subscribe(string subject, Action<string, string> replyCallback)
+        public void Subscribe(NatsSubscription argSubscription, Action<string, string> argCallback)
         {
             if (NatsMessagingStatus.RUNNING != Status)
                 return;
 
             Interlocked.Increment(ref sequence);
 
-            Logger.Debug("NATS Subscribing to subject: {0}, sequence {1}", subject, Sequence);            
-            
-            string formattedMessage = String.Format(NatsCommandFormats.Subscribe, subject, Sequence);
+            Logger.Debug("NATS Subscribing to subject: {0}, sequence {1}", argSubscription, Sequence);
+
+            string formattedMessage = String.Format(NatsCommandFormats.Subscribe, argSubscription, Sequence);
 
             Logger.Trace(LogSentFormat, formattedMessage);
 
             write(formattedMessage);
-            
+
             lock (subscriptions)
-            { 
-                if (!subscriptions.ContainsKey(subject))
-                    subscriptions.Add(subject, new Dictionary<int,Action<string,string>>());
-                subscriptions[subject].Add(Sequence, replyCallback);
+            {
+                if (false == subscriptions.ContainsKey(argSubscription.Subscription))
+                {
+                    subscriptions.Add(argSubscription.Subscription, new Dictionary<int, Action<string, string>>());
+                }
+                subscriptions[argSubscription.Subscription].Add(Sequence, argCallback);
             }
         }
 
@@ -183,7 +185,7 @@
             }
 
             return rv;
-        }        
+        }
 
         public void Start()
         {
@@ -249,7 +251,7 @@
             Logger.Trace(LogSentFormat, formattedMessage);
 
             write(formattedMessage);
-        }        
+        }
 
         private void onFatalError(string argMessage = "")
         {
@@ -494,7 +496,6 @@
 
             public ReceivedMessage(string message)
             {
-                
                 MatchCollection matches = stdMsg.Matches(message);
                 if (matches.Count > 0)
                 {
@@ -510,13 +511,13 @@
                     if (inboxMatches.Count > 0)
                     {
                         GroupCollection groups = inboxMatches[0].Groups;
-                        Subject = groups[1].Value;                    
+                        Subject = groups[1].Value;
                         SubscriptionID = Convert.ToInt32(groups[2].Value);
                         InboxID = groups[3].Value;
                         Size = Convert.ToInt32(groups[4].Value);
                         RawMessage = groups[5].Value;
                     }
-                }            
+                }
             }
         }
     }

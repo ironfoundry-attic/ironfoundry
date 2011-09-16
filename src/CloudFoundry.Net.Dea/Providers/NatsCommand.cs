@@ -4,14 +4,14 @@
     {
         private static class NatsCommands
         {
-            public const string Ok          = "+OK";
-            public const string Error       = "-ERR";
-            public const string Ping        = "PING";
-            public const string Pong        = "PONG";
-            public const string Information = "INFO";
-            public const string Message     = "MSG";
-            public const string Publish     = "PUB";
-            public const string Subscribe   = "SUB";
+            public const string ok          = "+OK";
+            public const string error       = "-ERR";
+            public const string ping        = "PING";
+            public const string pong        = "PONG";
+            public const string information = "INFO";
+            public const string message     = "MSG";
+            public const string publish     = "PUB";
+            public const string subscribe   = "SUB";
         }
 
         public static readonly NatsCommand Ok          = new OKCommand();
@@ -25,67 +25,67 @@
 
         public abstract string Command { get; }
 
-        public class OKCommand : NatsCommand
+        private class OKCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Ok; }
+                get { return NatsCommands.ok; }
             }
         }
 
-        public class ErrorCommand : NatsCommand
+        private class ErrorCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Error; }
+                get { return NatsCommands.error; }
             }
         }
 
-        public class PingCommand : NatsCommand
+        private class PingCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Ping; }
+                get { return NatsCommands.ping; }
             }
         }
 
-        public class PongCommand : NatsCommand
+        private class PongCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Pong; }
+                get { return NatsCommands.pong; }
             }
         }
 
-        public class InformationCommand : NatsCommand
+        private class InformationCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Information; }
+                get { return NatsCommands.information; }
             }
         }
 
-        public class MessageCommand : NatsCommand
+        private class MessageCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Message; }
+                get { return NatsCommands.message; }
             }
         }
 
-        public class PublishCommand : NatsCommand
+        private class PublishCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Publish; }
+                get { return NatsCommands.publish; }
             }
         }
 
-        public class SubscribeCommand : NatsCommand
+        private class SubscribeCommand : NatsCommand
         {
             public override string Command
             {
-                get { return NatsCommands.Subscribe; }
+                get { return NatsCommands.subscribe; }
             }
         }
     }

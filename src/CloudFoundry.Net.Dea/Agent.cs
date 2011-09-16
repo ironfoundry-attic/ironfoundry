@@ -76,26 +76,24 @@
                     argCredentials: NATS.UniqueIdentifier,
                     argStart: DateTime.Now);
 
-                NATS.Subscribe(vcapComponentDiscoverMessage.PublishSubject,
+                NATS.Subscribe(NatsSubscription.VcapComponentDiscover,
                     (msg, reply) =>
                     {
                         // TODO update_discover_uptime
                         NATS.Publish(reply, vcapComponentDiscoverMessage);
                     });
 
-                // TODO not necessary NATS.Publish(NatsCommand.Ok, vcapComponentDiscoverMessage);
-
                 NATS.Publish( new VcapComponentAnnounce(vcapComponentDiscoverMessage));
 
-                NATS.Subscribe(Message.Subjects.DeaStatus, processDeaStatus);
-                NATS.Subscribe(Message.Subjects.DropletStatus, processDropletStatus);
-                NATS.Subscribe(Message.Subjects.DeaDiscover, processDeaDiscover);
-                NATS.Subscribe(Message.Subjects.DeaFindDroplet, processDeaFindDroplet);
-                NATS.Subscribe(Message.Subjects.DeaUpdate, processDeaUpdate);
-                NATS.Subscribe(Message.Subjects.DeaStop, processDeaStop);
-                NATS.Subscribe(String.Format(Message.Subjects.DeaInstanceStart, NATS.UniqueIdentifier), processDeaStart);
-                NATS.Subscribe(Message.Subjects.RouterStart, processRouterStart);
-                NATS.Subscribe(Message.Subjects.HealthManagerStart, processHealthManagerStart);
+                NATS.Subscribe(NatsSubscription.DeaStatus, processDeaStatus);
+                NATS.Subscribe(NatsSubscription.DropletStatus, processDropletStatus);
+                NATS.Subscribe(NatsSubscription.DeaDiscover, processDeaDiscover);
+                NATS.Subscribe(NatsSubscription.DeaFindDroplet, processDeaFindDroplet);
+                NATS.Subscribe(NatsSubscription.DeaUpdate, processDeaUpdate);
+                NATS.Subscribe(NatsSubscription.DeaStop, processDeaStop);
+                NATS.Subscribe(NatsSubscription.GetDeaInstanceStartFor(NATS.UniqueIdentifier), processDeaStart);
+                NATS.Subscribe(NatsSubscription.RouterStart, processRouterStart);
+                NATS.Subscribe(NatsSubscription.HealthManagerStart, processHealthManagerStart);
 
                 NATS.Publish(helloMessage);
 
@@ -103,8 +101,6 @@
 
                 tasks.Add(Task.Factory.StartNew(monitorLoop));
 
-                // TODO refactor threading?
-                // TODO how to indicate problems in threads? Events?
                 rv = true;
             }
 

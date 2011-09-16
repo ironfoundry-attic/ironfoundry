@@ -23,8 +23,7 @@
         void Publish(NatsCommand argCommand, Message argMessage);
         void Publish(Message argMessage);
 
-        void Subscribe(string subject, Action<string, string> replyCallback);
-        // TODO void Subscribe<TMsg>(Action<TMsg> argCallback);
+        void Subscribe(NatsSubscription argSubscription, Action<string, string> argCallback);
 
         bool Connect();
         void Start();
