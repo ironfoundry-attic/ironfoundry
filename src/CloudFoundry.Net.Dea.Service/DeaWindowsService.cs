@@ -46,7 +46,7 @@
         protected override void OnStop()
         {
             agent.Stop();
-            Task.WaitAll(new[] { agentTask }, TimeSpan.FromMinutes(2));
+            agentTask.Wait(TimeSpan.FromMinutes(2));
         }
 
         private void agentMonitor(object argState)

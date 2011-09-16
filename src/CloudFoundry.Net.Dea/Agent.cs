@@ -30,11 +30,10 @@
 
         private readonly Hello helloMessage;
         private readonly object lockObject = new object();
-        private readonly IList<Task> tasks = new List<Task>();
+        private readonly Task monitorTask;
+        private readonly string snapshotFile;
 
         private bool shutting_down = false;
-
-        private readonly string snapshotFile;
 
         public Agent()
         {
@@ -54,6 +53,8 @@
             Directory.CreateDirectory(applicationPath);
 
             snapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
+
+            monitorTask = new Task(monitorLoop);
         }
 
         public bool Error { get; private set; }
@@ -64,7 +65,7 @@
 
             if (NATS.Connect())
             {
-                tasks.Add(Task.Factory.StartNew(NATS.Start));
+                NATS.Start();
 
                 // TODO do we have to wait for poll to start?
 
@@ -99,7 +100,7 @@
 
                 recoverExistingDroplets();
 
-                tasks.Add(Task.Factory.StartNew(monitorLoop));
+                monitorTask.Start();
 
                 rv = true;
             }
@@ -137,7 +138,7 @@
 
             Logger.Debug(Resources.Agent_WaitingForTasksInStop_Message);
 
-            Task.WaitAll(tasks.ToArray(), TimeSpan.FromMinutes(1));
+            monitorTask.Wait(TimeSpan.FromSeconds(30));
 
             Logger.Debug(Resources.Agent_TasksCompletedInStop_Message);
         }
