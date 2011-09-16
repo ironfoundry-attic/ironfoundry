@@ -44,6 +44,6 @@
         public string[] Users { get; set; }
 
         [JsonProperty(PropertyName = "index")]
-        public string Index { get; set; }
+        public uint Index { get; set; }
     }
 }

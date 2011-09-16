@@ -25,7 +25,7 @@
 
         private readonly IMessagingProvider NATS;
         private readonly IWebServerAdministrationProvider IIS;
-        private readonly IDictionary<uint, Dictionary<Guid, Instance>> Droplets = new Dictionary<uint, Dictionary<Guid, Instance>>();        
+        private readonly IDictionary<uint, Dictionary<Guid, Instance>> Droplets = new Dictionary<uint, Dictionary<Guid, Instance>>();
         private readonly Hello helloMessage;
         private readonly string snapshotFile;
         private readonly object lockObject = new object();
@@ -146,8 +146,8 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);            
-            
+            Logger.Debug("Starting processDeaStart: {0}", message);
+
             Droplet droplet = Message.FromJson<Droplet>(message);
             if (droplet.Framework != "aspdotnet")
             {
@@ -156,7 +156,7 @@
             }
 
             var instance = new Instance(droplet);
-            
+
             FileData file = getStagedApplicationFile(droplet.ExecutableUri);
             if (null != file)
             {
@@ -218,7 +218,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
+            Logger.Debug("Starting processDeaUpdate: {0}", message);
             Droplet droplet = Message.FromJson<Droplet>(message);
             Instance instance = getFirstInstance(droplet.ID);
             string[] current_uris = new string[instance.Uris.Length];
@@ -227,7 +227,7 @@
 
             var toRemove = current_uris.Except(droplet.Uris);
             var toAdd = droplet.Uris.Except(current_uris);
-            
+
             unregisterWithRouter(instance, toRemove.ToArray());
 
             registerWithRouter(instance, toAdd.ToArray());
@@ -240,11 +240,11 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
+            Logger.Debug("Starting processDeaDiscover: {0}", message);
             Discover discover = Message.FromJson<Discover>(message);
             NATS.Publish(reply, helloMessage);
-        }  
-      
+        }
+
         /*
          * TODO UPDATE TO WORK WITH INSTANCES
          */
@@ -278,11 +278,11 @@
     end
          */
         private void processDeaStop(string message, string reply)
-        {            
+        {
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
+            Logger.Debug("Starting processDeaStop: {0}", message);
             StopDroplet stopDropletMsg = Message.FromJson<StopDroplet>(message);
             forAllInstances((instance) =>
                 {
@@ -300,7 +300,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
+            Logger.Debug("Starting processDeaStatus: {0}", message);
             var statusMessage = new Status
             {
                 ID             = helloMessage.ID,
@@ -320,7 +320,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
+            Logger.Debug("Starting processDeaFindDroplet: {0}", message);
             FindDroplet findDroplet = Message.FromJson<FindDroplet>(message);
             forAllInstances((instance) =>
             {
@@ -372,7 +372,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
+            Logger.Debug("Starting processDropletStatus: {0}", message);
             forAllInstances((instance) =>
             {
                 if (instance.IsStarting || instance.IsRunning)
@@ -393,7 +393,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name,message);
+            Logger.Debug("Starting processRouterStart: {0}", message);
 
             forAllInstances((instance) =>
                 {
@@ -406,7 +406,7 @@
 
         private void processHealthManagerStart(string message, string reply)
         {
-            Logger.Debug("Starting {0}: {1}", new StackFrame(0).GetMethod().Name, message);
+            Logger.Debug("Starting processHealthManagerStart: {0}", message);
             sendHeartbeat();
         }
 
@@ -441,6 +441,30 @@
             };
 
             NATS.Publish(Constants.Messages.RouterUnregister, routerRegister);
+        }
+
+        /*
+    def send_exited_notification(instance)
+      return if instance[:evacuated]
+      exit_message = {
+        :droplet => instance[:droplet_id],
+        :version => instance[:version],
+        :instance => instance[:instance_id],
+        :index => instance[:instance_index],
+        :reason => instance[:exit_reason],
+      }
+      exit_message[:crash_timestamp] = instance[:state_timestamp] if instance[:state] == :CRASHED
+      exit_message = exit_message.to_json
+      NATS.publish('droplet.exited', exit_message)
+      @logger.debug("Sent droplet.exited #{exit_message}")
+    end
+         */
+        private void sendExitedNotification(Instance argInstance)
+        {
+            if (argInstance.IsEvacuated)
+                return;
+
+            var exitedMessage = new DropletExited(argInstance);
         }
 
         private void sendHeartbeat()

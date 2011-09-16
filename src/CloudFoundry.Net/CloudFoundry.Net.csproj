@@ -44,6 +44,7 @@
     <Compile Include="TimerExtensionMethods.cs" />
     <Compile Include="Types\Application.cs" />
     <Compile Include="Types\AppService.cs" />
+    <Compile Include="Types\DropletExited.cs" />
     <Compile Include="Types\Frameworks.cs" />
     <Compile Include="Types\Info.cs" />
     <Compile Include="SocketErrorCode.cs" />

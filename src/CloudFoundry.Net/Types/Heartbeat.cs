@@ -26,7 +26,7 @@
         public Guid InstanceID { get; private set; }
 
         [JsonProperty(PropertyName = "index")]
-        public string Index { get; private set; }
+        public uint Index { get; private set; }
 
         [JsonProperty(PropertyName = "state")]
         public string State { get; private set; }

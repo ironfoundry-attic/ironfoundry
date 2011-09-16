@@ -40,7 +40,7 @@
         public Guid InstanceID { get; private set; }
 
         [JsonProperty(PropertyName = "instance_index")]
-        public string InstanceIndex { get; set; }
+        public uint InstanceIndex { get; set; }
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; private set; }
@@ -110,6 +110,15 @@
         {
             get { return null != State && State == InstanceState.RUNNING; }
         }
+
+        [JsonIgnore]
+        public bool IsCrashed
+        {
+            get { return null != State && State == InstanceState.CRASHED; }
+        }
+
+        [JsonIgnore]
+        public bool IsEvacuated { get; set; } // TODO
 
         [JsonIgnore]
         public string IIsName
