@@ -59,6 +59,7 @@
     <Compile Include="Providers\IProviderFactory.cs" />
     <Compile Include="Providers\IWebServerAdministrationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\NatsCommand.cs" />
     <Compile Include="Providers\NatsMessagingProvider.cs" />
     <Compile Include="Providers\ProviderFactory.cs" />
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />

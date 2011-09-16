@@ -27,6 +27,26 @@
         private static readonly TimeSpan CONNECTION_ATTEMPT_INTERVAL = TimeSpan.FromSeconds(10);
 #endif
 
+        private static class NatsCommandFormats
+        {
+            /// <summary>
+            /// Format for sending publish messages. First parameter is the subject,
+            /// second parameter is the actual byte length of the message (you should
+            /// retrieve this by converting the string to an ascii message than retrieving 
+            /// the byte array length that's produced), 
+            /// third parameter is the actual message (should be in JSON format).
+            /// </summary>
+            public static readonly string Publish = NatsCommand.Publish.Command + " {0}  {1}\r\n{2}\r\n";
+
+            /// <summary>
+            /// Format for sending subscribe message. First parameter is the subject,
+            /// second parameter is a sequential integer identifier. For every subscribe message
+            /// a running tally of unique integers is used in order to reply back to the 
+            /// subscribed message.
+            /// </summary>
+            public static readonly string Subscribe = NatsCommand.Subscribe.Command + " {0}  {1}\r\n";
+        }
+
         private const string LogSentFormat = "NATS Msg Sent: {0}";
         private const string LogReceivedFormat = "NATS Msg Recv: {0}";
         private const string CRLF = "\r\n";
@@ -52,8 +72,8 @@
             host = argHost;
             port = argPort;
             sequence = 1;
-            UniqueIdentifier = Guid.NewGuid().ToString("N");   
-            Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, argHost, port);
+            UniqueIdentifier = Guid.NewGuid();
+            Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0:N}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, argHost, port);
             subscriptions = new Dictionary<string, Dictionary<int, Action<string, string>>>();
         }
 
@@ -61,28 +81,39 @@
 
         public string StatusMessage { get; private set; }
 
-        public string UniqueIdentifier { get; private set; }
+        public Guid UniqueIdentifier { get; private set; }
 
         public int Sequence { get { return sequence; } }
 
         public void Publish(string argSubject, Message argMessage)
         {
-            Publish(argSubject, argMessage.ToJson());
+            Hello helloMessage = argMessage as Hello;
+            if (null != helloMessage)
+            {
+                doPublish(argSubject, helloMessage);
+                return;
+            }
+
+            FindDropletResponse findDropletResponse = argMessage as FindDropletResponse;
+            if (null != findDropletResponse)
+            {
+                doPublish(argSubject, findDropletResponse);
+                return;
+            }
+
+            throw new InvalidOperationException(
+                String.Format("Invalid attempt to publish message of type '{0}' with subject '{1}'", argMessage.GetType().Name, argSubject));
         }
 
-        public void Publish(string subject, string message)
+        public void Publish(Message argMessage)
         {
-            if (NatsMessagingStatus.RUNNING != Status)
-                return;
+            doPublish(argMessage.PublishSubject, argMessage);
+        }
 
-            Logger.Debug("NATS Publishing subject: {0},{1}", subject, message);  
-
-            string formattedMessage = String.Format(Constants.NatsCommandFormats.Publish, subject, Encoding.ASCII.GetBytes(message).Length, message);
-
-            Logger.Trace(LogSentFormat, formattedMessage);
-
-            write(formattedMessage);
-        }        
+        public void Publish(NatsCommand argCommand, Message argMessage)
+        {
+            doPublish(argCommand.Command, argMessage);
+        }
 
         public void Subscribe(string subject, Action<string, string> replyCallback)
         {
@@ -93,9 +124,9 @@
 
             Logger.Debug("NATS Subscribing to subject: {0}, sequence {1}", subject, Sequence);            
             
-            string formattedMessage = String.Format(Constants.NatsCommandFormats.Subscribe, subject, Sequence);
+            string formattedMessage = String.Format(NatsCommandFormats.Subscribe, subject, Sequence);
 
-            Logger.Trace(LogSentFormat,formattedMessage);
+            Logger.Trace(LogSentFormat, formattedMessage);
 
             write(formattedMessage);
             
@@ -196,6 +227,30 @@
             Stop();
         }
 
+        private void doPublish(string argSubject, Message argMessage)
+        {
+            if (Message.RECEIVE_ONLY == argSubject)
+            {
+                throw new InvalidOperationException("Attempt to publish receive-only message!");
+            }
+
+            if (NatsMessagingStatus.RUNNING != Status)
+            {
+                return;
+            }
+
+            Logger.Debug("NATS Publishing subject: {0},{1}", argSubject, argMessage);
+
+            string messageJson = argMessage.ToJson();
+
+            string formattedMessage = String.Format(
+                NatsCommandFormats.Publish, argSubject, Encoding.ASCII.GetBytes(messageJson).Length, messageJson);
+
+            Logger.Trace(LogSentFormat, formattedMessage);
+
+            write(formattedMessage);
+        }        
+
         private void onFatalError(string argMessage = "")
         {
             error_occurred = true;
@@ -220,15 +275,15 @@
 
                     Logger.Trace(LogReceivedFormat, message);
 
-                    if (Constants.NatsCommands.Ok == message)
+                    if (NatsCommand.Ok.Command == message)
                     {
                         Logger.Trace("NATS Message Acknowledged: {0}", message);
                     }
-                    else if (message.StartsWith(Constants.NatsCommands.Information))
+                    else if (message.StartsWith(NatsCommand.Information.Command))
                     {
                         Logger.Trace("NATS Info Message {0}", message);
                     }
-                    else if (message.StartsWith(Constants.NatsCommands.Message))
+                    else if (message.StartsWith(NatsCommand.Message.Command))
                     {
                         // We can't guarantee that the continuation will be on the queue
                         while (messageQueue.IsNullOrEmpty())
@@ -237,6 +292,8 @@
                         }
 
                         string messageContinuation = messageQueue.Dequeue();
+
+                        Logger.Trace(LogReceivedFormat, messageContinuation);
 
                         var receivedMessage = new ReceivedMessage(message + CRLF + messageContinuation);
 

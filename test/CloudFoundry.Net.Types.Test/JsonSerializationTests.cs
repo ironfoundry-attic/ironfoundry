@@ -53,7 +53,7 @@
         [Fact]
         public void Can_Serialize_RouterRegister()
         {
-            string dea = randomString();
+            Guid dea = Guid.NewGuid();
 
             string host = randomString();
 
@@ -72,7 +72,7 @@
 
             var rr = new RouterRegister
             {
-                Dea = dea, Host = host, Port = port, Uris = uris, Tag = tag,
+                Dea = dea, Host = host, Port = port, Uris = uris, Tag = tag
             };
 
             string json = rr.ToJson();

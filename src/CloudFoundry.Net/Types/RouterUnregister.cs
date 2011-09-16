@@ -5,11 +5,11 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// router.register
+    /// Used for router.unregister
     /// </summary>
-    public class RouterRegister : Message
+    public class RouterUnregister : Message
     {
-        private const string publishSubject = "router.register";
+        private const string publishSubject = "router.unregister";
 
         [JsonIgnore]
         public override string PublishSubject
@@ -28,8 +28,5 @@
 
         [JsonProperty(PropertyName = "uris")]
         public string[] Uris { get; set; } // TODO actual System.Uri
-
-        [JsonProperty(PropertyName = "tags")] // TODO why tags plural?
-        public Tag Tag { get; set; }
     }
 }

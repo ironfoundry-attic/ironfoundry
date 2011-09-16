@@ -9,19 +9,13 @@
         [Fact]
         public void Can_Convert_Hello_Message()
         {
-            string id = "FOO_1234";
+            Guid id = Guid.NewGuid();
             IPAddress addr;
             IPAddress.TryParse("10.0.0.1", out addr);
 
             string expected = @"{""id"":""FOO_1234"",""ip"":""10.0.0.1"",""port"":80,""version"":1.0}";
 
-            var msg = new Hello
-            {
-                ID = id,
-                IPAddress = addr,
-                Port = 80,
-                Version = 1.0M,
-            };
+            var msg = new Hello(id, addr, 80, 1.0M);
 
             Assert.Equal(expected, msg.ToJson());
         }
@@ -31,15 +25,7 @@
         {
             Guid uuid = Guid.NewGuid();
 
-            var msg = new VcapComponentDiscover
-            {
-                Type        = "DEA",
-                Index       = 1,
-                Uuid        = uuid.ToString(),
-                Host        = "127.0.0.1:9999",
-                Credentials = uuid.ToString(),
-                Start       = DateTime.Now,
-            };
+            var msg = new VcapComponentDiscover("DEA", 1, uuid, "127.0.0.1:9999", uuid, DateTime.Now);
 
             var json = msg.ToJson();
 

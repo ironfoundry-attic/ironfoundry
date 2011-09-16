@@ -3,17 +3,17 @@
     using System;
     using Newtonsoft.Json;
 
-    public class VcapComponentDiscover : VcapComponentBase
+    public class VcapComponentAnnounce : VcapComponentBase
     {
-        private const string publishSubject = "vcap.component.discover";
+        private const string publishSubject = "vcap.component.announce";
 
-        public VcapComponentDiscover(
+        public VcapComponentAnnounce(
             string argType, int argIndex, Guid argUuid,
             string argHost, Guid argCredentials, DateTime argStart)
             : base(argType, argIndex, argUuid,
                    argHost, argCredentials, argStart) { }
 
-        public VcapComponentDiscover(VcapComponentBase argVcapComponentBase)
+        public VcapComponentAnnounce(VcapComponentBase argVcapComponentBase)
             : base(argVcapComponentBase) { }
 
         [JsonIgnore]

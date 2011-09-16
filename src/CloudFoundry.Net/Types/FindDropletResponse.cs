@@ -1,13 +1,19 @@
 ﻿namespace CloudFoundry.Net.Types
 {
     using System;
-    using Converters;
+    using JsonConverters;
     using Newtonsoft.Json;
 
-    public class FindDropletResponse : JsonBase
+    public class FindDropletResponse : Message
     {
-        [JsonProperty(PropertyName = "dea")]
-        public string Dea { get; set; }
+        [JsonIgnore]
+        public override string PublishSubject
+        {
+            get { return REPLY_OK; } // Find Droplet has no message specific subject.
+        }
+
+        [JsonProperty(PropertyName = "dea"), JsonConverter(typeof(VcapGuidConverter))]
+        public Guid Dea { get; set; }
 
         [JsonProperty(PropertyName = "version")]
         public string Version { get; set; }

@@ -1,7 +1,7 @@
 ﻿namespace CloudFoundry.Net.Types
 {
     using System;
-    using Converters;
+    using JsonConverters;
     using Newtonsoft.Json;
 
     public class Heartbeat : Message

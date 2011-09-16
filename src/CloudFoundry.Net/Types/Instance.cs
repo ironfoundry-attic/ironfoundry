@@ -1,7 +1,7 @@
 ﻿namespace CloudFoundry.Net.Types
 {
     using System;
-    using Converters;
+    using JsonConverters;
     using Newtonsoft.Json;
 
     public class Instance : JsonBase
@@ -91,7 +91,13 @@
         public string Staged { get; private set; }
 
         [JsonProperty(PropertyName = "exit_reason")]
-        public string ExitReason { get; private set; }
+        public string ExitReason { get; private set; } // TODO used?
+
+        [JsonIgnore]
+        public bool HasExitReason
+        {
+            get { return false == String.IsNullOrWhiteSpace(ExitReason); }
+        }
 
         [JsonProperty(PropertyName = "sha1")]
         public string Sha1 { get; private set; }
@@ -118,13 +124,19 @@
         }
 
         [JsonIgnore]
-        public bool IsEvacuated { get; set; } // TODO
+        public bool IsEvacuated { get; private set; }
 
         [JsonIgnore]
         public string IIsName
         {
             get { return String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID); }
         }
+
+        [JsonIgnore]
+        public bool StopProcessed { get; set; } // TODO
+
+        [JsonIgnore]
+        public bool IsNotified { get; set; } // TODO
 
         public static class InstanceState
         {
@@ -134,6 +146,18 @@
             public const string SHUTTING_DOWN = "SHUTTING_DOWN";
             public const string CRASHED       = "CRASHED";
             public const string DELETED       = "DELETED";
+        }
+
+        public void Crashed()
+        {
+            ExitReason = State = InstanceState.CRASHED;
+            StateTimestamp = Utility.GetEpochTimestamp();
+        }
+
+        public void DeaEvacuation()
+        {
+            ExitReason = "DEA_EVACUATION";
+            IsEvacuated = true;
         }
     }
 }

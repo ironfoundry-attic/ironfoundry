@@ -1,7 +1,7 @@
 ﻿namespace CloudFoundry.Net.Types
 {
     using System;
-    using Converters;
+    using JsonConverters;
     using Newtonsoft.Json;
 
     /*
@@ -12,8 +12,16 @@
         :reason => instance[:exit_reason],
         exit_message[:crash_timestamp] = instance[:state_timestamp] if instance[:state] == :CRASHED
      */
-    public class DropletExited : Message
+    public class InstanceExited : Message
     {
+        private const string publishSubject = "droplet.exited";
+
+        [JsonIgnore]
+        public override string PublishSubject
+        {
+            get { return publishSubject; }
+        }
+
         [JsonProperty(PropertyName = "droplet")]
         public uint ID { get; private set; }
 
@@ -32,7 +40,7 @@
         [JsonProperty(PropertyName = "crash_timestamp")]
         public int CrashTimestamp { get; private set; }
 
-        public DropletExited(Instance argInstance)
+        public InstanceExited(Instance argInstance)
         {
             ID            = argInstance.DropletID;
             Version       = argInstance.Version;

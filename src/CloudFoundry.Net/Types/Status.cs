@@ -18,5 +18,8 @@
 
         [JsonProperty(PropertyName = "state")]
         public string State { get; set; }
+
+        public Status(Hello argHello)
+            : base(argHello.ID, argHello.IPAddress, argHello.Port, argHello.Version) { }
     }
 }

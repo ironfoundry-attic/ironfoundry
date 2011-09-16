@@ -25,13 +25,16 @@
 
         private readonly IMessagingProvider NATS;
         private readonly IWebServerAdministrationProvider IIS;
-        private readonly IDictionary<uint, Dictionary<Guid, Instance>> Droplets = new Dictionary<uint, Dictionary<Guid, Instance>>();
+
+        private readonly IDictionary<uint, IDictionary<Guid, Instance>> Droplets = new Dictionary<uint, IDictionary<Guid, Instance>>();
+
         private readonly Hello helloMessage;
-        private readonly string snapshotFile;
         private readonly object lockObject = new object();
         private readonly IList<Task> tasks = new List<Task>();
 
-        private bool shutting_down = false; // TODO: cancellation tokens
+        private bool shutting_down = false;
+
+        private readonly string snapshotFile;
 
         public Agent()
         {
@@ -43,13 +46,7 @@
 
             IIS = providerFactory.CreateWebServerAdministrationProvider();
 
-            helloMessage = new Hello
-            {
-                ID = NATS.UniqueIdentifier,
-                IPAddress = Utility.LocalIPAddress,
-                Port = 12345,
-                Version = 0.99M,
-            };
+            helloMessage = new Hello(NATS.UniqueIdentifier, Utility.LocalIPAddress, 12345, 0.99M);
 
             string dropletsPath = ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory];
             string applicationPath = ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory];
@@ -71,33 +68,36 @@
 
                 // TODO do we have to wait for poll to start?
 
-                NATS.Subscribe(Constants.Messages.VcapComponentDiscover, (msg, reply) => { }); // TODO subscribe to message types instead
+                var vcapComponentDiscoverMessage = new VcapComponentDiscover(
+                    argType: "DEA",
+                    argIndex: 1,
+                    argUuid: NATS.UniqueIdentifier, 
+                    argHost: Utility.LocalIPAddress.ToString(),
+                    argCredentials: NATS.UniqueIdentifier,
+                    argStart: DateTime.Now);
 
-                var vcapComponentDiscoverMessage = new VcapComponentDiscover
-                {
-                    Type = "DEA",
-                    Index = 1,
-                    Uuid = NATS.UniqueIdentifier,
-                    Host = Utility.LocalIPAddress.ToString(),
-                    Credentials = NATS.UniqueIdentifier,
-                    Start = DateTime.Now, // TODO UTC?
-                };
+                NATS.Subscribe(vcapComponentDiscoverMessage.PublishSubject,
+                    (msg, reply) =>
+                    {
+                        // TODO update_discover_uptime
+                        NATS.Publish(reply, vcapComponentDiscoverMessage);
+                    });
 
-                NATS.Publish(Constants.NatsCommands.Ok, vcapComponentDiscoverMessage);
+                // TODO not necessary NATS.Publish(NatsCommand.Ok, vcapComponentDiscoverMessage);
 
-                NATS.Publish(Constants.Messages.VcapComponentAnnounce, vcapComponentDiscoverMessage);
+                NATS.Publish( new VcapComponentAnnounce(vcapComponentDiscoverMessage));
 
-                NATS.Subscribe(Constants.Messages.DeaStatus, processDeaStatus);
-                NATS.Subscribe(Constants.Messages.DropletStatus, processDropletStatus);
-                NATS.Subscribe(Constants.Messages.DeaDiscover, processDeaDiscover);
-                NATS.Subscribe(Constants.Messages.DeaFindDroplet, processDeaFindDroplet);
-                NATS.Subscribe(Constants.Messages.DeaUpdate, processDeaUpdate);
-                NATS.Subscribe(Constants.Messages.DeaStop, processDeaStop);
-                NATS.Subscribe(String.Format(Constants.Messages.DeaInstanceStart, NATS.UniqueIdentifier), processDeaStart);
-                NATS.Subscribe(Constants.Messages.RouterStart, processRouterStart);
-                NATS.Subscribe(Constants.Messages.HealthManagerStart, processHealthManagerStart);
+                NATS.Subscribe(Message.Subjects.DeaStatus, processDeaStatus);
+                NATS.Subscribe(Message.Subjects.DropletStatus, processDropletStatus);
+                NATS.Subscribe(Message.Subjects.DeaDiscover, processDeaDiscover);
+                NATS.Subscribe(Message.Subjects.DeaFindDroplet, processDeaFindDroplet);
+                NATS.Subscribe(Message.Subjects.DeaUpdate, processDeaUpdate);
+                NATS.Subscribe(Message.Subjects.DeaStop, processDeaStop);
+                NATS.Subscribe(String.Format(Message.Subjects.DeaInstanceStart, NATS.UniqueIdentifier), processDeaStart);
+                NATS.Subscribe(Message.Subjects.RouterStart, processRouterStart);
+                NATS.Subscribe(Message.Subjects.HealthManagerStart, processHealthManagerStart);
 
-                NATS.Publish(Constants.Messages.DeaStart, helloMessage);
+                NATS.Publish(helloMessage);
 
                 recoverExistingDroplets();
 
@@ -111,15 +111,38 @@
             return rv;
         }
 
-        public void Stop()
+        public void Stop() // evacuate_apps_then_quit TODO
         {
             if (shutting_down)
                 return;
 
             shutting_down = true;
+
+            Logger.Info("Evacuating applications..");
+
+            forAllInstances(
+                (dropletID) =>
+                {
+                    Logger.Debug("Evacuating app {0}", dropletID);
+                },
+                (instance) =>
+                {
+                    if (instance.IsCrashed)
+                        return;
+
+                    instance.DeaEvacuation();
+
+                    sendExitedNotification(instance);
+                });
+
+            takeSnapshot();
+
             NATS.Dispose();
+
             Logger.Debug(Resources.Agent_WaitingForTasksInStop_Message);
+
             Task.WaitAll(tasks.ToArray(), TimeSpan.FromMinutes(1));
+
             Logger.Debug(Resources.Agent_TasksCompletedInStop_Message);
         }
 
@@ -190,7 +213,7 @@
 
                     lock (lockObject)
                     {
-                        Dictionary<Guid, Instance> instances;
+                        IDictionary<Guid, Instance> instances;
                         if (Droplets.TryGetValue(droplet.ID, out instances))
                         {
                             instances.Add(instance.InstanceID, instance);
@@ -229,7 +252,6 @@
             var toAdd = droplet.Uris.Except(current_uris);
 
             unregisterWithRouter(instance, toRemove.ToArray());
-
             registerWithRouter(instance, toAdd.ToArray());
 
             takeSnapshot();
@@ -246,36 +268,8 @@
         }
 
         /*
-         * TODO UPDATE TO WORK WITH INSTANCES
-         */
-        /*
-    def process_dea_stop(message)
-      return if @shutting_down
-      message_json = JSON.parse(message)
-      @logger.debug("DEA received stop message: #{message}")
-
-      droplet_id   = message_json['droplet']
-      version      = message_json['version']
-      instance_ids = message_json['instances'] ? Set.new(message_json['instances']) : nil
-      indices      = message_json['indices'] ? Set.new(message_json['indices']) : nil
-      states       = message_json['states'] ? Set.new(message_json['states']) : nil
-
-      return unless instances = @droplets[droplet_id]
-      instances.each_value do |instance|
-        version_matched  = version.nil? || instance[:version] == version
-        instance_matched = instance_ids.nil? || instance_ids.include?(instance[:instance_id])
-        index_matched    = indices.nil? || indices.include?(instance[:instance_index])
-        state_matched    = states.nil? || states.include?(instance[:state].to_s)
-        if (version_matched && instance_matched && index_matched && state_matched)
-          instance[:exit_reason] = :STOPPED if [:STARTING, :RUNNING].include?(instance[:state])
-          if instance[:state] == :CRASHED
-            instance[:state] = :DELETED
-            instance[:stop_processed] = false
-          end
-          stop_droplet(instance)
-        end
-      end
-    end
+         * stop_droplet
+         * cleanup_droplet
          */
         private void processDeaStop(string message, string reply)
         {
@@ -283,16 +277,44 @@
                 return;
 
             Logger.Debug("Starting processDeaStop: {0}", message);
+
             StopDroplet stopDropletMsg = Message.FromJson<StopDroplet>(message);
-            forAllInstances((instance) =>
+            forAllInstances((argInstance) =>
                 {
-                    IIS.UninstallWebApp(instance.IIsName);
-                    unregisterWithRouter(instance, instance.Uris);
+                    // TODO version and instance matching
+                    IIS.UninstallWebApp(argInstance.IIsName);
+
+                    unregisterWithRouter(argInstance, argInstance.Uris);
+
+                    if (argInstance.StopProcessed)
+                        return;
+
+                    sendExitedMessage(argInstance);
+
+                    Logger.Info("Stopping instance {0}", argInstance.LogID);
+
+                    argInstance.StopProcessed = true;
                 });
-            // TODO stop_droplet() !!!
-            Droplets.Remove(stopDropletMsg.ID); // TODO: lock??
+
+            // TODO delete files?
             takeSnapshot();
-            NATS.Publish(Constants.NatsCommands.Ok, message);
+        }
+
+        private void sendExitedMessage(Instance argInstance)
+        {
+            if (argInstance.IsNotified)
+                return;
+
+            unregisterWithRouter(argInstance);
+
+            if (false == argInstance.HasExitReason)
+            {
+                argInstance.Crashed();
+            }
+
+            sendExitedNotification(argInstance);
+
+            argInstance.IsNotified = true;
         }
 
         private void processDeaStatus(string message, string reply)
@@ -301,18 +323,14 @@
                 return;
 
             Logger.Debug("Starting processDeaStatus: {0}", message);
-            var statusMessage = new Status
+            var statusMessage = new Status(helloMessage)
             {
-                ID             = helloMessage.ID,
-                IPAddress      = helloMessage.IPAddress,
-                Port           = helloMessage.Port,
-                Version        = helloMessage.Version,
                 MaxMemory      = 4096,
                 UsedMemory     = 0,
                 ReservedMemory = 0,
                 NumClients     = 20
             };
-            NATS.Publish(reply, statusMessage.ToJson());
+            NATS.Publish(reply, statusMessage);
         }
 
         private void processDeaFindDroplet(string message, string reply)
@@ -344,7 +362,7 @@
                                 FileUri        = string.Empty,
                                 Credentials    = string.Empty,
                                 Staged         = instance.Staged,
-                                Stats          = new Stats()
+                                Stats          = new Stats
                                 {
                                     Name      = instance.Name,
                                     Host      = instance.Host,
@@ -358,9 +376,13 @@
                                     //,Usage     = 20
                                 }
                             };
+
                             if (response.State != Instance.InstanceState.RUNNING)
+                            {
                                 response.Stats = null;
-                            NATS.Publish(reply, response.ToJson());
+                            }
+
+                            NATS.Publish(reply, response);
                         }
                     }
                 }
@@ -410,61 +432,52 @@
             sendHeartbeat();
         }
 
-        private void registerWithRouter(Instance instance, string[] uris)
+        private void registerWithRouter(Instance argInstance, string[] argUris)
         {
-            if (shutting_down || uris.IsNullOrEmpty())
+            if (shutting_down || argInstance.Uris.IsNullOrEmpty())
                 return;
 
             var routerRegister = new RouterRegister
             {
                 Dea  = NATS.UniqueIdentifier,
-                Host = instance.Host,
-                Port = instance.Port,
-                Uris = uris,
-                Tag  = new Tag { Framework = instance.Framework, Runtime = instance.Runtime }
+                Host = argInstance.Host,
+                Port = argInstance.Port,
+                Uris = argUris ?? argInstance.Uris,
+                Tag  = new Tag { Framework = argInstance.Framework, Runtime = argInstance.Runtime }
             };
 
-            NATS.Publish(Constants.Messages.RouterRegister, routerRegister);
+            NATS.Publish(routerRegister);
         }
 
-        private void unregisterWithRouter(Instance instance, string[] uris)
+        private void unregisterWithRouter(Instance argInstance)
         {
-            if (shutting_down || uris.IsNullOrEmpty())
+            unregisterWithRouter(argInstance, null);
+        }
+
+        private void unregisterWithRouter(Instance argInstance, string[] argUris)
+        {
+            if (shutting_down || argInstance.Uris.IsNullOrEmpty())
                 return;
 
-            var routerRegister = new RouterRegister
+            var routerUnregister = new RouterUnregister
             {
                 Dea  = NATS.UniqueIdentifier,
-                Host = instance.Host,
-                Port = instance.Port,
-                Uris = uris
+                Host = argInstance.Host,
+                Port = argInstance.Port,
+                Uris = argUris ?? argInstance.Uris,
             };
 
-            NATS.Publish(Constants.Messages.RouterUnregister, routerRegister);
+            NATS.Publish(routerUnregister);
         }
 
-        /*
-    def send_exited_notification(instance)
-      return if instance[:evacuated]
-      exit_message = {
-        :droplet => instance[:droplet_id],
-        :version => instance[:version],
-        :instance => instance[:instance_id],
-        :index => instance[:instance_index],
-        :reason => instance[:exit_reason],
-      }
-      exit_message[:crash_timestamp] = instance[:state_timestamp] if instance[:state] == :CRASHED
-      exit_message = exit_message.to_json
-      NATS.publish('droplet.exited', exit_message)
-      @logger.debug("Sent droplet.exited #{exit_message}")
-    end
-         */
         private void sendExitedNotification(Instance argInstance)
         {
             if (argInstance.IsEvacuated)
                 return;
 
-            var exitedMessage = new DropletExited(argInstance);
+            NATS.Publish(new InstanceExited(argInstance));
+
+            Logger.Debug("Sent droplet.exited.");
         }
 
         private void sendHeartbeat()
@@ -486,7 +499,7 @@
                 Droplets = heartbeats.ToArray()
             };
 
-            NATS.Publish(Constants.Messages.DeaHeartbeat, message);
+            NATS.Publish( message);
         }
 
         private string getApplicationState(string name)
@@ -525,6 +538,9 @@
 
         private void takeSnapshot()
         {
+            /*
+             * TODO: should we bother with scheduling?
+             */
             var dropletEntries = new List<DropletEntry>();
 
             foreach (var droplet in Droplets)
@@ -573,7 +589,7 @@
                             /*
                              * TODO: this is where Ruby's auto-vivication is awesome.
                              */
-                            Dictionary<Guid, Instance> instances;
+                            IDictionary<Guid, Instance> instances;
                             if (Droplets.TryGetValue(dropletEntry.DropletID, out instances))
                             {
                                 instances.Add(instanceEntry.InstanceID, instanceEntry.Instance);
@@ -594,18 +610,31 @@
             }
         }
 
-        private void forAllInstances(Action<Instance> action)
+        private void forAllInstances(Action<Instance> argInstanceAction)
+        {
+            forAllInstances(null, argInstanceAction);
+        }
+
+        private void forAllInstances(Action<uint> argDropletAction, Action<Instance> argInstanceAction)
         {
             lock (lockObject)
             {
                 if (Droplets.IsNullOrEmpty())
                     return;
 
-                foreach (Dictionary<Guid, Instance> droplet in Droplets.Values)
+                foreach (KeyValuePair<uint, IDictionary<Guid, Instance>> kvp in Droplets)
                 {
-                    foreach (Instance instance in droplet.Values)
+                    uint dropletID = kvp.Key;
+                    IDictionary<Guid, Instance> instanceDict = kvp.Value;
+
+                    if (null != argDropletAction)
                     {
-                        action(instance);
+                        argDropletAction(dropletID);
+                    }
+
+                    foreach (Instance instance in instanceDict.Values)
+                    {
+                        argInstanceAction(instance);
                     }
                 }
             }
@@ -624,7 +653,7 @@
             {
                 Droplets = new[] { argHeartbeat }
             };
-            NATS.Publish(Constants.Messages.DeaHeartbeat, message);
+            NATS.Publish(message);
         }
 
         private static Heartbeat generateHeartbeat(Instance instance)
