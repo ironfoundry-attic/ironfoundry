@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.Vmc
 {
@@ -17,11 +18,11 @@ namespace CloudFoundry.Net.Vmc
             return cfa.Login(email, password, URL);
         }
 
-        public string LogOut(string authenticationtoken)
-        {
-            throw new NotImplementedException();
+        public Cloud LogIn(Cloud cloud){
+            VmcAdministration cfa = new VmcAdministration();
+            return cfa.Login(cloud);
         }
-
+        
         public string Push(string appname, string fdqn, string fileURI, string framework, string memorysize)
         {
             VmcApps cfapps = new VmcApps();
