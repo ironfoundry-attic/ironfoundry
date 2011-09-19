@@ -21,4 +21,6 @@
 	<Color x:Key="BorderBlueColor">#FFBACADB</Color>	    
 
 	<converters:MinutesConverter x:Key="minutesConverter" />
+    <converters:CsvConverter x:Key="csvConverter" />
+    <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
 </ResourceDictionary>

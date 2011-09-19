@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
     public class Cloud
     {
         public Cloud() {
-            Applications = new List<Application>();
+            Applications = new ObservableCollection<Application>();
             ID = Guid.NewGuid();
         }
 
@@ -21,7 +22,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public bool Connected { get; set; }
         public int TimeoutStart { get; set; }
         public int TimeoutStop { get; set; }
-        public List<Application> Applications { get; set; }
-        public List<Service> Services { get; set; }
+        public ObservableCollection<Application> Applications { get; set; }
+        public ObservableCollection<Service> Services { get; set; }
     }
 }

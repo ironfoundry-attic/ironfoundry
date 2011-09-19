@@ -12,7 +12,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class CloudTreeViewItemViewModel : TreeViewItemViewModel
     {
-        readonly Cloud cloud;
+        private Cloud cloud;
         public RelayCommand<MouseButtonEventArgs> OpenCloudCommand { get; private set; }
 
         public CloudTreeViewItemViewModel(Cloud cloud) : base(null,false)
@@ -31,10 +31,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void OpenCloud(MouseButtonEventArgs e)
         {
-            if (e.ClickCount >= 2)
-            {
+            if (e == null || e.ClickCount >= 2)
                 Messenger.Default.Send(new NotificationMessage<Cloud>(this, this.cloud, Messages.OpenCloud));
-            }
         }
     }
 }

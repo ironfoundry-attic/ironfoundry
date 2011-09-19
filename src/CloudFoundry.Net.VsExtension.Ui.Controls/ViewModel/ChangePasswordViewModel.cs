@@ -17,13 +17,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private string verifyPassword = string.Empty;
         private string eMail = string.Empty;
 
-        public RelayCommand ConfirmedPasswordCommand { get; private set; }
-        public RelayCommand CancelledPasswordCommand { get; private set; }
+        public RelayCommand ConfirmedCommand { get; private set; }
+        public RelayCommand CancelledCommand { get; private set; }
 
         public ChangePasswordViewModel()
         {
-            ConfirmedPasswordCommand = new RelayCommand(ConfirmedPassword, () => true);
-            CancelledPasswordCommand = new RelayCommand(CancelledPassword, () => true);
+            ConfirmedCommand = new RelayCommand(Confirmed);
+            CancelledCommand = new RelayCommand(Cancelled);
             
             // Send a message back to the caller, to intialize data
             // in this case - email address.
@@ -71,16 +71,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         }
 
 
-        private void ConfirmedPassword()
+        private void Confirmed()
         {
-            var message = new NotificationMessage<bool>(this, true, Messages.ChangePasswordDialogResult);
-            Messenger.Default.Send(message);
+            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.ChangePasswordDialogResult));
         }
 
-        private void CancelledPassword()
+        private void Cancelled()
         {
-            var message = new NotificationMessage<bool>(this, false, Messages.ChangePasswordDialogResult);
-            Messenger.Default.Send(message);
+            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.ChangePasswordDialogResult));
         }
     }
 }

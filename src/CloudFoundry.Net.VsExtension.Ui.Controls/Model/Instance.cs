@@ -19,27 +19,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public int Memory { get; set; }
         public int Disk { get; set; }
         public TimeSpan Uptime { get; set; }
-
-        public DirectoryInfo Files
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-
-        public Application Parent
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+        public DirectoryInfo Files { get; set; }
+        public Application Parent { get; set; }
     }
 }

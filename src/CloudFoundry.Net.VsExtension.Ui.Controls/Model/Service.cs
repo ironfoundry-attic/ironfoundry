@@ -16,16 +16,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public string ServiceType { get; set; }
         public string Vendor { get; set; }
         public string Version { get; set; }
-
-        public Application Parent
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+        public Cloud Parent { get; set; }
+        
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
@@ -9,60 +10,21 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
     {        
         public Application()
         {
-            MappedUrls = new List<string>();
-            Instances = new List<Instance>();
-            Services = new List<Service>();
+            MappedUrls = new ObservableCollection<string>();
+            Instances = new ObservableCollection<Instance>();
+            Services = new ObservableCollection<Service>();
         }
 
         public string Name { get; set; }
         public int MemoryLimit { get; set; }
-        public List<string> MappedUrls { get; set; }
-        public List<Instance> Instances { get; set; }
-        public List<Service> Services { get; set; }
-
-        public int DiskLimit
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-
-        public int Cpus
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-
-        public Cloud Parent
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-
-        public int InstanceCount
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+        public ObservableCollection<string> MappedUrls { get; set; }
+        public ObservableCollection<Instance> Instances { get; set; }
+        public ObservableCollection<Service> Services { get; set; }
+        public string State { get; set; }
+        public int DiskLimit { get; set; }
+        public int Cpus { get; set; }
+        public Cloud Parent { get; set; }        
+        public int InstanceCount { get; set; }        
         
     }
 }

@@ -23,7 +23,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             this.Clouds = new ObservableCollection<CloudViewModel>();
             var sampleData = GetSampleData();
             this.CloudExplorer = new CloudExplorerViewModel(sampleData);
-            Messenger.Default.Register<NotificationMessage<Cloud>>(this, AddCloud);
+            Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
+            Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             if (IsInDesignMode)
             {                
                 for (int i = 0; i < 3; i++)
@@ -77,15 +78,43 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        private void AddCloud(NotificationMessage<Cloud> message)
+        private void ProcessCloudNotification(NotificationMessage<Cloud> message)
         {
             if (message.Notification.Equals(Messages.OpenCloud))
             {
-                var viewModel = new CloudViewModel(message.Content);
-                this.Clouds.Add(viewModel);
-                this.SelectedCloudView = viewModel;
+                var selectedCloudViewModel = this.Clouds.SingleOrDefault((i) => i.Cloud == message.Content);
+                if (selectedCloudViewModel == null)
+                {
+                    selectedCloudViewModel = new CloudViewModel(message.Content);
+                    this.Clouds.Add(selectedCloudViewModel);
+                }
+                this.SelectedCloudView = selectedCloudViewModel;
             }
         }
+
+        private void ProcessApplicationNotification(NotificationMessage<Application> message)
+        {
+            if (message.Notification.Equals(Messages.OpenApplication))
+            {
+                var application = message.Content;
+                if (application.Parent != null)
+                    SelectCloud(application.Parent);
+                this.SelectedCloudView.SelectedApplication = application;
+                this.SelectedCloudView.IsApplicationViewSelected = true;
+            }
+        }
+
+        private void SelectCloud(Cloud cloud)
+        {
+            var selectedCloudViewModel = this.Clouds.SingleOrDefault((i) => i.Cloud == cloud);
+            if (selectedCloudViewModel == null)
+            {
+                selectedCloudViewModel = new CloudViewModel(cloud);
+                this.Clouds.Add(selectedCloudViewModel);
+            }
+            this.SelectedCloudView = selectedCloudViewModel;
+        }
+        
 
         private void RemoveCloud(CloudViewModel cloudView)
         {
@@ -96,11 +125,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private ObservableCollection<Cloud> GetSampleData()
         {
-            return new ObservableCollection<Cloud>(GetRandomObjects<Cloud>(GetSampleCloud));            
+            return new ObservableCollection<Cloud>(GetRandomObjects<Cloud,object>(null,GetSampleCloud));            
         }
 
         private static Random rnd = new Random();
-        private Cloud GetSampleCloud()
+        private Cloud GetSampleCloud(int i, object parent)
         {
             var hostname = string.Format("api.cloud-{0}.org",GetRandomString(5));
             var cloud = new Cloud()
@@ -112,23 +141,72 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 Url = string.Format("http://{0}",hostname),
                 Password = GetRandomString(10),
                 TimeoutStart = rnd.Next(9999),
-                TimeoutStop = rnd.Next(9999),
-                Applications = GetRandomObjects<Application>(GetSampleApplication)
+                TimeoutStop = rnd.Next(9999),                
             };
+
+            cloud.Applications = GetRandomObjects<Application, Cloud>(cloud, GetSampleApplication);
+            cloud.Services = GetRandomObjects<Service, Cloud>(cloud, GetSampleService);
 
             return cloud;
         }
 
-        private Application GetSampleApplication()
+        private Application GetSampleApplication(int i, Cloud parent)
         {
             var app =  new Application()
             {
                 Name = "App " + rnd.Next(10000),
-                Cpus = rnd.Next(4),                
-                Instances = GetRandomObjects<Instance>(() => new Instance() { Host = GetRandomIP() })                
+                Cpus = rnd.Next(4),
+                State = CloudFoundry.Net.Types.Instance.InstanceState.STOPPED,
+                MappedUrls = GetRandomUrls(),
+                MemoryLimit = CloudFoundry.Net.VsExtension.Ui.Controls.Model.Constants.MemoryLimits[rnd.Next(0,5)],
+                Parent = parent                
             };
 
+            app.Instances = GetRandomObjects<Instance,Application>(app,GetSampleInstance);
+            app.InstanceCount = app.Instances.Count;
+            app.Services = GetRandomObjects<Service, Cloud>(parent, GetSampleService);            
+
             return app;
+        }
+
+        private ObservableCollection<string> GetRandomUrls()
+        {
+            string[] com = { "com", "org", "ca", "net", "uk" };
+            ObservableCollection<string> retString = new ObservableCollection<string>();
+            for (int i = 2; i < rnd.Next(4, 7); i++)
+                retString.Add(GetRandomString(12) + "." + com[rnd.Next(4)]);
+            return retString;
+        }
+
+        private Service GetSampleService(int i, Cloud parent)
+        {
+            string [] serviceTypes = { "Database", "Web Service", "Service Type 1", "Service Type 2"};
+            string [] vendors = { "MySql", "Postgres", "Sql Server", "Sybase"};
+            string [] versions = { "4.0", "5.1", "10.0", "15.3.1"};
+            var service = new Service()
+            {
+                Name = "Service " + rnd.Next(10000),
+                ServiceType = serviceTypes[rnd.Next(0, 3)],
+                Vendor = vendors[rnd.Next(0, 3)],
+                Version = versions[rnd.Next(0, 3)],
+                Parent = parent
+            };
+            return service;
+        }
+
+        private Instance GetSampleInstance(int i, Application parent)
+        {
+            var instance = new Instance()
+            {
+                CpuPercent = Convert.ToDecimal(rnd.NextDouble() * 100.00),
+                Disk = rnd.Next(0, 2048),
+                Host = GetRandomIP(),
+                ID = i,
+                Memory = CloudFoundry.Net.VsExtension.Ui.Controls.Model.Constants.MemoryLimits[rnd.Next(0, 5)],
+                Parent = parent,
+                Uptime = DateTime.Now - DateTime.Now.Subtract(new TimeSpan((long)rnd.Next(200000)))
+            };
+            return instance;
         }
 
         
@@ -136,13 +214,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         {
             return string.Format("{0}.{1}.{2}.{3}", 192, 168, rnd.Next(255),rnd.Next(255));
         }
-        
-        private List<T> GetRandomObjects<T>(Func<T> objectCreate)
+
+        private ObservableCollection<T> GetRandomObjects<T, U>(U parent, Func<int, U, T> objectCreate)
         {
-            var list = new List<T>();
+            var list = new ObservableCollection<T>();
             int count = Convert.ToInt32(rnd.Next(2, 10));
             for (int i = 0; i <= count; i++)
-                list.Add(objectCreate());
+                list.Add(objectCreate(i,parent));
             return list;
         }
 
@@ -160,5 +238,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         }
 
         #endregion
+
     }
 }

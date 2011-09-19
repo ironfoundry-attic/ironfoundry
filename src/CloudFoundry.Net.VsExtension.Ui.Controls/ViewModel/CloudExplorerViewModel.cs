@@ -6,23 +6,40 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 using GalaSoft.MvvmLight;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using System.Collections.ObjectModel;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class CloudExplorerViewModel : ViewModelBase
     {      
-        readonly ReadOnlyCollection<CloudTreeViewItemViewModel> clouds;
+        private ObservableCollection<CloudTreeViewItemViewModel> clouds;
+        public RelayCommand AddCloudCommand { get; private set; }
 
         public CloudExplorerViewModel(ObservableCollection<Cloud> cloudList)
         {
-            this.clouds = new ReadOnlyCollection<CloudTreeViewItemViewModel>(
+            AddCloudCommand = new RelayCommand(AddCloud);
+            this.clouds = new ObservableCollection<CloudTreeViewItemViewModel>(
                 (from cloud in cloudList
                  select new CloudTreeViewItemViewModel(cloud)).ToList());
         }
 
-        public ReadOnlyCollection<CloudTreeViewItemViewModel> Clouds
+        public ObservableCollection<CloudTreeViewItemViewModel> Clouds
         {
             get { return this.clouds; }
+        }
+
+        private void AddCloud()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloud,
+                (confirmed) =>
+                {
+                    if (confirmed)
+                    {
+
+                    }
+                }));
         }
     }
 }

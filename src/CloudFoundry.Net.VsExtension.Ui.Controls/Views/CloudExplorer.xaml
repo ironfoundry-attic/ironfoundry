@@ -9,7 +9,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <DockPanel>
-        <TreeView ItemsSource="{Binding Clouds}" VerticalAlignment="Stretch">
+        <ToolBar DockPanel.Dock="Top" Height="28">
+            <Button ToolTip="Add Cloud Connection..." Command="{Binding AddCloudCommand}">
+                <Image Source="../Images/cloud_add.png"/>
+            </Button>
+        </ToolBar>
+        <TreeView DockPanel.Dock="Bottom" ItemsSource="{Binding Clouds}" VerticalAlignment="Stretch">
             <TreeView.ItemContainerStyle>                
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -27,6 +32,14 @@
                 <HierarchicalDataTemplate DataType="{x:Type vm:CloudTreeViewItemViewModel}" 
                                           ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
+                        <StackPanel.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Open" Command="{Binding OpenCloudCommand, Mode=OneWay}" />
+                                <MenuItem Header="Remove" Command="{Binding RemoveCloudCommand, Mode=OneWay}" />
+                                <MenuItem Header="Connect" Command="{Binding ConnectCommand, Mode=OneWay}" />
+                                <MenuItem Header="Disconnect" Command="{Binding ConnectCommand, Mode=OneWay}" />
+                            </ContextMenu>
+                        </StackPanel.ContextMenu>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                 <cmd:EventToCommand Command="{Binding OpenCloudCommand, Mode=OneWay}"
@@ -40,6 +53,17 @@
 
                 <HierarchicalDataTemplate DataType="{x:Type vm:ApplicationTreeViewItemViewModel}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
+                        <StackPanel.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Open" Command="{Binding OpenApplicationCommand, Mode=OneWay}" />
+                            </ContextMenu>
+                        </StackPanel.ContextMenu>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <cmd:EventToCommand Command="{Binding OpenApplicationCommand, Mode=OneWay}"
+                                                    PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\cloud_droplet.png" />
                         <TextBlock Text="{Binding Name}" />
                     </StackPanel>

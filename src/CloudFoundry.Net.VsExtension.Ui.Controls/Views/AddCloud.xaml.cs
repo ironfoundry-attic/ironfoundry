@@ -9,30 +9,28 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using GalaSoft.MvvmLight.Messaging;
 
-namespace CloudFoundry.Net.VsExtension.Ui.Controls
+namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
     /// <summary>
-    /// Interaction logic for CloudExplorer.xaml
+    /// Interaction logic for AddCloud.xaml
     /// </summary>
-    public partial class CloudExplorer : UserControl
+    public partial class AddCloud : Window
     {
-        public CloudExplorer()
+        public AddCloud()
         {
             InitializeComponent();
-            Messenger.Default.Register<NotificationMessageAction<bool>>(
-                this,
+            Messenger.Default.Register<NotificationMessage<bool>>(this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.AddCloud))
+                    if (message.Notification.Equals(Messages.AddCloudDialogResult))
                     {
-                        var view = new Views.AddCloud();
-                        var result = view.ShowDialog();
-                        message.Execute(result.GetValueOrDefault());
+                        this.DialogResult = message.Content;
+                        this.Close();
+                        Messenger.Default.Unregister(this);
                     }
                 });
         }
