@@ -4,14 +4,6 @@
     using JsonConverters;
     using Newtonsoft.Json;
 
-    /*
-        :droplet => instance[:droplet_id],
-        :version => instance[:version],
-        :instance => instance[:instance_id],
-        :index => instance[:instance_index],
-        :reason => instance[:exit_reason],
-        exit_message[:crash_timestamp] = instance[:state_timestamp] if instance[:state] == :CRASHED
-     */
     public class InstanceExited : Message
     {
         private const string publishSubject = "droplet.exited";

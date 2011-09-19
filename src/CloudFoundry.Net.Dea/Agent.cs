@@ -182,9 +182,6 @@
             }
         }
 
-        /*
-         * TODO UPDATE TO WORK WITH INSTANCES
-         */
         private void processDeaUpdate(string message, string reply)
         {
             if (shutting_down)
@@ -340,7 +337,7 @@
                                     DiskQuota = instance.DiskQuota,
                                     FdsQuota  = instance.FdsQuota,
                                     Cores     = 1
-                                    //,Usage     = 20
+                                    // TODO Usage     = 20
                                 }
                             };
 

@@ -1,6 +1,7 @@
 ﻿namespace CloudFoundry.Net.Dea.Service
 {
     using System;
+    using System.IO;
     using System.ServiceProcess;
     using NLog;
 
@@ -11,6 +12,7 @@
         static void Main()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 #if DEBUG
             if (Environment.UserInteractive)
             {

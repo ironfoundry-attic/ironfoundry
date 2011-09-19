@@ -266,15 +266,17 @@
             {
                 Thread.Sleep(DEFAULT_INTERVAL);
 
-                if (false == messageQueue.IsNullOrEmpty())
+                string message = null;
+                lock (messageQueue)
                 {
-                    string message = messageQueue.Dequeue();
-                    if (String.IsNullOrEmpty(message))
+                    if (false == messageQueue.IsNullOrEmpty())
                     {
-                        // NB: SHOULD NEVER HAPPEN
-                        continue;
+                        message = messageQueue.Dequeue();
                     }
+                }
 
+                if (false == String.IsNullOrWhiteSpace(message))
+                {
                     Logger.Trace(LogReceivedFormat, message);
 
                     if (NatsCommand.Ok.Command == message)
@@ -287,13 +289,23 @@
                     }
                     else if (message.StartsWith(NatsCommand.Message.Command))
                     {
-                        // We can't guarantee that the continuation will be on the queue
-                        while (messageQueue.IsNullOrEmpty())
+                        string messageContinuation = null;
+                        while (true)
                         {
-                            Thread.Sleep(DEFAULT_INTERVAL);
-                        }
+                            lock (messageQueue)
+                            {
+                                if (false == messageQueue.IsNullOrEmpty())
+                                {
+                                    messageContinuation = messageQueue.Dequeue();
+                                    break;
+                                }
+                            }
 
-                        string messageContinuation = messageQueue.Dequeue();
+                            if (String.IsNullOrWhiteSpace(messageContinuation))
+                            {
+                                Thread.Sleep(DEFAULT_INTERVAL);
+                            }
+                        }
 
                         Logger.Trace(LogReceivedFormat, messageContinuation);
 
@@ -381,25 +393,26 @@
                     {
                         // Read a complete message
                         string[] messages = incomingData.Split(new[] { CRLF }, StringSplitOptions.RemoveEmptyEntries);
-
-                        // TODO lock queue?
-                        if (false == incomingData.EndsWith(CRLF))
+                        lock (messageQueue)
                         {
-                            incomingData = messages.Last(); // Last bit of data is incomplete, preserve
-                            for (uint i = 0; i < messages.Length; ++i) // NB: will leave off the last partial message
+                            if (false == incomingData.EndsWith(CRLF))
                             {
-                                if (false == String.IsNullOrWhiteSpace(messages[i]))
+                                incomingData = messages.Last(); // Last bit of data is incomplete, preserve
+                                for (uint i = 0; i < messages.Length; ++i) // NB: will leave off the last partial message
                                 {
-                                    messageQueue.Enqueue(messages[i]);
+                                    if (false == String.IsNullOrWhiteSpace(messages[i]))
+                                    {
+                                        messageQueue.Enqueue(messages[i]);
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            incomingData = String.Empty;
-                            foreach (string msg in messages.Where(msg => false == String.IsNullOrWhiteSpace(msg)))
+                            else
                             {
-                                messageQueue.Enqueue(msg);
+                                incomingData = String.Empty;
+                                foreach (string msg in messages.Where(msg => false == String.IsNullOrWhiteSpace(msg)))
+                                {
+                                    messageQueue.Enqueue(msg);
+                                }
                             }
                         }
                     }

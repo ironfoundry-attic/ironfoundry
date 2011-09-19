@@ -21,7 +21,7 @@
         }
 
         [Fact]
-        public void Can_Convert_Vcap_Discover_Message() // TODO
+        public void Can_Convert_Vcap_Discover_Message()
         {
             Guid uuid = Guid.NewGuid();
 
@@ -29,9 +29,7 @@
 
             var json = msg.ToJson();
 
-            Console.WriteLine(json);
-
-            // TODO assert
+            Assert.False(String.IsNullOrWhiteSpace(json));
         }
     }
 }
