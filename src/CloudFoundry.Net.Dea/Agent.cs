@@ -25,11 +25,8 @@
 
         private readonly IMessagingProvider NATS;
         private readonly IWebServerAdministrationProvider IIS;
-
-        private readonly IDictionary<uint, IDictionary<Guid, Instance>> Droplets = new Dictionary<uint, IDictionary<Guid, Instance>>();
-
+        private readonly DropletManager dropletManager = new DropletManager();
         private readonly Hello helloMessage;
-        private readonly object lockObject = new object();
         private readonly Task monitorTask;
         private readonly string snapshotFile;
 
@@ -67,8 +64,6 @@
             {
                 NATS.Start();
 
-                // TODO do we have to wait for poll to start?
-
                 var vcapComponentDiscoverMessage = new VcapComponentDiscover(
                     argType: "DEA",
                     argIndex: 1,
@@ -84,7 +79,7 @@
                         NATS.Publish(reply, vcapComponentDiscoverMessage);
                     });
 
-                NATS.Publish( new VcapComponentAnnounce(vcapComponentDiscoverMessage));
+                NATS.Publish(new VcapComponentAnnounce(vcapComponentDiscoverMessage));
 
                 NATS.Subscribe(NatsSubscription.DeaStatus, processDeaStatus);
                 NATS.Subscribe(NatsSubscription.DropletStatus, processDropletStatus);
@@ -117,7 +112,7 @@
 
             Logger.Info("Evacuating applications..");
 
-            forAllInstances(
+            dropletManager.ForAllInstances(
                 (dropletID) =>
                 {
                     Logger.Debug("Evacuating app {0}", dropletID);
@@ -203,27 +198,13 @@
 
                     instance.StateTimestamp = Utility.GetEpochTimestamp();
 
-                    instance.State = Instance.InstanceState.RUNNING;
+                    instance.OnDeaStart();
+
                     sendSingleHeartbeat(generateHeartbeat(instance));
 
                     registerWithRouter(instance, instance.Uris);
 
-                    lock (lockObject)
-                    {
-                        IDictionary<Guid, Instance> instances;
-                        if (Droplets.TryGetValue(droplet.ID, out instances))
-                        {
-                            instances.Add(instance.InstanceID, instance);
-                        }
-                        else
-                        {
-                            instances = new Dictionary<Guid, Instance>
-                        {
-                            { instance.InstanceID, instance }
-                        };
-                            Droplets.Add(droplet.ID, instances);
-                        }
-                    }
+                    dropletManager.Add(droplet.ID, instance);
 
                     takeSnapshot();
                 }
@@ -239,17 +220,23 @@
                 return;
 
             Logger.Debug("Starting processDeaUpdate: {0}", message);
+
             Droplet droplet = Message.FromJson<Droplet>(message);
-            Instance instance = getFirstInstance(droplet.ID);
-            string[] current_uris = new string[instance.Uris.Length];
-            Array.Copy(instance.Uris, current_uris, instance.Uris.Length);
-            instance.Uris = droplet.Uris;
 
-            var toRemove = current_uris.Except(droplet.Uris);
-            var toAdd = droplet.Uris.Except(current_uris);
+            dropletManager.ForAllInstances(droplet.ID, (argInstance) =>
+                {
+                    string[] currentUris = argInstance.Uris.ToArrayOrNull(); // NB: will create new array
 
-            unregisterWithRouter(instance, toRemove.ToArray());
-            registerWithRouter(instance, toAdd.ToArray());
+                    argInstance.Uris = droplet.Uris;
+
+                    var toRemove = currentUris.Except(droplet.Uris);
+
+                    var toAdd = droplet.Uris.Except(currentUris);
+
+                    unregisterWithRouter(argInstance, toRemove.ToArray());
+
+                    registerWithRouter(argInstance, toAdd.ToArray());
+                });
 
             takeSnapshot();
         }
@@ -276,25 +263,39 @@
             Logger.Debug("Starting processDeaStop: {0}", message);
 
             StopDroplet stopDropletMsg = Message.FromJson<StopDroplet>(message);
-            forAllInstances((argInstance) =>
+
+            uint dropletID = stopDropletMsg.DropletID;
+
+            dropletManager.ForAllInstances(dropletID, (argInstance) =>
                 {
-                    // TODO version and instance matching
-                    IIS.UninstallWebApp(argInstance.IIsName);
+                    if (stopDropletMsg.AppliesTo(argInstance))
+                    {
+                        argInstance.OnDeaStop();
 
-                    unregisterWithRouter(argInstance, argInstance.Uris);
+                        // stop_droplet
+                        if (false == argInstance.StopProcessed)
+                        {
+                            sendExitedMessage(argInstance);
 
-                    if (argInstance.StopProcessed)
-                        return;
+                            if (argInstance.IsStartingOrRunning)
+                            {
+                                IIS.UninstallWebApp(argInstance.IIsName);
+                            }
 
-                    sendExitedMessage(argInstance);
+                            argInstance.DeaStopComplete();
 
-                    Logger.Info("Stopping instance {0}", argInstance.LogID);
+                            // cleanup_droplet
+                            // TODO delete files?
+                            // remove_instance_resources
 
-                    argInstance.StopProcessed = true;
+                            dropletManager.InstanceStopped(dropletID, argInstance);
+
+                            Logger.Info("Stopped instance {0}", argInstance.LogID);
+
+                            takeSnapshot();
+                        }
+                    }
                 });
-
-            // TODO delete files?
-            takeSnapshot();
         }
 
         private void sendExitedMessage(Instance argInstance)
@@ -336,8 +337,10 @@
                 return;
 
             Logger.Debug("Starting processDeaFindDroplet: {0}", message);
+
             FindDroplet findDroplet = Message.FromJson<FindDroplet>(message);
-            forAllInstances((instance) =>
+
+            dropletManager.ForAllInstances((instance) =>
             {
                 if (instance.DropletID == findDroplet.DropletID)
                 {
@@ -392,7 +395,8 @@
                 return;
 
             Logger.Debug("Starting processDropletStatus: {0}", message);
-            forAllInstances((instance) =>
+
+            dropletManager.ForAllInstances((instance) =>
             {
                 if (instance.IsStarting || instance.IsRunning)
                 {
@@ -414,7 +418,7 @@
 
             Logger.Debug("Starting processRouterStart: {0}", message);
 
-            forAllInstances((instance) =>
+            dropletManager.ForAllInstances((instance) =>
                 {
                     if (instance.IsRunning)
                     {
@@ -479,14 +483,14 @@
 
         private void sendHeartbeat()
         {
-            if (shutting_down || Droplets.IsNullOrEmpty())
+            if (shutting_down || dropletManager.IsEmpty)
                 return;
 
             var heartbeats = new List<Heartbeat>();
 
-            forAllInstances((instance) =>
+            dropletManager.ForAllInstances((instance) =>
             {
-                instance.State = getApplicationState(instance.IIsName);
+                instance.UpdateState(getApplicationState(instance.IIsName));
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
                 heartbeats.Add(generateHeartbeat(instance));
             });
@@ -535,39 +539,7 @@
 
         private void takeSnapshot()
         {
-            /*
-             * TODO: should we bother with scheduling?
-             */
-            var dropletEntries = new List<DropletEntry>();
-
-            foreach (var droplet in Droplets)
-            {
-                var instanceEntries = new List<InstanceEntry>();
-
-                foreach (var instance in droplet.Value)
-                {
-                    var instanceEntry = new InstanceEntry
-                    {
-                        InstanceID = instance.Key,
-                        Instance = instance.Value
-                    };
-                    instanceEntries.Add(instanceEntry);
-                }
-
-                var d = new DropletEntry
-                {
-                    DropletID = droplet.Key,
-                    Instances = instanceEntries.ToArray()
-                };
-
-                dropletEntries.Add(d);
-            }
-
-            var snapshot = new Snapshot()
-            {
-                Entries = dropletEntries.ToArray()
-            };
-
+            Snapshot snapshot = dropletManager.GetSnapshot();
             File.WriteAllText(snapshotFile, snapshot.ToJson(), new ASCIIEncoding());
         }
 
@@ -575,73 +547,12 @@
         {
             if (File.Exists(snapshotFile))
             {
-                lock (lockObject) // TODO: necessary?
-                {
-                    string dropletsJson = File.ReadAllText(snapshotFile, new ASCIIEncoding());
-                    Snapshot snapshot = JsonBase.FromJson<Snapshot>(dropletsJson);
-                    foreach (DropletEntry dropletEntry in snapshot.Entries)
-                    {
-                        foreach (InstanceEntry instanceEntry in dropletEntry.Instances)
-                        {
-                            /*
-                             * TODO: this is where Ruby's auto-vivication is awesome.
-                             */
-                            IDictionary<Guid, Instance> instances;
-                            if (Droplets.TryGetValue(dropletEntry.DropletID, out instances))
-                            {
-                                instances.Add(instanceEntry.InstanceID, instanceEntry.Instance);
-                            }
-                            else
-                            {
-                                instances = new Dictionary<Guid, Instance>
-                                {
-                                    { instanceEntry.InstanceID, instanceEntry.Instance }
-                                };
-                                Droplets.Add(dropletEntry.DropletID, instances);
-                            }
-                        }
-                    }
-                }
+                string dropletsJson = File.ReadAllText(snapshotFile, new ASCIIEncoding());
+                Snapshot snapshot = JsonBase.FromJson<Snapshot>(dropletsJson);
+                dropletManager.FromSnapshot(snapshot);
                 sendHeartbeat();
                 takeSnapshot();
             }
-        }
-
-        private void forAllInstances(Action<Instance> argInstanceAction)
-        {
-            forAllInstances(null, argInstanceAction);
-        }
-
-        private void forAllInstances(Action<uint> argDropletAction, Action<Instance> argInstanceAction)
-        {
-            lock (lockObject)
-            {
-                if (Droplets.IsNullOrEmpty())
-                    return;
-
-                foreach (KeyValuePair<uint, IDictionary<Guid, Instance>> kvp in Droplets)
-                {
-                    uint dropletID = kvp.Key;
-                    IDictionary<Guid, Instance> instanceDict = kvp.Value;
-
-                    if (null != argDropletAction)
-                    {
-                        argDropletAction(dropletID);
-                    }
-
-                    foreach (Instance instance in instanceDict.Values)
-                    {
-                        argInstanceAction(instance);
-                    }
-                }
-            }
-        }
-
-        private Instance getFirstInstance(uint dropletId)
-        {
-            if (!Droplets.Keys.Contains(dropletId))
-                return null;
-            return Droplets[dropletId].First().Value;
         }
 
         private void sendSingleHeartbeat(Heartbeat argHeartbeat)

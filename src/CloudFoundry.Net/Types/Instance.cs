@@ -67,7 +67,7 @@
         public int FdsQuota { get; private set; }
 
         [JsonProperty(PropertyName = "state")]
-        public string State { get; set; }
+        public string State { get; private set; }
 
         [JsonProperty(PropertyName = "runtime")]
         public string Runtime { get; private set; }
@@ -91,7 +91,7 @@
         public string Staged { get; private set; }
 
         [JsonProperty(PropertyName = "exit_reason")]
-        public string ExitReason { get; private set; } // TODO used?
+        public string ExitReason { get; private set; }
 
         [JsonIgnore]
         public bool HasExitReason
@@ -118,6 +118,12 @@
         }
 
         [JsonIgnore]
+        public bool IsStartingOrRunning
+        {
+            get { return null != State && (State == InstanceState.RUNNING || State == InstanceState.STARTING); }
+        }
+
+        [JsonIgnore]
         public bool IsCrashed
         {
             get { return null != State && State == InstanceState.CRASHED; }
@@ -133,10 +139,10 @@
         }
 
         [JsonIgnore]
-        public bool StopProcessed { get; set; } // TODO
+        public bool StopProcessed { get; private set; }
 
         [JsonIgnore]
-        public bool IsNotified { get; set; } // TODO
+        public bool IsNotified { get; set; }
 
         public static class InstanceState
         {
@@ -146,6 +152,16 @@
             public const string SHUTTING_DOWN = "SHUTTING_DOWN";
             public const string CRASHED       = "CRASHED";
             public const string DELETED       = "DELETED";
+
+            public static bool IsValid(string argState)
+            {
+                return STARTING == argState ||
+                       STOPPED == argState ||
+                       RUNNING == argState ||
+                       SHUTTING_DOWN == argState ||
+                       CRASHED == argState ||
+                       DELETED == argState;
+            }
         }
 
         public void Crashed()
@@ -158,6 +174,42 @@
         {
             ExitReason = "DEA_EVACUATION";
             IsEvacuated = true;
+        }
+
+        public void OnDeaStop()
+        {
+            if (State == InstanceState.STARTING || State == InstanceState.RUNNING)
+            {
+                ExitReason = InstanceState.STOPPED;
+            }
+
+            if (State == InstanceState.CRASHED)
+            {
+                State = InstanceState.DELETED;
+                StopProcessed = false;
+            }
+        }
+
+        public void DeaStopComplete()
+        {
+            StopProcessed = true;
+        }
+
+        public void OnDeaStart()
+        {
+            State = Instance.InstanceState.RUNNING;
+        }
+
+        public void UpdateState(string argNewState)
+        {
+            if (InstanceState.IsValid(argNewState))
+            {
+                State = argNewState;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
         }
     }
 }
