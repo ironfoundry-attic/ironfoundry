@@ -34,6 +34,13 @@
 
         public string SnapshotFile { get; private set; }
 
+        public string GetApplicationPathFor(Instance argInstance)
+        {
+            string instanceDropletsPath, instanceApplicationPath;
+            getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
+            return instanceApplicationPath;
+        }
+
         public void TakeSnapshot(Snapshot argSnapshot)
         {
             File.WriteAllText(SnapshotFile, argSnapshot.ToJson(), new ASCIIEncoding());
@@ -58,13 +65,20 @@
             {
                 string instanceDropletsPath, instanceApplicationPath;
                 getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
-                if (Directory.Exists(instanceDropletsPath))
+                try
                 {
-                    Directory.Delete(instanceDropletsPath, true);
+                    if (Directory.Exists(instanceDropletsPath))
+                    {
+                        Directory.Delete(instanceDropletsPath, true);
+                    }
+                    if (Directory.Exists(instanceApplicationPath))
+                    {
+                        Directory.Delete(instanceApplicationPath, true);
+                    }
                 }
-                if (Directory.Exists(instanceApplicationPath))
+                catch
                 {
-                    Directory.Delete(instanceApplicationPath, true);
+                    // TODO
                 }
             }
         }

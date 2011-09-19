@@ -161,7 +161,7 @@
 
             if (filesManager.Stage(droplet, instance))
             {
-                WebServerAdministrationBinding binding = IIS.InstallWebApp(filesManager.ApplicationPath, instance.IIsName);
+                WebServerAdministrationBinding binding = IIS.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.IIsName);
                 instance.Host = binding.Host;
                 instance.Port = binding.Port;
 
