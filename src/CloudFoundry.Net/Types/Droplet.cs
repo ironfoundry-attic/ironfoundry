@@ -1,5 +1,6 @@
 ﻿namespace CloudFoundry.Net.Types
 {
+    using System;
     using Newtonsoft.Json;
 
     public class Droplet : JsonBase
@@ -45,5 +46,11 @@
 
         [JsonProperty(PropertyName = "index")]
         public uint Index { get; set; }
+
+        [JsonIgnore]
+        public bool FrameworkSupported
+        {
+            get { return false == String.IsNullOrWhiteSpace(Framework) && Framework == Constants.SupportedFramework; }
+        }
     }
 }

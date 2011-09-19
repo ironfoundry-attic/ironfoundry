@@ -3,16 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Configuration;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using System.Net;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using ICSharpCode.SharpZipLib.GZip;
-    using ICSharpCode.SharpZipLib.Tar;
     using NLog;
     using Properties;
     using Providers;
@@ -26,9 +20,9 @@
         private readonly IMessagingProvider NATS;
         private readonly IWebServerAdministrationProvider IIS;
         private readonly DropletManager dropletManager = new DropletManager();
+        private readonly FilesManager filesManager = new FilesManager();
         private readonly Hello helloMessage;
         private readonly Task monitorTask;
-        private readonly string snapshotFile;
 
         private bool shutting_down = false;
 
@@ -43,13 +37,6 @@
             IIS = providerFactory.CreateWebServerAdministrationProvider();
 
             helloMessage = new Hello(NATS.UniqueIdentifier, Utility.LocalIPAddress, 12345, 0.99M);
-
-            string dropletsPath = ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory];
-            string applicationPath = ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory];
-            Directory.CreateDirectory(dropletsPath);
-            Directory.CreateDirectory(applicationPath);
-
-            snapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
 
             monitorTask = new Task(monitorLoop);
         }
@@ -164,42 +151,26 @@
             Logger.Debug("Starting processDeaStart: {0}", message);
 
             Droplet droplet = Message.FromJson<Droplet>(message);
-            if (droplet.Framework != "aspdotnet")
+            if (false == droplet.FrameworkSupported)
             {
                 Logger.Debug("This DEA does not support non-aspdotnet frameworks");
                 return;
             }
 
-            var instance = new Instance(droplet);
+            Instance instance = new Instance(droplet);
 
-            FileData file = getStagedApplicationFile(droplet.ExecutableUri);
-            if (null != file)
+            if (filesManager.Stage(droplet, instance))
             {
-                string dropletsPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], instance.Dir);
-                string applicationPath = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory], instance.Dir);
-                Directory.CreateDirectory(dropletsPath);
-                Directory.CreateDirectory(applicationPath);
+                WebServerAdministrationBinding binding = IIS.InstallWebApp(filesManager.ApplicationPath, instance.IIsName);
+                instance.Host = binding.Host;
+                instance.Port = binding.Port;
 
-                using (var gzipStream = new GZipInputStream(file.FileStream))
-                {
-                    TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
-                    tarArchive.ExtractContents(dropletsPath);
-                    tarArchive.Close();
-                }
+                instance.StateTimestamp = Utility.GetEpochTimestamp();
 
-                file.Dispose();
+                instance.OnDeaStart();
 
                 if (false == shutting_down)
                 {
-                    Utility.CopyDirectory(new DirectoryInfo(dropletsPath + @"/app"), new DirectoryInfo(applicationPath));
-                    WebServerAdministrationBinding binding = IIS.InstallWebApp(applicationPath, instance.IIsName);
-                    instance.Host = binding.Host;
-                    instance.Port = binding.Port;
-
-                    instance.StateTimestamp = Utility.GetEpochTimestamp();
-
-                    instance.OnDeaStart();
-
                     sendSingleHeartbeat(generateHeartbeat(instance));
 
                     registerWithRouter(instance, instance.Uris);
@@ -251,10 +222,6 @@
             NATS.Publish(reply, helloMessage);
         }
 
-        /*
-         * stop_droplet
-         * cleanup_droplet
-         */
         private void processDeaStop(string message, string reply)
         {
             if (shutting_down)
@@ -284,8 +251,8 @@
 
                             argInstance.DeaStopComplete();
 
-                            // cleanup_droplet
-                            // TODO delete files?
+                            filesManager.CleanupInstanceDirectory(argInstance);
+
                             // remove_instance_resources
 
                             dropletManager.InstanceStopped(dropletID, argInstance);
@@ -540,15 +507,14 @@
         private void takeSnapshot()
         {
             Snapshot snapshot = dropletManager.GetSnapshot();
-            File.WriteAllText(snapshotFile, snapshot.ToJson(), new ASCIIEncoding());
+            filesManager.TakeSnapshot(snapshot);
         }
 
         private void recoverExistingDroplets()
         {
-            if (File.Exists(snapshotFile))
+            Snapshot snapshot = filesManager.GetSnapshot();
+            if (null != snapshot)
             {
-                string dropletsJson = File.ReadAllText(snapshotFile, new ASCIIEncoding());
-                Snapshot snapshot = JsonBase.FromJson<Snapshot>(dropletsJson);
                 dropletManager.FromSnapshot(snapshot);
                 sendHeartbeat();
                 takeSnapshot();
@@ -567,36 +533,6 @@
         private static Heartbeat generateHeartbeat(Instance instance)
         {
             return new Heartbeat(instance);
-        }
-
-        private static FileData getStagedApplicationFile(string executableUri)
-        {
-            FileData rv = null;
-
-            try
-            {
-                string tempFile = Path.GetTempFileName();
-
-                var sw = new Stopwatch();
-                sw.Start();
-                using (var client = new WebClient())
-                {
-                    client.Proxy = null;
-                    client.UseDefaultCredentials = false;
-                    client.DownloadFile(executableUri, tempFile);
-                }
-                sw.Stop();
-                Logger.Debug("Took {0} time to dowload from {1} to {2}", sw.Elapsed, executableUri, tempFile);
-
-                rv = new FileData(new FileStream(tempFile, FileMode.Open), tempFile);
-            }
-            catch
-            {
-                // TODO
-                // Can happen if there's a 404 or something.
-            }
-
-            return rv;
         }
     }
 }
