@@ -6,6 +6,21 @@
 
     public class FindDropletResponse : Message
     {
+        public FindDropletResponse(Guid argID, Instance argInstance, TimeSpan argUptime)
+        {
+            Dea            = argID;
+            Version        = argInstance.Version;
+            Droplet        = argInstance.DropletID;
+            InstanceID     = argInstance.InstanceID;
+            Index          = argInstance.InstanceIndex;
+            State          = argInstance.State;
+            StateTimestamp = argInstance.StateTimestamp;
+            FileUri        = String.Empty; // TODO
+            Credentials    = String.Empty; // TODO
+            Staged         = argInstance.Staged;
+            Stats          = new Stats(argInstance, argUptime);
+        }
+
         [JsonIgnore]
         public override string PublishSubject
         {

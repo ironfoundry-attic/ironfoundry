@@ -18,7 +18,7 @@
         private static readonly TimeSpan HEARTBEAT_INTERVAL = TimeSpan.FromSeconds(10);
 
         private readonly IMessagingProvider NATS;
-        private readonly IWebServerAdministrationProvider IIS;
+        private readonly IWebServerAdministrationProvider IIS = new WebServerAdministrationProvider();
         private readonly DropletManager dropletManager = new DropletManager();
         private readonly FilesManager filesManager = new FilesManager();
         private readonly Hello helloMessage;
@@ -28,13 +28,9 @@
 
         public Agent()
         {
-            var providerFactory = new ProviderFactory();
-
-            NATS = providerFactory.CreateMessagingProvider(
+            NATS = new NatsMessagingProvider(
                 ConfigurationManager.AppSettings[Constants.AppSettings.NatsHost],
                 Convert.ToUInt16(ConfigurationManager.AppSettings[Constants.AppSettings.NatsPort]));
-
-            IIS = providerFactory.CreateWebServerAdministrationProvider();
 
             helloMessage = new Hello(NATS.UniqueIdentifier, Utility.LocalIPAddress, 12345, 0.99M);
 
@@ -171,7 +167,7 @@
 
                 if (false == shutting_down)
                 {
-                    sendSingleHeartbeat(generateHeartbeat(instance));
+                    sendSingleHeartbeat(new Heartbeat(instance));
 
                     registerWithRouter(instance, instance.Uris);
 
@@ -314,32 +310,7 @@
                         {
                             var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
                             var span = DateTime.Now - startDate;
-                            var response = new FindDropletResponse // TODO ctor arg
-                            {
-                                Dea            = NATS.UniqueIdentifier,
-                                Version        = instance.Version,
-                                Droplet        = instance.DropletID,
-                                InstanceID     = instance.InstanceID,
-                                Index          = instance.InstanceIndex,
-                                State          = instance.State,
-                                StateTimestamp = instance.StateTimestamp,
-                                FileUri        = string.Empty,
-                                Credentials    = string.Empty,
-                                Staged         = instance.Staged,
-                                Stats          = new Stats
-                                {
-                                    Name      = instance.Name,
-                                    Host      = instance.Host,
-                                    Port      = instance.Port,
-                                    Uris      = instance.Uris,
-                                    Uptime    = span.TotalSeconds,
-                                    MemQuota  = instance.MemQuota,
-                                    DiskQuota = instance.DiskQuota,
-                                    FdsQuota  = instance.FdsQuota,
-                                    Cores     = 1
-                                    // TODO Usage     = 20
-                                }
-                            };
+                            var response = new FindDropletResponse(NATS.UniqueIdentifier, instance, span);
 
                             if (response.State != Instance.InstanceState.RUNNING)
                             {
@@ -456,7 +427,7 @@
             {
                 instance.UpdateState(getApplicationState(instance.IIsName));
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
-                heartbeats.Add(generateHeartbeat(instance));
+                heartbeats.Add(new Heartbeat(instance));
             });
 
             var message = new DropletHeartbeat
@@ -525,11 +496,6 @@
                 Droplets = new[] { argHeartbeat }
             };
             NATS.Publish(message);
-        }
-
-        private static Heartbeat generateHeartbeat(Instance instance)
-        {
-            return new Heartbeat(instance);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace CloudFoundry.Net.Dea.Providers
 {
+    using System.Linq;
     using System.Net;
     using Microsoft.Web.Administration;
 
@@ -11,6 +12,7 @@
          * Probably should figure out a way to specify the IP.
          */
         private readonly IPAddress localIPAddress = Utility.LocalIPAddress;
+        private const ushort STARTING_PORT = 9000;
 
         public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
         {
@@ -125,37 +127,19 @@
         }
 
 
-        private static ApplicationPool getApplicationPool(ServerManager argManager, string name)
+        private static ApplicationPool getApplicationPool(ServerManager argManager, string argName)
         {
-            ApplicationPool returnPool = null;
-            foreach (var pool in argManager.ApplicationPools)
-            {
-                if (pool.Name.Equals(name))
-                {
-                    returnPool = pool;
-                    break;
-                }
-            }
-            return returnPool;
+            return argManager.ApplicationPools.FirstOrDefault(a => a.Name == argName);
+        }
+
+        private static Site getSite(ServerManager argManager, string argName)
+        {
+            return argManager.Sites.FirstOrDefault(s => s.Name == argName);
         }
 
         private static ushort findNextAvailablePort()
         {
-            return Utility.FindNextAvailablePortAfter(9000);
-        }
-
-        private static Site getSite(ServerManager argManager, string name)
-        {
-            Site returnSite = null;
-            foreach (var site in argManager.Sites)
-            {
-                if (site.Name.Equals(name))
-                {
-                    returnSite = site;
-                    break;
-                }
-            }
-            return returnSite;
+            return Utility.FindNextAvailablePortAfter(STARTING_PORT);
         }
     }
 }

@@ -5,56 +5,54 @@
 
     public class Stats : Message
     {
-        public Stats() {
-            Usage = new Usage();
-        }
-
-        public Stats(Instance argInstance, TimeSpan argSpan)
+        public Stats(Instance argInstance, TimeSpan argUptime)
         {
             Name      = argInstance.Name;
             Host      = argInstance.Host;
             Port      = argInstance.Port;
+            Uptime    = argUptime.TotalSeconds;
             Uris      = argInstance.Uris;
-            Uptime    = argSpan.TotalSeconds;
             MemQuota  = argInstance.MemQuota;
             DiskQuota = argInstance.DiskQuota;
             FdsQuota  = argInstance.FdsQuota;
-            Usage = new Usage();
+            Cores     = 1; // TODO
+            Usage     = new Usage();
+            // TODO Usage = 20
         }
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         [JsonProperty(PropertyName = "host")]
-        public string Host { get; set; }
+        public string Host { get; private set; }
 
         [JsonProperty(PropertyName = "port")]
-        public int Port { get; set; }
+        public int Port { get; private set; }
 
         [JsonProperty(PropertyName = "uptime")]
-        public double Uptime { get; set; }
+        public double Uptime { get; private set; }
 
         [JsonProperty(PropertyName = "uris")]
-        public string[] Uris { get; set; }
+        public string[] Uris { get; private set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public int MemQuota { get; set; }
+        public int MemQuota { get; private set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
-        public int DiskQuota { get; set; }
+        public int DiskQuota { get; private set; }
 
         [JsonProperty(PropertyName = "fds_quota")]
-        public int FdsQuota { get; set; }
+        public int FdsQuota { get; private set; }
 
         [JsonProperty(PropertyName = "cores")]
-        public int Cores { get; set; }
+        public int Cores { get; private set; }
 
         [JsonProperty(PropertyName = "usage")]
-        public Usage Usage { get; set; }
+        public Usage Usage { get; private set; }
     }
 
-     public class Usage {
-        
+     public class Usage
+     {
         [JsonProperty(PropertyName="time")]
         DateTime CurrentTime { get; set; }
 

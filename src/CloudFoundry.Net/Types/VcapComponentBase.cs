@@ -21,7 +21,7 @@
         [JsonProperty(PropertyName = "credentials"), JsonConverter(typeof(VcapGuidConverter))]
         public Guid Credentials { get; private set; }
 
-        [JsonProperty(PropertyName = "start"), JsonConverter(typeof(VcapDateTimeConverter))] // TODO
+        [JsonProperty(PropertyName = "start"), JsonConverter(typeof(VcapDateTimeConverter))]
         public DateTime Start { get; private set; }
 
         public VcapComponentBase(
