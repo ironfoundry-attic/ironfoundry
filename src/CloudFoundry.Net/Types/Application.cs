@@ -6,40 +6,41 @@ using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
-    class Application : JsonBase
+    public class Application : JsonBase
     {
+        
         [JsonProperty(PropertyName = "name")]
-        string Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "staging")]
-        Staging Staging { get; set; }
+        public Staging Staging { get; set; }
 
         [JsonProperty(PropertyName = "uris")]
-        string[] Uris { get; set; }
+        public string[] Uris { get; set; }
 
         [JsonProperty(PropertyName = "instances")]
-        int Instances { get; set; }
+        public int Instances { get; set; }
 
         [JsonProperty(PropertyName = "runningInstances")]
-        int RunningInstances { get; set; }
+        public int RunningInstances { get; set; }
 
         [JsonProperty(PropertyName = "resources")]
-        Resources Resources { get; set; }
+        public Resources Resources { get; set; }
 
         [JsonProperty(PropertyName = "state")]
-        string State { get; set; }
+        public string State { get; set; }
 
         [JsonProperty(PropertyName = "services")]
-        string[] Services { get; set; }
+        public string[] Services { get; set; }
 
         [JsonProperty(PropertyName = "version")]
-        string Version { get; set; }
+        public string Version { get; set; }
 
         [JsonProperty(PropertyName = "env")]
-        Env Enviorment { get; set; }
+        public Env Enviorment { get; set; }
 
         [JsonProperty(PropertyName = "meta")]
-        AppMeta MetaData { get; set; }
+        public AppMeta MetaData { get; set; }
 
         public Application() {
             Staging = new Types.Staging();
@@ -48,7 +49,7 @@ namespace CloudFoundry.Net.Types
         }
     }
 
-    internal class Staging : JsonBase 
+    public class Staging : JsonBase 
     {
         [JsonProperty(PropertyName = "model")]
         string Model { get; set; }
@@ -57,7 +58,7 @@ namespace CloudFoundry.Net.Types
         string Stack { get; set; }
     }
 
-    internal class Resources : JsonBase
+    public class Resources : JsonBase
     {
         [JsonProperty(PropertyName = "memory")]
         int Memory { get; set; }
@@ -72,14 +73,14 @@ namespace CloudFoundry.Net.Types
 
     }
 
-    internal class Env
+   public class Env
     {
         public Env () {
 
         }
     }
 
-    internal class AppMeta : JsonBase
+   public class AppMeta : JsonBase
     {
         [JsonProperty(PropertyName = "version")]
         int Version { get; set; }

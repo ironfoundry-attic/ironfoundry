@@ -9,6 +9,7 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RestSharp;
+    using CloudFoundry.Net.Types;
 
     internal class VmcApps
     {
@@ -32,6 +33,17 @@
                 request.AddHeader("Authorization", accesstoken);
                 return client.Execute(request).Content;
             }
+        }
+
+        public void StartApp (Application application, Cloud cloud){
+            
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.PUT;
+            request.Resource = "/apps/"+application.Name;
+            request.AddHeader("Authorization", cloud.AccessToken);
+            client.Execute(request);
         }
 
         public string GetAppInfo (string appname, string url, string accesstoken)
@@ -82,6 +94,16 @@
                 request.AddHeader("Authorization", accesstoken);
                 return client.Execute(request).Content;
             }
+        }
+
+        public void DeleteApp(Application application, Cloud cloud){
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.DELETE;
+            request.Resource = "/apps/" + application.Name;
+            request.AddHeader("Authorization", cloud.AccessToken);
+            client.Execute(request);
         }
 
         public string PushApp (string Appname, string Url, string Accesstoken, string Dirlocation, string Deployedurl, string Framework, string Runtime, string Memoryreservation, string Servicebindings )
@@ -249,6 +271,16 @@
             }
         }
 
+        public List<Crash> GetAppCrash (Application application, Cloud cloud){
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.GET;
+            request.Resource = "/apps/" + application.Name + "/crashes";
+            request.AddHeader("Authorization", cloud.AccessToken);
+            return (List<Crash>)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(List<Crash>));
+        }
+
         public string ListApps (string url, string accesstoken)
         {
             if (url == null)
@@ -271,6 +303,16 @@
             }
         }
 
+        public List<Application> ListApps (Cloud cloud){
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.GET;
+            request.Resource = "/apps";
+            request.AddHeader("Authorization", cloud.AccessToken);
+            return (List<Application>)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(List<Application>));
+        }
+
         public static string GenerateHash(string filePathAndName)
         {
             string hashText = "";
@@ -287,6 +329,8 @@
 
             return hashText;
         }
+
+
     }
 
 }

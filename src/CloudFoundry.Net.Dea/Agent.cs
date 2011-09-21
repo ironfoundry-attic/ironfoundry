@@ -114,11 +114,11 @@
 
             NATS.Dispose();
 
-            Logger.Debug(Resources.Agent_WaitingForTasksInStop_Message);
+            Logger.Debug(CloudFoundry.Net.Dea.Properties.Resources.Agent_WaitingForTasksInStop_Message);
 
             monitorTask.Wait(TimeSpan.FromSeconds(30));
 
-            Logger.Debug(Resources.Agent_TasksCompletedInStop_Message);
+            Logger.Debug(CloudFoundry.Net.Dea.Properties.Resources.Agent_TasksCompletedInStop_Message);
         }
 
         private void monitorLoop()
@@ -127,7 +127,7 @@
             {
                 if (NatsMessagingStatus.RUNNING != NATS.Status)
                 {
-                    Logger.Error(Resources.Agent_ErrorDetectedInNats_Message);
+                    Logger.Error(CloudFoundry.Net.Dea.Properties.Resources.Agent_ErrorDetectedInNats_Message);
                     Error = true;
                     return;
                 }

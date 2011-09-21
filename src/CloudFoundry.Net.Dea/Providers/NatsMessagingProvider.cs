@@ -198,7 +198,7 @@
         {
             if (shutting_down)
             {
-                throw new InvalidOperationException(Resources.NatsMessagingProvider_AttemptingStopTwice_Message);
+                throw new InvalidOperationException(CloudFoundry.Net.Dea.Properties.Resources.NatsMessagingProvider_AttemptingStopTwice_Message);
             }
 
             Status = NatsMessagingStatus.STOPPING;
@@ -350,7 +350,7 @@
 
                 if (false == networkStream.CanRead)
                 {
-                    onFatalError(Resources.NatsMessagingProvider_CantReadFromStream_Message);
+                    onFatalError(CloudFoundry.Net.Dea.Properties.Resources.NatsMessagingProvider_CantReadFromStream_Message);
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
@@ -358,7 +358,7 @@
 
                 if (false == StillConnected)
                 {
-                    onFatalError(Resources.NatsMessagingProvider_Disconnected_Message);
+                    onFatalError(CloudFoundry.Net.Dea.Properties.Resources.NatsMessagingProvider_Disconnected_Message);
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
@@ -480,7 +480,7 @@
                         // NB: http://msdn.microsoft.com/en-us/library/bk6w7hs8.aspx
                         break;
                     case SocketErrorCode.ConnectionAborted :
-                        onFatalError(Resources.NatsMessagingProvider_Disconnected_Message);
+                        onFatalError(CloudFoundry.Net.Dea.Properties.Resources.NatsMessagingProvider_Disconnected_Message);
                         break;
                     default :
                         rethrow = true;
