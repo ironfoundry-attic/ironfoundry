@@ -32,28 +32,32 @@ namespace CloudFoundry.Net.Vmc
             }
         }
 
-        private string GetServices(Cloud currentcloud)
+        
+        public List<SystemService> GetAvailableServices(Cloud cloud) 
         {
+            
             var client = new RestClient();
-            client.BaseUrl = currentcloud.Url;
+            client.BaseUrl = cloud.Url;
             var request = new RestRequest();
             request.Method = Method.GET;
             request.Resource = "/info/services";
-            request.AddHeader("Authorization", currentcloud.AccessToken);
-            return client.Execute(request).Content;
-      
-        }
-        public List<SystemService> GetAvailableServices(Cloud cloud) 
-        {
-            //Get /info/services
-            return (List<SystemService>)JsonConvert.DeserializeObject(GetServices(cloud), typeof(List<SystemService>)); 
+            request.AddHeader("Authorization", cloud.AccessToken);
+            string Jsonstring = client.Execute(request).Content;
+            return (List<SystemService>)JsonConvert.DeserializeObject(Jsonstring, typeof(List<SystemService>)); 
 
         }
 
         public List<AppService> GetProvisionedServices(Cloud cloud)
         {
-            //Get /services
-            return (List<AppService>)JsonConvert.DeserializeObject(GetServices(cloud), typeof(List<AppService>));
+            
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.GET;
+            request.Resource = "/services";
+            request.AddHeader("Authorization", cloud.AccessToken);
+            string Jsonstring = client.Execute(request).Content;
+            return (List<AppService>)JsonConvert.DeserializeObject(Jsonstring, typeof(List<AppService>));
         }
 
 
