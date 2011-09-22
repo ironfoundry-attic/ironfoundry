@@ -2,8 +2,10 @@
 {
     using System;
     using System.Configuration;
+    using System.Data.SqlClient;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Text;
     using ICSharpCode.SharpZipLib.GZip;
@@ -103,13 +105,64 @@
                         tarArchive.Close();
                     }
 
-                    Utility.CopyDirectory(new DirectoryInfo(Path.Combine(instanceDropletsPath, "app")), new DirectoryInfo(instanceApplicationPath));
+                    var instanceApplicationDirInfo =  new DirectoryInfo(instanceApplicationPath);
+                    Utility.CopyDirectory(new DirectoryInfo(Path.Combine(instanceDropletsPath, "app")), instanceApplicationDirInfo);
 
                     rv = true;
                 }
             }
 
             return rv;
+        }
+
+        // TODO not a FilesManager kind of method
+        public void BindServices(Droplet argDroplet, string argIIsName)
+        {
+            if (false == argDroplet.Services.IsNullOrEmpty())
+            {
+                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", argIIsName);
+                if (null != c)
+                {
+                    ConnectionStringsSection connectionStringsSection = c.GetSection("connectionStrings") as ConnectionStringsSection;
+                    if (null != connectionStringsSection)
+                    {
+                        foreach (Service svc in argDroplet.Services.Where(s => s.IsMSSqlServer))
+                        {
+                            if (null != svc.Credentials)
+                            {
+                                SqlConnectionStringBuilder builder;
+                                ConnectionStringSettings defaultConnectionStringSettings = connectionStringsSection.ConnectionStrings["Default"];
+                                if (null != defaultConnectionStringSettings)
+                                {
+                                    builder = new SqlConnectionStringBuilder(defaultConnectionStringSettings.ConnectionString);
+                                }
+                                else
+                                {
+                                    builder = new SqlConnectionStringBuilder();
+                                }
+
+                                builder.DataSource = svc.Credentials.Host;
+
+                                if (svc.Credentials.Password.IsNullOrWhiteSpace() || svc.Credentials.Username.IsNullOrWhiteSpace())
+                                {
+                                    builder.IntegratedSecurity = true;
+                                }
+                                else
+                                {
+                                    builder.UserID = svc.Credentials.Username;
+                                    builder.Password = svc.Credentials.Password;
+                                }
+
+                                defaultConnectionStringSettings.ConnectionString = builder.ConnectionString;
+                                // TODO
+                                // builder.InitialCatalog 
+                                break;
+                            }
+                        }
+                    }
+                    c.Save();
+                }
+            }
         }
 
         private void getInstancePaths(Instance argInstance,

@@ -8,7 +8,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using NLog;
-    using Properties;
     using Providers;
     using Types;
 
@@ -160,6 +159,8 @@
                 WebServerAdministrationBinding binding = IIS.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.IIsName);
                 instance.Host = binding.Host;
                 instance.Port = binding.Port;
+
+                filesManager.BindServices(droplet, instance.IIsName);
 
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
 

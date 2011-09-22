@@ -10,7 +10,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using NLog;
-    using Properties;
     using Types;
 
     public class NatsMessagingProvider : IMessagingProvider

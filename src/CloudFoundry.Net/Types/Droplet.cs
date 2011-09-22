@@ -33,7 +33,7 @@
         public string Version { get; set; }
 
         [JsonProperty(PropertyName = "services")]
-        public string[] Services { get; set; }
+        public Service[] Services { get; set; }
 
         [JsonProperty(PropertyName = "limits")]
         public Limits Limits { get; set; }
