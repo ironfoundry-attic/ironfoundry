@@ -14,7 +14,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
     {
         #region Properties
         [ImportMany("ViewModel", AllowRecomposition = true)]
-        private IEnumerable<Lazy<object, IViewModelMetadata>> ViewModels { get; set; }
+        private List<Lazy<object, IViewModelMetadata>> ViewModels { get; set; }
         private static Dictionary<string, object> dictionary = new Dictionary<string, object>();
         #endregion
 
@@ -23,27 +23,35 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            string name = binder.Name;
-            if (!dictionary.TryGetValue(name, out result))
+            if (ViewModels == null)
+                Compose();
+
+            var viewModelMetadata = ViewModels.Single(v => v.Metadata.Name.Equals(binder.Name));
+            if (viewModelMetadata.IsValueCreated && !viewModelMetadata.Metadata.IsStatic)
+            {
+                var newInstance = Activator.CreateInstance(viewModelMetadata.Value.GetType());
+                dictionary[binder.Name] = (result = newInstance);
+                return result != null;
+            }
+            if (!dictionary.TryGetValue(binder.Name, out result))
+            {
                 try
                 {
-                    if (ViewModels == null)
-                    {
-                        var catalog = new AggregateCatalog();
-                        catalog.Catalogs.Add(new AssemblyCatalog(typeof(ViewModelLocator).Assembly));
-                        CompositionContainer _container = new CompositionContainer(catalog);
-                        var compositionContainer = new CompositionContainer(catalog);
-                        compositionContainer.ComposeParts(this);
-                    }
-
-                    dictionary[binder.Name] = (result = ViewModels.Single(v => v.Metadata.Name.Equals(name)).Value);
+                    dictionary[binder.Name] = (result = viewModelMetadata.Value);
                     return result != null;
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-            return true;
+                catch { }
+            }
+            return true;       
+        }
+
+        private void Compose()
+        {
+            var catalog = new AggregateCatalog();
+            catalog.Catalogs.Add(new AssemblyCatalog(typeof(ViewModelLocator).Assembly));
+            CompositionContainer _container = new CompositionContainer(catalog);
+            var compositionContainer = new CompositionContainer(catalog);
+            compositionContainer.ComposeParts(this);
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)

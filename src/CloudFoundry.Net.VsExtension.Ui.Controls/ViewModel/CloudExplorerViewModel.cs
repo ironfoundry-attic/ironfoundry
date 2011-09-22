@@ -16,13 +16,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     {      
         private ObservableCollection<CloudTreeViewItemViewModel> clouds;
         public RelayCommand AddCloudCommand { get; private set; }
+        private ObservableCollection<Cloud> cloudList;
 
         public CloudExplorerViewModel(ObservableCollection<Cloud> cloudList)
         {
-            AddCloudCommand = new RelayCommand(AddCloud);
+            this.cloudList = cloudList;            
             this.clouds = new ObservableCollection<CloudTreeViewItemViewModel>(
                 (from cloud in cloudList
                  select new CloudTreeViewItemViewModel(cloud)).ToList());
+
+            AddCloudCommand = new RelayCommand(AddCloud);
         }
 
         public ObservableCollection<CloudTreeViewItemViewModel> Clouds
@@ -37,7 +40,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 {
                     if (confirmed)
                     {
-
+                        Messenger.Default.Send(new NotificationMessageAction<AddCloudViewModel>(Messages.GetAddCloudData,
+                            (viewModel) =>
+                            {
+                                this.cloudList.Add(viewModel.Cloud);
+                                this.clouds.Add(new CloudTreeViewItemViewModel(viewModel.Cloud));
+                            }));
                     }
                 }));
         }

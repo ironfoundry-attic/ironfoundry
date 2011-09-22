@@ -57,8 +57,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 (confirmed) =>
                 {
                     if (confirmed)
-                    {
-
+                    {                        
+                        // Send Message to grab ViewModel
+                        // Process Results from ViewModel
                     }
                 }));
         }

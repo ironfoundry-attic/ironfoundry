@@ -37,7 +37,7 @@
                                 <MenuItem Header="Open" Command="{Binding OpenCloudCommand, Mode=OneWay}" />
                                 <MenuItem Header="Remove" Command="{Binding RemoveCloudCommand, Mode=OneWay}" />
                                 <MenuItem Header="Connect" Command="{Binding ConnectCommand, Mode=OneWay}" />
-                                <MenuItem Header="Disconnect" Command="{Binding ConnectCommand, Mode=OneWay}" />
+                                <MenuItem Header="Disconnect" Command="{Binding DisconnectCommand, Mode=OneWay}" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
                         <i:Interaction.Triggers>
@@ -56,6 +56,9 @@
                         <StackPanel.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Open" Command="{Binding OpenApplicationCommand, Mode=OneWay}" />
+                                <MenuItem Header="Start" Command="{Binding StartApplicationCommand, Mode=OneWay}" />
+                                <MenuItem Header="Stop" Command="{Binding StopApplicationCommand, Mode=OneWay}" />
+                                <MenuItem Header="Restart" Command="{Binding RestartApplicationCommand, Mode=OneWay}" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
                         <i:Interaction.Triggers>

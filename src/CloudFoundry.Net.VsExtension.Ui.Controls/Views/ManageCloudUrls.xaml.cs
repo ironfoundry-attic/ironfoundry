@@ -1,32 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+﻿using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
-    /// <summary>
-    /// Interaction logic for AddCloud.xaml
-    /// </summary>
-    public partial class AddCloud : Window
-    {
-        public AddCloud()
-        {
-            InitializeComponent();
+	/// <summary>
+	/// Interaction logic for ManageCloudUrls.xaml
+	/// </summary>
+	public partial class ManageCloudUrls : Window
+	{
+		public ManageCloudUrls()
+		{
+			this.InitializeComponent();
             Messenger.Default.Register<NotificationMessage<bool>>(this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.AddCloudDialogResult))
+                    if (message.Notification.Equals(Messages.ManageCloudUrlsDialogResult))
                     {
                         this.DialogResult = message.Content;
                         this.Close();
@@ -38,9 +27,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                 this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.ManageCloudUrls))
+                    if (message.Notification.Equals(Messages.AddCloudUrl))
                     {
-                        var view = new Views.ManageCloudUrls();
+                        var view = new Views.AddCloudUrl();
                         var result = view.ShowDialog();
                         message.Execute(result.GetValueOrDefault());
                     }
@@ -50,13 +39,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                this,
                message =>
                {
-                   if (message.Notification.Equals(Messages.RegisterAccount))
+                   if (message.Notification.Equals(Messages.CreateMicrocloudTarget))
                    {
-                       var view = new Views.RegisterAccount();
+                       var view = new Views.CreateMicrocloudTarget();
                        var result = view.ShowDialog();
                        message.Execute(result.GetValueOrDefault());
                    }
                });
-        }
-    }
+		}
+	}
 }

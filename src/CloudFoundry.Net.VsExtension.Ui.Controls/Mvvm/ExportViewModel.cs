@@ -11,16 +11,19 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
     public class ExportViewModel : ExportAttribute
     {
         public string Name { get; private set; }
+        public bool IsStatic { get; private set; }
 
         public ExportViewModel(string name, bool isStatic)
             : base("ViewModel")
         {
             Name = name;
+            IsStatic = isStatic;
         }
     }
 
     public interface IViewModelMetadata
     {
         string Name { get; }
+        bool IsStatic { get; }
     }
 }

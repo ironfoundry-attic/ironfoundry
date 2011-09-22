@@ -21,16 +21,28 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         {
             this.CloseCloud = new RelayCommand<CloudViewModel>(RemoveCloud);
             this.Clouds = new ObservableCollection<CloudViewModel>();
+            
             var sampleData = GetSampleData();
+            //this.CloudExplorer = new CloudExplorerViewModel(new ObservableCollection<Cloud>());
             this.CloudExplorer = new CloudExplorerViewModel(sampleData);
+            this.cloudUrls = GetBaseCloudUrls();
             Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
+            Messenger.Default.Register<NotificationMessageAction<ObservableCollection<CloudUrl>>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetAddCloudData))
+                        message.Execute(this.cloudUrls);
+                });
+
             if (IsInDesignMode)
             {                
                 for (int i = 0; i < 3; i++)
                     this.Clouds.Add(new CloudViewModel(sampleData[i]));
             }
         }
+
+        private ObservableCollection<CloudUrl> cloudUrls;
 
         private ObservableCollection<CloudViewModel> clouds;
 
@@ -94,14 +106,25 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void ProcessApplicationNotification(NotificationMessage<Application> message)
         {
-            if (message.Notification.Equals(Messages.OpenApplication))
+            OpenApplication(message.Content);
+            if (message.Notification.Equals(Messages.StartApplication))
             {
-                var application = message.Content;
-                if (application.Parent != null)
-                    SelectCloud(application.Parent);
-                this.SelectedCloudView.SelectedApplication = application;
-                this.SelectedCloudView.IsApplicationViewSelected = true;
+                this.SelectedCloudView.Start();
+            } else if (message.Notification.Equals(Messages.StopApplication))
+            {
+                this.SelectedCloudView.Stop();
+            } else if (message.Notification.Equals(Messages.RestartApplication))
+            {
+                this.SelectedCloudView.Restart();
             }
+        }
+
+        private void OpenApplication(Application application)
+        {
+            if (application.Parent != null)
+                SelectCloud(application.Parent);
+            this.SelectedCloudView.SelectedApplication = application;
+            this.SelectedCloudView.IsApplicationViewSelected = true;
         }
 
         private void SelectCloud(Cloud cloud)
@@ -122,6 +145,17 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         }
 
         #region Sample Data For DELETE       
+
+        private ObservableCollection<CloudUrl> GetBaseCloudUrls()
+        {
+            ObservableCollection<CloudUrl> cloudUrls = new ObservableCollection<CloudUrl>() {
+                new CloudUrl() { ServerType = "Local cloud", Url = "http://api.vcap.me", IsConfigurable = false},
+                new CloudUrl() { ServerType = "Microcloud", Url = "http://api.{mycloud}.cloudfoundry.me", IsConfigurable = true, IsMicroCloud = true },
+                new CloudUrl() { ServerType = "VMware Cloud Foundry", Url = "https://api.cloudfoundry.com", IsDefault = true },
+                new CloudUrl() { ServerType = "vmforce", Url = "http://api.alpha.vmforce.com", IsConfigurable = false}
+            };
+            return cloudUrls;
+        }
 
         private ObservableCollection<Cloud> GetSampleData()
         {
