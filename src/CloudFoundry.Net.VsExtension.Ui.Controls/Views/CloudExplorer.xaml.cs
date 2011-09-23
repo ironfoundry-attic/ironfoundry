@@ -31,6 +31,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                     if (message.Notification.Equals(Messages.AddCloud))
                     {
                         var view = new Views.AddCloud();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
                         var result = view.ShowDialog();
                         message.Execute(result.GetValueOrDefault());
                     }

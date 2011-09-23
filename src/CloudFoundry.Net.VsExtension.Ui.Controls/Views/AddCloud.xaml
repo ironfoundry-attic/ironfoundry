@@ -4,6 +4,7 @@
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 		xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
+        WindowStartupLocation="CenterOwner"
 		Title="Add Cloud" Height="320" Width="613"
 		DataContext="{Binding AddCloud, Source={StaticResource Locator}}">
     <Window.Resources>

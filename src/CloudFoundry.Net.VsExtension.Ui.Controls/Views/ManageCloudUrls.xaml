@@ -4,7 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
 	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.ManageCloudUrls"
-	x:Name="Window"
+	WindowStartupLocation="CenterOwner"
 	Title="Manage Cloud URLs"
 	Width="700" Height="245"
 	DataContext="{Binding ManageCloudUrls, Source={StaticResource Locator}}">

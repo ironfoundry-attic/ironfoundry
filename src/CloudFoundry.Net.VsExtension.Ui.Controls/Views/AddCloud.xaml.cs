@@ -41,6 +41,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                     if (message.Notification.Equals(Messages.ManageCloudUrls))
                     {
                         var view = new Views.ManageCloudUrls();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
                         var result = view.ShowDialog();
                         message.Execute(result.GetValueOrDefault());
                     }
@@ -53,6 +55,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                    if (message.Notification.Equals(Messages.RegisterAccount))
                    {
                        var view = new Views.RegisterAccount();
+                       Window parentWindow = Window.GetWindow(this);
+                       view.Owner = parentWindow;
                        var result = view.ShowDialog();
                        message.Execute(result.GetValueOrDefault());
                    }

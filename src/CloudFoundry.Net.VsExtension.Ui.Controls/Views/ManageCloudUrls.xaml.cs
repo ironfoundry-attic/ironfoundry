@@ -30,6 +30,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                     if (message.Notification.Equals(Messages.AddCloudUrl))
                     {
                         var view = new Views.AddCloudUrl();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
                         var result = view.ShowDialog();
                         message.Execute(result.GetValueOrDefault());
                     }
@@ -42,6 +44,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                    if (message.Notification.Equals(Messages.CreateMicrocloudTarget))
                    {
                        var view = new Views.CreateMicrocloudTarget();
+                       Window parentWindow = Window.GetWindow(this);
+                       view.Owner = parentWindow;
                        var result = view.ShowDialog();
                        message.Execute(result.GetValueOrDefault());
                    }

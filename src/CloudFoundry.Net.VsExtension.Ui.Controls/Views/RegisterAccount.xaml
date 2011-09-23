@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
         Title="Register Account" Height="184" Width="400"
         DataContext="{Binding RegisterAccount, Source={StaticResource Locator}}">
     <Window.Resources>
