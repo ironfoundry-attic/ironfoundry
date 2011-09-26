@@ -42,10 +42,14 @@
             var request = new RestRequest();
             request.Method = Method.PUT;
             request.Resource = "/apps/"+application.Name;
+            application.State = "Started";
             request.AddHeader("Authorization", cloud.AccessToken);
+            request.AddObject(application);
+            request.RequestFormat = DataFormat.Json;
             client.Execute(request);
         }
 
+        
         public string GetAppInfo (string appname, string url, string accesstoken)
         {
             if (url == null)
@@ -68,9 +72,31 @@
             }
         }
 
-        public string StopApp(string appname, string url, string accesstoken)
+        
+
+        public Application GetAppInfo (String appname, Cloud cloud){
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.GET;
+            request.Resource = "/apps/" + appname;
+            request.AddHeader("Authorization", cloud.AccessToken);
+            request.RequestFormat = DataFormat.Json;
+            return (Application)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(Application));
+        }
+
+        public void StopApp(Application application, Cloud cloud)
         {
-            return null;
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.PUT;
+            request.Resource = "/apps/" + application.Name;
+            application.State = "Stopped";
+            request.AddHeader("Authorization", cloud.AccessToken);
+            request.AddObject(application);
+            request.RequestFormat = DataFormat.Json;
+            client.Execute(request);
 
         }
 
@@ -104,6 +130,12 @@
             request.Resource = "/apps/" + application.Name;
             request.AddHeader("Authorization", cloud.AccessToken);
             client.Execute(request);
+        }
+
+        public void RestartApp (Application application, Cloud cloud)
+        {
+            StopApp(application, cloud);
+            StartApp(application, cloud);
         }
 
         public string PushApp (string Appname, string Url, string Accesstoken, string Dirlocation, string Deployedurl, string Framework, string Runtime, string Memoryreservation, string Servicebindings )
