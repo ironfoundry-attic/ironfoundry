@@ -63,15 +63,15 @@
      public class Usage
      {
         [JsonProperty(PropertyName="time")]
-        DateTime CurrentTime { get; set; }
+        public DateTime CurrentTime { get; set; }
 
         [JsonProperty(PropertyName="cpu")]
-        float CpuTime { get; set; }
+        public float CpuTime { get; set; }
 
         [JsonProperty(PropertyName="mem")]
-        float MemoryUsage { get; set; }
+        public float MemoryUsage { get; set; }
 
         [JsonProperty(PropertyName="disk")]
-        float DisKUsage { get; set; }
+        public float DisKUsage { get; set; }
     }
 }
