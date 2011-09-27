@@ -8,6 +8,7 @@ using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {

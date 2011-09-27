@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
-    public class Instance
+    public class AInstance
     {
-        public Instance()
+        public AInstance()
         {
         
         }

@@ -31,7 +31,8 @@ namespace CloudFoundry.Net.Vmc
             request.RequestFormat = DataFormat.Json;
             request.Resource = "/users/" + currentcloud.Email + "/tokens";
             request.AddBody(new { password = currentcloud.Password });
-            JObject jobj = new JObject(client.Execute(request).Content);
+            var response = client.Execute(request).Content;
+            JObject jobj = JObject.Parse(response);
             currentcloud.AccessToken = jobj.Value<string>("token");
             return currentcloud;
         }

@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -21,9 +22,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public CloudExplorerViewModel(ObservableCollection<Cloud> cloudList)
         {
             this.cloudList = cloudList;            
-            this.clouds = new ObservableCollection<CloudTreeViewItemViewModel>(
-                (from cloud in cloudList
-                 select new CloudTreeViewItemViewModel(cloud)).ToList());
+            this.clouds = new ObservableCollection<CloudTreeViewItemViewModel>();
+            foreach (var cloud in cloudList)
+                clouds.Add(new CloudTreeViewItemViewModel(cloud));
 
             AddCloudCommand = new RelayCommand(AddCloud);
         }

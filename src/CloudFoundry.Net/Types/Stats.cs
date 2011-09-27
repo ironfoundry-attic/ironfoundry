@@ -3,6 +3,15 @@
     using System;
     using Newtonsoft.Json;
 
+    public class StatInfo : JsonBase
+    {
+        [JsonProperty(PropertyName = "state")]
+        public string state;
+
+        [JsonProperty(PropertyName = "stats")]
+        public Stats stats;
+    }
+
     public class Stats : Message
     {
         public Stats(Instance argInstance, TimeSpan argUptime)

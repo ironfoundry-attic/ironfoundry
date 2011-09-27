@@ -9,6 +9,7 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using System.Collections.ObjectModel;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -26,7 +27,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public AddCloudViewModel()
         {
-            this.Cloud = new Cloud();
+            this.Cloud = new Cloud();            
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanValidate);
             RegisterAccountCommand = new RelayCommand(RegisterAccount, CanRegister);
             ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);

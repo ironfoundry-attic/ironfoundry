@@ -8,7 +8,7 @@ namespace CloudFoundry.Net.Types
 {
     public class Application : JsonBase
     {
-        
+
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
@@ -37,56 +37,61 @@ namespace CloudFoundry.Net.Types
         public string Version { get; set; }
 
         [JsonProperty(PropertyName = "env")]
-        public Env Enviorment { get; set; }
+        public string[] Enviorment { get; set; }
 
         [JsonProperty(PropertyName = "meta")]
         public AppMeta MetaData { get; set; }
 
-        public Application() {
+        [JsonIgnore]
+        public Cloud Parent { get; set; }
+
+        public Application()
+        {
             Staging = new Types.Staging();
             Resources = new Resources();
             MetaData = new AppMeta();
         }
     }
 
-    public class Staging : JsonBase 
+    public class Staging : JsonBase
     {
         [JsonProperty(PropertyName = "model")]
-        string Model { get; set; }
+        public string Model { get; set; }
 
         [JsonProperty(PropertyName = "stack")]
-        string Stack { get; set; }
+        public string Stack { get; set; }
     }
 
     public class Resources : JsonBase
     {
         [JsonProperty(PropertyName = "memory")]
-        int Memory { get; set; }
+        public int Memory { get; set; }
 
         [JsonProperty(PropertyName = "disk")]
-        int Disk { get; set; }
+        public int Disk { get; set; }
 
         [JsonProperty(PropertyName = "fds")]
-        int Fds { get; set; }
+        public int Fds { get; set; }
 
-        
+
 
     }
 
-   public class Env
+    public class Env
     {
-        public Env () {
+        public Env()
+        {
 
         }
     }
 
-   public class AppMeta : JsonBase
+    public class AppMeta : JsonBase
     {
         [JsonProperty(PropertyName = "version")]
-        int Version { get; set; }
+        public int Version { get; set; }
 
         [JsonProperty(PropertyName = "created")]
-        int Created { get; set; }
+        public int Created { get; set; }
 
     }
 }

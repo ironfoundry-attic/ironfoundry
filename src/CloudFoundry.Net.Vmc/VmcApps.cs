@@ -342,7 +342,10 @@
             request.Method = Method.GET;
             request.Resource = "/apps";
             request.AddHeader("Authorization", cloud.AccessToken);
-            return (List<Application>)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(List<Application>));
+            var response = client.Execute(request).Content;
+            var list = JsonConvert.DeserializeObject<List<Application>>(response);
+            list.ForEach((a) => a.Parent = cloud);
+            return list;
         }
 
         public static string GenerateHash(string filePathAndName)

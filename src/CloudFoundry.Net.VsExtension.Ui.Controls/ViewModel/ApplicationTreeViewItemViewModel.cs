@@ -7,6 +7,8 @@ using GalaSoft.MvvmLight.Command;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.Types;
+using CloudFoundry.Net.Vmc;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -26,8 +28,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             RestartApplicationCommand = new RelayCommand(RestartApplication, CanStop);
 
             this.application = application;
-            foreach (Instance instance in application.Instances)
-                base.Children.Add(new InstanceTreeViewItemViewModel(instance, this));
+            var manager = new VmcManager();
+            var stats = manager.GetStats(this.application, this.application.Parent);
+            //var instances = manager.GetInstances(this.application, this.application.Parent);
+            //foreach (Instance instance in instances)
+              //  base.Children.Add(new InstanceTreeViewItemViewModel(instance, this));
         }
 
         public string Name

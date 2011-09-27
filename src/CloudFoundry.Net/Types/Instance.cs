@@ -85,7 +85,7 @@
         public string LogID { get; private set; }
 
         [JsonProperty(PropertyName = "port")]
-        public ushort Port { get; set; }
+        public ushort Port { get; set; }       
 
         [JsonProperty(PropertyName = "staged")]
         public string Staged { get; private set; }

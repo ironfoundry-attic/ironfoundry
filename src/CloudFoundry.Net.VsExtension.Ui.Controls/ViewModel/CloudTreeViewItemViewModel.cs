@@ -7,6 +7,7 @@ using GalaSoft.MvvmLight.Command;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {

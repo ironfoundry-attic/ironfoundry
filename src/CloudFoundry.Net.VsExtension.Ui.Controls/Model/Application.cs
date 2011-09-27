@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
-    public class Application
+    public class AApplication
     {        
-        public Application()
+        public AApplication()
         {
             MappedUrls = new ObservableCollection<string>();
             Instances = new ObservableCollection<Instance>();

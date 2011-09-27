@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using System.Windows;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using System.Collections.ObjectModel;
+using CloudFoundry.Net.Types;
+using CloudFoundry.Net.Vmc;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -312,44 +309,46 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        public ObservableCollection<CloudFoundry.Net.VsExtension.Ui.Controls.Model.Application> Applications
+        public ObservableCollection<Application> Applications
         {
             get { return this.Cloud.Applications; }
         }
 
-        private CloudFoundry.Net.VsExtension.Ui.Controls.Model.Application selectedApplication;
-        public CloudFoundry.Net.VsExtension.Ui.Controls.Model.Application SelectedApplication
+        private Application selectedApplication;
+        public Application SelectedApplication
         {
             get { return this.selectedApplication; }
             set
             {
                 
                 this.selectedApplication = value;
-                this.Instances = this.selectedApplication.Instances;
-                this.ApplicationServices = this.selectedApplication.Services;
+                var manager = new VmcManager();
+                this.instances = new ObservableCollection<Instance>(manager.GetInstances(this.selectedApplication, this.Cloud));
                 this.Name = selectedApplication.Name;
-                this.Cpus = selectedApplication.Cpus;
-                this.DiskLimit = selectedApplication.DiskLimit;
-                this.InstanceCount = selectedApplication.InstanceCount;
-                this.MappedUrls = selectedApplication.MappedUrls;
-                this.MemoryLimit = selectedApplication.MemoryLimit;
+                this.DiskLimit = selectedApplication.Resources.Disk;
+                this.InstanceCount = selectedApplication.Instances;
+                this.MappedUrls = new ObservableCollection<string>(selectedApplication.Uris);
+                this.MemoryLimit = selectedApplication.Resources.Memory;
                 this.State = selectedApplication.State;                
                 RaisePropertyChanged("SelectedApplication");
                 RaisePropertyChanged("IsApplicationSelected");
             }
         }
 
-        public ObservableCollection<CloudFoundry.Net.VsExtension.Ui.Controls.Model.Service> CloudServices
+        private ObservableCollection<Service> systemServices;
+        private ObservableCollection<AppService> applicationServices;
+        private ObservableCollection<Instance> instances;
+
+        public ObservableCollection<Service> CloudServices
         {
-            get { return this.Cloud.Services; }
+            get { return this.systemServices; }
             set
             {
-                this.Cloud.Services = value;
+                this.systemServices = value;
                 RaisePropertyChanged("CloudServices");
             }
         }
 
-        private ObservableCollection<Instance> instances;
         public ObservableCollection<Instance> Instances
         {
             get { return this.instances; }
@@ -360,13 +359,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        private ObservableCollection<Service> services;
-        public ObservableCollection<Service> ApplicationServices
+        public ObservableCollection<AppService> ApplicationServices
         {
-            get { return this.services; }
+            get { return this.applicationServices; }
             set
             {
-                this.services = value;
+                this.applicationServices = value;
                 RaisePropertyChanged("ApplicationServices");
             }
         }

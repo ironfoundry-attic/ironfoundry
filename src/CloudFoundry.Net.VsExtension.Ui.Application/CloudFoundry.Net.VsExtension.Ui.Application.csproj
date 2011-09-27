@@ -116,6 +116,10 @@
       <Project>{C6E076BF-108A-4379-AE35-8F47059F4331}</Project>
       <Name>CloudFoundry.Net.VsExtension.Ui.Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CloudFoundry.Net\CloudFoundry.Net.csproj">
+      <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
+      <Name>CloudFoundry.Net</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />

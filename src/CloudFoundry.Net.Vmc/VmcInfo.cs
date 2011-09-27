@@ -71,16 +71,26 @@ namespace CloudFoundry.Net.Vmc
 
         }
 
-        public List<Stats> GetStats(Application application, Cloud cloud)
+        public List<StatInfo> GetStats(Application application, Cloud cloud)
         {
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.GET;
-            request.Resource = "/apps/" + application.Name + "/stats";
-            request.AddHeader("Authorization", cloud.AccessToken);
-            return (List<Stats>)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(List<Stats>));
+            var list = new List<StatInfo>();
+            try
+            {
+                var client = new RestClient();
+                client.BaseUrl = cloud.Url;
+                var request = new RestRequest();
+                request.Method = Method.GET;
+                request.Resource = "/apps/" + application.Name + "/stats";
+                request.AddHeader("Authorization", cloud.AccessToken);
+                var response = client.Execute(request).Content;
+                list = JsonConvert.DeserializeObject<List<StatInfo>>(response);
 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return list;
         }
 
         public List<Instance> GetInstances(Application application, Cloud cloud) 
@@ -92,7 +102,9 @@ namespace CloudFoundry.Net.Vmc
             request.Method = Method.GET;
             request.Resource = "/apps/" + application.Name + "/instances";
             request.AddHeader("Authorization", cloud.AccessToken);
-            return (List<Instance>)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(List<Instance>));
+            var response = client.Execute(request).Content;
+            var list = JsonConvert.DeserializeObject<List<Instance>>(response);
+            return list;
         }
 
     }

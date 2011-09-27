@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
-    public class Cloud
+    public class ACloud
     {
-        public Cloud() {
-            Applications = new ObservableCollection<Application>();
-            ID = Guid.NewGuid();
+        public ACloud() {
+            Applications = new ObservableCollection<AApplication>();            
         }
-
-        public Guid ID { get; set; }
+        
         public string ServerName { get; set; }
         public string HostName { get; set; }
         public string Email { get; set; }
@@ -22,7 +21,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public bool Connected { get; set; }
         public int TimeoutStart { get; set; }
         public int TimeoutStop { get; set; }
-        public ObservableCollection<Application> Applications { get; set; }
+        public string AccessToken { get; set; }
+        public ObservableCollection<AApplication> Applications { get; set; }
         public ObservableCollection<Service> Services { get; set; }
     }
 }
