@@ -18,7 +18,7 @@ namespace CloudFoundry.Net.Vmc
         void RestartApp(Application application, Cloud cloud);
         string GetLogs(Application application, int instanceNumber, Cloud cloud);
         SortedDictionary<int,StatInfo> GetStats(Application application, Cloud cloud);
-        List<Instance> GetInstances(Application application, Cloud cloud);
+        List<ExternalInstance> GetInstances(Application application, Cloud cloud);
         List<Crash> GetAppCrash(Application application, Cloud cloud);
         List<Application> ListApps(Cloud cloud);
         string Info();

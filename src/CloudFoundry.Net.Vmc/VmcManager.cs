@@ -75,7 +75,7 @@ namespace CloudFoundry.Net.Vmc
             return info.GetStats(application, cloud);
         }
 
-        public List<Instance> GetInstances(Application application, Cloud cloud)
+        public List<ExternalInstance> GetInstances(Application application, Cloud cloud)
         {
             VmcInfo info = new VmcInfo();
             return info.GetInstances(application, cloud);

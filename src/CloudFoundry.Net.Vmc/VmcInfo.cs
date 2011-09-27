@@ -94,7 +94,7 @@ namespace CloudFoundry.Net.Vmc
             return list;
         }
 
-        public List<Instance> GetInstances(Application application, Cloud cloud) 
+        public List<ExternalInstance> GetInstances(Application application, Cloud cloud) 
         {
             //GET /apps/sroytest1/instances
             var client = new RestClient();
@@ -104,7 +104,7 @@ namespace CloudFoundry.Net.Vmc
             request.Resource = "/apps/" + application.Name + "/instances";
             request.AddHeader("Authorization", cloud.AccessToken);
             var response = client.Execute(request).Content;
-            var list = JsonConvert.DeserializeObject<Dictionary<string,Instance>>(response);
+            var list = JsonConvert.DeserializeObject<Dictionary<string,ExternalInstance>>(response);
             return null;
         }
 

@@ -7,7 +7,7 @@ using CloudFoundry.Net;
 
 namespace CloudFoundry.Net.Types
 {
-    class ExternalInstance : JsonBase
+    public class ExternalInstance : JsonBase
     {
         [JsonProperty(PropertyName = "instances")]
         public InstanceDetail[] ExternInstance { get;  set; }
