@@ -323,7 +323,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 
                 this.selectedApplication = value;
                 var manager = new VmcManager();
-                this.instances = new ObservableCollection<Instance>(manager.GetInstances(this.selectedApplication, this.Cloud));
+                //this.instances = new ObservableCollection<Instance>(manager.GetInstances(this.selectedApplication, this.Cloud));
+                this.instances = new ObservableCollection<ExternalInstance>(manager.GetInstances(this.selectedApplication, this.Cloud));
                 this.Name = selectedApplication.Name;
                 this.DiskLimit = selectedApplication.Resources.Disk;
                 this.InstanceCount = selectedApplication.Instances;
@@ -337,8 +338,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private ObservableCollection<Service> systemServices;
         private ObservableCollection<AppService> applicationServices;
-        private ObservableCollection<Instance> instances;
-
+       // private ObservableCollection<Instance> instances;
+        private ObservableCollection<ExternalInstance> instances;
         public ObservableCollection<Service> CloudServices
         {
             get { return this.systemServices; }
@@ -349,7 +350,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        public ObservableCollection<Instance> Instances
+        public ObservableCollection<ExternalInstance> Instances
         {
             get { return this.instances; }
             set
@@ -358,6 +359,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 RaisePropertyChanged("Instances");
             }
         }
+        //public ObservableCollection<Instance> Instances
+        //{
+        //    get { return this.instances; }
+        //    set
+        //    {
+        //        this.instances = value;
+        //        RaisePropertyChanged("Instances");
+        //    }
+        //}
 
         public ObservableCollection<AppService> ApplicationServices
         {
