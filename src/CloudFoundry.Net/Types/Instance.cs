@@ -6,6 +6,11 @@
 
     public class Instance : JsonBase
     {
+        public Instance()
+        {
+
+        }
+
         public Instance(Droplet argDroplet)
         {
             if (null != argDroplet)
@@ -34,64 +39,64 @@
         }
 
         [JsonProperty(PropertyName = "droplet_id")]
-        public uint DropletID { get; private set; }
+        public uint DropletID { get;  set; }
 
         [JsonProperty(PropertyName = "instance_id"), JsonConverter(typeof(VcapGuidConverter))]
-        public Guid InstanceID { get; private set; }
+        public Guid InstanceID { get;  set; }
 
         [JsonProperty(PropertyName = "instance_index")]
         public uint InstanceIndex { get; set; }
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; private set; }
+        public string Name { get;  set; }
 
         [JsonProperty(PropertyName = "dir")]
-        public string Dir { get; private set; }
+        public string Dir { get;  set; }
 
         [JsonProperty(PropertyName = "uris")]
         public string[] Uris { get; set; }
 
         [JsonProperty(PropertyName = "users")]
-        public string[] Users { get; private set; }
+        public string[] Users { get;  set; }
 
         [JsonProperty(PropertyName = "version")]
-        public string Version { get; private set; }
+        public string Version { get;  set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public int MemQuota { get; private set; }
+        public int MemQuota { get;  set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
-        public int DiskQuota { get; private set; }
+        public int DiskQuota { get;  set; }
 
         [JsonProperty(PropertyName = "fds_quota")]
-        public int FdsQuota { get; private set; }
+        public int FdsQuota { get;  set; }
 
         [JsonProperty(PropertyName = "state")]
-        public string State { get; private set; }
+        public string State { get;  set; }
 
         [JsonProperty(PropertyName = "runtime")]
-        public string Runtime { get; private set; }
+        public string Runtime { get;  set; }
 
         [JsonProperty(PropertyName = "framework")]
-        public string Framework { get; private set; }
+        public string Framework { get;  set; }
 
         [JsonProperty(PropertyName = "start")]
-        public string Start { get; private set; }
+        public string Start { get;  set; }
 
         [JsonProperty(PropertyName = "state_timestamp")]
         public int StateTimestamp { get; set; }
 
         [JsonProperty(PropertyName = "log_id")]
-        public string LogID { get; private set; }
+        public string LogID { get;  set; }
 
         [JsonProperty(PropertyName = "port")]
-        public ushort Port { get; set; }       
+        public ushort Port { get; set; }
 
         [JsonProperty(PropertyName = "staged")]
-        public string Staged { get; private set; }
+        public string Staged { get;  set; }
 
         [JsonProperty(PropertyName = "exit_reason")]
-        public string ExitReason { get; private set; }
+        public string ExitReason { get;  set; }
 
         [JsonIgnore]
         public bool HasExitReason
@@ -100,7 +105,7 @@
         }
 
         [JsonProperty(PropertyName = "sha1")]
-        public string Sha1 { get; private set; }
+        public string Sha1 { get;  set; }
 
         [JsonProperty(PropertyName = "host")]
         public string Host { get; set; }
@@ -130,7 +135,7 @@
         }
 
         [JsonIgnore]
-        public bool IsEvacuated { get; private set; }
+        public bool IsEvacuated { get;  set; }
 
         [JsonIgnore]
         public string IIsName
@@ -139,7 +144,7 @@
         }
 
         [JsonIgnore]
-        public bool StopProcessed { get; private set; }
+        public bool StopProcessed { get;  set; }
 
         [JsonIgnore]
         public bool IsNotified { get; set; }

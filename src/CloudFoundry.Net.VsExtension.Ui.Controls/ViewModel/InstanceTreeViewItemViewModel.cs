@@ -9,16 +9,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class InstanceTreeViewItemViewModel : TreeViewItemViewModel
     {
-        readonly Instance instance;
+        readonly StatInfo statInfo;
 
-        public InstanceTreeViewItemViewModel(Instance instance, ApplicationTreeViewItemViewModel parentApplication) : base(parentApplication,false)
+        public InstanceTreeViewItemViewModel(StatInfo statInfo, ApplicationTreeViewItemViewModel parentApplication) : base(parentApplication,false)
         {
-            this.instance = instance;
+            this.statInfo = statInfo;
         }
 
         public string Host
         {
-            get { return this.instance.Host; }
+            get { return this.statInfo.stats.Host; }
         }
     }
 }

@@ -71,9 +71,9 @@ namespace CloudFoundry.Net.Vmc
 
         }
 
-        public List<StatInfo> GetStats(Application application, Cloud cloud)
+        public SortedDictionary<int, StatInfo> GetStats(Application application, Cloud cloud)
         {
-            var list = new List<StatInfo>();
+            var list = new SortedDictionary<int, StatInfo>();
             try
             {
                 var client = new RestClient();
@@ -83,7 +83,7 @@ namespace CloudFoundry.Net.Vmc
                 request.Resource = "/apps/" + application.Name + "/stats";
                 request.AddHeader("Authorization", cloud.AccessToken);
                 var response = client.Execute(request).Content;
-                list = JsonConvert.DeserializeObject<List<StatInfo>>(response);
+                list = JsonConvert.DeserializeObject<SortedDictionary<int,StatInfo>>(response);
 
             }
             catch (Exception ex)
@@ -103,8 +103,8 @@ namespace CloudFoundry.Net.Vmc
             request.Resource = "/apps/" + application.Name + "/instances";
             request.AddHeader("Authorization", cloud.AccessToken);
             var response = client.Execute(request).Content;
-            var list = JsonConvert.DeserializeObject<List<Instance>>(response);
-            return list;
+            var list = JsonConvert.DeserializeObject<Dictionary<string,Instance>>(response);
+            return null;
         }
 
     }

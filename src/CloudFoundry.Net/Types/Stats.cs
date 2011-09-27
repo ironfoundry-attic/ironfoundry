@@ -14,6 +14,11 @@
 
     public class Stats : Message
     {
+        public Stats()
+        {
+
+        }
+
         public Stats(Instance argInstance, TimeSpan argUptime)
         {
             Name      = argInstance.Name;
@@ -30,34 +35,34 @@
         }
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "host")]
-        public string Host { get; private set; }
+        public string Host { get; set; }
 
         [JsonProperty(PropertyName = "port")]
-        public int Port { get; private set; }
+        public int Port { get; set; }
 
         [JsonProperty(PropertyName = "uptime")]
-        public double Uptime { get; private set; }
+        public double Uptime { get; set; }
 
         [JsonProperty(PropertyName = "uris")]
-        public string[] Uris { get; private set; }
+        public string[] Uris { get; set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public int MemQuota { get; private set; }
+        public long MemQuota { get; set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
-        public int DiskQuota { get; private set; }
+        public long DiskQuota { get; set; }
 
         [JsonProperty(PropertyName = "fds_quota")]
-        public int FdsQuota { get; private set; }
+        public long FdsQuota { get; set; }
 
         [JsonProperty(PropertyName = "cores")]
-        public int Cores { get; private set; }
+        public int Cores { get; set; }
 
         [JsonProperty(PropertyName = "usage")]
-        public Usage Usage { get; private set; }
+        public Usage Usage { get; set; }
     }
 
      public class Usage
@@ -72,6 +77,6 @@
         public float MemoryUsage { get; set; }
 
         [JsonProperty(PropertyName="disk")]
-        public float DisKUsage { get; set; }
+        public float DiskUsage { get; set; }
     }
 }
