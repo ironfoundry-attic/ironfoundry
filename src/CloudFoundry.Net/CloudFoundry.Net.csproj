@@ -54,6 +54,7 @@
     <Compile Include="Types\Cloud.cs" />
     <Compile Include="Types\Crash.cs" />
     <Compile Include="Types\Credentials.cs" />
+    <Compile Include="Types\ExternalInstance.cs" />
     <Compile Include="Types\Service.cs" />
     <Compile Include="Types\VcapComponentAnnounce.cs" />
     <Compile Include="Types\RouterRegister.cs" />

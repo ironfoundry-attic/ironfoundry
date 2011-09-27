@@ -5,6 +5,7 @@ using System.Text;
 using CloudFoundry.Net.Types;
 using RestSharp;
 using Newtonsoft.Json;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace CloudFoundry.Net.Vmc
 {
@@ -68,7 +69,7 @@ namespace CloudFoundry.Net.Vmc
 
         public void GetFiles(Application application, int instanceNumber, Cloud cloud)
         {
-
+            
         }
 
         public SortedDictionary<int, StatInfo> GetStats(Application application, Cloud cloud)
