@@ -154,6 +154,7 @@
             public const string STARTING      = "STARTING";
             public const string STOPPED       = "STOPPED";
             public const string RUNNING       = "RUNNING";
+            public const string STARTED       = "STARTED";
             public const string SHUTTING_DOWN = "SHUTTING_DOWN";
             public const string CRASHED       = "CRASHED";
             public const string DELETED       = "DELETED";

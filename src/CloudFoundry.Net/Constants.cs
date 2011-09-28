@@ -10,6 +10,8 @@
 
         public static readonly IPAddress LocalhostIP;
 
+        public static int[] MemoryLimits = new int[6] { 64, 128, 256, 512, 1024, 2048 };
+
         private const string localhostStr = "127.0.0.1";
 
         static Constants()

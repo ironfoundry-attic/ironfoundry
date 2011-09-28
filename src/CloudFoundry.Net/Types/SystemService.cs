@@ -5,70 +5,63 @@ using System.Text;
 using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
-{
-    public class SystemService : JsonBase
+{   
+    public class SystemServices : JsonBase
     {
-        Datastore DataStoreService { get; set; }
+        [JsonProperty(PropertyName = "type")]
+        public string Type { get; set; } //Types supported are key/value, generic, database... could potentially be a static class or enum
 
-        public SystemService() 
-        {
-            DataStoreService = new Datastore();
-        }
-    }
+        [JsonProperty(PropertyName = "version")]
+        public string Version { get; set; }
 
-   internal class Datastore : JsonBase
-    {
-       [JsonProperty(PropertyName = "type")]
-        string Type { get; set; } //Types supported are key/value, generic, database... could potentially be a static class or enum
-       
-       [JsonProperty(PropertyName = "version")]
-        string Version { get; set; }
+        [JsonProperty(PropertyName = "id")]
+        public int Id { get; set; }
 
-       [JsonProperty(PropertyName = "id")]
-        int Id { get; set; }
+        [JsonProperty(PropertyName = "vendor")]
+        public string Vendor { get; set; }
 
-       [JsonProperty(PropertyName = "vendor")]
-        string Vendor { get; set; }
+        [JsonProperty(PropertyName = "tiers")]
+        public Tiers Tiers { get; set; }
 
-       [JsonProperty(PropertyName = "tiers")]
-        Tiers Tiers { get; set; }
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
 
-       [JsonProperty(PropertyName = "description")]
-        string Description { get; set; } 
-
-        public Datastore () 
+        public SystemServices()
         {
             Tiers = new Tiers();
         }
     }
 
-    internal class Tiers : JsonBase
+    public class Tiers : JsonBase
     {
         [JsonProperty(PropertyName = "free")]
-        Type Type { get; set; } //Currently on showing Free but potentially other options in the future
+        public Type Type { get; set; } //Currently on showing Free but potentially other options in the future
 
         [JsonProperty(PropertyName = "order")]
-        int Order { get; set; }
-        
-        public Tiers () {
+        public int Order { get; set; }
+
+        public Tiers()
+        {
             Type = new Type();
         }
     }
 
-    internal class Type : JsonBase
+    public class Type : JsonBase
     {
         [JsonProperty(PropertyName = "options")]
         Options Options { get; set; }
 
-        public Type () {
+        public Type()
+        {
             Options = new Options();
         }
     }
-    internal class Options : JsonBase
+    
+    public class Options : JsonBase
     {
 
     }
 
-    
+
 
 }

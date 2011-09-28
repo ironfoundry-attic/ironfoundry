@@ -96,7 +96,7 @@
             request.AddHeader("Authorization", cloud.AccessToken);
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
-            client.Execute(request);
+            var response =  client.Execute(request).Content;
 
         }
 

@@ -10,41 +10,44 @@ namespace CloudFoundry.Net.Types
     {
         
         [JsonProperty(PropertyName = "name")]
-        string Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "type")]
-        string Type { get; set; }
+        public string Type { get; set; }
 
         [JsonProperty(PropertyName = "vendor")]
-        string Vendor { get; set; }
+        public string Vendor { get; set; }
 
         [JsonProperty(PropertyName = "meta")]
-        Meta MetaData { get; set; }
+        public Meta MetaData { get; set; }
+
+        [JsonProperty(PropertyName = "version")]
+        public float Version { get; set; }
 
         [JsonProperty(PropertyName = "properties")]
-        Properties Props { get; set; }
+        public Properties Props { get; set; }
         public AppService () {
             MetaData = new Meta();
             Props = new Properties();
         }
     }
 
-    class Meta : JsonBase
+    public class Meta : JsonBase
     {
         [JsonProperty(PropertyName = "created")]
-        int Created { get; set; }
+        public int Created { get; set; }
 
         [JsonProperty(PropertyName = "updated")]
-        int Updated { get; set; }
+        public int Updated { get; set; }
 
         [JsonProperty(PropertyName = "tags")]
-        string[] Tags { get; set; }
+        public string[] Tags { get; set; }
         
         [JsonProperty(PropertyName = "version")]
-        int Version { get; set; }
+        public int Version { get; set; }
     }
 
-    class Properties : JsonBase {
+    public class Properties : JsonBase {
 
         //have to discover what this is off the ruby code
     }

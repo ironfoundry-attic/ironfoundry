@@ -10,7 +10,7 @@ namespace CloudFoundry.Net.Vmc
 {
     internal class VmcServices
     {
-        private string GetServices(string url, string accesstoken)
+        public string GetServices(string url, string accesstoken)
         {
             if (url == null)
             {
@@ -33,31 +33,35 @@ namespace CloudFoundry.Net.Vmc
         }
 
         
-        public List<SystemService> GetAvailableServices(Cloud cloud) 
+        public List<SystemServices> GetAvailableServices(Cloud cloud) 
         {
-            
+            List<SystemServices> datastores = new List<SystemServices>();
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
             request.Method = Method.GET;
             request.Resource = "/info/services";
             request.AddHeader("Authorization", cloud.AccessToken);
-            string Jsonstring = client.Execute(request).Content;
-            return (List<SystemService>)JsonConvert.DeserializeObject(Jsonstring, typeof(List<SystemService>)); 
-
+            string response = client.Execute(request).Content;
+            var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemServices>>>>(response);
+            foreach (var val in list.Values)
+                foreach (var val1 in val.Values)
+                    foreach (var val2 in val1.Values)
+                        datastores.Add(val2);
+            return datastores; 
         }
 
         public List<AppService> GetProvisionedServices(Cloud cloud)
-        {
-            
+        {            
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
             request.Method = Method.GET;
             request.Resource = "/services";
             request.AddHeader("Authorization", cloud.AccessToken);
-            string Jsonstring = client.Execute(request).Content;
-            return (List<AppService>)JsonConvert.DeserializeObject(Jsonstring, typeof(List<AppService>));
+            string response = client.Execute(request).Content;
+            var list = JsonConvert.DeserializeObject<List<AppService>>(response);
+            return list;
         }
 
 

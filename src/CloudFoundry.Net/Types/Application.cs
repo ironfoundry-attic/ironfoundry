@@ -22,7 +22,7 @@ namespace CloudFoundry.Net.Types
         public int Instances { get; set; }
 
         [JsonProperty(PropertyName = "runningInstances")]
-        public int RunningInstances { get; set; }
+        public int? RunningInstances { get; set; }
 
         [JsonProperty(PropertyName = "resources")]
         public Resources Resources { get; set; }

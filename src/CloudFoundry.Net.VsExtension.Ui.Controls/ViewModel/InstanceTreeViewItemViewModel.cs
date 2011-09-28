@@ -18,7 +18,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public string Host
         {
-            get { return this.statInfo.stats.Host; }
+            get { return this.statInfo.Stats.Host; }
         }
     }
 }

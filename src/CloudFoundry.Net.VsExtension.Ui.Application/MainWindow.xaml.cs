@@ -22,8 +22,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Application
                         Email = "caledh@gmail.com",
                         Password = "password",
                         HostName = "localhost",
-                        Url = "http://api.cloudfoundry.com", 
-                        AccessToken = "04085b0849221563616c65646840676d61696c2e636f6d063a0645546c2b07a64c8b4e2219d48bc74501e8837a187aca53d371998a758b74d0"
+                        Url = "http://api.cloudfoundry.com"                       
                     }
                 }, Messages.InitializeClouds);
             Messenger.Default.Send(message);

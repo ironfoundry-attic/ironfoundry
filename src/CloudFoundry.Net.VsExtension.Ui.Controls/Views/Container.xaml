@@ -6,32 +6,47 @@
         xmlns:vw="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls"
         xmlns:vm="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel"
         mc:Ignorable="d" 
-        DataContext="{Binding Container, Source={StaticResource Locator}}">
+        DataContext="{Binding Container, Source={StaticResource Locator}}">    
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="250"/>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="200*" MinWidth="200" />
-        </Grid.ColumnDefinitions>                
-        <vw:CloudExplorer Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DataContext="{Binding CloudExplorer}"/>        
-        <GridSplitter ResizeDirection="Columns" Grid.Column="1" Width="5" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"/>
-        <TabControl Grid.Column="2" x:Name="Clouds" 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="50" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
+                <DockPanel>
+                    <Image DockPanel.Dock="Left" Source="../Images/cloud_foundry_logo_400.png" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Label DockPanel.Dock="Left" Content="EXPLORER" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" 
+                           FontWeight="Bold" FontSize="28" Margin="5,0,0,0" />                                       
+                </DockPanel>
+            </Border>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="250"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="200*" MinWidth="200" />
+            </Grid.ColumnDefinitions>
+            <vw:CloudExplorer Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DataContext="{Binding CloudExplorer}"/>
+            <GridSplitter ResizeDirection="Columns" Grid.Column="1" Width="5" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"/>
+            <TabControl Grid.Column="2" x:Name="Clouds" 
                     ItemsSource="{Binding Clouds}"
                     SelectedItem="{Binding SelectedCloudView}">
-            <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:CloudViewModel}">
-                    <StackPanel Orientation="Horizontal">                        
-                        <TextBlock Text="{Binding ServerName}" VerticalAlignment="Center"/>
-                        <Button Width="15" Height="17" Content="X" Command="{Binding DataContext.CloseCloud, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type UserControl}}}" 
-                                                                   CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}" Margin="5,0,0,0" FontSize="8" FontWeight="Bold" />                        
-                    </StackPanel>                                        
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type vm:CloudViewModel}">
-                    <vw:CloudView />
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
-    </Grid>
+                <TabControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:CloudViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding ServerName}" VerticalAlignment="Center"/>
+                            <Button Width="15" Height="17" Content="X" Command="{Binding DataContext.CloseCloud, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type UserControl}}}" 
+                                                                   CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}" Margin="5,0,0,0" FontSize="8" FontWeight="Bold" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate DataType="{x:Type vm:CloudViewModel}">
+                        <vw:CloudView />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </Grid>
+    </Grid>    
 </UserControl>

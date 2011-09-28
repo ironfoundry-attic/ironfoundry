@@ -21,6 +21,8 @@ namespace CloudFoundry.Net.Vmc
         List<ExternalInstance> GetInstances(Application application, Cloud cloud);
         List<Crash> GetAppCrash(Application application, Cloud cloud);
         List<Application> ListApps(Cloud cloud);
+        List<SystemServices> GetAvailableServices(Cloud cloud);
+        List<AppService> GetProvisionedServices(Cloud cloud);
         string Info();
     }
 }

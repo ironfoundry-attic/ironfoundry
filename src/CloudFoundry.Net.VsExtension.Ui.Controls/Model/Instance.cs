@@ -7,18 +7,16 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
-    public class AInstance
+    public class Instance
     {
-        public AInstance()
-        {
-        
-        }
-
         public int ID { get; set; }
+        public int Cores { get; set; }
+        public long MemoryQuota { get; set; }
+        public long DiskQuota { get; set; }
         public string Host { get; set; }
-        public decimal CpuPercent { get; set; }
-        public int Memory { get; set; }
-        public int Disk { get; set; }
+        public float Cpu { get; set; }
+        public long Memory { get; set; }
+        public long Disk { get; set; }
         public TimeSpan Uptime { get; set; }
         public DirectoryInfo Files { get; set; }
         public Application Parent { get; set; }

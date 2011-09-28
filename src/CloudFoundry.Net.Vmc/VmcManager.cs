@@ -92,5 +92,17 @@ namespace CloudFoundry.Net.Vmc
             VmcApps apps = new VmcApps();
             return apps.ListApps(cloud);
         }
+
+        public List<SystemServices> GetAvailableServices(Cloud cloud)
+        {
+            VmcServices services = new VmcServices();
+            return services.GetAvailableServices(cloud);
+        }
+
+        public List<AppService> GetProvisionedServices(Cloud cloud)
+        {
+            VmcServices services = new VmcServices();
+            return services.GetProvisionedServices(cloud);
+        }
     }
 }

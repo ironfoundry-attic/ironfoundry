@@ -11,7 +11,7 @@ using CloudFoundry.Net.Vmc;
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class CloudViewModel : ViewModelBase
-    {       
+    {
         public RelayCommand ChangePasswordCommand { get; private set; }
         public RelayCommand ValidateAccountCommand { get; private set; }
         public RelayCommand ConnectCommand { get; private set; }
@@ -22,6 +22,19 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand RestartCommand { get; private set; }
         public RelayCommand UpdateAndRestartCommand { get; private set; }
         public Cloud Cloud { get; private set; }
+
+        private string name;
+        private string state = Types.Instance.InstanceState.STOPPED;
+        private int memoryLimit;
+        private int instanceCount;
+        private ObservableCollection<string> mappedUrls;
+        private Application selectedApplication;
+        private bool isApplicationViewSelected;
+        private ObservableCollection<AppService> provisionedServices;
+        private ObservableCollection<AppService> applicationServices;
+        private ObservableCollection<Model.Instance> instances;
+        private VmcManager manager;
+
 
         public CloudViewModel(Cloud cloud)
         {
@@ -35,6 +48,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);
 
             this.Cloud = cloud;
+            manager = new VmcManager();
+            if (String.IsNullOrEmpty(cloud.AccessToken))
+                cloud.AccessToken = manager.LogIn(cloud).AccessToken;
+            this.CloudServices = new ObservableCollection<AppService>(manager.GetProvisionedServices(cloud));
         }
 
         #region Overview
@@ -54,7 +71,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 (confirmed) =>
                 {
                     if (confirmed)
-                    {                        
+                    {
                         // Send Message to grab ViewModel
                         // Process Results from ViewModel
                     }
@@ -92,7 +109,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 RaisePropertyChanged("Connected");
             }
         }
-        
+
         public string ServerName
         {
             get { return this.Cloud.ServerName; }
@@ -162,16 +179,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 RaisePropertyChanged("TimeoutEnd");
             }
         }
-        #endregion        
+        #endregion
 
         #region Application
-        
+
         public bool IsApplicationSelected
         {
             get { return this.SelectedApplication != null; }
         }
 
-        private bool isApplicationViewSelected;
         public bool IsApplicationViewSelected
         {
             get { return this.isApplicationViewSelected; }
@@ -189,17 +205,23 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public bool CanExecuteStart()
         {
-            return !this.State.Equals(CloudFoundry.Net.Types.Instance.InstanceState.RUNNING);
+            return !(this.State.Equals(Types.Instance.InstanceState.RUNNING) ||
+                   this.State.Equals(Types.Instance.InstanceState.STARTED) ||
+                   this.State.Equals(Types.Instance.InstanceState.STARTING));
         }
 
         public bool CanExecuteStopActions()
         {
-            return this.State.Equals(CloudFoundry.Net.Types.Instance.InstanceState.RUNNING);
+            return this.State.Equals(Types.Instance.InstanceState.RUNNING) ||
+                   this.State.Equals(Types.Instance.InstanceState.STARTED) ||
+                   this.State.Equals(Types.Instance.InstanceState.STARTING);
         }
 
         public void Stop()
         {
-            this.State = CloudFoundry.Net.Types.Instance.InstanceState.STOPPED;
+            manager.StopApp(SelectedApplication, Cloud);
+            var application = manager.GetAppInfo(SelectedApplication.Name, Cloud);            
+            this.SelectedApplication = application;
         }
 
         public void Restart()
@@ -212,9 +234,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             this.State = CloudFoundry.Net.Types.Instance.InstanceState.RUNNING;
         }
 
-        public int[] MemoryLimits { get { return CloudFoundry.Net.VsExtension.Ui.Controls.Model.Constants.MemoryLimits; } }
+        public int[] MemoryLimits { get { return Constants.MemoryLimits; } }
 
-        private string name;
         public string Name
         {
             get { return this.name; }
@@ -225,7 +246,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        private string state = CloudFoundry.Net.Types.Instance.InstanceState.STOPPED;
+
         public string State
         {
             get
@@ -239,55 +260,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        private int cpus;
-        public int Cpus
-        {
-            get
-            {
-                return this.cpus;
-            }
-            set
-            {
-                this.cpus = value;
-                RaisePropertyChanged("Cpus");
-            }
-        }
-
-        private int diskLimit;
-        public int DiskLimit
-        {
-            get
-            {
-                return this.diskLimit;
-            }
-            set
-            {
-                this.diskLimit = value;
-                RaisePropertyChanged("DiskLimit");
-            }
-        }
-
-        private ObservableCollection<string> mappedUrls;
         public ObservableCollection<string> MappedUrls
         {
-            get
-            {
-                return this.mappedUrls;
-            }
-            set
-            {
-                this.mappedUrls = value;
-                RaisePropertyChanged("MappedUrls");
-            }
+            get { return this.mappedUrls; }
+            set { this.mappedUrls = value; RaisePropertyChanged("MappedUrls"); }
         }
 
-        private int instanceCount;
         public int InstanceCount
         {
-            get
-            {
-                return this.instanceCount;
-            }
+            get { return this.instanceCount; }
             set
             {
                 this.instanceCount = value;
@@ -295,7 +276,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        private int memoryLimit;
+
         public int MemoryLimit
         {
             get
@@ -314,43 +295,63 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return this.Cloud.Applications; }
         }
 
-        private Application selectedApplication;
+
         public Application SelectedApplication
         {
             get { return this.selectedApplication; }
             set
             {
-                
+
                 this.selectedApplication = value;
-                var manager = new VmcManager();
-                //this.instances = new ObservableCollection<Instance>(manager.GetInstances(this.selectedApplication, this.Cloud));
-                this.instances = new ObservableCollection<ExternalInstance>(manager.GetInstances(this.selectedApplication, this.Cloud));
+                manager = new VmcManager();
+                var stats = manager.GetStats(this.selectedApplication, this.Cloud);
+                var instances = new ObservableCollection<Model.Instance>();
+                foreach (var stat in stats)
+                {
+                    var actualstats = stat.Value.Stats;
+                    var instance = new Model.Instance()
+                    {
+                        ID = stat.Key,
+                        Cpu = actualstats.Usage.CpuTime / 100,
+                        Cores = actualstats.Cores,
+                        Memory = Convert.ToInt32(actualstats.Usage.MemoryUsage) / 1024,
+                        MemoryQuota = actualstats.MemQuota / 1048576,
+                        Disk = Convert.ToInt32(actualstats.Usage.DiskUsage) / 1048576,
+                        DiskQuota = actualstats.DiskQuota / 1048576,
+                        Host = actualstats.Host,
+                        Parent = this.selectedApplication,
+                        Uptime = TimeSpan.FromSeconds(Convert.ToInt32(actualstats.Uptime))
+                    };
+                    instances.Add(instance);
+                }
+                this.Instances = instances;
                 this.Name = selectedApplication.Name;
-                this.DiskLimit = selectedApplication.Resources.Disk;
                 this.InstanceCount = selectedApplication.Instances;
                 this.MappedUrls = new ObservableCollection<string>(selectedApplication.Uris);
                 this.MemoryLimit = selectedApplication.Resources.Memory;
-                this.State = selectedApplication.State;                
+                this.State = selectedApplication.State;
+                this.ApplicationServices = new ObservableCollection<AppService>();
+                foreach (var svc in this.selectedApplication.Services)
+                    foreach (var appService in this.provisionedServices)
+                        if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
+                            this.ApplicationServices.Add(appService);
+
                 RaisePropertyChanged("SelectedApplication");
-                RaisePropertyChanged("IsApplicationSelected");
+                RaisePropertyChanged("IsApplicationSelected");              
             }
         }
 
-        private ObservableCollection<Service> systemServices;
-        private ObservableCollection<AppService> applicationServices;
-       // private ObservableCollection<Instance> instances;
-        private ObservableCollection<ExternalInstance> instances;
-        public ObservableCollection<Service> CloudServices
+        public ObservableCollection<AppService> CloudServices
         {
-            get { return this.systemServices; }
+            get { return this.provisionedServices; }
             set
             {
-                this.systemServices = value;
+                this.provisionedServices = value;
                 RaisePropertyChanged("CloudServices");
             }
         }
 
-        public ObservableCollection<ExternalInstance> Instances
+        public ObservableCollection<Model.Instance> Instances
         {
             get { return this.instances; }
             set
@@ -359,15 +360,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 RaisePropertyChanged("Instances");
             }
         }
-        //public ObservableCollection<Instance> Instances
-        //{
-        //    get { return this.instances; }
-        //    set
-        //    {
-        //        this.instances = value;
-        //        RaisePropertyChanged("Instances");
-        //    }
-        //}
 
         public ObservableCollection<AppService> ApplicationServices
         {
@@ -381,6 +373,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         #endregion
 
-        
+
     }
 }

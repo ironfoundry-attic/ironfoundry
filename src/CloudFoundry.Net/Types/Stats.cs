@@ -6,10 +6,10 @@
     public class StatInfo : JsonBase
     {
         [JsonProperty(PropertyName = "state")]
-        public string state;
+        public string State;
 
         [JsonProperty(PropertyName = "stats")]
-        public Stats stats;
+        public Stats Stats;
     }
 
     public class Stats : Message
