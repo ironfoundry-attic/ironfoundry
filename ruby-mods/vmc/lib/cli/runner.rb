@@ -469,6 +469,13 @@ class VMC::Cli::Runner
   rescue Interrupt => e
     say("\nInterrupted".red)
     @exit_status = false
+  rescue LoadError => e
+    puts e.message.red
+    @exit_status = false
+  rescue Exception => e
+    puts e.message.red
+    puts e.backtrace
+    @exit_status = false
   rescue => e
     puts e.message.red
     puts e.backtrace

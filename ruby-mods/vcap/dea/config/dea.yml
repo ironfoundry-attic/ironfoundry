@@ -1,0 +1,58 @@
+---
+# Base directory where all applications are staged and hosted
+base_dir: C:/CloudFoundry/vcap.local/dea
+
+# dea_ruby: C:\Ruby192\bin\rubyw.exe # NB: forward slash OK
+
+dea_appcmd: C:\Windows\System32\inetsrv\appcmd.exe # NB: required on windows, forward slash OK
+
+# tmp: C:\Windows\TEMP
+
+# Local_route is the IP address of a well known server on your network, it
+# is used to choose the right ip address (think of hosts that have multiple nics
+# and IP addresses assigned to them) of the host running the DEA. Default
+# value of nil, should work in most cases.
+local_route: 172.21.10.231 # 127.0.0.1
+
+# Port for accessing the files of running applications
+filer_port: 12345
+
+# NATS message bus URI
+mbus: nats://172.21.193.11:4222/
+intervals:
+  # Time interval between heartbeats sent to the Health Manager
+  heartbeat: 10
+
+logging:
+  level: debug
+  file: C:/CloudFoundry/log/dea.log
+
+# Allow more than one application to run per DEA
+multi_tenant: true
+
+# Maximum memory allocated to this DEA. In a multi tenant setup, this
+# memory is divided amongst all applications managed by this DEA.
+max_memory: 4096
+
+# Secure environment for running applications in a multi tenant setup.
+secure: false # NB: should be 'false' on windows
+
+# Provide ulimit based resource isolation in a multi tenant setup.
+enforce_ulimit: false
+pid: C:/CloudFoundry/vcap/sys/run/dea.pid
+
+#Force droplets to be downloaded over http even when
+#there is a shared directory containing the droplet.
+force_http_sharing: true
+
+disable_dir_cleanup: true
+
+# This is where the execution agent determines its available runtimes.
+# version flags are assumed to be '-v' unless noted below.
+
+runtimes:
+  aspdotnet40:
+    executable: C:\Windows\Microsoft.NET\Framework64\v4.0.30319\aspnet_regiis.exe
+    version: 4.0.30319.0
+    version_flag: -lv
+    environment:

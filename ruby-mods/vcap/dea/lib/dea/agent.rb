@@ -38,8 +38,6 @@ module DEA
 
     VERSION = 0.99
 
-    APPCMD = 'C:\\Windows\\System32\\inetsrv\\appcmd.exe' # TODO T3CF
-
     # Allow modular security models
     include DEA::Secure
 
@@ -78,7 +76,7 @@ module DEA
     def initialize(config)
       VCAP::Logging.setup_from_config(config['logging'])
       @logger = VCAP::Logging.logger('dea')
-      @secure = config['secure']
+      @secure = config['secure'] && ! VCAP::WINDOWS # TODO T3CF
       @enforce_ulimit = config['enforce_ulimit']
 
       @droplets = {}
@@ -92,8 +90,14 @@ module DEA
 
       # Path to the ruby executable the dea should use when executing the prepare script.
       # BOSH sets this in the config. For development, try to pick a ruby if none provided.
-      @dea_ruby = config['dea_ruby'] || `which ruby`.strip
-      verify_ruby(@dea_ruby)
+      @dea_ruby = config['dea_ruby'] || find_command('ruby')
+
+      verify_executable('Ruby', @dea_ruby)
+
+      if VCAP::WINDOWS # TODO T3CF
+        @dea_appcmd = config['dea_appcmd'] || 'C:/Windows/System32/inetsrv/appcmd.exe'
+        verify_executable('appcmd', @dea_appcmd)
+      end
 
       @runtimes = config['runtimes']
 
@@ -128,7 +132,7 @@ module DEA
       if config['logging'] && config['logging']['file']
         @apps_dump_dir = File.dirname(config['logging']['file'])
       else
-        @apps_dump_dir = ENV['TMPDIR'] || '/tmp'
+        @apps_dump_dir = ENV['TMPDIR'] || ENV['TEMP'] || config['tmp'] || '/tmp' # TODO T3CF
       end
 
       @nats_uri = config['mbus']
@@ -533,7 +537,8 @@ module DEA
       return unless runtime_supported? runtime
 
       tgz_file = File.join(@staged_dir, "#{sha1}.tgz")
-      instance_dir = File.join(@apps_dir, "#{name}-#{instance_index}-#{instance_id}")
+      instance_unique_name = "#{name}-#{instance_index}-#{instance_id}" # NB: should be method on instance class! TODO T3CF
+      instance_dir = File.join(@apps_dir, instance_unique_name)
 
       instance = {
         :droplet_id => droplet_id,
@@ -555,6 +560,13 @@ module DEA
         :log_id => "(name=%s app_id=%s instance=%s index=%s)" % [name, droplet_id, instance_id, instance_index],
       }
 
+      if VCAP::WINDOWS
+        # TODO T3CF
+        instance[:win_dir] = instance[:dir].gsub(File::SEPARATOR, File::ALT_SEPARATOR || File::SEPARATOR)
+        instance[:win_site_path] = instance[:win_dir] + '\app'
+        instance[:win_site_name] = instance_unique_name
+      end
+
       instances = @droplets[droplet_id] || {}
       instances[instance_id] = instance
       @droplets[droplet_id] = instances
@@ -567,6 +579,7 @@ module DEA
         instance[:secure_user] = user[:user]
       end
 
+      # NB: delayed proc called after app dir is staged
       start_operation = proc do
         @logger.debug('Completed download')
 
@@ -592,70 +605,74 @@ module DEA
         manifest = {}
         manifest = File.open(manifest_file) { |f| YAML.load(f) } if File.file?(manifest_file)
 
-        prepare_script = File.join(instance_dir, 'prepare')
-        # once EM allows proper close_on_exec we can remove
-        FileUtils.cp(File.expand_path("../../../bin/close_fds", __FILE__), prepare_script)
-        FileUtils.chmod(0700, prepare_script)
-
-        # Secure mode requires a platform-specific shell command.
-        if @secure
-          case RUBY_PLATFORM
-          when /linux/
-            sh_command = "env -i su -s /bin/sh #{user[:user]}"
-          when /darwin/
-            sh_command = "env -i su -m #{user[:user]}"
-          else
-            @logger.fatal("Unsupported platform for secure mode: #{RUBY_PLATFORM}")
-            exit 1
-          end
+        if VCAP::WINDOWS
+          iis_create(instance)
         else
-          # In non-secure mode, we simply use 'sh' to execute commands, but still strip the environment
-          sh_command = "env -i /bin/sh"
-        end
+          prepare_script = File.join(instance_dir, 'prepare')
+          # once EM allows proper close_on_exec we can remove
+          FileUtils.cp(File.expand_path("../../../bin/close_fds", __FILE__), prepare_script)
+          FileUtils.chmod(0700, prepare_script)
 
-        if @secure
-          system("chown -R #{user[:user]} #{instance_dir}")
-          system("chgrp -R #{DEFAULT_SECURE_GROUP} #{instance_dir}")
-          system("chmod -R o-rwx #{instance_dir}")
-          system("chmod -R g-rwx #{instance_dir}")
-        end
-
-        app_env = setup_instance_env(instance, app_env, services)
-
-        # Add a bit of overhead here for JVM semantics where request is for heap, not total process.
-        mem_kbytes = ((mem * 1024) * 1.125).to_i
-
-        # 512 byte blocks
-        one_gb = 1024*1024*2
-        disk_limit = ((disk*1024)*2)*2
-        disk_limit = one_gb if disk_limit > one_gb
-
-        exec_operation = proc do |process|
-          process.send_data("cd #{instance_dir}\n")
-          if @secure || @enforce_ulimit
-            process.send_data("ulimit -m #{mem_kbytes} 2> /dev/null\n")  # ulimit -m takes kb, soft enforce
-            process.send_data("ulimit -v 3000000 2> /dev/null\n") # virtual memory at 3G, this will be enforced
-            process.send_data("ulimit -n #{num_fds} 2> /dev/null\n")
-            process.send_data("ulimit -u 512 2> /dev/null\n") # processes/threads
-            process.send_data("ulimit -f #{disk_limit} 2> /dev/null\n") # File size to complete disk usage
-            process.send_data("umask 077\n")
+          # Secure mode requires a platform-specific shell command.
+          if @secure
+            case RUBY_PLATFORM
+            when /linux/
+              sh_command = "env -i su -s /bin/sh #{user[:user]}"
+            when /darwin/
+              sh_command = "env -i su -m #{user[:user]}"
+            else
+              @logger.fatal("Unsupported platform for secure mode: #{RUBY_PLATFORM}")
+              exit 1
+            end
+          else
+            # In non-secure mode, we simply use 'sh' to execute commands, but still strip the environment
+            sh_command = "env -i /bin/sh"
           end
-          app_env.each { |env| process.send_data("export #{env}\n") }
-          process.send_data("./startup -p #{port}\n")
-          process.send_data("exit\n")
+
+          if @secure
+            system("chown -R #{user[:user]} #{instance_dir}")
+            system("chgrp -R #{DEFAULT_SECURE_GROUP} #{instance_dir}")
+            system("chmod -R o-rwx #{instance_dir}")
+            system("chmod -R g-rwx #{instance_dir}")
+          end
+
+          app_env = setup_instance_env(instance, app_env, services)
+
+          # Add a bit of overhead here for JVM semantics where request is for heap, not total process.
+          mem_kbytes = ((mem * 1024) * 1.125).to_i
+
+          # 512 byte blocks
+          one_gb = 1024*1024*2
+          disk_limit = ((disk*1024)*2)*2
+          disk_limit = one_gb if disk_limit > one_gb
+
+          exec_operation = proc do |process|
+            process.send_data("cd #{instance_dir}\n")
+            if @secure || @enforce_ulimit
+              process.send_data("ulimit -m #{mem_kbytes} 2> /dev/null\n")  # ulimit -m takes kb, soft enforce
+              process.send_data("ulimit -v 3000000 2> /dev/null\n") # virtual memory at 3G, this will be enforced
+              process.send_data("ulimit -n #{num_fds} 2> /dev/null\n")
+              process.send_data("ulimit -u 512 2> /dev/null\n") # processes/threads
+              process.send_data("ulimit -f #{disk_limit} 2> /dev/null\n") # File size to complete disk usage
+              process.send_data("umask 077\n")
+            end
+            app_env.each { |env| process.send_data("export #{env}\n") }
+            process.send_data("./startup -p #{port}\n")
+            process.send_data("exit\n")
+          end
+
+          exit_operation = proc do |_, status|
+            @logger.info("#{name} completed running with status = #{status}.")
+            @logger.info("#{name} uptime was #{Time.now - instance[:start]}.")
+            stop_droplet(instance)
+          end
+
+          # Being a bit paranoid here and wipe all processes for the secure user
+          # before we start..
+          kill_all_procs_for_user(user) if @secure
+
+          Bundler.with_clean_env { EM.system("#{@dea_ruby} -- #{prepare_script} true #{sh_command}", exec_operation, exit_operation) } # NB: system doesn't work on windows
         end
-
-        exit_operation = proc do |_, status|
-          @logger.info("#{name} completed running with status = #{status}.")
-          @logger.info("#{name} uptime was #{Time.now - instance[:start]}.")
-          stop_droplet(instance)
-        end
-
-        # Being a bit paranoid here and wipe all processes for the secure user
-        # before we start..
-        kill_all_procs_for_user(user) if @secure
-
-        Bundler.with_clean_env { EM.system("#{@dea_ruby} -- #{prepare_script} true #{sh_command}", exec_operation, exit_operation) }
 
         instance[:staged] = instance_dir.sub("#{@apps_dir}/", '')
 
@@ -674,12 +691,20 @@ module DEA
             stop_droplet(instance)
           end
         end
-
-        detect_app_pid(instance_dir) do |pid|
-          if pid and not instance[:stop_processed]
+        if VCAP::WINDOWS
+          if not instance[:stop_processed]
+            pid = instance[:instance_id] # TODO T3CF
             @logger.info("PID:#{pid} assigned to droplet instance: #{instance[:log_id]}")
             instance[:pid] = pid
             schedule_snapshot
+          end
+        else
+          detect_app_pid(instance_dir) do |pid|
+            if pid and not instance[:stop_processed]
+              @logger.info("PID:#{pid} assigned to droplet instance: #{instance[:log_id]}")
+              instance[:pid] = pid
+              schedule_snapshot
+            end
           end
         end
       end
@@ -842,22 +867,17 @@ module DEA
       (instance[:mem_quota] / (1024*1024)).to_i
     end
 
-    def grab_ephemeral_port
-      socket = TCPServer.new('0.0.0.0', 0)
-      socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
-      Socket.do_not_reverse_lookup = true
-      port = socket.addr[1]
-      socket.close
-      return port
-    end
-
     def detect_app_ready(instance, manifest, &block)
-      state_file = manifest['state_file']
-      if state_file
-        state_file = File.join(instance[:dir], state_file)
-        detect_state_ready(instance, state_file, &block)
+      if VCAP::WINDOWS
+        block.call(iis_running(instance))
       else
-        detect_port_ready(instance, &block)
+        state_file = manifest['state_file']
+        if state_file
+          state_file = File.join(instance[:dir], state_file)
+          detect_state_ready(instance, state_file, &block)
+        else
+          detect_port_ready(instance, &block)
+        end
       end
     end
 
@@ -914,7 +934,7 @@ module DEA
       # Use a tmp file here so other queue up and fail the File.exists?
       pending_tgz_file = File.join(@staged_dir, "#{sha1}.pending")
 
-      file = File.open(pending_tgz_file, 'w')
+      file = File.open(pending_tgz_file, 'wb') # TODO T3CF BINARY MODE
       http.errback {
         @logger.warn("Failed to download app bits from #{bits_uri}")
         file.close
@@ -945,16 +965,18 @@ module DEA
       return unless instance_dir && runtime_name && runtime_supported?(runtime_name)
       runtime = @runtimes[runtime_name]
 
-      startup = File.expand_path(File.join(instance_dir, 'startup'))
-      return unless File.exists? startup
+      if not VCAP::WINDOWS # TODO T3CF
+        startup = File.expand_path(File.join(instance_dir, 'startup'))
+        return unless File.exists? startup
 
-      startup_contents = File.read(startup)
-      new_startup = startup_contents.gsub!('%VCAP_LOCAL_RUNTIME%', runtime['executable'])
-      return unless new_startup
+        startup_contents = File.read(startup)
+        new_startup = startup_contents.gsub!('%VCAP_LOCAL_RUNTIME%', runtime['executable'])
+        return unless new_startup
 
-      FileUtils.chmod(0600, startup)
-      File.open(startup, 'w') { |f| f.write(new_startup) }
-      FileUtils.chmod(0500, startup)
+        FileUtils.chmod(0600, startup)
+        File.open(startup, 'w') { |f| f.write(new_startup) }
+        FileUtils.chmod(0500, startup)
+      end
     end
 
     def stage_app_dir(bits_file, bits_uri, sha1, tgz_file, instance_dir, runtime)
@@ -996,16 +1018,18 @@ module DEA
       # Explode the app into its directory and optionally bind its
       # local runtime.
 
-      st, stdout, stderr = run_command("mkdir #{instance_dir}")
+      # TODO removed st, stdout, stderr = run_command("mkdir #{instance_dir}")
+      st = Dir.mkdir(instance_dir)
       unless st == 0
         @logger.warn("Failed creating instance dir '#{instance_dir}', command exited with status #{st}")
-        @logger.warn("stdout: #{stdout}")
-        @logger.warn("stderr: #{stderr}")
+        # @logger.warn("stdout: #{stdout}")
+        # @logger.warn("stderr: #{stderr}")
         FileUtils.rm_f(tgz_file) unless @disable_dir_cleanup
         return false
       end
 
-      st, stdout, stderr = run_command("cd #{instance_dir} && tar -xzf #{tgz_file}")
+      @logger.debug("run_command: tar -xzf #{tgz_file} -C #{instance_dir}")
+      st, stdout, stderr = run_command("tar -xzf #{tgz_file} -C #{instance_dir}") # TODO T3CF install libarchive and fsutil hardlink create tar.exe bsdtar.exe
       unless st == 0
         @logger.warn("Failed unzipping droplet, command exited with status #{st}")
         @logger.warn("stdout: #{stdout}")
@@ -1161,8 +1185,8 @@ module DEA
 
     def instance_running?(instance)
       return false unless instance && instance[:pid]
-      if VCAP::WINDOWS # TODO T3CF should go into common lib
-        false
+      if VCAP::WINDOWS # TODO T3CF
+        iis_running(instance)
       else
         `ps -o rss= -p #{instance[:pid]}`.length > 0
       end
@@ -1184,15 +1208,19 @@ module DEA
       if instance[:pid] || [:STARTING, :RUNNING].include?(instance[:state])
         instance[:state] = :STOPPED unless instance[:state] == :CRASHED
         instance[:state_timestamp] = Time.now.to_i
-        stop_cmd = File.join(instance[:dir], 'stop')
-        stop_cmd = "su -c #{stop_cmd} #{username}" if @secure
-        stop_cmd = "#{stop_cmd} 2> /dev/null"
 
-        unless (RUBY_PLATFORM =~ /darwin/ and @secure)
-          @logger.debug("Executing stop script: '#{stop_cmd}'")
-          # We can't make 'stop_cmd' into EM.system because of a race with
-          # 'cleanup_droplet'
-          Bundler.with_clean_env { system(stop_cmd) }
+        if VCAP::WINDOWS
+          iis_delete(instance)
+        else
+          stop_cmd = File.join(instance[:dir], 'stop')
+          stop_cmd = "su -c #{stop_cmd} #{username}" if @secure
+          stop_cmd = "#{stop_cmd} 2> /dev/null"
+          unless (RUBY_PLATFORM =~ /darwin/ and @secure)
+            @logger.debug("Executing stop script: '#{stop_cmd}'")
+            # We can't make 'stop_cmd' into EM.system because of a race with
+            # 'cleanup_droplet'
+            Bundler.with_clean_env { system(stop_cmd) }
+          end
         end
       end
 
@@ -1224,12 +1252,14 @@ module DEA
         end
         unless @disable_dir_cleanup
           @logger.debug("#{instance[:name]}: Cleaning up dir #{instance[:dir]}")
-          EM.system("rm -rf #{instance[:dir]}")
+          FileUtils.rm_rf(instance[:dir])
         end
       # Rechown crashed application directory using uid and gid of DEA
       else
-        @logger.debug("#{instance[:name]}: Chowning crashed dir #{instance[:dir]}")
-        EM.system("chown -R #{Process.euid}:#{Process.egid} #{instance[:dir]}")
+        if not VCAP::WINDOWS # TODO T3CF
+          @logger.debug("#{instance[:name]}: Chowning crashed dir #{instance[:dir]}")
+          EM.system("chown -R #{Process.euid}:#{Process.egid} #{instance[:dir]}")
+        end
       end
     end
 
@@ -1387,7 +1417,7 @@ module DEA
           delete_instance = instance[:state] == :CRASHED && Time.now.to_i - instance[:state_timestamp] > CRASHES_REAPER_TIMEOUT
           if delete_instance
             @logger.debug("Crashes reaper deleted: #{instance[:instance_id]}")
-            EM.system("rm -rf #{instance[:dir]}") unless @disable_dir_cleanup
+            FileUtils.rm_rf(instance[:dir]) unless @disable_dir_cleanup
           end
           delete_instance
         end
@@ -1411,40 +1441,45 @@ module DEA
         return
       end
 
-      pid_info = {}
-      user_info = {}
       start = Time.now
-
-      # BSD style ps invocation
       ps_start = Time.now
-      process_statuses = `ps axo pid=,ppid=,pcpu=,rss=,user=`.split("\n")
-      ps_elapsed = Time.now - ps_start
-      @logger.warn("Took #{ps_elapsed}s to execute ps. (#{process_statuses.length} entries returned)") if ps_elapsed > 0.25
-      process_statuses.each do |process_status|
-        parts = process_status.lstrip.split(/\s+/)
-        pid = parts[PID_INDEX].to_i
-        pid_info[pid] = parts
-        (user_info[parts[USER_INDEX]] ||= []) << parts if (@secure && parts[USER_INDEX] =~ SECURE_USER)
-      end
 
-      # This really, really needs refactoring, but seems like the least intrusive/failure-prone way
-      # of making the du non-blocking in all but the startup case...
-      du_start = Time.now
-      if startup_check
-        du_all_out = `cd #{@apps_dir}; du -sk * 2> /dev/null`
-        monitor_apps_helper(startup_check, start, du_start, du_all_out, pid_info, user_info)
+      if VCAP::WINDOWS # TODO T3CF
+        # TODO gets disk and ps info
       else
-        du_proc = proc do |p|
-          p.send_data("cd #{@apps_dir}\n")
-          p.send_data("du -sk * 2> /dev/null\n")
-          p.send_data("exit\n")
+        pid_info = {}
+        user_info = {}
+
+        # BSD style ps invocation
+        process_statuses = `ps axo pid=,ppid=,pcpu=,rss=,user=`.split("\n")
+        ps_elapsed = Time.now - ps_start
+        @logger.warn("Took #{ps_elapsed}s to execute ps. (#{process_statuses.length} entries returned)") if ps_elapsed > 0.25
+        process_statuses.each do |process_status|
+          parts = process_status.lstrip.split(/\s+/)
+          pid = parts[PID_INDEX].to_i
+          pid_info[pid] = parts
+          (user_info[parts[USER_INDEX]] ||= []) << parts if (@secure && parts[USER_INDEX] =~ SECURE_USER)
         end
 
-        cont_proc = proc do |output, status|
-          monitor_apps_helper(startup_check, start, du_start, output, pid_info, user_info)
-        end
+        # This really, really needs refactoring, but seems like the least intrusive/failure-prone way
+        # of making the du non-blocking in all but the startup case...
+        du_start = Time.now
+        if startup_check
+          du_all_out = `cd #{@apps_dir}; du -sk * 2> /dev/null`
+          monitor_apps_helper(startup_check, start, du_start, du_all_out, pid_info, user_info)
+        else
+          du_proc = proc do |p|
+            p.send_data("cd #{@apps_dir}\n")
+            p.send_data("du -sk * 2> /dev/null\n")
+            p.send_data("exit\n")
+          end
 
-        EM.system('/bin/sh', du_proc, cont_proc)
+          cont_proc = proc do |output, status|
+            monitor_apps_helper(startup_check, start, du_start, output, pid_info, user_info)
+          end
+
+          EM.system('/bin/sh', du_proc, cont_proc)
+        end
       end
     end
 
@@ -1563,9 +1598,9 @@ module DEA
       success
     end
 
-    def verify_ruby(path_to_ruby)
-      raise "Ruby @ '#{path_to_ruby}' doesn't exist" unless File.exist?(path_to_ruby)
-      raise "Ruby @ '#{path_to_ruby}' isn't executable" unless File.executable?(path_to_ruby)
+    def verify_executable(name, path_to_exe)
+      raise "#{name} @ '#{path_to_exe}' doesn't exist" unless File.exist?(path_to_exe)
+      raise "#{name} @ '#{path_to_exe}' isn't executable" unless File.executable?(path_to_exe)
     end
 
     def runtime_supported?(runtime_name)
@@ -1606,7 +1641,7 @@ module DEA
         # Check that we can get a version from the executable
         version_flag = runtime['version_flag'] || '-v'
 
-        expanded_exec = `which #{runtime['executable']}`
+        expanded_exec = find_command(runtime['executable']) # TODO T3CF
         unless $? == 0
           @logger.info("  #{pname} FAILED, executable '#{runtime['executable']}' not found")
           next
@@ -1614,20 +1649,23 @@ module DEA
         expanded_exec.strip!
 
         # java prints to stderr, so munch them both..
-        version_check = `#{expanded_exec} #{version_flag} 2>&1`.strip!
-        unless $? == 0
+        st, version_check = run_command("#{expanded_exec} #{version_flag}", true)
+        unless st == 0
           @logger.info("  #{pname} FAILED, executable '#{runtime['executable']}' not found")
           next
         end
+
         runtime['executable'] = expanded_exec
 
         next unless runtime['version']
+
         # Check the version for a match
         if /#{runtime['version']}/ =~ version_check
           # Additional checks should return true
           if runtime['additional_checks']
-            additional_check = `#{runtime['executable']} #{runtime['additional_checks']} 2>&1`
-            unless additional_check =~ /true/i
+            # TODO T3CF additional_check = `#{runtime['executable']} #{runtime['additional_checks']} 2>&1`
+            st, output = run_command("#{runtime['executable']} #{runtime['additional_checks']}", true)
+            unless output =~ /true/i
               @logger.info("  #{pname} FAILED, additional checks failed")
             end
           end
@@ -1642,16 +1680,20 @@ module DEA
     # Logs out the directory structure of the apps dir. This produces both a summary
     # (top level view) of the directory, as well as a detailed view.
     def dump_apps_dir
-      now = Time.now
-      pid = fork do
-        # YYYYMMDD_HHMM
-        tsig = "%04d%02d%02d_%02d%02d" % [now.year, now.month, now.day, now.hour, now.min]
-        summary_file = File.join(@apps_dump_dir, "apps.du.#{tsig}.summary")
-        details_file = File.join(@apps_dump_dir, "apps.du.#{tsig}.details")
-        exec("du -skh #{@apps_dir}/* > #{summary_file} 2>&1; du -h --max-depth 6 #{@apps_dir} > #{details_file}")
+      if VCAP::WINDOWS
+        # TODO T3CF
+      else
+        now = Time.now
+        pid = fork do
+          # YYYYMMDD_HHMM
+          tsig = "%04d%02d%02d_%02d%02d" % [now.year, now.month, now.day, now.hour, now.min]
+          summary_file = File.join(@apps_dump_dir, "apps.du.#{tsig}.summary")
+          details_file = File.join(@apps_dump_dir, "apps.du.#{tsig}.details")
+          exec("du -skh #{@apps_dir}/* > #{summary_file} 2>&1; du -h --max-depth 6 #{@apps_dir} > #{details_file}")
+        end
+        Process.detach(pid)
+        pid
       end
-      Process.detach(pid)
-      pid
     end
 
     def self.ensure_writable(dir)
@@ -1660,14 +1702,77 @@ module DEA
       FileUtils.rm_f(test_file)
     end
 
-
-    def run_command(cmd)
+    def run_command(cmd, combine_output=false)
       outdir = Dir.mktmpdir
-      stderr_path = File.join(outdir, 'stderr.log')
-      stdout = `#{cmd} 2> #{stderr_path}`
-      stderr = File.read(stderr_path)
-      FileUtils.rm_rf(outdir)
-      [$?, stdout, stderr]
+      curpid = Process.pid
+      stdout_path = File.join(outdir, "#{curpid}_stdout.log").gsub(File::SEPARATOR, File::ALT_SEPARATOR || File::SEPARATOR)
+      stderr_path = File.join(outdir, "#{curpid}_stderr.log").gsub(File::SEPARATOR, File::ALT_SEPARATOR || File::SEPARATOR)
+      begin
+        stdout = nil
+        stderr = nil
+        if combine_output
+          @logger.debug("run_command: '#{cmd} > #{stdout_path} 2>&1'")
+          if system("#{cmd} > #{stdout_path} 2>&1")
+            stdout = File.read(stdout_path)
+          end
+          [$?, stdout]
+        else
+          @logger.debug("run_command: '#{cmd} > #{stdout_path} 2> #{stderr_path}'")
+          if system("#{cmd} > #{stdout_path} 2> #{stderr_path}")
+            stdout = File.read(stdout_path)
+            stderr = File.read(stderr_path)
+          end
+          [$?, stdout, stderr]
+        end
+      ensure
+        FileUtils.rm_rf(outdir)
+      end
+    end
+
+    def find_command(cmd)
+      st, stdout, stderr = run_command("which #{cmd}")
+      stdout.strip if st == 0
+    end
+
+    def iis_create(instance)
+      site_name = instance[:win_site_name]
+      site_port = instance[:port]
+      site_path = instance[:win_site_path]
+      @logger.debug("APPCMD add apppool /name:#{site_name}")
+      if not system(@dea_appcmd, 'add', 'apppool', "/name:#{site_name}")
+        return false
+      end
+      @logger.debug("APPCMD set apppool #{site_name} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated")
+      if not system(@dea_appcmd, 'set', 'apppool', site_name, '/autoStart:true', '/managedRuntimeVersion:v4.0', '/managedPipelineMode:Integrated')
+        return false
+      end
+      @logger.debug("APPCMD add site /name:#{site_name} /bindings:http/*:#{site_port}: /physicalPath:#{site_path}")
+      if not system(@dea_appcmd, 'add', 'site', "/name:#{site_name}", "/bindings:http/*:#{site_port}:", "/physicalPath:#{site_path}")
+        return false
+      end
+      @logger.debug("APPCMD set site #{site_name} /[path='/'].applicationPool:#{site_name}")
+      if not system(@dea_appcmd, 'set', 'site', site_name, "/[path='/'].applicationPool:#{site_name}")
+        return false
+      end
+      true
+    end
+
+    def iis_running(instance)
+      site_name = instance[:win_site_name]
+      site_running = system(@dea_appcmd, 'list', 'site', "/name:#{site_name}", '/state:started')
+      apppool_running = system(@dea_appcmd, 'list', 'apppool', "/name:#{site_name}", '/state:started')
+      site_running && apppool_running
+    end
+
+    def iis_delete(instance)
+      site_name = instance[:win_site_name]
+      if not system(@dea_appcmd, 'delete', 'site', site_name)
+        return false
+      end
+      if not system(@dea_appcmd, 'delete', 'apppool', site_name)
+        return false
+      end
+      true
     end
 
   end
