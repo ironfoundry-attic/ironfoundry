@@ -1028,7 +1028,6 @@ module DEA
         return false
       end
 
-      @logger.debug("run_command: tar -xzf #{tgz_file} -C #{instance_dir}")
       st, stdout, stderr = run_command("tar -xzf #{tgz_file} -C #{instance_dir}") # TODO T3CF install libarchive and fsutil hardlink create tar.exe bsdtar.exe
       unless st == 0
         @logger.warn("Failed unzipping droplet, command exited with status #{st}")
