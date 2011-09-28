@@ -13,7 +13,7 @@
 
     internal class VmcApps
     {
-        public string StartApp (string appname, string url, string accesstoken) 
+        internal string StartApp (string appname, string url, string accesstoken) 
         {
             if (url == null)
             {
@@ -35,22 +35,22 @@
             }
         }
 
-        public void StartApp (Application application, Cloud cloud){
+        internal void StartApp(Application application, Cloud cloud)
+        {
             
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
             request.Method = Method.PUT;
             request.Resource = "/apps/"+application.Name;
-            application.State = "Started";
+            application.State = Instance.InstanceState.STARTED;
             request.AddHeader("Authorization", cloud.AccessToken);
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
-            client.Execute(request);
+            var response = client.Execute(request).Content;
         }
 
-        
-        public string GetAppInfo (string appname, string url, string accesstoken)
+        internal string GetAppInfo(string appname, string url, string accesstoken)
         {
             if (url == null)
             {
@@ -68,13 +68,13 @@
                 request.Method = Method.GET;
                 request.Resource = "/apps/"+appname;
                 request.AddHeader("Authorization", accesstoken);
-                return client.Execute(request).Content;
+                var response = client.Execute(request).Content;
+                return response;
             }
         }
 
-        
-
-        public Application GetAppInfo (String appname, Cloud cloud){
+        internal Application GetAppInfo(String appname, Cloud cloud)
+        {
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
@@ -85,22 +85,21 @@
             return (Application)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(Application));
         }
 
-        public void StopApp(Application application, Cloud cloud)
+        internal void StopApp(Application application, Cloud cloud)
         {
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
             request.Method = Method.PUT;
             request.Resource = "/apps/" + application.Name;
-            application.State = "Stopped";
+            application.State = Instance.InstanceState.STOPPED;
             request.AddHeader("Authorization", cloud.AccessToken);
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
             var response =  client.Execute(request).Content;
-
         }
 
-        public string DeleteApp(string appname, string url, string accesstoken)
+        internal string DeleteApp(string appname, string url, string accesstoken)
         {
             if (url == null)
             {
@@ -122,7 +121,8 @@
             }
         }
 
-        public void DeleteApp(Application application, Cloud cloud){
+        internal void DeleteApp(Application application, Cloud cloud)
+        {
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
@@ -132,7 +132,7 @@
             client.Execute(request);
         }
 
-        public void RestartApp (Application application, Cloud cloud)
+        internal void RestartApp(Application application, Cloud cloud)
         {
             StopApp(application, cloud);
             StartApp(application, cloud);
