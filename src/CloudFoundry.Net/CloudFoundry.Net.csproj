@@ -46,7 +46,6 @@
     <Compile Include="JsonConverters\VcapGuidArrayConverter.cs" />
     <Compile Include="JsonConverters\VcapGuidConverter.cs" />
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
-    <Compile Include="Notifier.cs" />
     <Compile Include="SocketExtensionMethods.cs" />
     <Compile Include="StringExtensionMethods.cs" />
     <Compile Include="TimerExtensionMethods.cs" />
@@ -94,7 +93,6 @@
   <ItemGroup>
     <None Include="CloudFoundry.snk" />
     <None Include="packages.config" />
-    <None Include="Types\ClassDiagram1.cd" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=4.0.2.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

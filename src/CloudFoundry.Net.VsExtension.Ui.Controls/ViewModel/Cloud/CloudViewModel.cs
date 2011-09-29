@@ -10,6 +10,7 @@ using CloudFoundry.Net.Vmc;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -42,7 +43,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             this.Cloud = cloud;
             
             InitializeCommands();
-            InitializeData();
+            InitializeData();            
         }               
 
         private void InitializeCommands()
@@ -199,22 +200,34 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public void Start()
         {
             manager.StartApp(SelectedApplication, Cloud);
-        }
+            RefreshApplication();
+        }        
 
         public void Stop()
         {
             manager.StopApp(SelectedApplication, Cloud);
-
+            RefreshApplication();
         }
 
         public void Restart()
         {
             manager.RestartApp(SelectedApplication, Cloud);
+            RefreshApplication();
         }
 
         public void UpdateAndRestart()
         {
-            
+
+            Restart();
+        }
+
+        private void RefreshApplication()
+        {
+            var application = manager.GetAppInfo(SelectedApplication.Name, Cloud);
+            var applicationToReplace = Cloud.Applications.SingleOrDefault((i) => i.Name == application.Name);
+            if (applicationToReplace != null)
+                applicationToReplace = application;
+            SelectedApplication = application;
         }
 
         public int[] MemoryLimits { get { return Constants.MemoryLimits; } }        
@@ -246,6 +259,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             {
                 this.selectedApplication = value;
                 this.selectedApplication.PropertyChanged += new PropertyChangedEventHandler(selectedApplication_PropertyChanged);
+                
+                //TODO: Async
                 this.ApplicationServices = new ObservableCollection<AppService>();
                 foreach (var svc in this.selectedApplication.Services)
                     foreach (var appService in this.provisionedServices)
