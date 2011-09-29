@@ -65,14 +65,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             getProvisionedServices.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getProvisionedServices_RunWorkerCompleted);
             getInstances.DoWork += new DoWorkEventHandler(getInstances_DoWork);
             getInstances.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getInstances_RunWorkerCompleted);
+            if (Cloud.IsConnected)
+                getProvisionedServices.RunWorkerAsync();
         }
 
         private void Cloud_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "AccessToken" && !String.IsNullOrEmpty(Cloud.AccessToken))
-            {
+            if (e.PropertyName == "IsConnected" && Cloud.IsConnected)
                 getProvisionedServices.RunWorkerAsync();
-            }
         }                
 
         private void getProvisionedServices_DoWork(object sender, DoWorkEventArgs e)
@@ -217,7 +217,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public void UpdateAndRestart()
         {
-
+            manager.UpdateApplicationSettings(SelectedApplication, Cloud);
             Restart();
         }
 

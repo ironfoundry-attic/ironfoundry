@@ -33,21 +33,12 @@
                 request.AddHeader("Authorization", accesstoken);
                 return client.Execute(request).Content;
             }
-        }
+        }              
 
         internal void StartApp(Application application, Cloud cloud)
         {
-            
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.PUT;
-            request.Resource = "/apps/"+application.Name;
             application.State = Instance.InstanceState.STARTED;
-            request.AddHeader("Authorization", cloud.AccessToken);
-            request.AddObject(application);
-            request.RequestFormat = DataFormat.Json;
-            var response = client.Execute(request).Content;
+            UpdateApplicationSettings(application, cloud);
         }
 
         internal string GetAppInfo(string appname, string url, string accesstoken)
@@ -87,16 +78,21 @@
 
         internal void StopApp(Application application, Cloud cloud)
         {
+            application.State = Instance.InstanceState.STOPPED;
+            UpdateApplicationSettings(application, cloud);
+        }
+
+        internal void UpdateApplicationSettings(Application application, Cloud cloud)
+        {
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
+            request.RequestFormat = DataFormat.Json;
             request.Method = Method.PUT;
             request.Resource = "/apps/" + application.Name;
-            application.State = Instance.InstanceState.STOPPED;
             request.AddHeader("Authorization", cloud.AccessToken);
-            request.AddObject(application);
-            request.RequestFormat = DataFormat.Json;
-            var response =  client.Execute(request).Content;
+            request.AddBody(application);
+            var response = client.Execute(request).Content;
         }
 
         internal string DeleteApp(string appname, string url, string accesstoken)
