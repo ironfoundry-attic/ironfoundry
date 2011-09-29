@@ -55,10 +55,10 @@ namespace CloudFoundry.Net.Vmc
             return app.GetAppInfo(appname, cloud);
         }
 
-        public void UpdateApplicationSettings(Application application, Cloud cloud)
+        public VmcResponse UpdateApplicationSettings(Application application, Cloud cloud)
         {
             VmcApps app = new VmcApps();
-            app.UpdateApplicationSettings(application, cloud);
+            return app.UpdateApplicationSettings(application, cloud);
         }
 
 

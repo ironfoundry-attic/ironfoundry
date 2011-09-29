@@ -23,7 +23,7 @@ namespace CloudFoundry.Net.Vmc
         List<Application> ListApps(Cloud cloud);
         List<SystemServices> GetAvailableServices(Cloud cloud);
         List<AppService> GetProvisionedServices(Cloud cloud);
-        void UpdateApplicationSettings(Application application, Cloud cloud);
+        VmcResponse UpdateApplicationSettings(Application application, Cloud cloud);
         string Info();
     }
 }

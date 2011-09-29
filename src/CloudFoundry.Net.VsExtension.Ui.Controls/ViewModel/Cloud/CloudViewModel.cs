@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Threading;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -25,11 +26,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand StopCommand { get; private set; }
         public RelayCommand RestartCommand { get; private set; }
         public RelayCommand UpdateAndRestartCommand { get; private set; }
+        public RelayCommand UpdateInstanceCountCommand { get; private set; }
 
-        private Cloud cloud;        
+        private Cloud cloud;
         private Application selectedApplication;
         private bool isApplicationViewSelected;
-        
+        private string overviewErrorMessage;
+        private string applicationErrorMessage;
+
         private ObservableCollection<AppService> provisionedServices;
         private ObservableCollection<AppService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
@@ -37,14 +41,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         BackgroundWorker getProvisionedServices = new BackgroundWorker();
         BackgroundWorker getInstances = new BackgroundWorker();
+        BackgroundWorker updateApplication = new BackgroundWorker();
+        DispatcherTimer instanceTimer = new DispatcherTimer();
 
         public CloudViewModel(Cloud cloud)
-        {            
+        {
             this.Cloud = cloud;
-            
+
             InitializeCommands();
-            InitializeData();            
-        }               
+            InitializeData();
+        }
 
         private void InitializeCommands()
         {
@@ -55,67 +61,117 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             StartCommand = new RelayCommand(Start, CanExecuteStart);
             StopCommand = new RelayCommand(Stop, CanExecuteStopActions);
             RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
-            UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);
+            UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);            
         }
 
         private void InitializeData()
         {
-            Cloud.PropertyChanged += new PropertyChangedEventHandler(Cloud_PropertyChanged);
-            getProvisionedServices.DoWork += new DoWorkEventHandler(getProvisionedServices_DoWork);
-            getProvisionedServices.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getProvisionedServices_RunWorkerCompleted);
-            getInstances.DoWork += new DoWorkEventHandler(getInstances_DoWork);
-            getInstances.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getInstances_RunWorkerCompleted);
+            instanceTimer.Interval = TimeSpan.FromSeconds(5);
+            instanceTimer.Tick += RefreshInstances;
+            instanceTimer.Start();
+            Cloud.PropertyChanged += Cloud_PropertyChanged;
+            getProvisionedServices.DoWork += BeginGetProvisionedServices;
+            getProvisionedServices.RunWorkerCompleted += EndGetProvisionedServices;
+            getInstances.DoWork += BeginGetInstances;
+            getInstances.RunWorkerCompleted += EndGetInstances;
+            updateApplication.DoWork += BeginUpdateApplication;
+            updateApplication.RunWorkerCompleted += EndUpdateApplication;
             if (Cloud.IsConnected)
                 getProvisionedServices.RunWorkerAsync();
         }
 
+        
         private void Cloud_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsConnected" && Cloud.IsConnected)
                 getProvisionedServices.RunWorkerAsync();
-        }                
+        }
 
-        private void getProvisionedServices_DoWork(object sender, DoWorkEventArgs e)
+        private void BeginGetProvisionedServices(object sender, DoWorkEventArgs e)
         {
             e.Result = manager.GetProvisionedServices(Cloud);
         }
 
-        private void getProvisionedServices_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void EndGetProvisionedServices(object sender, RunWorkerCompletedEventArgs e)
         {
             this.CloudServices = new ObservableCollection<AppService>(e.Result as List<AppService>);
         }
 
-        private void getInstances_DoWork(object sender, DoWorkEventArgs e)
+        private void RefreshInstances(object sender, EventArgs e)
+        {
+            var stats = manager.GetStats(SelectedApplication, Cloud);
+            UpdateInstanceCollection(stats);
+        }
+
+        private void BeginGetInstances(object sender, DoWorkEventArgs e)
         {
             e.Result = manager.GetStats(SelectedApplication, Cloud);
         }
 
-        private void getInstances_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void EndGetInstances(object sender, RunWorkerCompletedEventArgs e)
         {
             var stats = e.Result as SortedDictionary<int, StatInfo>;
+            UpdateInstanceCollection(stats);
+        }
+
+        private void BeginUpdateApplication(object sender, DoWorkEventArgs e)
+        {
+            ApplicationErrorMessage = string.Empty;
+            e.Result = manager.UpdateApplicationSettings(SelectedApplication, Cloud);
+        }
+
+        private void EndUpdateApplication(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Result != null)
+            {
+                VmcResponse response = e.Result as VmcResponse;
+                ApplicationErrorMessage = string.Format("{0} - (Error: {1})", response.Description, response.Code);
+            }
+            RefreshApplication();
+        }
+
+        private void UpdateInstanceCollection(SortedDictionary<int, StatInfo> stats)
+        {
             var instances = new ObservableCollection<Model.Instance>();
             foreach (var stat in stats)
             {
-                var actualstats = stat.Value.Stats;
-                var instance = new Model.Instance()
+                if (stat.Value.State.Equals(Types.Instance.InstanceState.RUNNING) ||
+                    stat.Value.State.Equals(Types.Instance.InstanceState.STARTED) ||
+                    stat.Value.State.Equals(Types.Instance.InstanceState.STARTING))
                 {
-                    ID = stat.Key,
-                    Cpu = actualstats.Usage.CpuTime / 100,
-                    Cores = actualstats.Cores,
-                    Memory = Convert.ToInt32(actualstats.Usage.MemoryUsage) / 1024,
-                    MemoryQuota = actualstats.MemQuota / 1048576,
-                    Disk = Convert.ToInt32(actualstats.Usage.DiskUsage) / 1048576,
-                    DiskQuota = actualstats.DiskQuota / 1048576,
-                    Host = actualstats.Host,
-                    Parent = this.selectedApplication,
-                    Uptime = TimeSpan.FromSeconds(Convert.ToInt32(actualstats.Uptime))
-                };
-                instances.Add(instance);
+                    var actualstats = stat.Value.Stats;
+                    var instance = new Model.Instance()
+                    {
+                        ID = stat.Key,
+                        Cores = actualstats.Cores,
+                        MemoryQuota = actualstats.MemQuota / 1048576,
+                        DiskQuota = actualstats.DiskQuota / 1048576,
+                        Host = actualstats.Host,
+                        Parent = this.selectedApplication,
+                        Uptime = TimeSpan.FromSeconds(Convert.ToInt32(actualstats.Uptime))
+                    };
+                    if (actualstats.Usage != null)
+                    {
+                        instance.Cpu = actualstats.Usage.CpuTime / 100;
+                        instance.Memory = Convert.ToInt32(actualstats.Usage.MemoryUsage) / 1024;
+                        instance.Disk = Convert.ToInt32(actualstats.Usage.DiskUsage) / 1048576;
+                    }
+                    instances.Add(instance);
+                }
             }
             this.Instances = instances;
         }
 
         #region Overview
+
+        public string OverviewErrorMessage
+        {
+            get { return this.overviewErrorMessage; }
+            set { 
+                this.overviewErrorMessage = value;
+                RaisePropertyChanged("OverviewErrorMessage");
+            }
+        }
 
         private void ChangePassword()
         {
@@ -163,12 +219,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void Connect()
         {
-            
+
         }
 
         private void Disconnect()
         {
-            
+
         }
 
         public Cloud Cloud
@@ -176,10 +232,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return this.cloud; }
             set { this.cloud = value; RaisePropertyChanged("Cloud"); }
         }
-        
+
         #endregion
 
-        #region Application        
+        #region Application
+
+        public string ApplicationErrorMessage
+        {
+            get { return this.applicationErrorMessage; }
+            set
+            {
+                this.applicationErrorMessage = value;
+                RaisePropertyChanged("ApplicationErrorMessage");
+            }
+        }
 
         public bool CanExecuteStart()
         {
@@ -190,18 +256,18 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         }
 
         public bool CanExecuteStopActions()
-        {            
+        {
             return IsApplicationSelected && (
                    SelectedApplication.State.Equals(Types.Instance.InstanceState.RUNNING) ||
                    SelectedApplication.State.Equals(Types.Instance.InstanceState.STARTED) ||
                    SelectedApplication.State.Equals(Types.Instance.InstanceState.STARTING));
         }
-        
+
         public void Start()
         {
             manager.StartApp(SelectedApplication, Cloud);
             RefreshApplication();
-        }        
+        }
 
         public void Stop()
         {
@@ -230,7 +296,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             SelectedApplication = application;
         }
 
-        public int[] MemoryLimits { get { return Constants.MemoryLimits; } }        
+        public int[] MemoryLimits { get { return Constants.MemoryLimits; } }
 
         public ObservableCollection<Application> Applications
         {
@@ -257,10 +323,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return this.selectedApplication; }
             set
             {
+                if (this.SelectedApplication != null)
+                    this.SelectedApplication.PropertyChanged -= selectedApplication_PropertyChanged;
                 this.selectedApplication = value;
-                this.selectedApplication.PropertyChanged += new PropertyChangedEventHandler(selectedApplication_PropertyChanged);
-                
-                //TODO: Async
+                this.selectedApplication.PropertyChanged += selectedApplication_PropertyChanged;
+
                 this.ApplicationServices = new ObservableCollection<AppService>();
                 foreach (var svc in this.selectedApplication.Services)
                     foreach (var appService in this.provisionedServices)
@@ -273,16 +340,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        void selectedApplication_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void selectedApplication_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Services")
-            {
-                this.ApplicationServices = new ObservableCollection<AppService>();
-                foreach (var svc in this.selectedApplication.Services)
-                    foreach (var appService in this.provisionedServices)
-                        if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
-                            this.ApplicationServices.Add(appService);
-            }
+            updateApplication.RunWorkerAsync();
         }
 
         public ObservableCollection<AppService> CloudServices
@@ -316,7 +376,5 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         }
 
         #endregion
-
-
     }
 }

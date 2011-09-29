@@ -82,8 +82,9 @@
             UpdateApplicationSettings(application, cloud);
         }
 
-        internal void UpdateApplicationSettings(Application application, Cloud cloud)
+        internal VmcResponse UpdateApplicationSettings(Application application, Cloud cloud)
         {
+            VmcResponse vmcResponse = null;
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
@@ -93,6 +94,9 @@
             request.AddHeader("Authorization", cloud.AccessToken);
             request.AddBody(application);
             var response = client.Execute(request).Content;
+            if (!String.IsNullOrEmpty(response.Trim()))
+                vmcResponse = JsonConvert.DeserializeObject<VmcResponse>(response);
+            return vmcResponse;
         }
 
         internal string DeleteApp(string appname, string url, string accesstoken)

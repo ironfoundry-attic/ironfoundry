@@ -87,6 +87,7 @@
     <Compile Include="Types\Status.cs" />
     <Compile Include="Types\VcapComponentBase.cs" />
     <Compile Include="Types\VcapComponentDiscover.cs" />
+    <Compile Include="Types\VmcResponse.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WinSockErrorCode.cs" />
   </ItemGroup>
