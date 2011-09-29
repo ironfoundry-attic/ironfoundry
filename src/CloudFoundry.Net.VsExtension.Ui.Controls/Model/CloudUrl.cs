@@ -12,6 +12,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public bool IsConfigurable { get; set; }
         public bool IsRemovable { get; set; }
         public bool IsDefault { get; set; }
-        public bool IsMicroCloud { get; set; }
+        public bool IsMicroCloud { get; set; }        
     }    
 }

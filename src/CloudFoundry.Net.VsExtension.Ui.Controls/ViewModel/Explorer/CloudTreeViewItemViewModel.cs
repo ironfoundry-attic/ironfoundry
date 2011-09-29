@@ -8,6 +8,7 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using CloudFoundry.Net.Types;
+using System.Collections.Specialized;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -19,15 +20,22 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public CloudTreeViewItemViewModel(Cloud cloud) : base(null,false)
         {
             OpenCloudCommand = new RelayCommand<MouseButtonEventArgs>(OpenCloud);
-
-            this.cloud = cloud;
-            foreach (Application app in cloud.Applications)
-                base.Children.Add(new ApplicationTreeViewItemViewModel(app, this));
+            
+            this.Cloud = cloud;
+            this.Cloud.Applications.CollectionChanged += new NotifyCollectionChangedEventHandler(Applications_CollectionChanged);       
         }
 
-        public string ServerName
+        private void Applications_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            get { return this.cloud.ServerName; }
+            base.Children.Clear();
+            foreach (Application app in this.cloud.Applications)
+                base.Children.Add(new ApplicationTreeViewItemViewModel(app, this));                
+        }
+
+        public Cloud Cloud
+        {
+            get { return this.cloud; }
+            set { this.cloud = value; RaisePropertyChanged("Cloud"); }
         }
 
         private void OpenCloud(MouseButtonEventArgs e)

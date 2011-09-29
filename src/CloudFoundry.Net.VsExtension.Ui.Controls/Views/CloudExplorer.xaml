@@ -47,7 +47,7 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\CloudFoundrySmall.ico" />
-                        <TextBlock Text="{Binding ServerName}" />
+                        <TextBlock Text="{Binding Cloud.ServerName}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
 

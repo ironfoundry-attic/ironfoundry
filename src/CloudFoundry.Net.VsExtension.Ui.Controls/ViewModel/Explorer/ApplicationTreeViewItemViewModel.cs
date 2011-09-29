@@ -47,12 +47,17 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private bool CanStart()
         {
-            return this.application.State.Equals(CloudFoundry.Net.Types.Instance.InstanceState.STOPPED);
+            return !(application.State.Equals(Types.Instance.InstanceState.RUNNING) ||
+                     application.State.Equals(Types.Instance.InstanceState.STARTED) ||
+                     application.State.Equals(Types.Instance.InstanceState.STARTING));
         }
 
         private bool CanStop()
         {
-            return this.application.State.Equals(CloudFoundry.Net.Types.Instance.InstanceState.RUNNING);
+            return  (application.State.Equals(Types.Instance.InstanceState.RUNNING) ||
+                     application.State.Equals(Types.Instance.InstanceState.STARTED) ||
+                     application.State.Equals(Types.Instance.InstanceState.STARTING));
+
         }
 
         private void StartApplication()

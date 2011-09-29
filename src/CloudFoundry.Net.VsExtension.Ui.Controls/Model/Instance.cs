@@ -18,7 +18,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public long Memory { get; set; }
         public long Disk { get; set; }
         public TimeSpan Uptime { get; set; }
-        public DirectoryInfo Files { get; set; }
         public Application Parent { get; set; }
     }
 }

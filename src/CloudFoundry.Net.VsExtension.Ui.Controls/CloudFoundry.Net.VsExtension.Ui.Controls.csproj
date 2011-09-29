@@ -69,27 +69,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\CsvConverter.cs" />
-    <Compile Include="Model\CloudFoundryProvider.cs" />
     <Compile Include="Model\CloudUrl.cs" />
     <Compile Include="Model\Instance.cs" />
     <Compile Include="Mvvm\ExportViewModel.cs" />
     <Compile Include="Mvvm\ViewModelLocator.cs" />
     <Compile Include="Utilities\Messages.cs" />
     <Compile Include="Utilities\PasswordHelper.cs" />
-    <Compile Include="Utilities\SampleData.cs" />
-    <Compile Include="ViewModel\AddCloudUrlViewModel.cs" />
-    <Compile Include="ViewModel\AddCloudViewModel.cs" />
-    <Compile Include="ViewModel\ApplicationTreeViewItemViewModel.cs" />
-    <Compile Include="ViewModel\ChangePasswordViewModel.cs" />
-    <Compile Include="ViewModel\CloudExplorerViewModel.cs" />
-    <Compile Include="ViewModel\CloudTreeViewItemViewModel.cs" />
-    <Compile Include="ViewModel\CloudViewModel.cs" />
-    <Compile Include="ViewModel\RegisterAccountViewModel.cs" />
-    <Compile Include="ViewModel\CreateMicrocloudTargetViewModel.cs" />
-    <Compile Include="ViewModel\InstanceTreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
+    <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
+    <Compile Include="ViewModel\Explorer\ApplicationTreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\Cloud\ChangePasswordViewModel.cs" />
+    <Compile Include="ViewModel\Explorer\CloudExplorerViewModel.cs" />
+    <Compile Include="ViewModel\Explorer\CloudTreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\Cloud\CloudViewModel.cs" />
+    <Compile Include="ViewModel\AddCloud\RegisterAccountViewModel.cs" />
+    <Compile Include="ViewModel\AddCloud\CreateMicrocloudTargetViewModel.cs" />
+    <Compile Include="ViewModel\Explorer\InstanceTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\ContainerViewModel.cs" />
-    <Compile Include="ViewModel\ManageCloudUrlsViewModel.cs" />
-    <Compile Include="ViewModel\TreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\AddCloud\ManageCloudUrlsViewModel.cs" />
+    <Compile Include="Mvvm\TreeViewItemViewModel.cs" />
     <Compile Include="Views\AddCloud.xaml.cs">
       <DependentUpon>AddCloud.xaml</DependentUpon>
     </Compile>
@@ -135,7 +133,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Model\ModelClasses.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -239,6 +236,7 @@
   <ItemGroup>
     <Resource Include="Images\cloud_foundry_logo_400.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>
