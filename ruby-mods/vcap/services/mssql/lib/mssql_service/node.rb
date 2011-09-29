@@ -80,6 +80,15 @@ class VCAP::Services::Mssql::Node
     #   @available_storage -= storage_for_service(provisioned_service)
     # end
 
+    @queries_served=0
+    @qps_last_updated=0
+    # initialize qps counter
+    # TODO get_qps
+    @long_queries_killed=0
+    @long_tx_killed=0
+    @provision_served=0
+    @binding_served=0
+
   end
 
   def announcement

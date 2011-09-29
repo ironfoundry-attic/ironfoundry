@@ -39,7 +39,7 @@
         [JsonIgnore]
         public bool IsMSSqlServer
         {
-            get { return false == Vendor.IsNullOrWhiteSpace() && "mysql" == Vendor; } // TODO
+            get { return false == Vendor.IsNullOrWhiteSpace() && "mssql" == Vendor; } // TODO
         }
     }
 }

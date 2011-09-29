@@ -609,7 +609,7 @@ module DEA
           # app_env is ary of ENV=VAL pairs
           # we can translate into appSettings for now
           app_env = setup_instance_env(instance, app_env, services)
-          iis_create(instance, app_env)
+          iis_create(instance, app_env, services)
         else
           prepare_script = File.join(instance_dir, 'prepare')
           # once EM allows proper close_on_exec we can remove
@@ -1738,7 +1738,7 @@ module DEA
       stdout.strip if st == 0
     end
 
-    def iis_create(instance, app_env) # instance = {}, app_env = []
+    def iis_create(instance, app_env=[], services=[]) # instance = {}, app_env = [], services=[]
       site_name = instance[:win_site_name]
       site_port = instance[:port]
       site_path = instance[:win_site_path]
@@ -1769,7 +1769,55 @@ module DEA
           end
           @logger.debug("APPCMD set config #{site_name} /commit:site /section:appSettings /+[key='#{key}',value='#{value}']")
           if not system(@dea_appcmd, 'set', 'config', site_name, '/commit:site', '/section:appSettings', "/+[key='#{key}',value='#{value}']")
-            return false
+            # TODO log error
+          end
+        end
+      end
+      # NB: Documentation for a vcap message with service info
+      # {
+      #   "services":[
+      #     {
+      #       "name":"mysql-cf",
+      #       "type":"database",
+      #       "label":"mysql-5.1",
+      #       "vendor":"mysql",
+      #       "version":"5.1",
+      #       "tags":[
+      #         "mysql",
+      #         "mysql-5.1",
+      #         "relational"
+      #       ],
+      #       "plan":"free",
+      #       "plan_option":null,
+      #       "credentials":{
+      #         "name":"d9ccf6c9b1c384c1182eb3b5d075c48b8",
+      #         "hostname":"127.0.0.1",
+      #         "host":"127.0.0.1",
+      #         "port":3306,
+      #         "user":"ujOkmwbBtdffF",
+      #         "username":"ujOkmwbBtdffF",
+      #         "password":"pCNJsjwoV25BV"
+      #       }
+      #     }
+      #   ],
+      # }
+      if not services.nil?
+        services.each do |service|
+          service_vendor = service['vendor']
+          if service_vendor == 'mssql' # TODO T3CF
+            hostname = service['credentials']['hostname'] || service['credentials']['host']
+            port     = service['credentials']['port'] || 1433
+            user     = service['credentials']['username'] || service['credentials']['user']
+            password = service['credentials']['password']
+
+            @logger.debug("APPCMD set config #{site_name} /commit:site /section:connectionStrings /-[name='Default']")
+            system(@dea_appcmd, 'set', 'config', site_name, '/commit:site', '/section:connectionStrings', %q{/-[name='Default']}) # NB: ignore error
+
+            conn_str = "server=#{hostname},#{port};uid=#{user};pwd=#{password};trusted_connection=false;" # TODO application name, other settings?
+            @logger.debug("APPCMD set config #{site_name} /commit:site /section:connectionStrings /+[name='Default',connectionString='#{conn_str}']")
+            if system(@dea_appcmd, 'set', 'config', site_name, '/commit:site', '/section:connectionStrings', "/+[name='Default',connectionString='#{conn_str}']")
+              break # only set one conn str TODO T3CF
+            end
           end
         end
       end
