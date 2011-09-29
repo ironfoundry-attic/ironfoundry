@@ -91,7 +91,6 @@ module DEA
       # Path to the ruby executable the dea should use when executing the prepare script.
       # BOSH sets this in the config. For development, try to pick a ruby if none provided.
       @dea_ruby = config['dea_ruby'] || find_command('ruby')
-
       verify_executable('Ruby', @dea_ruby)
 
       if VCAP::WINDOWS # TODO T3CF
@@ -606,7 +605,11 @@ module DEA
         manifest = File.open(manifest_file) { |f| YAML.load(f) } if File.file?(manifest_file)
 
         if VCAP::WINDOWS
-          iis_create(instance)
+          # TODO T3CF
+          # app_env is ary of ENV=VAL pairs
+          # we can translate into appSettings for now
+          app_env = setup_instance_env(instance, app_env, services)
+          iis_create(instance, app_env)
         else
           prepare_script = File.join(instance_dir, 'prepare')
           # once EM allows proper close_on_exec we can remove
@@ -1028,6 +1031,7 @@ module DEA
         return false
       end
 
+      @logger.debug("run_command: tar -xzf #{tgz_file} -C #{instance_dir}")
       st, stdout, stderr = run_command("tar -xzf #{tgz_file} -C #{instance_dir}") # TODO T3CF install libarchive and fsutil hardlink create tar.exe bsdtar.exe
       unless st == 0
         @logger.warn("Failed unzipping droplet, command exited with status #{st}")
@@ -1255,7 +1259,7 @@ module DEA
         end
       # Rechown crashed application directory using uid and gid of DEA
       else
-        if not VCAP::WINDOWS # TODO T3CF
+        if ! VCAP::WINDOWS # TODO T3CF
           @logger.debug("#{instance[:name]}: Chowning crashed dir #{instance[:dir]}")
           EM.system("chown -R #{Process.euid}:#{Process.egid} #{instance[:dir]}")
         end
@@ -1572,6 +1576,7 @@ module DEA
       begin
         apps_dir = @apps_dir
         @file_auth = [VCAP.secure_uuid, VCAP.secure_uuid]
+        @logger.debug("file_viewer apps_dir: #{apps_dir} file_auth: #{@file_auth.to_s}")
         auth = @file_auth
         @file_viewer_server = Thin::Server.new(@local_ip, @file_viewer_port, :signals => false) do
           Thin::Logging.silent = true
@@ -1733,7 +1738,7 @@ module DEA
       stdout.strip if st == 0
     end
 
-    def iis_create(instance)
+    def iis_create(instance, app_env) # instance = {}, app_env = []
       site_name = instance[:win_site_name]
       site_port = instance[:port]
       site_path = instance[:win_site_path]
@@ -1753,6 +1758,21 @@ module DEA
       if not system(@dea_appcmd, 'set', 'site', site_name, "/[path='/'].applicationPool:#{site_name}")
         return false
       end
+      if not app_env.nil?
+        app_env.each do |env|
+          key, value = env.split('=', 2)
+          if not value.nil?
+            # TODO T3CF determine better way to figure out if it's JSON
+            # delete leading/trailing quotes
+            value.sub!(/^["']/, '')
+            value.sub!(/["']$/, '') if not value.nil?
+          end
+          @logger.debug("APPCMD set config #{site_name} /commit:site /section:appSettings /+[key='#{key}',value='#{value}']")
+          if not system(@dea_appcmd, 'set', 'config', site_name, '/commit:site', '/section:appSettings', "/+[key='#{key}',value='#{value}']")
+            return false
+          end
+        end
+      end
       true
     end
 
@@ -1765,9 +1785,16 @@ module DEA
 
     def iis_delete(instance)
       site_name = instance[:win_site_name]
+      @logger.debug("APPCMD delete site #{site_name}")
       if not system(@dea_appcmd, 'delete', 'site', site_name)
         return false
       end
+      # TODO T3CF get worker process ID and wait for stop so that cleanup will not find open files?
+      @logger.debug("APPCMD stop apppool #{site_name}")
+      if not system(@dea_appcmd, 'stop', 'apppool', site_name)
+        return false
+      end
+      @logger.debug("APPCMD delete apppool #{site_name}")
       if not system(@dea_appcmd, 'delete', 'apppool', site_name)
         return false
       end
