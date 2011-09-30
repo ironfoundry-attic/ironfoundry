@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\CsvConverter.cs" />
+    <Compile Include="Converters\TitleCaseConverter.cs" />
     <Compile Include="Model\CloudUrl.cs" />
     <Compile Include="Model\Instance.cs" />
     <Compile Include="Mvvm\ExportViewModel.cs" />

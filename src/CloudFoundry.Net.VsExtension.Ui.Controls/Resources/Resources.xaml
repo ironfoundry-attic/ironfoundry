@@ -22,5 +22,7 @@
 
 	<converters:MinutesConverter x:Key="minutesConverter" />
     <converters:CsvConverter x:Key="csvConverter" />
+    <converters:TitleCaseConverter x:Key="titleCaseConverter" />
     <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
+    
 </ResourceDictionary>

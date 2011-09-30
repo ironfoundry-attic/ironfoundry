@@ -32,9 +32,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             CancelledCommand = new RelayCommand(Cancelled);
 
             Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<string>>(Messages.SetManageApplicationUrlsData,
-                (message) =>
+                (urls) =>
                 {
-                    this.Urls = message;
+                    this.Urls = new ObservableCollection<string>(from url in urls select url);
                 }));
 
             Messenger.Default.Register<NotificationMessageAction<ManageApplicationUrlsViewModel>>(this,
