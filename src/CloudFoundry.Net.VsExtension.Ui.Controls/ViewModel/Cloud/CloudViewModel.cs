@@ -28,6 +28,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand UpdateAndRestartCommand { get; private set; }
         public RelayCommand UpdateInstanceCountCommand { get; private set; }
 
+        public RelayCommand ManageApplicationUrlsCommand { get; private set; }
+
         private Cloud cloud;
         private Application selectedApplication;
         private bool isApplicationViewSelected;
@@ -61,7 +63,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             StartCommand = new RelayCommand(Start, CanExecuteStart);
             StopCommand = new RelayCommand(Stop, CanExecuteStopActions);
             RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
-            UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);            
+            UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);
+            ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);
         }
 
         private void InitializeData()
@@ -126,6 +129,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             {
                 VmcResponse response = e.Result as VmcResponse;
                 ApplicationErrorMessage = string.Format("{0} - (Error: {1})", response.Description, response.Code);
+            }
+            else
+            {
+                ApplicationErrorMessage = string.Empty;
             }
             RefreshApplication();
         }
@@ -324,9 +331,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set
             {
                 if (this.SelectedApplication != null)
+                {
                     this.SelectedApplication.PropertyChanged -= selectedApplication_PropertyChanged;
+                    this.SelectedApplication.Resources.PropertyChanged -= selectedApplication_PropertyChanged;
+                }
                 this.selectedApplication = value;
                 this.selectedApplication.PropertyChanged += selectedApplication_PropertyChanged;
+                this.selectedApplication.Resources.PropertyChanged += selectedApplication_PropertyChanged;
 
                 this.ApplicationServices = new ObservableCollection<AppService>();
                 foreach (var svc in this.selectedApplication.Services)
@@ -373,6 +384,29 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 this.applicationServices = value;
                 RaisePropertyChanged("ApplicationServices");
             }
+        }
+
+        private void ManageApplicationUrls()
+        {
+            Messenger.Default.Register<NotificationMessageAction<ObservableCollection<string>>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetManageApplicationUrlsData))
+                        message.Execute(this.SelectedApplication.Uris);
+                });
+
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ManageApplicationUrls,
+                (confirmed) =>
+                {
+                    if (confirmed)
+                    {
+                        Messenger.Default.Send(new NotificationMessageAction<ManageApplicationUrlsViewModel>(Messages.GetManageApplicationUrlsData,
+                            (viewModel) =>
+                            {
+                                this.SelectedApplication.Uris = viewModel.Urls;
+                            }));
+                    }
+                }));
         }
 
         #endregion

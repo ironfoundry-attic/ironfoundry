@@ -40,6 +40,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string SetManageCloudUrlsData = "SetManageCloudUrlsData";
         public const string GetManageCloudUrlsData = "SetManageCloudUrlsData";
 
+        public const string ManageApplicationUrls = "ManageApplicationUrls";
+        public const string ManageApplicationUrlsDialogResult = "ManageApplicationUrlsDialogResult";
+        public const string SetManageApplicationUrlsData = "SetManageApplicationUrlsData";
+        public const string GetManageApplicationUrlsData = "GetManageApplicationUrlsData";
+
+        public const string AddApplicationUrl = "AddApplicationUrl";
+        public const string AddApplicationUrlDialogResult = "AddApplicationUrlDialogResult";
+        public const string GetAddApplicationUrlData = "GetAddApplicationUrlData";
+        public const string SetAddApplicationUrlData = "SetAddApplicationUrlData";
+
         public const string RegisterAccount = "RegisterAccount";
         public const string RegisterAccountDialogResult = "RegisterAccountDialogResult";
         public const string GetRegisterAccountData = "GetRegisterAccountData";

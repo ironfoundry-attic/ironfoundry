@@ -77,6 +77,8 @@
     <Compile Include="Utilities\PasswordHelper.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
+    <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
+    <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
     <Compile Include="ViewModel\Explorer\ApplicationTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModel\Explorer\CloudExplorerViewModel.cs" />
@@ -119,6 +121,12 @@
     </Compile>
     <Compile Include="Views\Container.xaml.cs">
       <DependentUpon>Container.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AddApplicationUrl.xaml.cs">
+      <DependentUpon>AddApplicationUrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ManageApplicationUrls.xaml.cs">
+      <DependentUpon>ManageApplicationUrls.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\RegisterAccount.xaml.cs">
       <DependentUpon>RegisterAccount.xaml</DependentUpon>
@@ -179,6 +187,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Container.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AddApplicationUrl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ManageApplicationUrls.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

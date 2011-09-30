@@ -32,8 +32,24 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                 {
                     if (message.Notification.Equals(Messages.ChangePassword))
                     {
-                        var changePasswordView = new Views.ChangePassword();
-                        var result = changePasswordView.ShowDialog();
+                        var view = new Views.ChangePassword();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
+                        var result = view.ShowDialog();
+                        message.Execute(result.GetValueOrDefault());
+                    }
+                });
+
+            Messenger.Default.Register<NotificationMessageAction<bool>>(
+                this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.ManageApplicationUrls))
+                    {
+                        var view = new Views.ManageApplicationUrls();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
+                        var result = view.ShowDialog();
                         message.Execute(result.GetValueOrDefault());
                     }
                 });
