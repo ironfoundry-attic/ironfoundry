@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 
 namespace CloudFoundry.Net.Types
 {
+    [Serializable]
     public class Cloud : JsonBase, INotifyPropertyChanged
     {
         private Guid id;
@@ -22,16 +23,24 @@ namespace CloudFoundry.Net.Types
         private int timeoutStop;
         private string accessToken;
         private ObservableCollection<Application> applications;
+        private ObservableCollection<AppService> services;
 
         public Cloud()
         {            
             applications = new ObservableCollection<Application>();
-            applications.CollectionChanged += new NotifyCollectionChangedEventHandler(Applications_CollectionChanged);
+            services = new ObservableCollection<AppService>();
+            services.CollectionChanged += Services_CollectionChanged;
+            applications.CollectionChanged += Applications_CollectionChanged;
             id = Guid.NewGuid();
             TimeoutStart = 600;
             TimeoutStop = 60;
             IsConnected = false;
             IsDisconnected = true;
+        }
+
+        void Services_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Services");
         }
 
         void Applications_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -42,6 +51,7 @@ namespace CloudFoundry.Net.Types
         public Guid ID
         {
             get { return id; }
+            set { id = value; }
         }
 
         public string ServerName 
@@ -120,6 +130,11 @@ namespace CloudFoundry.Net.Types
         public ObservableCollection<Application> Applications 
         {
             get { return this.applications; }            
+        }
+
+        public ObservableCollection<AppService> Services
+        {
+            get { return this.services; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

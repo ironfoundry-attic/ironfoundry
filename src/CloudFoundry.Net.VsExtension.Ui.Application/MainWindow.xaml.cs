@@ -13,19 +13,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Application
     {
         public MainWindow()
         {
-            InitializeComponent();
-            var message = new NotificationMessage<ObservableCollection<Cloud>>(
-                new ObservableCollection<Cloud>()
-                {
-                    new Cloud() {
-                        ServerName = "VMware Cloud Foundry",
-                        Email = "caledh@gmail.com",
-                        Password = "password",
-                        HostName = "localhost",
-                        Url = "http://api.cloudfoundry.com"                       
-                    }
-                }, Messages.InitializeClouds);
-            Messenger.Default.Send(message);
+            InitializeComponent();            
         }
     }
 }

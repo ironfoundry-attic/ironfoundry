@@ -76,30 +76,34 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         {
             var cloudList = args.Argument as ObservableCollection<Cloud>;
             var manager = new VmcManager();
-            Dictionary<Cloud, List<Application>> dictionary = new Dictionary<Cloud, List<Application>>();            
+            Dictionary<Cloud, object[]> dictionary = new Dictionary<Cloud, object[]>();            
             foreach (var cloud in cloudList)
             {
-                var serverCloud = manager.LogIn(cloud);
+                var serverCloud = manager.LogIn(cloud);                
+                var provisionedServices = manager.GetProvisionedServices(serverCloud);
                 var applications = manager.ListApps(serverCloud);
-                dictionary.Add(serverCloud, applications);                
+                dictionary.Add(serverCloud, new object[] { applications,provisionedServices } );                
             }
             args.Result = dictionary;
         }
 
         private void EndConnect(object sender, RunWorkerCompletedEventArgs args)
         {
-            var dictionary = args.Result as Dictionary<Cloud,List<Application>>;
+            var dictionary = args.Result as Dictionary<Cloud,object[]>;
             foreach (var item in dictionary)
             {
-                var cloud = this.CloudList.Single((i) => item.Key.ID == i.ID);
-                foreach (var application in item.Value)
+                var cloud = this.CloudList.Single((i) => item.Key.ID == i.ID);                
+                foreach (var application in item.Value[0] as List<Application>)
                 {
                     var current = cloud.Applications.SingleOrDefault((i) => i.Name == application.Name);
                     if (current != null)
                         current = application;
                     else
                         cloud.Applications.Add(application);
-                }                
+                }       
+                cloud.Services.Clear();
+                foreach (var provisionedService in item.Value[1] as List<AppService>)
+                    cloud.Services.Add(provisionedService);
             }
             CommandManager.InvalidateRequerySuggested();
         }        

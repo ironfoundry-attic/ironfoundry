@@ -36,12 +36,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private string overviewErrorMessage;
         private string applicationErrorMessage;
 
-        private ObservableCollection<AppService> provisionedServices;
         private ObservableCollection<AppService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
         private VmcManager manager = new VmcManager();
 
-        BackgroundWorker getProvisionedServices = new BackgroundWorker();
         BackgroundWorker getInstances = new BackgroundWorker();
         BackgroundWorker updateApplication = new BackgroundWorker();
         DispatcherTimer instanceTimer = new DispatcherTimer();
@@ -71,34 +69,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         {
             instanceTimer.Interval = TimeSpan.FromSeconds(5);
             instanceTimer.Tick += RefreshInstances;
-            instanceTimer.Start();
-            Cloud.PropertyChanged += Cloud_PropertyChanged;
-            getProvisionedServices.DoWork += BeginGetProvisionedServices;
-            getProvisionedServices.RunWorkerCompleted += EndGetProvisionedServices;
+            instanceTimer.Start();            
             getInstances.DoWork += BeginGetInstances;
             getInstances.RunWorkerCompleted += EndGetInstances;
             updateApplication.DoWork += BeginUpdateApplication;
-            updateApplication.RunWorkerCompleted += EndUpdateApplication;
-            if (Cloud.IsConnected)
-                getProvisionedServices.RunWorkerAsync();
-        }
-
-        
-        private void Cloud_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "IsConnected" && Cloud.IsConnected)
-                getProvisionedServices.RunWorkerAsync();
-        }
-
-        private void BeginGetProvisionedServices(object sender, DoWorkEventArgs e)
-        {
-            e.Result = manager.GetProvisionedServices(Cloud);
-        }
-
-        private void EndGetProvisionedServices(object sender, RunWorkerCompletedEventArgs e)
-        {
-            this.CloudServices = new ObservableCollection<AppService>(e.Result as List<AppService>);
-        }
+            updateApplication.RunWorkerCompleted += EndUpdateApplication;            
+        }        
 
         private void RefreshInstances(object sender, EventArgs e)
         {
@@ -341,7 +317,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
                 this.ApplicationServices = new ObservableCollection<AppService>();
                 foreach (var svc in this.selectedApplication.Services)
-                    foreach (var appService in this.provisionedServices)
+                    foreach (var appService in Cloud.Services)
                         if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
                             this.ApplicationServices.Add(appService);
 
@@ -354,17 +330,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void selectedApplication_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             updateApplication.RunWorkerAsync();
-        }
-
-        public ObservableCollection<AppService> CloudServices
-        {
-            get { return this.provisionedServices; }
-            set
-            {
-                this.provisionedServices = value;
-                RaisePropertyChanged("CloudServices");
-            }
-        }
+        }       
 
         public ObservableCollection<Model.Instance> Instances
         {

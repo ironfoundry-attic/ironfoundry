@@ -1,7 +1,9 @@
 ﻿namespace CloudFoundry.Net
 {
     using Newtonsoft.Json;
+    using System;
 
+    [Serializable]
     public abstract class JsonBase
     {
         public string ToJson()

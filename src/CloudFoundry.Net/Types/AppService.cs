@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
+    [Serializable]
     public class AppService : JsonBase
     {
         
@@ -32,6 +33,7 @@ namespace CloudFoundry.Net.Types
         }
     }
 
+    [Serializable]
     public class Meta : JsonBase
     {
         [JsonProperty(PropertyName = "created")]

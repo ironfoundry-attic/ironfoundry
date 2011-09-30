@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.Types
 {
+    [Serializable]
     public class Application : JsonBase, INotifyPropertyChanged
     {
         private string name;
@@ -122,6 +123,7 @@ namespace CloudFoundry.Net.Types
         #endregion
     }
 
+    [Serializable]
     public class Staging : JsonBase, INotifyPropertyChanged
     {
         private string model;
@@ -151,6 +153,7 @@ namespace CloudFoundry.Net.Types
         #endregion
     }
 
+    [Serializable]
     public class Resources : JsonBase, INotifyPropertyChanged
     {
         private int memory;
@@ -189,6 +192,7 @@ namespace CloudFoundry.Net.Types
 
     }
 
+    [Serializable]
     public class AppMeta : JsonBase, INotifyPropertyChanged
     {
         private int version;
