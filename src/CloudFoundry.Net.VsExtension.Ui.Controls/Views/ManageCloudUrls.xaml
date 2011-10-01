@@ -17,13 +17,17 @@
     </Window.Resources>
 	<DockPanel Margin="10">     
 		<StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-			<DockPanel>
+			<DockPanel>                
 				<DataGrid DockPanel.Dock="Left" AutoGenerateColumns="False" ItemsSource="{Binding CloudUrls}" 
                           SelectedItem="{Binding SelectedCloudUrl}"
                           HeadersVisibility="Column"
                           Background="{x:Null}"
                           HorizontalGridLinesBrush="{x:Null}"
-                          Width="600" Height="155" FontSize="10.667">
+                          Width="600" Height="155" FontSize="10.667"
+                          CanUserAddRows="False" 
+                          SelectionMode="Single" 
+                          SelectionUnit="FullRow" 
+                          IsReadOnly="True">
                     <DataGrid.VerticalGridLinesBrush>
                         <SolidColorBrush Color="{DynamicResource BorderBlueColor}"/>
                     </DataGrid.VerticalGridLinesBrush>

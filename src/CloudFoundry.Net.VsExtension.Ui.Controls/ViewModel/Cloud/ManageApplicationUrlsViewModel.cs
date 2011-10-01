@@ -34,7 +34,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<string>>(Messages.SetManageApplicationUrlsData,
                 (urls) =>
                 {
-                    this.Urls = new ObservableCollection<string>(from url in urls select url);
+                    this.Urls = urls.DeepCopy();
                 }));
 
             Messenger.Default.Register<NotificationMessageAction<ManageApplicationUrlsViewModel>>(this,

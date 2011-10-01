@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    public class Discover : JsonBase
+    public class Discover : EntityBase
     {
         [JsonProperty(PropertyName = "droplet")]
         public int Droplet { get; set; }

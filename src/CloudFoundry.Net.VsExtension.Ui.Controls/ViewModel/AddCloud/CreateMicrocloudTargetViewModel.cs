@@ -9,6 +9,7 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using System.Text.RegularExpressions;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -83,7 +84,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set
             {
                 this.replacementText = value;
-                //RaisePropertyChanged("Name");
                 RaisePropertyChanged("ReplacementText");
                 this.Name = string.Format("Microcloud ({0})", this.replacementText);
             }

@@ -5,33 +5,40 @@ using System.Text;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace CloudFoundry.Net.Types
 {
     [Serializable]
-    public class Application : JsonBase, INotifyPropertyChanged
+    public class Application : EntityBase
     {
         private string name;
-        private Staging staging;
-        private ObservableCollection<string> uris;
+        private Staging staging;        
         private int instances;
         private int? runningInstances;
         private Resources resources;
         private string state;
-        private ObservableCollection<string> services;
         private string version;
+        private ObservableCollection<string> services;
+        private ObservableCollection<string> uris;
         private ObservableCollection<string> environment;
-        private AppMeta metadata;
+        private Metadata metadata;
 
         public Application()
         {
             Staging = new Staging();
             Resources = new Resources();
-            MetaData = new AppMeta();
+            Metadata = new Metadata();
             Services = new ObservableCollection<string>();
             Uris = new ObservableCollection<string>();
             Environment = new ObservableCollection<string>();
-        }
+            Services.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(ServicesChanged);
+            Uris.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(UrisChanged);
+            Environment.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(EnvironmentChanged);
+            Staging.PropertyChanged += StagingChanged;
+            Resources.PropertyChanged += ResourcesChanged;
+            Metadata.PropertyChanged += MetadataChanged;
+        }       
 
         [JsonProperty(PropertyName = "name")]
         public string Name
@@ -104,7 +111,7 @@ namespace CloudFoundry.Net.Types
         }
 
         [JsonProperty(PropertyName = "meta")]
-        public AppMeta MetaData
+        public Metadata Metadata
         {
             get { return this.metadata; }
             set { this.metadata = value; RaisePropertyChanged("MetaData"); }
@@ -113,18 +120,39 @@ namespace CloudFoundry.Net.Types
         [JsonIgnore]
         public Cloud Parent { get; set; }
 
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
+        private void MetadataChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            RaisePropertyChanged("Metadata");
         }
-        #endregion
+
+        private void ResourcesChanged(object sender, PropertyChangedEventArgs e)
+        {
+            RaisePropertyChanged("Resources");
+        }
+
+        private void StagingChanged(object sender, PropertyChangedEventArgs e)
+        {
+            RaisePropertyChanged("Staging");
+        }
+
+        private void EnvironmentChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Environment");
+        }
+
+        private void UrisChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Uris");
+        }
+
+        private void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Services");
+        }
     }
 
     [Serializable]
-    public class Staging : JsonBase, INotifyPropertyChanged
+    public class Staging : EntityBase
     {
         private string model;
         private string stack;
@@ -141,20 +169,11 @@ namespace CloudFoundry.Net.Types
         {
             get { return this.stack; }
             set { this.stack = value; RaisePropertyChanged("Stack"); }
-        }
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
+        }       
     }
 
     [Serializable]
-    public class Resources : JsonBase, INotifyPropertyChanged
+    public class Resources : EntityBase
     {
         private int memory;
         private int disk;
@@ -180,20 +199,10 @@ namespace CloudFoundry.Net.Types
             get { return this.fds; }
             set { this.fds = value; RaisePropertyChanged("Fds"); }
         }
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
-
     }
 
     [Serializable]
-    public class AppMeta : JsonBase, INotifyPropertyChanged
+    public class Metadata : EntityBase
     {
         private int version;
         private long created;
@@ -210,15 +219,6 @@ namespace CloudFoundry.Net.Types
         {
             get { return this.created; }
             set { this.created = value; RaisePropertyChanged("Created"); }
-        }
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
+        }     
     }
 }

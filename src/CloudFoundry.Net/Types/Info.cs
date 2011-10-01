@@ -40,7 +40,7 @@ namespace CloudFoundry.Net.Types
             Usage = new ResourceUsage();
         }
     }
-    internal class ResourceLimits : JsonBase
+    internal class ResourceLimits : EntityBase
     {
 
         [JsonProperty(PropertyName = "memory")]
@@ -58,7 +58,7 @@ namespace CloudFoundry.Net.Types
 
     }
 
-     internal class ResourceUsage : JsonBase
+     internal class ResourceUsage : EntityBase
     {
         
         [JsonProperty(PropertyName = "memory")]

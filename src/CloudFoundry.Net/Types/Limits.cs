@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    public class Limits : JsonBase
+    public class Limits : EntityBase
     {
         [JsonProperty(PropertyName = "mem")]
         public int Mem { get; set; }

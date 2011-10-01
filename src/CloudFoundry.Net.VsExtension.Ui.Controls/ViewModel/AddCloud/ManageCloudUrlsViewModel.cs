@@ -9,6 +9,7 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using GalaSoft.MvvmLight.Messaging;
 using System.Collections.ObjectModel;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -32,9 +33,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             CancelledCommand = new RelayCommand(Cancelled);
 
             Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<CloudUrl>>(Messages.SetManageCloudUrlsData,
-                (message) =>
+                (cloudUrls) =>
                 {
-                    this.CloudUrls = message;
+                    this.CloudUrls = cloudUrls.DeepCopy();
                 }));
 
             Messenger.Default.Register<NotificationMessageAction<ManageCloudUrlsViewModel>>(this,

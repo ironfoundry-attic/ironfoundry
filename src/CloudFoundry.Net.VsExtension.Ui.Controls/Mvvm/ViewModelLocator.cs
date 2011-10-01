@@ -35,12 +35,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
             }
             if (!dictionary.TryGetValue(binder.Name, out result))
             {
-                try
-                {
-                    dictionary[binder.Name] = (result = viewModelMetadata.Value);
-                    return result != null;
-                }
-                catch { }
+                dictionary[binder.Name] = (result = viewModelMetadata.Value);
+                return result != null;
             }
             return true;       
         }

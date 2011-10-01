@@ -9,7 +9,7 @@ using System.Collections.Specialized;
 namespace CloudFoundry.Net.Types
 {
     [Serializable]
-    public class Cloud : JsonBase, INotifyPropertyChanged
+    public class Cloud : EntityBase
     {
         private Guid id;
         private string serverName;
@@ -29,24 +29,14 @@ namespace CloudFoundry.Net.Types
         {            
             applications = new ObservableCollection<Application>();
             services = new ObservableCollection<AppService>();
-            services.CollectionChanged += Services_CollectionChanged;
-            applications.CollectionChanged += Applications_CollectionChanged;
+            services.CollectionChanged += ServicesChanged;
+            applications.CollectionChanged += ApplicationsChanged;
             id = Guid.NewGuid();
             TimeoutStart = 600;
             TimeoutStop = 60;
             IsConnected = false;
             IsDisconnected = true;
-        }
-
-        void Services_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Services");
-        }
-
-        void Applications_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Applications");
-        }
+        }        
 
         public Guid ID
         {
@@ -137,12 +127,15 @@ namespace CloudFoundry.Net.Types
             get { return this.services; }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string propertyName)
+        private void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            RaisePropertyChanged("Services");
         }
+
+        private void ApplicationsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Applications");
+        }
+      
     }
 }

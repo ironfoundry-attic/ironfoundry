@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
-    public class VmcResponse : JsonBase
+    public class VmcResponse : EntityBase
     {
         [JsonProperty(PropertyName = "code")]
         public int Code

@@ -127,7 +127,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                         Messenger.Default.Send(new NotificationMessageAction<ManageCloudUrlsViewModel>(Messages.GetManageCloudUrlsData,
                             (viewModel) =>
                             {
-                                this.CloudUrls = viewModel.CloudUrls;
+                                var newItems = viewModel.CloudUrls.Except(this.CloudUrls, new CloudUrlEqualityComparer());
+                                var removeItems = this.CloudUrls.Except(viewModel.CloudUrls, new CloudUrlEqualityComparer());                                
+                                foreach (var cloudUrl in newItems)
+                                    this.CloudUrls.Add(cloudUrl);
+                                foreach (var cloudUrl in removeItems)
+                                {
+                                    var toRemove = this.CloudUrls.SingleOrDefault((i) => i.ServerType == cloudUrl.ServerType);
+                                    if (toRemove != null)
+                                        this.CloudUrls.Remove(toRemove);
+                                }                                    
                             }));
                     }
                 }));
@@ -140,7 +149,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set
             {
                 this.selectedCloudUrl = value;
-                this.Cloud.Url = selectedCloudUrl.Url;
+                if (this.selectedCloudUrl != null)
+                    this.Cloud.Url = selectedCloudUrl.Url;
+                else
+                    this.Cloud.Url = string.Empty;
                 RaisePropertyChanged("SelectedCloudUrl");
             }
         }

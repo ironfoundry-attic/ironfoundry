@@ -7,9 +7,8 @@ using Newtonsoft.Json;
 namespace CloudFoundry.Net.Types
 {
     [Serializable]
-    public class AppService : JsonBase
-    {
-        
+    public class AppService : EntityBase
+    {        
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
@@ -34,7 +33,7 @@ namespace CloudFoundry.Net.Types
     }
 
     [Serializable]
-    public class Meta : JsonBase
+    public class Meta : EntityBase
     {
         [JsonProperty(PropertyName = "created")]
         public int Created { get; set; }
@@ -49,7 +48,7 @@ namespace CloudFoundry.Net.Types
         public int Version { get; set; }
     }
 
-    public class Properties : JsonBase {
+    public class Properties : EntityBase {
 
         //have to discover what this is off the ruby code
     }

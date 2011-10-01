@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
-    class Frameworks : JsonBase
+    class Frameworks : EntityBase
     {
         [JsonProperty(PropertyName = "frameworks")]
         Framework framework { get; set; }

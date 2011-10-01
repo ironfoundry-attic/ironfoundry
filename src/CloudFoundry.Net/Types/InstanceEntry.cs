@@ -4,7 +4,7 @@
     using JsonConverters;
     using Newtonsoft.Json;
 
-    public class InstanceEntry : JsonBase
+    public class InstanceEntry : EntityBase
     {
         [JsonProperty(PropertyName = "instance_id"), JsonConverter(typeof(VcapGuidConverter))]
         public Guid InstanceID { get; set; }

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
-    public class Crash : JsonBase
+    public class Crash : EntityBase
     {
         [JsonProperty(PropertyName = "instance")]
         string Instance { get; set; }

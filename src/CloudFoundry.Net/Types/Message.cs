@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    public abstract class Message : JsonBase
+    public abstract class Message : EntityBase
     {
         public const string RECEIVE_ONLY = "RECEIVE_ONLY";
         public const string REPLY_OK = "REPLY_OK";

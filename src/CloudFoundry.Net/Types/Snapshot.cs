@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    public class Snapshot : JsonBase
+    public class Snapshot : EntityBase
     {
         [JsonProperty(PropertyName = "entries")]
         public DropletEntry[] Entries { get; set; }

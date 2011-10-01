@@ -4,7 +4,7 @@
     using JsonConverters;
     using Newtonsoft.Json;
 
-    public class Instance : JsonBase
+    public class Instance : EntityBase
     {
         public Instance()
         {

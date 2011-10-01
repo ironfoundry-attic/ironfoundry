@@ -3,7 +3,7 @@
     using System;
     using Newtonsoft.Json;
 
-    public class StatInfo : JsonBase
+    public class StatInfo : EntityBase
     {
         [JsonProperty(PropertyName = "state")]
         public string State;

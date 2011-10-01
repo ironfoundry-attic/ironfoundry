@@ -55,7 +55,7 @@
             if (File.Exists(SnapshotFile))
             {
                 string dropletsJson = File.ReadAllText(SnapshotFile, new ASCIIEncoding());
-                rv = JsonBase.FromJson<Snapshot>(dropletsJson);
+                rv = EntityBase.FromJson<Snapshot>(dropletsJson);
             }
 
             return rv;

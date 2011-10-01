@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {   
-    public class SystemServices : JsonBase
+    public class SystemServices : EntityBase
     {
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; } //Types supported are key/value, generic, database... could potentially be a static class or enum
@@ -32,7 +32,7 @@ namespace CloudFoundry.Net.Types
         }
     }
 
-    public class Tiers : JsonBase
+    public class Tiers : EntityBase
     {
         [JsonProperty(PropertyName = "free")]
         public Type Type { get; set; } //Currently on showing Free but potentially other options in the future
@@ -46,7 +46,7 @@ namespace CloudFoundry.Net.Types
         }
     }
 
-    public class Type : JsonBase
+    public class Type : EntityBase
     {
         [JsonProperty(PropertyName = "options")]
         Options Options { get; set; }
@@ -57,7 +57,7 @@ namespace CloudFoundry.Net.Types
         }
     }
     
-    public class Options : JsonBase
+    public class Options : EntityBase
     {
 
     }

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
-    class Framework :JsonBase
+    class Framework :EntityBase
     {
         [JsonProperty(PropertyName = "name")]
         string Name { get; set; }
@@ -26,7 +26,7 @@ namespace CloudFoundry.Net.Types
             FrameworkDetection = new Detection();
         }
     }
-    internal class Runtimes : JsonBase
+    internal class Runtimes : EntityBase
     {
         [JsonProperty(PropertyName = "version")]
         string Version { get; set; }
@@ -37,7 +37,7 @@ namespace CloudFoundry.Net.Types
         [JsonProperty(PropertyName = "description")]
         string Description { get; set; }
     }
-    internal class AppServers : JsonBase
+    internal class AppServers : EntityBase
     {
         [JsonProperty(PropertyName = "name")]
         string Name { get; set; }
@@ -45,7 +45,7 @@ namespace CloudFoundry.Net.Types
         [JsonProperty(PropertyName = "description")]
         string Description { get; set; }
     }
-    internal class Detection : JsonBase
+    internal class Detection : EntityBase
     {
         
         string FileExtension { get; set; }

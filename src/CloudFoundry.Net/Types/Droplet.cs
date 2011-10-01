@@ -3,7 +3,7 @@
     using System;
     using Newtonsoft.Json;
 
-    public class Droplet : JsonBase
+    public class Droplet : EntityBase
     {
         [JsonProperty(PropertyName = "droplet")]
         public uint ID { get; set; }

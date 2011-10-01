@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    public class Service : JsonBase
+    public class Service : EntityBase
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
