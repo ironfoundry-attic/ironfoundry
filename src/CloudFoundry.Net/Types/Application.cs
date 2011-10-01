@@ -1,10 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using Newtonsoft.Json;
-
-namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types
 {
-    public class Application : JsonBase, INotifyPropertyChanged
+    using System.Collections.ObjectModel;
+    using Newtonsoft.Json;
+
+    public class Application : EntityBase
     {
         private string name;
         private Staging staging;
@@ -107,18 +106,9 @@ namespace CloudFoundry.Net.Types
 
         [JsonIgnore]
         public Cloud Parent { get; set; }
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
     }
 
-    public class Staging : JsonBase, INotifyPropertyChanged
+    public class Staging : EntityBase
     {
         private string model;
         private string stack;
@@ -136,18 +126,9 @@ namespace CloudFoundry.Net.Types
             get { return this.stack; }
             set { this.stack = value; RaisePropertyChanged("Stack"); }
         }
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
     }
 
-    public class AppResources : JsonBase, INotifyPropertyChanged
+    public class AppResources : EntityBase
     {
         private int memory;
         private int disk;
@@ -173,19 +154,9 @@ namespace CloudFoundry.Net.Types
             get { return this.fds; }
             set { this.fds = value; RaisePropertyChanged("Fds"); }
         }
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
-
     }
 
-    public class AppMeta : JsonBase, INotifyPropertyChanged
+    public class AppMeta : EntityBase
     {
         private int version;
         private long created;
@@ -203,14 +174,5 @@ namespace CloudFoundry.Net.Types
             get { return this.created; }
             set { this.created = value; RaisePropertyChanged("Created"); }
         }
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
     }
 }

@@ -1,10 +1,8 @@
 ﻿namespace CloudFoundry.Net
 {
-    using Newtonsoft.Json;
     using System;
-    using System.IO;
-    using System.Runtime.Serialization.Formatters.Binary;
     using System.ComponentModel;
+    using Newtonsoft.Json;
 
     [Serializable]
     public abstract class EntityBase : INotifyPropertyChanged
@@ -24,8 +22,7 @@
             return JsonConvert.DeserializeObject<T>(argJson);
         }        
 
-        #region INotifyPropertyChanged Implementation
-        [field: NonSerialized]
+        [field: NonSerialized, JsonIgnore]
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void RaisePropertyChanged(string propertyName)
@@ -33,6 +30,5 @@
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-        #endregion
     }
 }

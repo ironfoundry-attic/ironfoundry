@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    public class VcapResponse : JsonBase
+    public class VcapResponse : EntityBase
     {
         [JsonProperty(PropertyName = "code")]
         public int Code

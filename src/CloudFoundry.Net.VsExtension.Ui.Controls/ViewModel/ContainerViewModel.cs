@@ -107,8 +107,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             var cloudList = this.CloudExplorer.CloudList.DeepCopy();
             foreach (var cloud in cloudList)
             {
-                cloud.Services.Clear();
-                cloud.Applications.Clear();
+                cloud.ClearServices();
+                cloud.ClearApplications();
             }
 
             binary.Serialize(configStream, cloudList);

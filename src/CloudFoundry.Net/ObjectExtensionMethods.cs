@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-
-namespace CloudFoundry.Net
+﻿namespace CloudFoundry.Net
 {
+    using System.IO;
+    using System.Runtime.Serialization.Formatters.Binary;
+
     public static class ObjectExtensionMethods
     {
         public static T DeepCopy<T>(this T obj)

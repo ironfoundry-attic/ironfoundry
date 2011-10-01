@@ -3,11 +3,10 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
-    using System.ComponentModel;
 
-    public class Cloud : JsonBase, INotifyPropertyChanged
+    public class Cloud : EntityBase
     {
-        private Guid id;
+        private readonly Guid id;
         private string serverName;
         private string hostName;
         private string email;
@@ -18,12 +17,14 @@
         private int timeoutStart;
         private int timeoutStop;
         private string accessToken;
-        private ObservableCollection<Application> applications;
+
+        private readonly ObservableCollection<Application> applications = new ObservableCollection<Application>();
+        private readonly ObservableCollection<AppService> services = new ObservableCollection<AppService>();
 
         public Cloud()
         {            
-            applications = new ObservableCollection<Application>();
-            applications.CollectionChanged += new NotifyCollectionChangedEventHandler(Applications_CollectionChanged);
+            applications.CollectionChanged += new NotifyCollectionChangedEventHandler(applications_CollectionChanged);
+
             id = Guid.NewGuid();
             TimeoutStart = 600;
             TimeoutStop = 60;
@@ -31,7 +32,7 @@
             IsDisconnected = true;
         }
 
-        void Applications_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void applications_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             RaisePropertyChanged("Applications");
         }
@@ -119,12 +120,19 @@
             get { return this.applications; }            
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string propertyName)
+        public ObservableCollection<AppService> Services
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            get { return services; }
+        }
+
+        public void ClearServices()
+        {
+            services.Clear();
+        }
+
+        public void ClearApplications()
+        {
+            applications.Clear();
         }
     }
 }
