@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Collections.Specialized;
-
-namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types
 {
-    [Serializable]
-    public class Cloud : EntityBase
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
+
+    public class Cloud : JsonBase, INotifyPropertyChanged
     {
         private Guid id;
         private string serverName;
@@ -23,25 +19,26 @@ namespace CloudFoundry.Net.Types
         private int timeoutStop;
         private string accessToken;
         private ObservableCollection<Application> applications;
-        private ObservableCollection<AppService> services;
 
         public Cloud()
         {            
             applications = new ObservableCollection<Application>();
-            services = new ObservableCollection<AppService>();
-            services.CollectionChanged += ServicesChanged;
-            applications.CollectionChanged += ApplicationsChanged;
+            applications.CollectionChanged += new NotifyCollectionChangedEventHandler(Applications_CollectionChanged);
             id = Guid.NewGuid();
             TimeoutStart = 600;
             TimeoutStop = 60;
             IsConnected = false;
             IsDisconnected = true;
-        }        
+        }
+
+        void Applications_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Applications");
+        }
 
         public Guid ID
         {
             get { return id; }
-            set { id = value; }
         }
 
         public string ServerName 
@@ -122,20 +119,12 @@ namespace CloudFoundry.Net.Types
             get { return this.applications; }            
         }
 
-        public ObservableCollection<AppService> Services
-        {
-            get { return this.services; }
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        protected virtual void RaisePropertyChanged(string propertyName)
         {
-            RaisePropertyChanged("Services");
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private void ApplicationsChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Applications");
-        }
-      
     }
 }

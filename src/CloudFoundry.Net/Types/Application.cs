@@ -1,44 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
 {
-    [Serializable]
-    public class Application : EntityBase
+    public class Application : JsonBase, INotifyPropertyChanged
     {
         private string name;
-        private Staging staging;        
+        private Staging staging;
+        private ObservableCollection<string> uris;
         private int instances;
         private int? runningInstances;
-        private Resources resources;
+        private AppResources resources;
         private string state;
-        private string version;
         private ObservableCollection<string> services;
-        private ObservableCollection<string> uris;
+        private string version;
         private ObservableCollection<string> environment;
-        private Metadata metadata;
+        private AppMeta metadata;
 
         public Application()
         {
             Staging = new Staging();
-            Resources = new Resources();
-            Metadata = new Metadata();
+            Resources = new AppResources();
+            MetaData = new AppMeta();
             Services = new ObservableCollection<string>();
             Uris = new ObservableCollection<string>();
             Environment = new ObservableCollection<string>();
-            Services.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(ServicesChanged);
-            Uris.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(UrisChanged);
-            Environment.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(EnvironmentChanged);
-            Staging.PropertyChanged += StagingChanged;
-            Resources.PropertyChanged += ResourcesChanged;
-            Metadata.PropertyChanged += MetadataChanged;
-        }       
+        }
 
         [JsonProperty(PropertyName = "name")]
         public string Name
@@ -76,7 +64,7 @@ namespace CloudFoundry.Net.Types
         }
 
         [JsonProperty(PropertyName = "resources")]
-        public Resources Resources
+        public AppResources Resources
         {
             get { return this.resources; }
             set { this.resources = value; RaisePropertyChanged("Resources"); }
@@ -111,7 +99,7 @@ namespace CloudFoundry.Net.Types
         }
 
         [JsonProperty(PropertyName = "meta")]
-        public Metadata Metadata
+        public AppMeta MetaData
         {
             get { return this.metadata; }
             set { this.metadata = value; RaisePropertyChanged("MetaData"); }
@@ -120,39 +108,17 @@ namespace CloudFoundry.Net.Types
         [JsonIgnore]
         public Cloud Parent { get; set; }
 
-        private void MetadataChanged(object sender, PropertyChangedEventArgs e)
+        #region INotifyPropertyChanged Implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void RaisePropertyChanged(string propertyName)
         {
-            RaisePropertyChanged("Metadata");
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private void ResourcesChanged(object sender, PropertyChangedEventArgs e)
-        {
-            RaisePropertyChanged("Resources");
-        }
-
-        private void StagingChanged(object sender, PropertyChangedEventArgs e)
-        {
-            RaisePropertyChanged("Staging");
-        }
-
-        private void EnvironmentChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Environment");
-        }
-
-        private void UrisChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Uris");
-        }
-
-        private void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Services");
-        }
+        #endregion
     }
 
-    [Serializable]
-    public class Staging : EntityBase
+    public class Staging : JsonBase, INotifyPropertyChanged
     {
         private string model;
         private string stack;
@@ -169,11 +135,19 @@ namespace CloudFoundry.Net.Types
         {
             get { return this.stack; }
             set { this.stack = value; RaisePropertyChanged("Stack"); }
-        }       
+        }
+
+        #region INotifyPropertyChanged Implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void RaisePropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
     }
 
-    [Serializable]
-    public class Resources : EntityBase
+    public class AppResources : JsonBase, INotifyPropertyChanged
     {
         private int memory;
         private int disk;
@@ -199,10 +173,19 @@ namespace CloudFoundry.Net.Types
             get { return this.fds; }
             set { this.fds = value; RaisePropertyChanged("Fds"); }
         }
+
+        #region INotifyPropertyChanged Implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void RaisePropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
     }
 
-    [Serializable]
-    public class Metadata : EntityBase
+    public class AppMeta : JsonBase, INotifyPropertyChanged
     {
         private int version;
         private long created;
@@ -219,6 +202,15 @@ namespace CloudFoundry.Net.Types
         {
             get { return this.created; }
             set { this.created = value; RaisePropertyChanged("Created"); }
-        }     
+        }
+
+        #region INotifyPropertyChanged Implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void RaisePropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
     }
 }

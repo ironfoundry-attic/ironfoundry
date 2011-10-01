@@ -55,6 +55,12 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="VcapClientResult.cs" />
     <Compile Include="VmcBase.cs" />
     <Compile Include="VmcInfo.cs" />
     <Compile Include="VmcMiscellaneous.cs" />
@@ -62,11 +68,11 @@
     <Compile Include="VmcApps.cs" />
     <Compile Include="VmcClient.cs" />
     <Compile Include="VmcInit.cs" />
-    <Compile Include="VmcManager.cs" />
+    <Compile Include="VcapClient.cs" />
     <Compile Include="VmcServices.cs" />
     <Compile Include="VmcSystem.cs" />
     <Compile Include="Entities.cs" />
-    <Compile Include="IVmcClient.cs" />
+    <Compile Include="IVcapClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +86,12 @@
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
       <Name>CloudFoundry.Net</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />

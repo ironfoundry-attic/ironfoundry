@@ -1,19 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-using System.IO;
-using RestSharp;
-
-namespace CloudFoundry.Net.Vmc
+﻿namespace CloudFoundry.Net.Vmc
 {
+    using RestSharp;
+    using System;
+    using CloudFoundry.Net.Vmc.Properties;
+
     internal class VmcInit
     {
-        public string Info (string accesstoken, string url){
-            if (url == null){
+        private readonly Uri uri;
+        private readonly string accessToken;
+
+        public VmcInit(Uri argUri, string argAccessToken)
+        {
+            uri = argUri;
+            accessToken = argAccessToken;
+
+            if (null == uri)
+            {
+                // throw new ArgumentNullException(Resources.VmcInit_UriRequired_Message);
+            }
+        }
+
+        public string Info (string accesstoken, string url)
+        {
+            if (url == null)
+            {
                 return ("Target URL has to be set");
-            } else {
+            }
+            else
+            {
                 var client = new RestClient();
                 client.BaseUrl = url;
                 var request = new RestRequest();

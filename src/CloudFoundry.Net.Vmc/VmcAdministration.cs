@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using RestSharp;
-using CloudFoundry.Net.Types;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace CloudFoundry.Net.Vmc
+﻿namespace CloudFoundry.Net.Vmc
 {
+    using CloudFoundry.Net.Types;
+    using Newtonsoft.Json.Linq;
+    using RestSharp;
+
     internal class VmcAdministration
     {
         public string Login(string username, string pass, string url)

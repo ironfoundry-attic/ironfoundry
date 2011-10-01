@@ -28,7 +28,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             RestartApplicationCommand = new RelayCommand(RestartApplication, CanStop);
 
             this.application = application;
-            var manager = new VmcManager();
+            var manager = new VcapClient();
             var stats = manager.GetStats(this.application, this.application.Parent);            
             foreach (StatInfo statInfo in stats.Values)
                 base.Children.Add(new InstanceTreeViewItemViewModel(statInfo, this));

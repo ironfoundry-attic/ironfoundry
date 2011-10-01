@@ -82,9 +82,9 @@
             UpdateApplicationSettings(application, cloud);
         }
 
-        internal VmcResponse UpdateApplicationSettings(Application application, Cloud cloud)
+        internal VcapResponse UpdateApplicationSettings(Application application, Cloud cloud)
         {
-            VmcResponse vmcResponse = null;
+            VcapResponse vmcResponse = null;
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
@@ -95,7 +95,7 @@
             request.AddBody(application);
             var response = client.Execute(request).Content;
             if (!String.IsNullOrEmpty(response.Trim()))
-                vmcResponse = JsonConvert.DeserializeObject<VmcResponse>(response);
+                vmcResponse = JsonConvert.DeserializeObject<VcapResponse>(response);
             return vmcResponse;
         }
 

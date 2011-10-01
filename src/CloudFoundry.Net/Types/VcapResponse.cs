@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-
-namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types
 {
-    public class VmcResponse : EntityBase
+    using Newtonsoft.Json;
+
+    public class VcapResponse : JsonBase
     {
         [JsonProperty(PropertyName = "code")]
         public int Code

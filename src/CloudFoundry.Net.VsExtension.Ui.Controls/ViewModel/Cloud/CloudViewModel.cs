@@ -38,7 +38,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private ObservableCollection<AppService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
-        private VmcManager manager = new VmcManager();
+        private VcapClient manager = new VcapClient();
 
         BackgroundWorker getInstances = new BackgroundWorker();
         BackgroundWorker updateApplication = new BackgroundWorker();
@@ -103,7 +103,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         {
             if (e.Result != null)
             {
-                VmcResponse response = e.Result as VmcResponse;
+                VcapResponse response = e.Result as VcapResponse;
                 ApplicationErrorMessage = string.Format("{0} - (Error: {1})", response.Description, response.Code);
             }
             else

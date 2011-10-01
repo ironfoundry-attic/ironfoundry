@@ -36,6 +36,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AccessTokenManagerTests.cs" />
     <Compile Include="ConversionTests.cs" />
     <Compile Include="JsonSerializationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -50,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="CloudFoundry.Net.Types.Test.xunit" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

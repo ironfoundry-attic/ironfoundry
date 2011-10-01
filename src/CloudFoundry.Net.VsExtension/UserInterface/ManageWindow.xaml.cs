@@ -181,12 +181,9 @@ namespace CloudFoundry.Net.VsExtension
 
                     if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                    var cfm = new VmcManager();
-                    cfm.URL = "http://" + url;
-                    string token = cfm.LogIn(username, password);
-                    JObject parse = JObject.Parse(token);
-                    var obj = (string)parse["token"];
-                    cfm.AccessToken = obj;
+                    var cfm = new VcapClient("http://" + url);
+                    VcapClientResult result = cfm.LogIn(username, password);
+
                     progressDialogDispatcher.BeginInvoke(update, string.Format("Pushing {0}", appurl), 65);
                     if (worker.CancellationPending) { args.Cancel = true; return; }
 
