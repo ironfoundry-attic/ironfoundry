@@ -54,5 +54,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string RegisterAccountDialogResult = "RegisterAccountDialogResult";
         public const string GetRegisterAccountData = "GetRegisterAccountData";
         public const string SetRegisterAccountData = "SetRegisterAccountData";
+
+        public const string SavePreferences = "SavePreferences";
     }
 }

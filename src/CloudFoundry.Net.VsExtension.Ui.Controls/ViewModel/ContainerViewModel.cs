@@ -38,12 +38,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             Messenger.Default.Register<NotificationMessageAction<ObservableCollection<CloudUrl>>>(this, ProcessCloudUrlsNotification);
-        }
-
-        private void CloudUrlsChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            SavePreferences();
-        }
+            Messenger.Default.Register<NotificationMessage>(this, ProcessMessages);
+        }        
 
         private void CloudChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -77,19 +73,25 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             var clouds = new ObservableCollection<Cloud>();
             this.cloudUrls = CloudUrl.GetDefaultCloudUrls();
 
-            IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
-            if (isoStore.FileExists(preferencesFileName))
+            try
             {
-                using (IsolatedStorageFileStream configStream = isoStore.OpenFile(preferencesFileName, FileMode.Open))
+                IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
+                if (isoStore.FileExists(preferencesFileName))
                 {
-                    BinaryFormatter binary = new BinaryFormatter();
-                    clouds = binary.Deserialize(configStream) as ObservableCollection<Cloud>;
-                    this.cloudUrls = binary.Deserialize(configStream) as ObservableCollection<CloudUrl>;
+                    using (IsolatedStorageFileStream configStream = isoStore.OpenFile(preferencesFileName, FileMode.Open))
+                    {
+                        BinaryFormatter binary = new BinaryFormatter();
+                        clouds = binary.Deserialize(configStream) as ObservableCollection<Cloud>;
+                        this.cloudUrls = binary.Deserialize(configStream) as ObservableCollection<CloudUrl>;
+                    }
                 }
             }
+            catch (Exception)
+            {
+                // If preferences fail to load, swallow the exception.
+            }
             this.CloudExplorer = new CloudExplorerViewModel(clouds);
-            this.CloudExplorer.CloudList.CollectionChanged += CloudsChanged;
-            this.cloudUrls.CollectionChanged += CloudUrlsChanged;
+            this.CloudExplorer.CloudList.CollectionChanged += CloudsChanged;            
             foreach (var cloud in this.CloudExplorer.CloudList)
                 cloud.PropertyChanged += CloudChanged;
         }
@@ -139,6 +141,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 this.Clouds.Add(selectedCloudViewModel);
             }
             this.SelectedCloudView = selectedCloudViewModel;
+        }
+
+        private void ProcessMessages(NotificationMessage message)
+        {
+            if (message.Notification.Equals(Messages.SavePreferences))
+                SavePreferences();
         }
 
         private void ProcessCloudListNotification(NotificationMessage<ObservableCollection<Cloud>> message)

@@ -80,9 +80,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             foreach (var cloud in cloudList)
             {
                 VcapClientResult result = manager.Login(cloud);
-                Cloud serverCloud = result.Cloud;
-                var applications = manager.ListApps(serverCloud);
-                dictionary.Add(serverCloud, applications);                
+                if (result.Success)
+                {
+                    Cloud serverCloud = result.Cloud;
+                    var applications = manager.ListApps(serverCloud);
+                    dictionary.Add(serverCloud, applications);
+                }
             }
             args.Result = dictionary;
         }

@@ -358,7 +358,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 message =>
                 {
                     if (message.Notification.Equals(Messages.SetManageApplicationUrlsData))
-                        message.Execute(this.SelectedApplication.Uris);
+                        message.Execute(this.SelectedApplication.Uris.DeepCopy());
                 });
 
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ManageApplicationUrls,
@@ -369,7 +369,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                         Messenger.Default.Send(new NotificationMessageAction<ManageApplicationUrlsViewModel>(Messages.GetManageApplicationUrlsData,
                             (viewModel) =>
                             {
-                                this.SelectedApplication.Uris = viewModel.Urls;
+                                this.SelectedApplication.Uris.Synchronize(viewModel.Urls, StringComparer.InvariantCultureIgnoreCase);
                             }));
                     }
                 }));

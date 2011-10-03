@@ -127,16 +127,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                         Messenger.Default.Send(new NotificationMessageAction<ManageCloudUrlsViewModel>(Messages.GetManageCloudUrlsData,
                             (viewModel) =>
                             {
-                                var newItems = viewModel.CloudUrls.Except(this.CloudUrls, new CloudUrlEqualityComparer());
-                                var removeItems = this.CloudUrls.Except(viewModel.CloudUrls, new CloudUrlEqualityComparer());                                
-                                foreach (var cloudUrl in newItems)
-                                    this.CloudUrls.Add(cloudUrl);
-                                foreach (var cloudUrl in removeItems)
-                                {
-                                    var toRemove = this.CloudUrls.SingleOrDefault((i) => i.ServerType == cloudUrl.ServerType);
-                                    if (toRemove != null)
-                                        this.CloudUrls.Remove(toRemove);
-                                }                                    
+                                this.CloudUrls.Synchronize(viewModel.CloudUrls, new CloudUrlEqualityComparer());
+                                Messenger.Default.Send<NotificationMessage>(new NotificationMessage(Messages.SavePreferences));                             
                             }));
                     }
                 }));

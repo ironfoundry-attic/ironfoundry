@@ -4,6 +4,7 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
 
+    [Serializable]
     public class Cloud : EntityBase
     {
         private readonly Guid id;
@@ -23,7 +24,8 @@
 
         public Cloud()
         {            
-            applications.CollectionChanged += new NotifyCollectionChangedEventHandler(applications_CollectionChanged);
+            applications.CollectionChanged += ApplicationsChanged;
+            services.CollectionChanged += ServicesChanged;
 
             id = Guid.NewGuid();
             TimeoutStart = 600;
@@ -32,7 +34,12 @@
             IsDisconnected = true;
         }
 
-        private void applications_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Services");
+        }
+
+        private void ApplicationsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             RaisePropertyChanged("Applications");
         }

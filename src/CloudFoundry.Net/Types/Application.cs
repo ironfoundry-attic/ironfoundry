@@ -2,29 +2,48 @@
 {
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
+    using System;
+    using System.Collections.Specialized;
 
+    [Serializable]
     public class Application : EntityBase
     {
         private string name;
         private Staging staging;
-        private ObservableCollection<string> uris;
+        private string version;
         private int instances;
         private int? runningInstances;
         private AppResources resources;
         private string state;
-        private ObservableCollection<string> services;
-        private string version;
-        private ObservableCollection<string> environment;
         private AppMeta metadata;
+        private readonly ObservableCollection<string> uris = new ObservableCollection<string>();
+        private readonly ObservableCollection<string> services = new ObservableCollection<string>();        
+        private readonly ObservableCollection<string> environment = new ObservableCollection<string>();
 
         public Application()
         {
+            uris.CollectionChanged += UrisChanged;
+            services.CollectionChanged += ServicesChanged;
+            environment.CollectionChanged += EnvironmentChanged;
+
             Staging = new Staging();
             Resources = new AppResources();
             MetaData = new AppMeta();
-            Services = new ObservableCollection<string>();
-            Uris = new ObservableCollection<string>();
-            Environment = new ObservableCollection<string>();
+        }
+
+        void EnvironmentChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Environment");
+        }
+
+        void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Services");
+        }
+
+        void UrisChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("Uris");
         }
 
         [JsonProperty(PropertyName = "name")]
@@ -45,7 +64,6 @@
         public ObservableCollection<string> Uris
         {
             get { return this.uris; }
-            set { this.uris = value; RaisePropertyChanged("Uris"); }        
         }
 
         [JsonProperty(PropertyName = "instances")]
@@ -80,7 +98,6 @@
         public ObservableCollection<string> Services
         {
             get { return this.services; }
-            set { this.services = value; RaisePropertyChanged("Services"); }
         }
 
         [JsonProperty(PropertyName = "version")]
@@ -94,7 +111,6 @@
         public ObservableCollection<string> Environment
         {
             get { return this.environment; }
-            set { this.environment = value; RaisePropertyChanged("Environment"); }
         }
 
         [JsonProperty(PropertyName = "meta")]
@@ -108,6 +124,7 @@
         public Cloud Parent { get; set; }
     }
 
+    [Serializable]
     public class Staging : EntityBase
     {
         private string model;
@@ -128,6 +145,7 @@
         }
     }
 
+    [Serializable]
     public class AppResources : EntityBase
     {
         private int memory;
@@ -156,6 +174,7 @@
         }
     }
 
+    [Serializable]
     public class AppMeta : EntityBase
     {
         private int version;

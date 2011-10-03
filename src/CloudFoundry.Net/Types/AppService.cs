@@ -47,7 +47,7 @@ namespace CloudFoundry.Net.Types
         [JsonProperty(PropertyName = "version")]
         public int Version { get; set; }
     }
-
+    
     public class Properties : EntityBase {
 
         //have to discover what this is off the ruby code
