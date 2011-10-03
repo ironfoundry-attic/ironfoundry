@@ -3,9 +3,10 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using System.Collections.Generic;
 
     [Serializable]
-    public class Cloud : EntityBase
+    public class Cloud : EntityBase, IEquatable<Cloud>
     {
         private readonly Guid id;
         private string serverName;
@@ -141,5 +142,22 @@
         {
             applications.Clear();
         }
-    }
+
+        public bool Equals(Cloud other)
+        {
+            return other.ID == this.ID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            return ((Cloud)obj).ID == this.ID;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.ID.GetHashCode();
+        }
+    }    
 }
