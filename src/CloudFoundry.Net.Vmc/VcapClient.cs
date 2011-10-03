@@ -6,34 +6,29 @@
 
     public class VcapClient : IVcapClient
     {
-        private readonly AccessTokenManager tokenManager = new AccessTokenManager();
-
-        private readonly string currentUri;
-
-        private AccessToken currentToken;
+        private readonly VcapCredentialManager credentialManager;
 
         public VcapClient()
         {
-            currentToken = tokenManager.GetFirst();
-            currentUri = currentToken.Uri.AbsoluteUri;
+            credentialManager = new VcapCredentialManager();
         }
 
         public VcapClient(string argUri)
         {
-            currentUri = argUri;
-            currentToken = tokenManager.GetFor(argUri);
+            credentialManager = new VcapCredentialManager();
+            credentialManager.SetTarget(argUri);
         }
 
         public string CurrentUri
         {
-            get { return currentUri; }
+            get { return credentialManager.CurrentTarget.AbsoluteUri; }
         }
 
         public VcapClientResult Login(string email, string password)
         {
             var cfa = new VmcAdministration();
-            string result = cfa.Login(email, password, currentUri);
-            currentToken = tokenManager.CreateFor(currentUri, result);
+            string result = cfa.Login(email, password, CurrentUri);
+            credentialManager.RegisterFor(CurrentUri, result);
             return new VcapClientResult();
         }
 
@@ -46,7 +41,7 @@
         public string Push(string appname, string fdqn, string fileURI, string framework, string memorysize)
         {
             VmcApps cfapps = new VmcApps();
-            var app =  cfapps.PushApp(appname, currentToken.Uri, currentToken.Token, fileURI, fdqn, framework, null,memorysize, null);
+            var app =  cfapps.PushApp(appname, credentialManager.CurrentTarget, credentialManager.CurrentToken, fileURI, fdqn, framework, null,memorysize, null);
             return app;
         }
 
@@ -132,11 +127,11 @@
 
         private string executeRequest(string argResource)
         {
-            var client = new RestClient { BaseUrl = currentToken.Uri.AbsoluteUri };
+            var client = new RestClient { BaseUrl = credentialManager.CurrentTarget.AbsoluteUri };
             var request = new RestRequest { Resource = argResource };
-            if (null != currentToken && false == currentToken.Token.IsNullOrWhiteSpace())
+            if (credentialManager.HasToken)
             {
-                request.AddHeader("Authorization", currentToken.Token);
+                request.AddHeader("Authorization", credentialManager.CurrentToken);
             }
             return client.Execute(request).Content;
         }

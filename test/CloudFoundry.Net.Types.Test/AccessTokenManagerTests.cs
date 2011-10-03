@@ -18,7 +18,7 @@
             string json = String.Format("{{\"{0}\":\"{1}\",\"{2}\":\"{3}\"}}",
                 uri1.AbsoluteUri, tokenStr1, uri2.AbsoluteUri, tokenStr2);
 
-            var tokenManager = new AccessTokenManager(json, false);
+            var tokenManager = new VcapCredentialManager(json, false);
 
             AccessToken token1 = tokenManager.GetFor(uri1.AbsoluteUri);
             Assert.NotNull(token1);

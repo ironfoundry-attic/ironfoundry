@@ -92,7 +92,7 @@
     <Compile Include="Types\VcapComponentDiscover.cs" />
     <Compile Include="Types\VcapResponse.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="Vmc\AccessTokenManager.cs" />
+    <Compile Include="Vmc\VcapCredentialManager.cs" />
     <Compile Include="WinSockErrorCode.cs" />
   </ItemGroup>
   <ItemGroup>
