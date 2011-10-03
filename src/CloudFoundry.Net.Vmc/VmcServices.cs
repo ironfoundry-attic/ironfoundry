@@ -105,6 +105,8 @@ namespace CloudFoundry.Net.Vmc
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
             client.Execute(request);
+            VmcApps apps = new VmcApps();
+            apps.RestartApp(application, cloud);
         }
 
         public void UnbindService (AppService appservice, Application application, Cloud cloud) {
@@ -118,6 +120,8 @@ namespace CloudFoundry.Net.Vmc
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
             client.Execute(request);
+            VmcApps apps = new VmcApps();
+            apps.RestartApp(application, cloud);
         }
     }
 }
