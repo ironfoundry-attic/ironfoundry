@@ -138,9 +138,9 @@
             StartApp(application, cloud);
         }
 
-        public string PushApp (string Appname, string Url, string Accesstoken, string Dirlocation, string Deployedurl, string Framework, string Runtime, string Memoryreservation, string Servicebindings )
+        public string PushApp (string Appname, Uri argUri, string Accesstoken, string Dirlocation, string Deployedurl, string Framework, string Runtime, string Memoryreservation, string Servicebindings )
         {
-            if (Url == null)
+            if (argUri == null)
             {
                 return ("Target URL has to be set");
             }
@@ -170,7 +170,7 @@
                     Servicebindings = "none";
 
                 var client = new RestClient();
-                client.BaseUrl = Url;
+                client.BaseUrl = argUri.AbsoluteUri;
                 
                 var request = new RestRequest();
                // request.AddHeader("Authorization", Accesstoken);
@@ -200,7 +200,7 @@
      
 
                 var client4 = new RestClient();
-                client4.BaseUrl = Url;
+                client4.BaseUrl = argUri.AbsoluteUri;
                 client4.AddDefaultHeader("Authorization", Accesstoken);
                 client4.FollowRedirects = false;
 
@@ -217,7 +217,7 @@
                 string resourcesJson = JsonConvert.SerializeObject(resources);
 
                 var client2 = new RestClient();
-                client2.BaseUrl = Url;
+                client2.BaseUrl = argUri.AbsoluteUri;
                 client2.AddDefaultHeader("Authorization", Accesstoken);
 
                 var request2 = new RestRequest();
@@ -233,12 +233,12 @@
                 request2.AddParameter("resources", resourcesJson);
                 var content = client2.Execute(request2).Content;
 
-                var app = GetAppInfo(Appname, Url, Accesstoken);
+                var app = GetAppInfo(Appname, argUri.AbsoluteUri, Accesstoken);
                 JObject getInfo = JObject.Parse(app);
                 getInfo["state"] = "STARTED";
 
                 var client3 = new RestClient();
-                client3.BaseUrl = Url;
+                client3.BaseUrl = argUri.AbsoluteUri;
                 client3.AddDefaultHeader("Authorization", Accesstoken);
                 var request3 = new RestRequest();
                 request3.Method = Method.PUT;
@@ -252,8 +252,8 @@
                 string info = string.Empty;
                 for (int i = 0; i < 4; i++)
                 {
-                    info = GetAppInfo(Appname, Url, Accesstoken);
-                    var crash = GetAppCrash(Appname, Url, Accesstoken);
+                    info = GetAppInfo(Appname, argUri.AbsoluteUri, Accesstoken);
+                    var crash = GetAppCrash(Appname, argUri.AbsoluteUri, Accesstoken);
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
 

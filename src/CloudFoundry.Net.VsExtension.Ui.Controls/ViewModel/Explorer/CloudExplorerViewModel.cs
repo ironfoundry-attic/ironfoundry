@@ -79,7 +79,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Dictionary<Cloud, List<Application>> dictionary = new Dictionary<Cloud, List<Application>>();            
             foreach (var cloud in cloudList)
             {
-                VcapClientResult result = manager.LogIn(cloud);
+                VcapClientResult result = manager.Login(cloud);
                 Cloud serverCloud = result.Cloud;
                 var applications = manager.ListApps(serverCloud);
                 dictionary.Add(serverCloud, applications);                

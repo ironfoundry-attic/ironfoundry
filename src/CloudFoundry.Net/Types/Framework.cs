@@ -1,56 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-
-namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types
 {
-    class Framework :EntityBase
+    using Newtonsoft.Json;
+
+    public class Framework :EntityBase
     {
         [JsonProperty(PropertyName = "name")]
-        string Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "runtimes")]
-        Runtimes FrameworkRuntimes { get; set; }
+        public Runtimes FrameworkRuntimes { get; set; }
 
         [JsonProperty(PropertyName="appservers")]
-        AppServers FrameworkAppServers { get; set; }
+        public AppServers FrameworkAppServers { get; set; }
 
         [JsonProperty(PropertyName = "detection")]
-        Detection FrameworkDetection { get; set; }
-
-        public Framework() {
-            FrameworkRuntimes = new Runtimes();
-            FrameworkAppServers = new AppServers();
-            FrameworkDetection = new Detection();
-        }
+        public Detection FrameworkDetection { get; set; }
     }
-    internal class Runtimes : EntityBase
+
+    public class Runtimes : EntityBase
     {
         [JsonProperty(PropertyName = "version")]
-        string Version { get; set; }
+        public string Version { get; set; }
 
         [JsonProperty(PropertyName = "name")]
-        string Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "description")]
-        string Description { get; set; }
+        public string Description { get; set; }
     }
-    internal class AppServers : EntityBase
+
+    public class AppServers : EntityBase
     {
         [JsonProperty(PropertyName = "name")]
-        string Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "description")]
-        string Description { get; set; }
-    }
-    internal class Detection : EntityBase
-    {
-        
-        string FileExtension { get; set; }
-        string InternalPattern { get; set; }
-        bool Enabeled { get; set; }
+        public string Description { get; set; }
     }
 
+    public class Detection : EntityBase
+    {
+        public string FileExtension { get; set; }
+        public string InternalPattern { get; set; }
+        public bool Enabeled { get; set; }
+    }
 }

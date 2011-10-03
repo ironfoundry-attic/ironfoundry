@@ -3,9 +3,7 @@
     // http://stackoverflow.com/questions/125319/should-usings-be-inside-or-outside-the-namespace
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using NDesk.Options;
-    using Newtonsoft.Json.Linq;
 
     static class Program
     {
@@ -72,7 +70,16 @@
         static void info(IList<string> unparsed)
         {
             var vc = new VcapClient();
-            Console.WriteLine(vc.Info());
+            VcapClientResult rslt = vc.Info();
+            if (rslt.Success)
+            {
+                Console.WriteLine(rslt.Message);
+            }
+            else
+            {
+                // TODO standardize errors
+                Console.Error.WriteLine(String.Format("Error: {0}", rslt.Message));
+            }
         }
 
         static void usage()

@@ -67,7 +67,6 @@
     <Compile Include="VmcAdministration.cs" />
     <Compile Include="VmcApps.cs" />
     <Compile Include="VmcClient.cs" />
-    <Compile Include="VmcInit.cs" />
     <Compile Include="VcapClient.cs" />
     <Compile Include="VmcServices.cs" />
     <Compile Include="VmcSystem.cs" />

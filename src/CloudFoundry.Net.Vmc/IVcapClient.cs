@@ -6,11 +6,9 @@
 
     public interface IVcapClient
     {
-        string URL { get; }
+        VcapClientResult Login(Cloud argCloud);
 
-        string AccessToken { get; }
-
-        VcapClientResult LogIn (string email, string password);
+        VcapClientResult Login(string email, string password);
 
         string Push(string appname, string fdqn, string fileURI, string framework, string memorysize);
 

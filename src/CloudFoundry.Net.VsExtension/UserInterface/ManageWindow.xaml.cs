@@ -182,7 +182,7 @@ namespace CloudFoundry.Net.VsExtension
                     if (worker.CancellationPending) { args.Cancel = true; return; }
 
                     var cfm = new VcapClient("http://" + url);
-                    VcapClientResult result = cfm.LogIn(username, password);
+                    VcapClientResult result = cfm.Login(username, password);
 
                     progressDialogDispatcher.BeginInvoke(update, string.Format("Pushing {0}", appurl), 65);
                     if (worker.CancellationPending) { args.Cancel = true; return; }

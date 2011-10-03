@@ -62,7 +62,6 @@
     <Compile Include="Types\VcapComponentAnnounce.cs" />
     <Compile Include="Types\RouterRegister.cs" />
     <Compile Include="Types\InstanceExited.cs" />
-    <Compile Include="Types\Frameworks.cs" />
     <Compile Include="Types\Info.cs" />
     <Compile Include="SocketErrorCode.cs" />
     <Compile Include="Types\Droplet.cs" />

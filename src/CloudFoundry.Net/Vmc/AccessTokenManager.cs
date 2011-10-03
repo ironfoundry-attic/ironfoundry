@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using Newtonsoft.Json;
     using Types;
 
@@ -13,7 +14,6 @@
         "http://api.vcap.me": "04085b0849221a6c756b652e62616b6b656e4074696572332e636f6d063a0645546c2b078b728b4e2219000104ec0d65746833caddd87eac48b0b2989604"}
      }
      */
-
     public class AccessTokenManager : IDisposable
     {
         private const string TOKEN_FILE = ".vmc_token";
@@ -26,16 +26,32 @@
 
         public AccessTokenManager()
         {
-            init(readTokenFile());
+            parseJson(readTokenFile());
         }
 
         public AccessTokenManager(string argTokenJson, bool argShouldWrite)
         {
-            init(argTokenJson);
+            parseJson(argTokenJson);
             shouldWrite = argShouldWrite;
         }
 
-        private void init(string argTokenJson)
+        public AccessToken CreateFor(string argUri, string argJson)
+        {
+            parseJson(argJson);
+            return GetFor(argUri);
+        }
+
+        public AccessToken GetFirst()
+        {
+            return tokenDict.FirstOrDefault().Value;
+        }
+
+        public AccessToken GetFor(string argUri)
+        {
+            return tokenDict[argUri];
+        }
+
+        private void parseJson(string argTokenJson)
         {
             Dictionary<string, string> allTokens = JsonConvert.DeserializeObject<Dictionary<string, string>>(argTokenJson);
             foreach (KeyValuePair<string, string> kvp in allTokens)
@@ -44,11 +60,6 @@
                 string token = kvp.Value;
                 tokenDict[uri] = new AccessToken(uri, token);
             }
-        }
-
-        public AccessToken GetFor(string argUri)
-        {
-            return tokenDict[argUri];
         }
 
         private string readTokenFile()

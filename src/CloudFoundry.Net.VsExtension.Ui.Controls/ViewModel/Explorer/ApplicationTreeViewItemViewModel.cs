@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using GalaSoft.MvvmLight.Command;
-using System.Windows.Input;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.Types;
-using CloudFoundry.Net.Vmc;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using GalaSoft.MvvmLight.Command;
+    using System.Windows.Input;
+    using GalaSoft.MvvmLight.Messaging;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.Vmc;
+
     public class ApplicationTreeViewItemViewModel : TreeViewItemViewModel
     {
         private Application application;
@@ -29,9 +29,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
             this.application = application;
             var manager = new VcapClient();
-            var stats = manager.GetStats(this.application, this.application.Parent);            
+            var stats = manager.GetStats(this.application, this.application.Parent);
             foreach (StatInfo statInfo in stats.Values)
+            {
                 base.Children.Add(new InstanceTreeViewItemViewModel(statInfo, this));
+            }
         }
 
         public string Name
