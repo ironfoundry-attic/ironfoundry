@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CloudFoundry.Net.Vmc.Properties {
+namespace CloudFoundry.Net.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace CloudFoundry.Net.Vmc.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CloudFoundry.Net.Vmc.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CloudFoundry.Net.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,6 +61,15 @@ namespace CloudFoundry.Net.Vmc.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Email: .
+        /// </summary>
+        public static string Vmc_EmailPrompt_Text {
+            get {
+                return ResourceManager.GetString("Vmc_EmailPrompt_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 
         ///{0}
         ///For support visit {1}
@@ -68,18 +77,18 @@ namespace CloudFoundry.Net.Vmc.Properties {
         ///Target:   {2} ({3})
         ///Client:   v{4}.
         /// </summary>
-        public static string VcapClient_InfoDisplay_1_Fmt {
+        public static string Vmc_InfoDisplay_1_Fmt {
             get {
-                return ResourceManager.GetString("VcapClient_InfoDisplay_1_Fmt", resourceCulture);
+                return ResourceManager.GetString("Vmc_InfoDisplay_1_Fmt", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to User:     {0}.
         /// </summary>
-        public static string VcapClient_InfoDisplay_2_Fmt {
+        public static string Vmc_InfoDisplay_2_Fmt {
             get {
-                return ResourceManager.GetString("VcapClient_InfoDisplay_2_Fmt", resourceCulture);
+                return ResourceManager.GetString("Vmc_InfoDisplay_2_Fmt", resourceCulture);
             }
         }
         
@@ -88,45 +97,99 @@ namespace CloudFoundry.Net.Vmc.Properties {
         ///          Services ({2} of {3} total)
         ///          Apps     ({4} of {5} total).
         /// </summary>
-        public static string VcapClient_InfoDisplay_3_Fmt {
+        public static string Vmc_InfoDisplay_3_Fmt {
             get {
-                return ResourceManager.GetString("VcapClient_InfoDisplay_3_Fmt", resourceCulture);
+                return ResourceManager.GetString("Vmc_InfoDisplay_3_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Problem with login to [{0}] Exception:{1}.
+        /// </summary>
+        public static string Vmc_LoginError_Fmt {
+            get {
+                return ResourceManager.GetString("Vmc_LoginError_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Problem with login to [{0}] invalid account or password..
+        /// </summary>
+        public static string Vmc_LoginFail_Fmt {
+            get {
+                return ResourceManager.GetString("Vmc_LoginFail_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully logged into [{0}].
+        /// </summary>
+        public static string Vmc_LoginSuccess_Fmt {
+            get {
+                return ResourceManager.GetString("Vmc_LoginSuccess_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Need a valid email..
+        /// </summary>
+        public static string Vmc_NeedEmailPrompt_Text {
+            get {
+                return ResourceManager.GetString("Vmc_NeedEmailPrompt_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Need a password..
+        /// </summary>
+        public static string Vmc_NeedPasswordPrompt_Text {
+            get {
+                return ResourceManager.GetString("Vmc_NeedPasswordPrompt_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password: .
+        /// </summary>
+        public static string Vmc_PasswordPrompt_Text {
+            get {
+                return ResourceManager.GetString("Vmc_PasswordPrompt_Text", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Please set a target..
         /// </summary>
-        public static string VcapClient_PleaseSetTarget_Message {
+        public static string Vmc_PleaseSetTarget_Message {
             get {
-                return ResourceManager.GetString("VcapClient_PleaseSetTarget_Message", resourceCulture);
+                return ResourceManager.GetString("Vmc_PleaseSetTarget_Message", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Succesfully targeted [{0}].
         /// </summary>
-        public static string VcapClient_TargetDisplay_Fmt {
+        public static string Vmc_TargetDisplay_Fmt {
             get {
-                return ResourceManager.GetString("VcapClient_TargetDisplay_Fmt", resourceCulture);
+                return ResourceManager.GetString("Vmc_TargetDisplay_Fmt", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to [{0}].
         /// </summary>
-        public static string VcapClient_TargetNoSuccessDisplay_Fmt {
+        public static string Vmc_TargetNoSuccessDisplay_Fmt {
             get {
-                return ResourceManager.GetString("VcapClient_TargetNoSuccessDisplay_Fmt", resourceCulture);
+                return ResourceManager.GetString("Vmc_TargetNoSuccessDisplay_Fmt", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Url required..
         /// </summary>
-        public static string VcapClient_UrlRequired_Message {
+        public static string Vmc_UrlRequired_Message {
             get {
-                return ResourceManager.GetString("VcapClient_UrlRequired_Message", resourceCulture);
+                return ResourceManager.GetString("Vmc_UrlRequired_Message", resourceCulture);
             }
         }
     }

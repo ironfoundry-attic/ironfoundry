@@ -1,8 +1,10 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
+    using System;
     using System.Collections.Generic;
     using RestSharp;
     using Types;
+    using Newtonsoft.Json.Linq;
 
     public class VcapClient : IVcapClient
     {
@@ -26,7 +28,7 @@
 
         public VcapClientResult Info()
         {
-            string response = executeRequest("/info");
+            string response = executeRequest(Constants.INFO_PATH);
             return new VcapClientResult(true, EntityBase.FromJson<Info>(response));
         }
 
@@ -44,7 +46,7 @@
                 // "target" does the same thing as "info", but not logged in
                 // considered valid if name, build, version and support are all non-null
                 // without argument, displays current target
-                var info = EntityBase.FromJson<Info>(executeRequest("/info", false));
+                var info = EntityBase.FromJson<Info>(executeRequest(Constants.INFO_PATH, false));
                 bool success = false == info.Name.IsNullOrWhiteSpace() &&
                                false == info.Build.IsNullOrWhiteSpace() &&
                                false == info.Version.IsNullOrWhiteSpace() &&
@@ -62,18 +64,31 @@
             return rv;
         }
 
-        public VcapClientResult Login(string email, string password)
+        public VcapClientResult Login(string argEmail, string argPassword)
         {
-            var cfa = new VmcAdministration();
-            string result = cfa.Login(email, password, CurrentUri);
-            credentialManager.RegisterFor(CurrentUri, result);
+            var client = new RestClient { BaseUrl = CurrentUri };
+            var request = new RestRequest
+            {
+                Method = Method.POST,
+                Resource = String.Format("{0}/{1}/tokens", Constants.USERS_PATH, argEmail),
+                RequestFormat = DataFormat.Json,
+            };
+            request.AddBody(new { password = argPassword });
+
+            string content = client.Execute(request).Content;
+
+            var parsed = JObject.Parse(content);
+
+            string token = parsed.Value<string>("token");
+
+            credentialManager.RegisterFor(CurrentUri, token);
+
             return new VcapClientResult();
         }
 
-        public VcapClientResult Login(Cloud cloud)
+        public VcapClientResult Login(Cloud argCloud)
         {
-            VmcAdministration cfa = new VmcAdministration();
-            return new VcapClientResult(cfa.Login(cloud));
+            return Login(argCloud.Email, argCloud.Password);
         }
         
         public string Push(string appname, string fdqn, string fileURI, string framework, string memorysize)

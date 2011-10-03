@@ -10,11 +10,14 @@
 
     static class Program
     {
-        static int verbosity = 0;
-        static bool show_help = false;
-        static bool result_as_json = false;
-        static bool result_as_rawjson = false;
-        static string command_url = null;
+        static int verbosity           = 0;
+        static bool show_help          = false;
+        static bool result_as_json     = false;
+        static bool result_as_rawjson  = false;
+        static string command_url      = null;
+        static string command_email    = null;
+        static string command_password = null;
+        static bool prompt_ok          = true;
 
         static void Main(string[] args)
         {
@@ -37,7 +40,13 @@
 
                 { "rawjson", "show result as raw json", v => { result_as_rawjson = null != v; } },
 
-                { "url", "set command url", v => { command_url = v; } },
+                { "url=", "set command url", v => { command_url = v; } },
+                
+                { "email=", "set command email", v => { command_email = v; } },
+                
+                { "passwd=", "set command password", v => { command_password = v; } },
+
+                { "noprompts", "set prompting", v => { prompt_ok = v.IsNullOrWhiteSpace(); } },
             };
 
             IList<string> unparsed = null;
@@ -94,12 +103,12 @@
                 }
                 else
                 {
-                    Console.WriteLine(String.Format(Resources.VcapClient_InfoDisplay_1_Fmt,
+                    Console.WriteLine(String.Format(Resources.Vmc_InfoDisplay_1_Fmt,
                         info.Description, info.Support, vc.CurrentUri, info.Version, "TODO CLIENT VERSION"));
 
                     if (false == info.User.IsNullOrEmpty())
                     {
-                        Console.WriteLine(String.Format(Resources.VcapClient_InfoDisplay_2_Fmt, info.User));
+                        Console.WriteLine(String.Format(Resources.Vmc_InfoDisplay_2_Fmt, info.User));
                     }
 
                     if (null != info.Usage && null != info.Limits)
@@ -107,7 +116,7 @@
                         string tmem = pretty_size(info.Limits.Memory * 1024 * 1024);
                         string mem = pretty_size(info.Usage.Memory * 1024 * 1024);
 
-                        Console.WriteLine(String.Format(Resources.VcapClient_InfoDisplay_3_Fmt,
+                        Console.WriteLine(String.Format(Resources.Vmc_InfoDisplay_3_Fmt,
                             mem, tmem,
                             info.Usage.Services, info.Limits.Services,
                             info.Usage.Apps, info.Limits.Apps));
@@ -123,33 +132,109 @@
 
         static void target(IList<string> unparsed)
         {
-            string url = null;
-            if (command_url.IsNullOrWhiteSpace())
+            string url = command_url;
+            if (false == unparsed.IsNullOrEmpty())
             {
-                if (false == (unparsed.IsNullOrEmpty() || unparsed[0].IsNullOrWhiteSpace()))
-                {
-                    url = unparsed[0];
-                }
-            }
-            else
-            {
-                url = command_url;
+                url = unparsed[0];
             }
 
             var vc = new VcapClient();
             VcapClientResult rslt = vc.Target(url);
             if (rslt.Success)
             {
-                Console.WriteLine(String.Format(Resources.VcapClient_TargetDisplay_Fmt, vc.CurrentUri));
+                Console.WriteLine(String.Format(Resources.Vmc_TargetDisplay_Fmt, vc.CurrentUri));
             }
             else
             {
-                Console.WriteLine(String.Format(Resources.VcapClient_TargetNoSuccessDisplay_Fmt, vc.CurrentUri));
+                Console.WriteLine(String.Format(Resources.Vmc_TargetNoSuccessDisplay_Fmt, vc.CurrentUri));
             }
         }
 
         static void login(IList<string> unparsed)
         {
+            bool failed = true;
+            ushort tries = 0;
+
+            while (failed && tries < 3)
+            {
+                string email = command_email;
+                if (false == unparsed.IsNullOrEmpty())
+                {
+                    email = unparsed[0];
+                }
+                if (prompt_ok && email.IsNullOrWhiteSpace())
+                {
+                    Console.Write(Resources.Vmc_EmailPrompt_Text);
+                    email = Console.ReadLine();
+                }
+
+                string password = command_password;
+                if (prompt_ok && password.IsNullOrWhiteSpace())
+                {
+                    Console.Write(Resources.Vmc_PasswordPrompt_Text);
+
+                    var passwordList = new LinkedList<char>();
+                    bool reading_pwd = true;
+                    while (reading_pwd)
+                    {
+                        ConsoleKeyInfo info = Console.ReadKey(true);
+                        switch (info.Key)
+                        {
+                            case ConsoleKey.Enter :
+                                reading_pwd = false;
+                                break;
+                            case ConsoleKey.Delete :
+                            case ConsoleKey.Backspace :
+                                if (false == passwordList.IsNullOrEmpty())
+                                {
+                                    Console.Write("\b \b");
+                                    passwordList.RemoveLast();
+                                }
+                                break;
+                            default :
+                                passwordList.AddLast(info.KeyChar);
+                                Console.Write('*');
+                                break;
+                        }
+                    }
+
+                    password = String.Join("", passwordList);
+                }
+
+                if (email.IsNullOrWhiteSpace())
+                {
+                    Console.Error.WriteLine(Resources.Vmc_NeedEmailPrompt_Text);
+                    return;
+                }
+
+                if (password.IsNullOrWhiteSpace())
+                {
+                    Console.Error.WriteLine(Resources.Vmc_NeedPasswordPrompt_Text);
+                    return;
+                }
+
+                var vc = new VcapClient();
+                try
+                {
+                    VcapClientResult rslt = vc.Login(email, password);
+                    if (rslt.Success)
+                    {
+                        Console.WriteLine(String.Format(Resources.Vmc_LoginSuccess_Fmt, vc.CurrentUri));
+                        failed = false;
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine(String.Format(Resources.Vmc_LoginFail_Fmt, vc.CurrentUri));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine(String.Format(Resources.Vmc_LoginError_Fmt, vc.CurrentUri, e.Message));
+                }
+
+                // TODO retry if (tries += 1) < 3 && prompt_ok && !@options[:password]
+                ++tries;
+            }
         }
 
         static void usage()
@@ -200,46 +285,6 @@
         }
 
             /*
-            if (args.Length == 0)
-            {
-                Console.WriteLine("Currently only login, info and push commands are supported");
-            }
-             else if (args[0] == "Target")
-            {
-                
-                writeTargetFile(args[1]);
-                Console.WriteLine("Target set to: {0}", args[1]);
-            }
-
-            else if (args[0] == "Info")
-            {
-            }
-            else if (args[0] == "Login")
-            {
-                url = readTargetFile();
-                if (url == String.Empty)
-                {
-                    Console.WriteLine("Please set a target");
-                }
-                else
-                {
-                    Console.Write("Email: ");
-                    string email = Console.ReadLine();
-                    Console.Write("Password: ");
-                    string password = Console.ReadLine(); //should figure out how to turn this to *
-                    VmcManager cfm = new VmcManager();
-                    cfm.URL = url;
-                    string returnvalue = cfm.LogIn(email, password);
-                    if (returnvalue.Contains("token"))
-                    {
-                        writeTokenFile(returnvalue.Replace("token",url));
-                    }
-                    else
-                    {
-                        Console.WriteLine("Login Failed");
-                    }
-                }
-            }
             else if (args[0] == "Push")
             {
                 url = readTargetFile();

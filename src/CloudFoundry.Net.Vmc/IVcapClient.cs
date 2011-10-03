@@ -13,6 +13,8 @@
         VcapClientResult Login(Cloud argCloud);
         VcapClientResult Login(string email, string password);
 
+        // TODO VcapClientResult ChangePassword(string username, string newpassword, string url, string accesstoken)
+
         string Push(string appname, string fdqn, string fileURI, string framework, string memorysize);
 
         void StopApp(Application application, Cloud cloud);

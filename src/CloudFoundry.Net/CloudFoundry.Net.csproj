@@ -48,6 +48,11 @@
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
     <Compile Include="ObjectExtensionMethods.cs" />
     <Compile Include="ObservableCollectionExtensionMethods.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SocketExtensionMethods.cs" />
     <Compile Include="StringExtensionMethods.cs" />
     <Compile Include="TimerExtensionMethods.cs" />
@@ -92,6 +97,7 @@
     <Compile Include="Types\VcapComponentDiscover.cs" />
     <Compile Include="Types\VcapResponse.cs" />
     <Compile Include="Utilities.cs" />
+    <Compile Include="Vmc\Constants.cs" />
     <Compile Include="Vmc\VcapCredentialManager.cs" />
     <Compile Include="WinSockErrorCode.cs" />
   </ItemGroup>
@@ -106,7 +112,12 @@
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>

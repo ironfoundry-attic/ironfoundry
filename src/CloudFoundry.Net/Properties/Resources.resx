@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="VcapClient_InfoDisplay_1_Fmt" xml:space="preserve">
+  <data name="Vmc_EmailPrompt_Text" xml:space="preserve">
+    <value>Email: </value>
+  </data>
+  <data name="Vmc_InfoDisplay_1_Fmt" xml:space="preserve">
     <value>
 {0}
 For support visit {1}
@@ -125,24 +128,42 @@ For support visit {1}
 Target:   {2} ({3})
 Client:   v{4}</value>
   </data>
-  <data name="VcapClient_InfoDisplay_2_Fmt" xml:space="preserve">
+  <data name="Vmc_InfoDisplay_2_Fmt" xml:space="preserve">
     <value>User:     {0}</value>
   </data>
-  <data name="VcapClient_InfoDisplay_3_Fmt" xml:space="preserve">
+  <data name="Vmc_InfoDisplay_3_Fmt" xml:space="preserve">
     <value>Usage:    Memory   ({0} of {1} total)
           Services ({2} of {3} total)
           Apps     ({4} of {5} total)</value>
   </data>
-  <data name="VcapClient_PleaseSetTarget_Message" xml:space="preserve">
+  <data name="Vmc_LoginError_Fmt" xml:space="preserve">
+    <value>Problem with login to [{0}] Exception:{1}</value>
+  </data>
+  <data name="Vmc_LoginFail_Fmt" xml:space="preserve">
+    <value>Problem with login to [{0}] invalid account or password.</value>
+  </data>
+  <data name="Vmc_LoginSuccess_Fmt" xml:space="preserve">
+    <value>Successfully logged into [{0}]</value>
+  </data>
+  <data name="Vmc_NeedEmailPrompt_Text" xml:space="preserve">
+    <value>Need a valid email.</value>
+  </data>
+  <data name="Vmc_NeedPasswordPrompt_Text" xml:space="preserve">
+    <value>Need a password.</value>
+  </data>
+  <data name="Vmc_PasswordPrompt_Text" xml:space="preserve">
+    <value>Password: </value>
+  </data>
+  <data name="Vmc_PleaseSetTarget_Message" xml:space="preserve">
     <value>Please set a target.</value>
   </data>
-  <data name="VcapClient_TargetDisplay_Fmt" xml:space="preserve">
+  <data name="Vmc_TargetDisplay_Fmt" xml:space="preserve">
     <value>Succesfully targeted [{0}]</value>
   </data>
-  <data name="VcapClient_TargetNoSuccessDisplay_Fmt" xml:space="preserve">
+  <data name="Vmc_TargetNoSuccessDisplay_Fmt" xml:space="preserve">
     <value>[{0}]</value>
   </data>
-  <data name="VcapClient_UrlRequired_Message" xml:space="preserve">
+  <data name="Vmc_UrlRequired_Message" xml:space="preserve">
     <value>Url required.</value>
   </data>
 </root>

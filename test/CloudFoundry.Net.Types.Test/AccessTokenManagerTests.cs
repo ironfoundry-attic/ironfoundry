@@ -20,13 +20,13 @@
 
             var tokenManager = new VcapCredentialManager(json, false);
 
-            AccessToken token1 = tokenManager.GetFor(uri1.AbsoluteUri);
-            Assert.NotNull(token1);
-            Assert.Equal(tokenStr1, token1.Token);
+            tokenManager.SetTarget(uri1.AbsoluteUri);
+            string token1 = tokenManager.CurrentToken;
+            Assert.Equal(tokenStr1, token1);
 
-            AccessToken token2 = tokenManager.GetFor(uri2.AbsoluteUri);
-            Assert.NotNull(token2);
-            Assert.Equal(tokenStr2, token2.Token);
+            tokenManager.SetTarget(uri2.AbsoluteUri);
+            string token2 = tokenManager.CurrentToken;
+            Assert.Equal(tokenStr2, token2);
         }
     }
 }

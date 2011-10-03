@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using Newtonsoft.Json;
     using Types;
 
@@ -13,16 +14,14 @@
         "http://api.vcap.me": "04085b0849221a6c756b652e62616b6b656e4074696572332e636f6d063a0645546c2b078b728b4e2219000104ec0d65746833caddd87eac48b0b2989604"}
      }
      */
-    public class VcapCredentialManager : IDisposable
+    public class VcapCredentialManager
     {
         private const string TOKEN_FILE = ".vmc_token";
         private const string TARGET_FILE = ".vmc_target";
-        private static readonly Uri DEFAULT_TARGET = new Uri("http://api.vcap.me");
 
         private readonly string tokenFile;
         private readonly string targetFile;
 
-        private bool disposed = false;
         private bool shouldWrite = true;
 
         private readonly IDictionary<Uri, AccessToken> tokenDict = new Dictionary<Uri, AccessToken>();
@@ -56,7 +55,7 @@
 
         public Uri CurrentTarget
         {
-            get { return currentTarget ?? DEFAULT_TARGET; }
+            get { return currentTarget ?? Constants.DEFAULT_TARGET; }
         }
 
         public string CurrentToken
@@ -64,7 +63,7 @@
             get
             {
                 string rv = null;
-                AccessToken accessToken = GetFor(CurrentTarget.AbsoluteUri);
+                AccessToken accessToken = getFor(CurrentTarget);
                 if (null != accessToken)
                 {
                     rv = accessToken.Token;
@@ -78,17 +77,11 @@
             currentTarget = new Uri(argUri);
         }
 
-        public void RegisterFor(string argUri, string argJson)
+        public void RegisterFor(string argUri, string argToken)
         {
-            parseJson(argJson, true);
-        }
-
-        public AccessToken GetFor(string argUri)
-        {
-            var uri = new Uri(argUri);
-            AccessToken rv;
-            tokenDict.TryGetValue(uri, out rv);
-            return rv;
+            var accessToken = new AccessToken(argUri, argToken);
+            tokenDict[accessToken.Uri] = accessToken;
+            writeTokenFile();
         }
 
         public bool HasToken
@@ -102,6 +95,13 @@
             {
                 File.WriteAllText(targetFile, currentTarget.AbsoluteUri);
             }
+        }
+
+        private AccessToken getFor(Uri argUri)
+        {
+            AccessToken rv;
+            tokenDict.TryGetValue(argUri, out rv);
+            return rv;
         }
 
         private void parseJson(string argTokenJson, bool argShouldWrite = false)
@@ -140,7 +140,8 @@
         {
             if (shouldWrite)
             {
-                File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tokenDict));
+                Dictionary<string, string> tmp = tokenDict.ToDictionary(e => e.Key.AbsoluteUri, e => e.Value.Token);
+                File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tmp));
             }
         }
 
@@ -153,29 +154,15 @@
                 string contents = File.ReadAllText(targetFile);
                 rv = new Uri(contents);
             }
-            catch (FileNotFoundException) { }
+            catch (FileNotFoundException)
+            {
+            }
+            catch (UriFormatException)
+            {
+                rv = Constants.DEFAULT_TARGET;
+            }
 
             return rv;
-        }
-
-        public void Dispose()
-        {
-            dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        ~VcapCredentialManager()
-        {
-            dispose(false);
-        }
-
-        private void dispose(bool argDisposing)
-        {
-            if (argDisposing && false == disposed)
-            {
-                disposed = true;
-                writeTokenFile();
-            }
         }
     }
 }
