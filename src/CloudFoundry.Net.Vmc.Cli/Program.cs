@@ -5,11 +5,13 @@
     using System.Collections.Generic;
     using CloudFoundry.Net.Types;
     using NDesk.Options;
+    using Newtonsoft.Json;
 
     static class Program
     {
         static int verbosity = 0;
         static bool show_help = false;
+        static bool result_as_json = false;
         static string url = String.Empty;
         static string accesstoken = String.Empty;
 
@@ -32,6 +34,8 @@
                     { if (false == String.IsNullOrEmpty(v)) ++verbosity; } },
 
                 { "h|help", "show help", v => { show_help = null != v; } },
+
+                { "json", "show result as json", v => { result_as_json = null != v; } },
             };
 
             IList<string> unparsed = null;
@@ -70,12 +74,32 @@
 
         static void info(IList<string> unparsed)
         {
+            string infoFmt = @"{0}
+For support visit {1}
+
+Target:   {2} ({3})
+Client:   v{4}
+
+User:     {5}
+Usage:    Memory   ({6} of {7} total)
+          Services ({8} of {9} total)
+          Apps     ({10} of {11} total)";
+
             var vc = new VcapClient();
             VcapClientResult rslt = vc.Info();
             if (rslt.Success)
             {
-                Info infoResponse = rslt.GetResponseMessage<Info>();
-                Console.WriteLine(infoResponse.Name);
+                var info = rslt.GetResponseMessage<Info>();
+                if (result_as_json)
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(info, Formatting.Indented));
+                }
+                else
+                {
+                    Console.WriteLine(String.Format(infoFmt,
+                        info.Description, info.Support, vc.CurrentUri, info.Version, "TODO CLIENT VERSION",
+                        info.User, 1234, 1234, 1234, 1234, 1234, 1234)); // TODO
+                }
             }
             else
             {

@@ -24,6 +24,11 @@
             currentToken = tokenManager.GetFor(argUri);
         }
 
+        public string CurrentUri
+        {
+            get { return currentUri; }
+        }
+
         public VcapClientResult Login(string email, string password)
         {
             var cfa = new VmcAdministration();
