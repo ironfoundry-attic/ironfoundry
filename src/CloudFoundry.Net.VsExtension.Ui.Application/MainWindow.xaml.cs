@@ -13,7 +13,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Application
     {
         public MainWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();           
         }
     }
 }

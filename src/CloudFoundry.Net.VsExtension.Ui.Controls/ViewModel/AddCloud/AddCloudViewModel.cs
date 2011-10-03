@@ -128,7 +128,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                             (viewModel) =>
                             {
                                 this.CloudUrls.Synchronize(viewModel.CloudUrls, new CloudUrlEqualityComparer());
-                                Messenger.Default.Send<NotificationMessage>(new NotificationMessage(Messages.SavePreferences));                             
+                                Messenger.Default.Send<NotificationMessage<ObservableCollection<CloudUrl>>>(new NotificationMessage<ObservableCollection<CloudUrl>>(this.CloudUrls,Messages.SaveCloudUrls));                             
                             }));
                     }
                 }));

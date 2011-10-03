@@ -55,6 +55,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string GetRegisterAccountData = "GetRegisterAccountData";
         public const string SetRegisterAccountData = "SetRegisterAccountData";
 
-        public const string SavePreferences = "SavePreferences";
+        public const string LoadPreferences = "LoadPreferences";
+        public const string SaveClouds = "SaveClouds";
+        public const string SaveCloudUrls = "SaveCloudUrls";
     }
 }
