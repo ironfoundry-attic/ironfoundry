@@ -100,15 +100,29 @@
     <Compile Include="Vmc\Constants.cs" />
     <Compile Include="Vmc\VcapCredentialManager.cs" />
     <Compile Include="WinSockErrorCode.cs" />
+    <Compile Include="Vmc\VcapClientResult.cs" />
+    <Compile Include="Vmc\VmcInfo.cs" />
+    <Compile Include="Vmc\VmcAdministration.cs" />
+    <Compile Include="Vmc\VmcApps.cs" />
+    <Compile Include="Vmc\VcapClient.cs" />
+    <Compile Include="Vmc\VmcServices.cs" />
+    <Compile Include="Vmc\Entities.cs" />
+    <Compile Include="Vmc\IVcapClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CloudFoundry.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.0.2.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\dependencies\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.0.3.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.4.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.4.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\..\dependencies\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>

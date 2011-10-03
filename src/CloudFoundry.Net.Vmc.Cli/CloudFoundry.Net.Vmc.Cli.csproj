@@ -61,10 +61,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CloudFoundry.Net.Vmc\CloudFoundry.Net.Vmc.csproj">
-      <Project>{E74BD185-0E4A-4634-92FC-3623E26C4E56}</Project>
-      <Name>CloudFoundry.Net.Vmc</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CloudFoundry.Net\CloudFoundry.Net.csproj">
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
       <Name>CloudFoundry.Net</Name>
