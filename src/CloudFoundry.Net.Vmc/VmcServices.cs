@@ -64,6 +64,60 @@ namespace CloudFoundry.Net.Vmc
             return list;
         }
 
+        public void CreateService(AppService appservice, Cloud cloud) {
+            /*
+             *"type":"database","tier":"free","vendor":"mysql","version":"5.1","name":"mysql-870f3"
+             *
+             */
 
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.POST;
+            request.Resource = "/services";
+            request.AddHeader("Authorization", cloud.AccessToken);
+            request.AddObject(appservice);
+            request.RequestFormat = DataFormat.Json;
+            client.Execute(request);
+            
+        }
+
+        public void DeleteService (AppService appservice, Cloud cloud) {
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.DELETE;
+            request.Resource = "/services/" + appservice.Name;
+            request.AddHeader("Authorization", cloud.AccessToken);
+            client.Execute(request);
+            //should prolly put a try-catch in here to catch the exception when the service is not in the current running list
+        }
+
+        public void BindService (AppService appservice, Application application, Cloud cloud) {
+
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.PUT;
+            request.Resource = "/apps/"+application.Name;
+            request.AddHeader("Authorization", cloud.AccessToken);
+            application.Services.Add(appservice.Name);
+            request.AddObject(application);
+            request.RequestFormat = DataFormat.Json;
+            client.Execute(request);
+        }
+
+        public void UnbindService (AppService appservice, Application application, Cloud cloud) {
+            var client = new RestClient();
+            client.BaseUrl = cloud.Url;
+            var request = new RestRequest();
+            request.Method = Method.PUT;
+            request.Resource = "/apps/" + application.Name;
+            request.AddHeader("Authorization", cloud.AccessToken);
+            application.Services.Remove(appservice.Name);
+            request.AddObject(application);
+            request.RequestFormat = DataFormat.Json;
+            client.Execute(request);
+        }
     }
 }

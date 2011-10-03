@@ -15,6 +15,9 @@ namespace CloudFoundry.Net.Types
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
 
+        [JsonProperty(PropertyName = "tiers")]
+        public Tier Tier {get; set;}
+
         [JsonProperty(PropertyName = "vendor")]
         public string Vendor { get; set; }
 
@@ -29,8 +32,29 @@ namespace CloudFoundry.Net.Types
         public AppService () {
             MetaData = new Meta();
             Props = new Properties();
+            Tier = new Tier();
         }
     }
+
+    [Serializable]
+    public class Tier : EntityBase
+    {
+        [JsonProperty(PropertyName = "options")]
+        public Options Option { get; set; }
+
+        [JsonProperty(PropertyName = "order")]
+        public int Order { get; set; }
+
+        public Tier() {
+            Option = new Options();
+        }
+    }
+
+    //[Serializable]
+    //public class Options : EntityBase
+    //{
+    //    //json does not contain defs..need to look in ruby code
+    //}
 
     [Serializable]
     public class Meta : EntityBase
