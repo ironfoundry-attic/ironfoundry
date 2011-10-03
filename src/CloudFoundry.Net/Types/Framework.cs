@@ -5,43 +5,49 @@
     public class Framework :EntityBase
     {
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         [JsonProperty(PropertyName = "runtimes")]
-        public Runtimes FrameworkRuntimes { get; set; }
+        public Runtime[] Runtimes { get; private set; }
 
         [JsonProperty(PropertyName="appservers")]
-        public AppServers FrameworkAppServers { get; set; }
+        public AppServer[] AppServers { get; private set; }
 
+        /*
+         * TODO
         [JsonProperty(PropertyName = "detection")]
-        public Detection FrameworkDetection { get; set; }
+        public Detection Detection { get; private set; }
+         */
     }
 
-    public class Runtimes : EntityBase
+    public class Runtime : EntityBase
     {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; private set; }
+
         [JsonProperty(PropertyName = "version")]
-        public string Version { get; set; }
-
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string Version { get; private set; }
 
         [JsonProperty(PropertyName = "description")]
-        public string Description { get; set; }
+        public string Description { get; private set; }
     }
 
-    public class AppServers : EntityBase
+    public class AppServer : EntityBase
     {
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         [JsonProperty(PropertyName = "description")]
-        public string Description { get; set; }
+        public string Description { get; private set; }
     }
 
+    /*
+     * TODO TODO
     public class Detection : EntityBase
     {
-        public string FileExtension { get; set; }
-        public string InternalPattern { get; set; }
-        public bool Enabeled { get; set; }
+        public string FileExtension { get; private set; }
+        public string InternalPattern { get; private set; }
+        public bool Enabeled { get; private set; }
     }
+     */
 }

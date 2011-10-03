@@ -47,9 +47,9 @@
 
         public VcapClientResult Info()
         {
-            return new VcapClientResult(true, executeRequest("/info"));
+            string response = executeRequest("/info");
+            return new VcapClientResult(true, EntityBase.FromJson<Info>(response));
         }
-
 
         public void StopApp(Application application, Cloud cloud)
         {

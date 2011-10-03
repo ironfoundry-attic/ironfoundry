@@ -3,6 +3,7 @@
     // http://stackoverflow.com/questions/125319/should-usings-be-inside-or-outside-the-namespace
     using System;
     using System.Collections.Generic;
+    using CloudFoundry.Net.Types;
     using NDesk.Options;
 
     static class Program
@@ -73,7 +74,8 @@
             VcapClientResult rslt = vc.Info();
             if (rslt.Success)
             {
-                Console.WriteLine(rslt.Message);
+                Info infoResponse = rslt.GetResponseMessage<Info>();
+                Console.WriteLine(infoResponse.Name);
             }
             else
             {
