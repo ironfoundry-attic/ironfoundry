@@ -15,6 +15,11 @@
             success = true;
         }
 
+        public VcapClientResult(bool argSuccess)
+        {
+            success = argSuccess;
+        }
+
         public VcapClientResult(bool argSuccess, string argMessage)
         {
             success = argSuccess;

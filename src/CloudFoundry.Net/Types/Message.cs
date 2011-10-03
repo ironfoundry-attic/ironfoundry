@@ -12,5 +12,8 @@
         {
             get { return RECEIVE_ONLY; }
         }
+
+        [JsonIgnore]
+        public string RawJson { get; set; }
     }
 }

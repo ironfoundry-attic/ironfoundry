@@ -61,15 +61,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="VcapClientResult.cs" />
-    <Compile Include="VmcBase.cs" />
     <Compile Include="VmcInfo.cs" />
-    <Compile Include="VmcMiscellaneous.cs" />
     <Compile Include="VmcAdministration.cs" />
     <Compile Include="VmcApps.cs" />
-    <Compile Include="VmcClient.cs" />
     <Compile Include="VcapClient.cs" />
     <Compile Include="VmcServices.cs" />
-    <Compile Include="VmcSystem.cs" />
     <Compile Include="Entities.cs" />
     <Compile Include="IVcapClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,7 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

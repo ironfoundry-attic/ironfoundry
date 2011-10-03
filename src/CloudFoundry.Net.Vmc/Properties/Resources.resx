@@ -117,7 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="VcapClient_InfoDisplay_1_Fmt" xml:space="preserve">
+    <value>
+{0}
+For support visit {1}
+
+Target:   {2} ({3})
+Client:   v{4}</value>
+  </data>
+  <data name="VcapClient_InfoDisplay_2_Fmt" xml:space="preserve">
+    <value>User:     {0}</value>
+  </data>
+  <data name="VcapClient_InfoDisplay_3_Fmt" xml:space="preserve">
+    <value>Usage:    Memory   ({0} of {1} total)
+          Services ({2} of {3} total)
+          Apps     ({4} of {5} total)</value>
+  </data>
   <data name="VcapClient_PleaseSetTarget_Message" xml:space="preserve">
     <value>Please set a target.</value>
+  </data>
+  <data name="VcapClient_TargetDisplay_Fmt" xml:space="preserve">
+    <value>Succesfully targeted [{0}]</value>
+  </data>
+  <data name="VcapClient_TargetNoSuccessDisplay_Fmt" xml:space="preserve">
+    <value>[{0}]</value>
+  </data>
+  <data name="VcapClient_UrlRequired_Message" xml:space="preserve">
+    <value>Url required.</value>
   </data>
 </root>

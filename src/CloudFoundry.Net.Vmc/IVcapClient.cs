@@ -6,8 +6,11 @@
 
     public interface IVcapClient
     {
-        VcapClientResult Login(Cloud argCloud);
+        VcapClientResult Info();
 
+        VcapClientResult Target(string argUri);
+
+        VcapClientResult Login(Cloud argCloud);
         VcapClientResult Login(string email, string password);
 
         string Push(string appname, string fdqn, string fileURI, string framework, string memorysize);
@@ -35,7 +38,5 @@
         List<AppService> GetProvisionedServices(Cloud cloud);
 
         VcapResponse UpdateApplicationSettings(Application application, Cloud cloud);
-
-        VcapClientResult Info();
     }
 }

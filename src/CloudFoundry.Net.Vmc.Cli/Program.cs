@@ -1,31 +1,29 @@
 ﻿namespace CloudFoundry.Net.Vmc.Cli
 {
-    // http://stackoverflow.com/questions/125319/should-usings-be-inside-or-outside-the-namespace
     using System;
     using System.Collections.Generic;
-    using CloudFoundry.Net.Types;
+    using System.Linq;
     using NDesk.Options;
     using Newtonsoft.Json;
+    using Properties;
+    using Types;
 
     static class Program
     {
         static int verbosity = 0;
         static bool show_help = false;
         static bool result_as_json = false;
-        static string url = String.Empty;
-        static string accesstoken = String.Empty;
+        static bool result_as_rawjson = false;
+        static string command_url = null;
 
         static void Main(string[] args)
         {
             var commands = new Dictionary<string, Action<IList<string>>>
             {
-                { "help", (arg) => usage() },
-                { "info", (arg) => info(arg) },
-                    /*
-                "info",
-                "target",
-                "login"
-                     */
+                { "help", (arg)   => usage() },
+                { "info", (arg)   => info(arg) },
+                { "target", (arg) => target(arg) },
+                { "login", (arg)  => login(arg) },
             };
 
             var p = new OptionSet
@@ -36,6 +34,10 @@
                 { "h|help", "show help", v => { show_help = null != v; } },
 
                 { "json", "show result as json", v => { result_as_json = null != v; } },
+
+                { "rawjson", "show result as raw json", v => { result_as_rawjson = null != v; } },
+
+                { "url", "set command url", v => { command_url = v; } },
             };
 
             IList<string> unparsed = null;
@@ -53,13 +55,13 @@
                 showHelp(p);
             }
 
-            if (false == unparsed.IsNullOrEmpty() && 1 == unparsed.Count)
+            if (false == unparsed.IsNullOrEmpty())
             {
                 string verb = unparsed[0];
                 Action<IList<string>> action;
                 if (commands.TryGetValue(verb, out action))
                 {
-                    action(unparsed);
+                    action(unparsed.Skip(1).ToList());
                 }
                 else
                 {
@@ -74,31 +76,42 @@
 
         static void info(IList<string> unparsed)
         {
-            string infoFmt = @"{0}
-For support visit {1}
-
-Target:   {2} ({3})
-Client:   v{4}
-
-User:     {5}
-Usage:    Memory   ({6} of {7} total)
-          Services ({8} of {9} total)
-          Apps     ({10} of {11} total)";
-
             var vc = new VcapClient();
             VcapClientResult rslt = vc.Info();
             if (rslt.Success)
             {
                 var info = rslt.GetResponseMessage<Info>();
-                if (result_as_json)
+                if (result_as_json || result_as_rawjson)
                 {
-                    Console.WriteLine(JsonConvert.SerializeObject(info, Formatting.Indented));
+                    if (result_as_rawjson)
+                    {
+                        Console.WriteLine(info.RawJson);
+                    }
+                    if (result_as_json)
+                    {
+                        Console.WriteLine(JsonConvert.SerializeObject(info, Formatting.Indented));
+                    }
                 }
                 else
                 {
-                    Console.WriteLine(String.Format(infoFmt,
-                        info.Description, info.Support, vc.CurrentUri, info.Version, "TODO CLIENT VERSION",
-                        info.User, 1234, 1234, 1234, 1234, 1234, 1234)); // TODO
+                    Console.WriteLine(String.Format(Resources.VcapClient_InfoDisplay_1_Fmt,
+                        info.Description, info.Support, vc.CurrentUri, info.Version, "TODO CLIENT VERSION"));
+
+                    if (false == info.User.IsNullOrEmpty())
+                    {
+                        Console.WriteLine(String.Format(Resources.VcapClient_InfoDisplay_2_Fmt, info.User));
+                    }
+
+                    if (null != info.Usage && null != info.Limits)
+                    {
+                        string tmem = pretty_size(info.Limits.Memory * 1024 * 1024);
+                        string mem = pretty_size(info.Usage.Memory * 1024 * 1024);
+
+                        Console.WriteLine(String.Format(Resources.VcapClient_InfoDisplay_3_Fmt,
+                            mem, tmem,
+                            info.Usage.Services, info.Limits.Services,
+                            info.Usage.Apps, info.Limits.Apps));
+                    }
                 }
             }
             else
@@ -106,6 +119,37 @@ Usage:    Memory   ({6} of {7} total)
                 // TODO standardize errors
                 Console.Error.WriteLine(String.Format("Error: {0}", rslt.Message));
             }
+        }
+
+        static void target(IList<string> unparsed)
+        {
+            string url = null;
+            if (command_url.IsNullOrWhiteSpace())
+            {
+                if (false == (unparsed.IsNullOrEmpty() || unparsed[0].IsNullOrWhiteSpace()))
+                {
+                    url = unparsed[0];
+                }
+            }
+            else
+            {
+                url = command_url;
+            }
+
+            var vc = new VcapClient();
+            VcapClientResult rslt = vc.Target(url);
+            if (rslt.Success)
+            {
+                Console.WriteLine(String.Format(Resources.VcapClient_TargetDisplay_Fmt, vc.CurrentUri));
+            }
+            else
+            {
+                Console.WriteLine(String.Format(Resources.VcapClient_TargetNoSuccessDisplay_Fmt, vc.CurrentUri));
+            }
+        }
+
+        static void login(IList<string> unparsed)
+        {
         }
 
         static void usage()
@@ -128,6 +172,31 @@ Usage:    Memory   ({6} of {7} total)
                 Console.Write ("# ");
                 Console.WriteLine (format, args);
             }
+        }
+
+        static string pretty_size(uint argSize, ushort argPrec = 1)
+        {
+            if (argSize == 0)
+            {
+                return "NA";
+            }
+
+            if (argSize < 1024)
+            {
+                return String.Format("{0}B", argSize);
+            }
+
+            if (argSize < (1024*1024))
+            {
+                return String.Format("{0:F" + argPrec + "}K", argSize / 1024.0);
+            }
+
+            if (argSize < (1024*1024*1024))
+            {
+                return String.Format("{0:F" + argPrec + "}M", argSize / 1024.0);
+            }
+
+            return String.Format("{0:F" + argPrec + "}G", argSize / (1024.0 * 1024.0 * 1024.0));
         }
 
             /*

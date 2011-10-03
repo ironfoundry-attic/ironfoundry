@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using Newtonsoft.Json;
     using Types;
 
@@ -18,6 +17,7 @@
     {
         private const string TOKEN_FILE = ".vmc_token";
         private const string TARGET_FILE = ".vmc_target";
+        private static readonly Uri DEFAULT_TARGET = new Uri("http://api.vcap.me");
 
         private readonly string tokenFile;
         private readonly string targetFile;
@@ -25,7 +25,7 @@
         private bool disposed = false;
         private bool shouldWrite = true;
 
-        private readonly IDictionary<string, AccessToken> tokenDict = new Dictionary<string, AccessToken>();
+        private readonly IDictionary<Uri, AccessToken> tokenDict = new Dictionary<Uri, AccessToken>();
 
         private Uri currentTarget;
 
@@ -56,18 +56,26 @@
 
         public Uri CurrentTarget
         {
-            get { return currentTarget; }
+            get { return currentTarget ?? DEFAULT_TARGET; }
         }
 
         public string CurrentToken
         {
-            get { return GetFor(CurrentTarget.AbsoluteUri).Token; }
+            get
+            {
+                string rv = null;
+                AccessToken accessToken = GetFor(CurrentTarget.AbsoluteUri);
+                if (null != accessToken)
+                {
+                    rv = accessToken.Token;
+                }
+                return rv;
+            }
         }
 
         public void SetTarget(string argUri)
         {
             currentTarget = new Uri(argUri);
-            writeTargetFile();
         }
 
         public void RegisterFor(string argUri, string argJson)
@@ -75,14 +83,12 @@
             parseJson(argJson, true);
         }
 
-        public AccessToken GetFirst()
-        {
-            return tokenDict.FirstOrDefault().Value;
-        }
-
         public AccessToken GetFor(string argUri)
         {
-            return tokenDict[argUri];
+            var uri = new Uri(argUri);
+            AccessToken rv;
+            tokenDict.TryGetValue(uri, out rv);
+            return rv;
         }
 
         public bool HasToken
@@ -90,40 +96,66 @@
             get { return false == CurrentToken.IsNullOrWhiteSpace(); }
         }
 
+        public void StoreTarget()
+        {
+            if (shouldWrite)
+            {
+                File.WriteAllText(targetFile, currentTarget.AbsoluteUri);
+            }
+        }
+
         private void parseJson(string argTokenJson, bool argShouldWrite = false)
         {
-            Dictionary<string, string> allTokens = JsonConvert.DeserializeObject<Dictionary<string, string>>(argTokenJson);
-            foreach (KeyValuePair<string, string> kvp in allTokens)
+            if (false == argTokenJson.IsNullOrWhiteSpace())
             {
-                string uri = kvp.Key;
-                string token = kvp.Value;
-                tokenDict[uri] = new AccessToken(uri, token);
-            }
-            if (argShouldWrite)
-            {
-                writeTokenFile();
+                Dictionary<string, string> allTokens = JsonConvert.DeserializeObject<Dictionary<string, string>>(argTokenJson);
+                foreach (KeyValuePair<string, string> kvp in allTokens)
+                {
+                    string uriStr = kvp.Key;
+                    string token = kvp.Value;
+                    var accessToken = new AccessToken(uriStr, token);
+                    tokenDict[accessToken.Uri] = accessToken;
+                }
+                if (argShouldWrite)
+                {
+                    writeTokenFile();
+                }
             }
         }
 
         private string readTokenFile()
         {
-            return File.ReadAllText(tokenFile);
+            string rv = null;
+
+            try
+            {
+                rv = File.ReadAllText(tokenFile);
+            }
+            catch (FileNotFoundException) { }
+
+            return rv;
         }
 
         private void writeTokenFile()
         {
-            File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tokenDict));
+            if (shouldWrite)
+            {
+                File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tokenDict));
+            }
         }
 
         private Uri readTargetFile()
         {
-            string contents = File.ReadAllText(targetFile);
-            return new Uri(contents);
-        }
+            Uri rv = null;
 
-        private void writeTargetFile()
-        {
-            File.WriteAllText(targetFile, currentTarget.AbsoluteUri);
+            try
+            {
+                string contents = File.ReadAllText(targetFile);
+                rv = new Uri(contents);
+            }
+            catch (FileNotFoundException) { }
+
+            return rv;
         }
 
         public void Dispose()
@@ -142,10 +174,7 @@
             if (argDisposing && false == disposed)
             {
                 disposed = true;
-                if (shouldWrite)
-                {
-                    writeTokenFile();
-                }
+                writeTokenFile();
             }
         }
     }

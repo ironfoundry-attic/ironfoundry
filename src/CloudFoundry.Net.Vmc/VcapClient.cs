@@ -24,6 +24,44 @@
             get { return credentialManager.CurrentTarget.AbsoluteUri; }
         }
 
+        public VcapClientResult Info()
+        {
+            string response = executeRequest("/info");
+            return new VcapClientResult(true, EntityBase.FromJson<Info>(response));
+        }
+
+        public VcapClientResult Target(string argUri)
+        {
+            VcapClientResult rv;
+
+            if (argUri.IsNullOrWhiteSpace())
+            {
+                // Just return current target
+                rv = new VcapClientResult(false, CurrentUri);
+            }
+            else
+            {
+                // "target" does the same thing as "info", but not logged in
+                // considered valid if name, build, version and support are all non-null
+                // without argument, displays current target
+                var info = EntityBase.FromJson<Info>(executeRequest("/info", false));
+                bool success = false == info.Name.IsNullOrWhiteSpace() &&
+                               false == info.Build.IsNullOrWhiteSpace() &&
+                               false == info.Version.IsNullOrWhiteSpace() &&
+                               false == info.Support.IsNullOrWhiteSpace();
+
+                if (success)
+                {
+                    credentialManager.SetTarget(argUri);
+                    credentialManager.StoreTarget();
+                }
+
+                rv = new VcapClientResult(success);
+            }
+
+            return rv;
+        }
+
         public VcapClientResult Login(string email, string password)
         {
             var cfa = new VmcAdministration();
@@ -43,12 +81,6 @@
             VmcApps cfapps = new VmcApps();
             var app =  cfapps.PushApp(appname, credentialManager.CurrentTarget, credentialManager.CurrentToken, fileURI, fdqn, framework, null,memorysize, null);
             return app;
-        }
-
-        public VcapClientResult Info()
-        {
-            string response = executeRequest("/info");
-            return new VcapClientResult(true, EntityBase.FromJson<Info>(response));
         }
 
         public void StopApp(Application application, Cloud cloud)
@@ -125,11 +157,11 @@
             return services.GetProvisionedServices(cloud);
         }
 
-        private string executeRequest(string argResource)
+        private string executeRequest(string argResource, bool argUseCredentials = true)
         {
             var client = new RestClient { BaseUrl = credentialManager.CurrentTarget.AbsoluteUri };
             var request = new RestRequest { Resource = argResource };
-            if (credentialManager.HasToken)
+            if (argUseCredentials && credentialManager.HasToken)
             {
                 request.AddHeader("Authorization", credentialManager.CurrentToken);
             }

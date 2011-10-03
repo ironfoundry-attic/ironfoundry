@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net
+﻿namespace CloudFoundry.Net.Types
 {
     using System;
     using System.ComponentModel;
@@ -19,7 +19,16 @@
 
         public static T FromJson<T>(string argJson)
         {
-            return JsonConvert.DeserializeObject<T>(argJson);
+            T rv = JsonConvert.DeserializeObject<T>(argJson);
+
+            // TODO hmm...
+            var message = rv as Message;
+            if (null != message)
+            {
+                message.RawJson = argJson;
+            }
+
+            return rv;
         }        
 
         [field: NonSerialized, JsonIgnore]

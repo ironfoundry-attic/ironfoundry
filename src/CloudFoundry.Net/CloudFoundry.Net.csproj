@@ -74,7 +74,7 @@
     <Compile Include="Types\Limits.cs" />
     <Compile Include="Types\Snapshot.cs" />
     <Compile Include="Types\Stats.cs" />
-    <Compile Include="EntityBase.cs" />
+    <Compile Include="Types\EntityBase.cs" />
     <Compile Include="Types\Discover.cs" />
     <Compile Include="Types\DropletHeartbeat.cs" />
     <Compile Include="Types\FindDroplet.cs" />

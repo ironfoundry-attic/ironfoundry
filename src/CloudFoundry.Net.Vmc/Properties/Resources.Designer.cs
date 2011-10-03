@@ -22,7 +22,7 @@ namespace CloudFoundry.Net.Vmc.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace CloudFoundry.Net.Vmc.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CloudFoundry.Net.Vmc.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace CloudFoundry.Net.Vmc.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,11 +61,72 @@ namespace CloudFoundry.Net.Vmc.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 
+        ///{0}
+        ///For support visit {1}
+        ///
+        ///Target:   {2} ({3})
+        ///Client:   v{4}.
+        /// </summary>
+        public static string VcapClient_InfoDisplay_1_Fmt {
+            get {
+                return ResourceManager.GetString("VcapClient_InfoDisplay_1_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User:     {0}.
+        /// </summary>
+        public static string VcapClient_InfoDisplay_2_Fmt {
+            get {
+                return ResourceManager.GetString("VcapClient_InfoDisplay_2_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage:    Memory   ({0} of {1} total)
+        ///          Services ({2} of {3} total)
+        ///          Apps     ({4} of {5} total).
+        /// </summary>
+        public static string VcapClient_InfoDisplay_3_Fmt {
+            get {
+                return ResourceManager.GetString("VcapClient_InfoDisplay_3_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please set a target..
         /// </summary>
-        internal static string VcapClient_PleaseSetTarget_Message {
+        public static string VcapClient_PleaseSetTarget_Message {
             get {
                 return ResourceManager.GetString("VcapClient_PleaseSetTarget_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Succesfully targeted [{0}].
+        /// </summary>
+        public static string VcapClient_TargetDisplay_Fmt {
+            get {
+                return ResourceManager.GetString("VcapClient_TargetDisplay_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [{0}].
+        /// </summary>
+        public static string VcapClient_TargetNoSuccessDisplay_Fmt {
+            get {
+                return ResourceManager.GetString("VcapClient_TargetNoSuccessDisplay_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Url required..
+        /// </summary>
+        public static string VcapClient_UrlRequired_Message {
+            get {
+                return ResourceManager.GetString("VcapClient_UrlRequired_Message", resourceCulture);
             }
         }
     }
