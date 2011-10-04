@@ -134,7 +134,7 @@
             return services.GetAvailableServices(cloud);
         }
 
-        public IEnumerable<AppService> GetProvisionedServices(Cloud argCloud)
+        public IEnumerable<ProvisionedService> GetProvisionedServices(Cloud argCloud)
         {
             var services = new ServicesHelper();
             return services.GetProvisionedServices(argCloud);

@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using CloudFoundry.Net.Types;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using CloudFoundry.Net.Vmc;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.Vmc;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Messaging;
+
     public class CloudFoundryProvider
     {
         private PreferencesProvider preferencesProvider;
@@ -79,19 +76,25 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 
         public Cloud Connect(Cloud cloud)
         {            
-            var local = cloud.DeepCopy();            
-            VcapClientResult result = client.Login(local);            
+            Cloud local = cloud.DeepCopy();            
+
+            VcapClientResult result = client.Login(local);
             if (result.Success)
             {
-                local.AccessToken = credentialManager.CurrentToken;                
+                local.AccessToken = credentialManager.CurrentToken;
                 var applications = client.ListApps(local);
-                local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());
-                var provisionedServices = client.GetProvisionedServices(local);
-                local.Services.Synchronize(new ObservableCollection<AppService>(provisionedServices), new AppServiceEqualityComparer());
+                if (null != applications)
+                {
+                    local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());
+                    var provisionedServices = client.GetProvisionedServices(local);
+                    local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
+                }
                 return local;
             }
             else
+            {
                 return null;
+            }
         }
 
         public Cloud Disconnect(Cloud cloud)

@@ -29,11 +29,11 @@
             return datastores.ToArrayOrNull(); 
         }
 
-        public IEnumerable<AppService> GetProvisionedServices(Cloud argCloud)
+        public IEnumerable<ProvisionedService> GetProvisionedServices(Cloud argCloud)
         {            
             RestClient client = buildClient(argCloud);
             RestRequest request = buildRequest(Method.GET, Constants.SERVICES_PATH);
-            return executeRequest<List<AppService>>(client, request);
+            return executeRequest<ProvisionedService[]>(client, request);
         }
 
 #if UNUSED

@@ -29,7 +29,7 @@ namespace CloudFoundry.Net.Properties {
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public Resources() {
+        internal Resources() {
         }
         
         /// <summary>
@@ -145,6 +145,15 @@ namespace CloudFoundry.Net.Properties {
         public static string Vmc_NeedPasswordPrompt_Text {
             get {
                 return ResourceManager.GetString("Vmc_NeedPasswordPrompt_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No content returned for request..
+        /// </summary>
+        public static string Vmc_NoContentReturned_Text {
+            get {
+                return ResourceManager.GetString("Vmc_NoContentReturned_Text", resourceCulture);
             }
         }
         

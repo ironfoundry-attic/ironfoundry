@@ -151,6 +151,9 @@ Client:   v{4}</value>
   <data name="Vmc_NeedPasswordPrompt_Text" xml:space="preserve">
     <value>Need a password.</value>
   </data>
+  <data name="Vmc_NoContentReturned_Text" xml:space="preserve">
+    <value>No content returned for request.</value>
+  </data>
   <data name="Vmc_PasswordPrompt_Text" xml:space="preserve">
     <value>Password: </value>
   </data>

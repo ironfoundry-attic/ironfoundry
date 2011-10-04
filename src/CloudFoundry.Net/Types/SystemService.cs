@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-
-namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types
 {
+    using System;
+    using Newtonsoft.Json;
+
     [Serializable]
     public class SystemServices : EntityBase
     {
@@ -21,18 +18,17 @@ namespace CloudFoundry.Net.Types
         [JsonProperty(PropertyName = "vendor")]
         public string Vendor { get; set; }
 
+        /*
+         * TODO
         [JsonProperty(PropertyName = "tiers")]
         public Tiers Tiers { get; set; }
+         */
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
-
-        public SystemServices()
-        {
-            Tiers = new Tiers();
-        }
     }
 
+    /*
     [Serializable]
     public class Tiers : EntityBase
     {
@@ -41,31 +37,16 @@ namespace CloudFoundry.Net.Types
 
         [JsonProperty(PropertyName = "order")]
         public int Order { get; set; }
-
-        public Tiers()
-        {
-            Type = new Type();
-        }
     }
 
     [Serializable]
     public class Type : EntityBase
     {
         [JsonProperty(PropertyName = "options")]
-        Options Options { get; set; }
-
-        public Type()
-        {
-            Options = new Options();
-        }
+        public Options Options { get; set; }
     }
     
     [Serializable]
-    public class Options : EntityBase
-    {
-
-    }
-
-
-
+    public class Options : EntityBase { }
+     */
 }

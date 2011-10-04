@@ -20,7 +20,7 @@
         private string accessToken;
 
         private readonly ObservableCollection<Application> applications = new ObservableCollection<Application>();
-        private readonly ObservableCollection<AppService> services = new ObservableCollection<AppService>();
+        private readonly ObservableCollection<ProvisionedService> services = new ObservableCollection<ProvisionedService>();
 
         public Cloud()
         {            
@@ -127,7 +127,7 @@
             get { return this.applications; }            
         }
 
-        public ObservableCollection<AppService> Services
+        public ObservableCollection<ProvisionedService> Services
         {
             get { return services; }
         }

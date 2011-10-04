@@ -40,7 +40,7 @@
 
         IEnumerable<SystemServices> GetAvailableServices(Cloud cloud);
 
-        IEnumerable<AppService> GetProvisionedServices(Cloud cloud);
+        IEnumerable<ProvisionedService> GetProvisionedServices(Cloud cloud);
 
         VcapResponse UpdateApplicationSettings(Application application, Cloud cloud);
     }

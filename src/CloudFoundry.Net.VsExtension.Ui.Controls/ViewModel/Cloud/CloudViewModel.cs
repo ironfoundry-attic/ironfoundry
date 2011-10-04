@@ -1,20 +1,18 @@
-﻿using System;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using System.Collections.ObjectModel;
-using CloudFoundry.Net.Types;
-using CloudFoundry.Net.Vmc;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Threading;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Windows.Threading;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+
     public class CloudViewModel : ViewModelBase
     {
         public RelayCommand ChangePasswordCommand { get; private set; }
@@ -36,7 +34,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private string overviewErrorMessage;
         private string applicationErrorMessage;
 
-        private ObservableCollection<AppService> applicationServices;
+        private ObservableCollection<ProvisionedService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
         private CloudFoundryProvider provider;
 
@@ -73,8 +71,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void RefreshInstances(object sender, EventArgs e)
         {
-            var stats = provider.GetStats(SelectedApplication, Cloud);
-            UpdateInstanceCollection(stats);
+            if (null != SelectedApplication)
+            {
+                var stats = provider.GetStats(SelectedApplication, Cloud);
+                UpdateInstanceCollection(stats);
+            }
         }
 
         private void BeginGetInstances(object sender, DoWorkEventArgs e)
@@ -201,7 +202,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             {
                 this.Cloud.AccessToken = returnCloud.AccessToken;
                 this.Cloud.Applications.Synchronize(returnCloud.Applications, new ApplicationEqualityComparer());
-                this.Cloud.Services.Synchronize(returnCloud.Services, new AppServiceEqualityComparer());
+                this.Cloud.Services.Synchronize(returnCloud.Services, new ProvisionedServiceEqualityComparer());
             }
         }
 
@@ -314,7 +315,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 this.selectedApplication.PropertyChanged += selectedApplication_PropertyChanged;
                 this.selectedApplication.Resources.PropertyChanged += selectedApplication_PropertyChanged;
 
-                this.ApplicationServices = new ObservableCollection<AppService>();
+                this.ApplicationServices = new ObservableCollection<ProvisionedService>();
                 foreach (var svc in this.selectedApplication.Services)
                     foreach (var appService in Cloud.Services)
                         if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
@@ -341,7 +342,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        public ObservableCollection<AppService> ApplicationServices
+        public ObservableCollection<ProvisionedService> ApplicationServices
         {
             get { return this.applicationServices; }
             set

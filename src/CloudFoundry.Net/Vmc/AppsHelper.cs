@@ -125,7 +125,7 @@
                     Staging = new Staging { Framework = argFramework, Runtime = argRuntime },
                     Uris = new string[] { argDeployUrl },
                     Instances = 1,
-                    Resources = new Resources { Memory = argMemoryReservation },
+                    Resources = new AppResources { Memory = argMemoryReservation },
                 };
 
                 RestClient client = buildClient();

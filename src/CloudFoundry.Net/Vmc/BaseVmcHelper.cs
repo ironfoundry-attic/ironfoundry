@@ -1,6 +1,8 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
     using System;
+    using System.Net;
+    using Newtonsoft.Json;
     using RestSharp;
     using Types;
 
@@ -18,20 +20,22 @@
         protected RestResponse executeRequest(RestClient argClient, RestRequest argRequest)
         {
             RestResponse response = argClient.Execute(argRequest);
-
-            // TODO process error codes!
-
+            bool errorOccurred = processResponse(response);
             return response;
         }
 
         protected TResponse executeRequest<TResponse>(RestClient argClient, RestRequest argRequest)
-            where TResponse: new()
         {
-            RestResponse<TResponse> response = argClient.Execute<TResponse>(argRequest);
-
-            // TODO process error codes!
-
-            return response.Data;
+            RestResponse response = argClient.Execute(argRequest);
+            bool errorOccurred = processResponse(response);
+            if (errorOccurred)
+            {
+                return default(TResponse);
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<TResponse>(response.Content);
+            }
         }
 
         protected RestRequest buildRequest(Method argMethod, params string[] args)
@@ -126,6 +130,23 @@
                 argRequest.Resource = String.Format(argFormats[args.Length], args);
             }
             return argRequest;
+        }
+
+        private static bool processResponse(RestResponse argResponse)
+        {
+            bool errorOccurred = false;
+
+            // TODO process error codes!
+            switch (argResponse.StatusCode)
+            {
+                case HttpStatusCode.OK :
+                    break;
+                default :
+                    errorOccurred = true;
+                    break;
+            }
+
+            return errorOccurred;
         }
     }
 }

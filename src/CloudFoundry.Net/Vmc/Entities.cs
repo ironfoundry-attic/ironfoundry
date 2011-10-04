@@ -14,7 +14,7 @@
         public ushort Instances { get; set; }
 
         [JsonProperty(PropertyName="resources")]
-        public Resources Resources { get; set; }
+        public AppResources Resources { get; set; }
 
         [JsonProperty(PropertyName="staging")]
         public Staging Staging { get; set;}
@@ -29,7 +29,7 @@
         public string Runtime { get; set; }
     }
 
-    public class Resources 
+    public class AppResources 
     {
         [JsonProperty(PropertyName="memory")]
         public uint Memory { get; set; }
