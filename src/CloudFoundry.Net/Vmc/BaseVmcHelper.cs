@@ -1,13 +1,17 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
     using System;
+    using System.Linq;
     using System.Net;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using RestSharp;
     using Types;
 
     public abstract class BaseVmcHelper
     {
+        private static readonly ushort[] VMC_HTTP_ERROR_CODES = { 400, 403, 404, 500 };
+
         private static readonly string[] argFormats = new[]
             {
                 null,              // 0
@@ -20,15 +24,15 @@
         protected RestResponse executeRequest(RestClient argClient, RestRequest argRequest)
         {
             RestResponse response = argClient.Execute(argRequest);
-            bool errorOccurred = processResponse(response);
+            processResponse(response);
             return response;
         }
 
         protected TResponse executeRequest<TResponse>(RestClient argClient, RestRequest argRequest)
         {
             RestResponse response = argClient.Execute(argRequest);
-            bool errorOccurred = processResponse(response);
-            if (errorOccurred)
+            processResponse(response);
+            if (response.Content.IsNullOrWhiteSpace())
             {
                 return default(TResponse);
             }
@@ -132,21 +136,35 @@
             return argRequest;
         }
 
-        private static bool processResponse(RestResponse argResponse)
+        private static void processResponse(RestResponse argResponse)
         {
-            bool errorOccurred = false;
-
             // TODO process error codes!
-            switch (argResponse.StatusCode)
+            if (VMC_HTTP_ERROR_CODES.Contains((ushort)argResponse.StatusCode))
             {
-                case HttpStatusCode.OK :
-                    break;
-                default :
-                    errorOccurred = true;
-                    break;
-            }
+                string errorMessage;
 
-            return errorOccurred;
+                JObject parsed = JObject.Parse(argResponse.Content);
+                JToken codeToken;
+                JToken descToken;
+                if (parsed.TryGetValue("code", out codeToken) && parsed.TryGetValue("description", out descToken))
+                {
+                    errorMessage = String.Format("Error {0}: {1}", codeToken, descToken);
+                }
+                else
+                {
+                    errorMessage = String.Format("Error (HTTP {0}): {1}", argResponse.StatusCode, argResponse.Content);
+                }
+
+                if (argResponse.StatusCode == HttpStatusCode.BadRequest ||
+                    argResponse.StatusCode == HttpStatusCode.NotFound)
+                {
+                    throw new VmcNotFoundException(errorMessage);
+                }
+                else
+                {
+                    throw new VmcTargetException(errorMessage);
+                }
+            }
         }
     }
 }

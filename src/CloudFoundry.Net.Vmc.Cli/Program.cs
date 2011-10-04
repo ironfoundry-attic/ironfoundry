@@ -73,7 +73,15 @@
                 Func<IList<string>, bool> action;
                 if (commands.TryGetValue(verb, out action))
                 {
-                    success = action(unparsed.Skip(1).ToList());
+                    try
+                    {
+                        success = action(unparsed.Skip(1).ToList());
+                    }
+                    catch (Exception e)
+                    {
+                        success = false;
+                        Console.Error.WriteLine(e.Message);
+                    }
                 }
                 else
                 {

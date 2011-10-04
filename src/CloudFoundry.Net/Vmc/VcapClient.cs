@@ -152,7 +152,7 @@
             if (rv.Success)
             {
                 var apps = new AppsHelper();
-                string app =  apps.Push(argName, argPath, argDeployFQDN, "ASP.NET 4.0", "aspdotnet", argMemory, null);
+                string app =  apps.Push(argName, argPath, argDeployFQDN, "aspdotnet", "aspdotnet40", argMemory, null);
                 rv = new VcapClientResult(true, app);
             }
             else

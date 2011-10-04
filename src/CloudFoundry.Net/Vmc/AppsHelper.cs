@@ -117,8 +117,6 @@
                     argServiceBindings = "none";
                 }
 
-                //Try and create application
-                //{"name":"johndoe","staging":{"framework":"sinatra","runtime":null},"uris":["johndoe.cloudfoundry.com"],"instances":1,"resources":{"memory":128}}
                 var manifest = new AppManifest
                 {
                     Name = argName,
