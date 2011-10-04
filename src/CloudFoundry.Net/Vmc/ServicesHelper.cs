@@ -5,71 +5,43 @@
     using Newtonsoft.Json;
     using RestSharp;
 
-    public class Services
+    public class ServicesHelper : BaseVmcHelper
     {
-        private readonly string token;
-
-        public Services(string argToken)
+        public IEnumerable<SystemServices> GetAvailableServices(Cloud argCloud) 
         {
-            token = argToken;
-        }
+            RestClient client = buildClient(argCloud);
+            RestRequest request = buildRequest(Method.GET, Constants.GLOBAL_SERVICES_PATH);
+            RestResponse response = executeRequest(client, request);
 
-        public string GetServices(string url)
-        {
-            if (url == null)
-            {
-                return ("Target URL has to be set");
-            }
-            else
-            {
-                var client = new RestClient();
-                client.BaseUrl = url;
-                var request = new RestRequest();
-                request.Method = Method.GET;
-                request.Resource = "/info/services";
-                request.AddHeader("Authorization", token);
-                return client.Execute(request).Content;
-            }
-        }
-
-        
-        public List<SystemServices> GetAvailableServices(Cloud cloud) 
-        {
-            List<SystemServices> datastores = new List<SystemServices>();
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.GET;
-            request.Resource = "/info/services";
-            request.AddHeader("Authorization", cloud.AccessToken);
-            string response = client.Execute(request).Content;
-            var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemServices>>>>(response);
+            var datastores = new List<SystemServices>();
+            var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemServices>>>>(response.Content);
             foreach (var val in list.Values)
+            {
                 foreach (var val1 in val.Values)
+                {
                     foreach (var val2 in val1.Values)
+                    {
                         datastores.Add(val2);
-            return datastores; 
+                    }
+                }
+            }
+
+            return datastores.ToArrayOrNull(); 
         }
 
-        public List<AppService> GetProvisionedServices(Cloud cloud)
+        public IEnumerable<AppService> GetProvisionedServices(Cloud argCloud)
         {            
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.GET;
-            request.Resource = "/services";
-            request.AddHeader("Authorization", cloud.AccessToken);
-            string response = client.Execute(request).Content;
-            var list = JsonConvert.DeserializeObject<List<AppService>>(response);
-            return list;
+            RestClient client = buildClient(argCloud);
+            RestRequest request = buildRequest(Method.GET, Constants.SERVICES_PATH);
+            return executeRequest<List<AppService>>(client, request);
         }
 
+#if UNUSED
         public void CreateService(AppService appservice, Cloud cloud) {
             /*
              *"type":"database","tier":"free","vendor":"mysql","version":"5.1","name":"mysql-870f3"
              *
              */
-
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
@@ -79,8 +51,6 @@
             request.AddObject(appservice);
             request.RequestFormat = DataFormat.Json;
             client.Execute(request);
-            
-        }
 
         public void DeleteService (AppService appservice, Cloud cloud) {
             var client = new RestClient();
@@ -105,7 +75,7 @@
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
             client.Execute(request);
-            var apps = new Apps(token);
+            var apps = new AppsHelper(token);
             apps.RestartApp(application, cloud);
         }
 
@@ -120,8 +90,9 @@
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
             client.Execute(request);
-            var apps = new Apps(token);
+            var apps = new AppsHelper(token);
             apps.RestartApp(application, cloud);
         }
+#endif
     }
 }

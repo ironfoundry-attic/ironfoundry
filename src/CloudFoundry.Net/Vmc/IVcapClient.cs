@@ -1,9 +1,9 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using CloudFoundry.Net.Types;
+    using Types;
+    using System.Collections.Generic;
 
     public interface IVcapClient
     {
@@ -17,28 +17,30 @@
         // TODO VcapClientResult ChangePassword(string username, string newpassword, string url, string accesstoken)
 
         VcapClientResult Push(string argName, string argDeployFQDN, DirectoryInfo argPath, uint memorysize);
+        VcapClientResult Push(Cloud argCloud, string argName, string argDeployFQDN, DirectoryInfo argPath, uint memorysize);
 
-        void StopApp(Application application, Cloud cloud);
+        void Stop(Cloud argCloud, Application argApplication);
 
-        void StartApp(Application application, Cloud cloud);
+        void Start(Cloud argCloud, Application argApplication);
 
-        Application GetAppInfo(String appname, Cloud cloud);
+        Application GetAppInfo(Cloud argCloud, string argName);
 
         void RestartApp(Application application, Cloud cloud);
 
         string GetLogs(Application application, int instanceNumber, Cloud cloud);
 
-        SortedDictionary<int,StatInfo> GetStats(Application application, Cloud cloud);
+        // SortedDictionary<int, StatInfo> GetStats(Application application, Cloud cloud);
+        IEnumerable<StatInfo> GetStats(Application application, Cloud cloud);
 
-        List<ExternalInstance> GetInstances(Application application, Cloud cloud);
+        IEnumerable<ExternalInstance> GetInstances(Application application, Cloud cloud);
 
-        List<Crash> GetAppCrash(Application application, Cloud cloud);
+        IEnumerable<Crash> GetAppCrash(Application application, Cloud cloud);
 
-        List<Application> ListApps(Cloud cloud);
+        IEnumerable<Application> ListApps(Cloud cloud);
 
-        List<SystemServices> GetAvailableServices(Cloud cloud);
+        IEnumerable<SystemServices> GetAvailableServices(Cloud cloud);
 
-        List<AppService> GetProvisionedServices(Cloud cloud);
+        IEnumerable<AppService> GetProvisionedServices(Cloud cloud);
 
         VcapResponse UpdateApplicationSettings(Application application, Cloud cloud);
     }

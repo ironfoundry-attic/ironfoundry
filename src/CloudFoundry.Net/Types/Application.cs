@@ -1,9 +1,9 @@
 ﻿namespace CloudFoundry.Net.Types
 {
-    using System.Collections.ObjectModel;
-    using Newtonsoft.Json;
     using System;
+    using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using Newtonsoft.Json;
     using System.Collections.Generic;
 
     [Serializable]

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Types;
-using RestSharp;
-using Newtonsoft.Json;
-using ICSharpCode.SharpZipLib.Zip;
-
-namespace CloudFoundry.Net.Vmc
+﻿namespace CloudFoundry.Net.Vmc
 {
-    public class VmcInfo
-    {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using CloudFoundry.Net.Types;
+    using Newtonsoft.Json;
+    using RestSharp;
 
-        
+    public class InfoHelper : BaseVmcHelper
+    {
         public string GetLogs(Application application, int instanceNumber, Cloud cloud)
         {
             string logoutput = "";
@@ -23,9 +19,6 @@ namespace CloudFoundry.Net.Vmc
             logoutput = logoutput + GetStdOutLog(application, instanceNumber, cloud);
             logoutput = logoutput + "\n====startup.log====\n";
             logoutput = logoutput + GetStartupLog(application, instanceNumber, cloud);
-            
-           
-            
 
             return logoutput;
         }
@@ -72,41 +65,39 @@ namespace CloudFoundry.Net.Vmc
             
         }
 
-        public SortedDictionary<int, StatInfo> GetStats(Application application, Cloud cloud)
+        public IEnumerable<StatInfo> GetStats(Application argApplication, Cloud argCloud)
         {
-            var list = new SortedDictionary<int, StatInfo>();
+            SortedDictionary<int, StatInfo> tmp = null;
+
             try
             {
-                var client = new RestClient();
-                client.BaseUrl = cloud.Url;
-                var request = new RestRequest();
-                request.Method = Method.GET;
-                request.Resource = "/apps/" + application.Name + "/stats";
-                request.AddHeader("Authorization", cloud.AccessToken);
-                var response = client.Execute(request).Content;
-                list = JsonConvert.DeserializeObject<SortedDictionary<int,StatInfo>>(response);
+                RestClient client = buildClient(argCloud);
+                RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApplication.Name, "stats");
+                RestResponse response = executeRequest(client, request);
+                tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            return list;
+
+            var rv = new List<StatInfo>();
+            foreach (KeyValuePair<int, StatInfo> kvp in tmp)
+            {
+                StatInfo si = kvp.Value;
+                si.ID = kvp.Key;
+                rv.Add(si);
+            }
+            return rv.ToArrayOrNull();
         }
 
-        public List<ExternalInstance> GetInstances(Application application, Cloud cloud) 
+        public IEnumerable<ExternalInstance> GetInstances(Application argApplication, Cloud argCloud) 
         {
-            //GET /apps/sroytest1/instances
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.GET;
-            request.Resource = "/apps/" + application.Name + "/instances";
-            request.AddHeader("Authorization", cloud.AccessToken);
-            var response = client.Execute(request).Content;
-            var list = JsonConvert.DeserializeObject<Dictionary<string,ExternalInstance>>(response);
-            return null;
+            RestClient client = buildClient(argCloud);
+            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApplication.Name, "instances");
+            var instances = executeRequest<Dictionary<string, ExternalInstance>>(client, request);
+            return instances.Values.ToArrayOrNull();
         }
-
     }
 }

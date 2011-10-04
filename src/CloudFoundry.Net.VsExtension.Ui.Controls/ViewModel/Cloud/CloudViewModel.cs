@@ -84,8 +84,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void EndGetInstances(object sender, RunWorkerCompletedEventArgs e)
         {
-            var stats = e.Result as SortedDictionary<int, StatInfo>;
-            UpdateInstanceCollection(stats);
+            UpdateInstanceCollection((IEnumerable<StatInfo>)e.Result);
         }
 
         private void BeginUpdateApplication(object sender, DoWorkEventArgs e)
@@ -108,19 +107,19 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             RefreshApplication();
         }
 
-        private void UpdateInstanceCollection(SortedDictionary<int, StatInfo> stats)
+        private void UpdateInstanceCollection(IEnumerable<StatInfo> stats)
         {
             var instances = new ObservableCollection<Model.Instance>();
             foreach (var stat in stats)
             {
-                if (stat.Value.State.Equals(Types.Instance.InstanceState.RUNNING) ||
-                    stat.Value.State.Equals(Types.Instance.InstanceState.STARTED) ||
-                    stat.Value.State.Equals(Types.Instance.InstanceState.STARTING))
+                if (stat.State.Equals(Types.Instance.InstanceState.RUNNING) ||
+                    stat.State.Equals(Types.Instance.InstanceState.STARTED) ||
+                    stat.State.Equals(Types.Instance.InstanceState.STARTING))
                 {
-                    var actualstats = stat.Value.Stats;
+                    var actualstats = stat.Stats;
                     var instance = new Model.Instance()
                     {
-                        ID = stat.Key,
+                        ID = stat.ID,
                         Cores = actualstats.Cores,
                         MemoryQuota = actualstats.MemQuota / 1048576,
                         DiskQuota = actualstats.DiskQuota / 1048576,

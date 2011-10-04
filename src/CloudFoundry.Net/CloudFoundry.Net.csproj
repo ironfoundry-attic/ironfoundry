@@ -98,15 +98,18 @@
     <Compile Include="Types\VcapResponse.cs" />
     <Compile Include="UriExtensionMethods.cs" />
     <Compile Include="Utilities.cs" />
+    <Compile Include="Vmc\BaseVmcHelper.cs" />
     <Compile Include="Vmc\Constants.cs" />
+    <Compile Include="Vmc\MiscHelper.cs" />
+    <Compile Include="Vmc\UserHelper.cs" />
     <Compile Include="Vmc\VcapCredentialManager.cs" />
     <Compile Include="WinSockErrorCode.cs" />
     <Compile Include="Vmc\VcapClientResult.cs" />
-    <Compile Include="Vmc\VmcInfo.cs" />
+    <Compile Include="Vmc\InfoHelper.cs" />
     <Compile Include="Vmc\VmcAdministration.cs" />
-    <Compile Include="Vmc\Apps.cs" />
+    <Compile Include="Vmc\AppsHelper.cs" />
     <Compile Include="Vmc\VcapClient.cs" />
-    <Compile Include="Vmc\Services.cs" />
+    <Compile Include="Vmc\ServicesHelper.cs" />
     <Compile Include="Vmc\Entities.cs" />
     <Compile Include="Vmc\IVcapClient.cs" />
   </ItemGroup>

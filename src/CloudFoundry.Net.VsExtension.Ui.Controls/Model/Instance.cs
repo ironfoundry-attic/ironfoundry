@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using CloudFoundry.Net.Types;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
+    using System;
+    using CloudFoundry.Net.Types;
+
     public class Instance
     {
         public int ID { get; set; }

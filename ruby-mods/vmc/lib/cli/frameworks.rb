@@ -9,7 +9,7 @@ module VMC::Cli
       'Rails'    => ['rails3',  { :mem => '256M', :description => 'Rails Application'}],
       'Spring'   => ['spring',  { :mem => '512M', :description => 'Java SpringSource Spring Application'}],
       'Grails'   => ['grails',  { :mem => '512M', :description => 'Java SpringSource Grails Application'}],
-      'Lift'   =>   ['lift',    { :mem => '512M', :description => 'Scala Lift Application'}],
+      'Lift'     => ['lift',    { :mem => '512M', :description => 'Scala Lift Application'}],
       'Roo'      => ['spring',  { :mem => '512M', :description => 'Java SpringSource Roo Application'}],
       'JavaWeb'  => ['spring',  { :mem => '512M', :description => 'Java Web Application'}],
       'Sinatra'  => ['sinatra', { :mem => '128M', :description => 'Sinatra Application'}],
@@ -75,10 +75,10 @@ module VMC::Cli
               return Framework.lookup('Node')
             end
 		
-          # Asp.net 4.0
+          # ASP.NET 4.0
           elsif !Dir.glob('*.config').empty?
             if File.exist?('web.config')
-              return Framework.lookup('Asp.Net 4.0')
+              return Framework.lookup('ASP.NET 4.0')
             end
 			
           # Erlang/OTP using Rebar

@@ -1,39 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-
-namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types
 {
+    using System;
+    using System.Collections.Generic;
+    using Newtonsoft.Json;
+
     [Serializable]
     public class AppService : EntityBase
     {        
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        public string Type { get; private set; }
 
         [JsonProperty(PropertyName = "tiers")]
-        public Tier Tier {get; set;}
+        public Tier Tier {get; private set;}
 
         [JsonProperty(PropertyName = "vendor")]
-        public string Vendor { get; set; }
+        public string Vendor { get; private set; }
 
         [JsonProperty(PropertyName = "meta")]
-        public Meta MetaData { get; set; }
+        public Meta MetaData { get; private set; }
 
         [JsonProperty(PropertyName = "version")]
-        public float Version { get; set; }
+        public float Version { get; private set; }
 
         [JsonProperty(PropertyName = "properties")]
-        public Properties Props { get; set; }
-        public AppService () {
-            MetaData = new Meta();
-            Props = new Properties();
-            Tier = new Tier();
-        }
+        public Properties Props { get; private set; }
     }
 
     [Serializable]
@@ -44,10 +37,6 @@ namespace CloudFoundry.Net.Types
 
         [JsonProperty(PropertyName = "order")]
         public int Order { get; set; }
-
-        public Tier() {
-            Option = new Options();
-        }
     }
 
     //[Serializable]

@@ -7,6 +7,12 @@
         private readonly Uri uri;
         private string token;
 
+        public AccessToken(Uri argUri, string argToken)
+        {
+            uri = argUri;
+            token = argToken;
+        }
+
         public AccessToken(string argUri, string argToken)
         {
             uri = new Uri(argUri);
@@ -21,6 +27,11 @@
         public string Token
         {
             get { return token; }
+        }
+
+        public bool HasToken
+        {
+            get { return false == token.IsNullOrWhiteSpace(); }
         }
     }
 }

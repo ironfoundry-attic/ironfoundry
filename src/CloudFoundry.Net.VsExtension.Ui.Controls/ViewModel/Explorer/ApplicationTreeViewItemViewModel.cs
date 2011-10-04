@@ -30,7 +30,7 @@
             this.application = application;
             var manager = new VcapClient();
             var stats = manager.GetStats(this.application, this.application.Parent);
-            foreach (StatInfo statInfo in stats.Values)
+            foreach (StatInfo statInfo in stats)
             {
                 base.Children.Add(new InstanceTreeViewItemViewModel(statInfo, this));
             }

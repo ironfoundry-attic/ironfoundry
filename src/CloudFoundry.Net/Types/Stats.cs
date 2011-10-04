@@ -6,10 +6,13 @@
     public class StatInfo : EntityBase
     {
         [JsonProperty(PropertyName = "state")]
-        public string State;
+        public string State { get; set; }
 
         [JsonProperty(PropertyName = "stats")]
-        public Stats Stats;
+        public Stats Stats { get; set; }
+
+        [JsonIgnore]
+        public int ID { get; set; }
     }
 
     public class Stats : Message

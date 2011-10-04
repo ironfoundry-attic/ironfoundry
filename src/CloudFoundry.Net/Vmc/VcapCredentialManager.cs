@@ -46,7 +46,16 @@
             currentTarget = readTargetFile();
         }
 
-        public VcapCredentialManager() : this(null) { }
+        public VcapCredentialManager() : this((string)null) { }
+
+        public VcapCredentialManager(Uri argCurrentTarget) : this((string)null)
+        {
+            if (null == argCurrentTarget)
+            {
+                throw new ArgumentNullException("argCurrentTarget");
+            }
+            SetTarget(argCurrentTarget);
+        }
 
         public VcapCredentialManager(string argTokenJson, bool argShouldWrite) : this(argTokenJson)
         {
@@ -72,12 +81,17 @@
             }
         }
 
+        public void SetTarget(Uri argUri)
+        {
+            currentTarget = argUri;
+        }
+
         public void SetTarget(string argUri)
         {
             currentTarget = new Uri(argUri);
         }
 
-        public void RegisterFor(string argUri, string argToken)
+        public void RegisterFor(Uri argUri, string argToken)
         {
             var accessToken = new AccessToken(argUri, argToken);
             tokenDict[accessToken.Uri] = accessToken;
@@ -123,6 +137,7 @@
             }
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         private string readTokenFile()
         {
             string rv = null;
@@ -146,6 +161,7 @@
             }
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         private Uri readTargetFile()
         {
             Uri rv = null;

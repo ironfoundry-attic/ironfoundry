@@ -102,7 +102,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             return cloud;
         }
 
-        public SortedDictionary<int,StatInfo> GetStats(Application app, Cloud cloud)
+        public IEnumerable<StatInfo> GetStats(Application app, Cloud cloud)
         {
             return client.GetStats(app, cloud);
         }
@@ -114,12 +114,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 
         public void Start(Application app, Cloud cloud)
         {
-            client.StartApp(app, cloud);
+            client.Start(cloud, app);
         }
 
         public void Stop(Application app, Cloud cloud)
         {
-            client.StopApp(app, cloud);
+            client.Stop(cloud, app);
         }
 
         public void Restart(Application app, Cloud cloud)
@@ -135,7 +135,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 
         public Application GetApplication(Application app, Cloud cloud)
         {
-            return client.GetAppInfo(app.Name, cloud);
+            return client.GetAppInfo(cloud, app.Name);
         }
     }
 }
