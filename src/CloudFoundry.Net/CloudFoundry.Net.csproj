@@ -96,6 +96,7 @@
     <Compile Include="Types\VcapComponentBase.cs" />
     <Compile Include="Types\VcapComponentDiscover.cs" />
     <Compile Include="Types\VcapResponse.cs" />
+    <Compile Include="UriExtensionMethods.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Vmc\Constants.cs" />
     <Compile Include="Vmc\VcapCredentialManager.cs" />

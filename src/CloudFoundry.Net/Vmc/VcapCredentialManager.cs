@@ -93,7 +93,7 @@
         {
             if (shouldWrite)
             {
-                File.WriteAllText(targetFile, currentTarget.AbsoluteUri);
+                File.WriteAllText(targetFile, currentTarget.AbsoluteUriTrimmed()); // NB: trim end!
             }
         }
 
@@ -140,7 +140,8 @@
         {
             if (shouldWrite)
             {
-                Dictionary<string, string> tmp = tokenDict.ToDictionary(e => e.Key.AbsoluteUri, e => e.Value.Token);
+                // NB: ruby vmc writes target uris without trailing slash
+                Dictionary<string, string> tmp = tokenDict.ToDictionary(e => e.Key.AbsoluteUriTrimmed(), e => e.Value.Token);
                 File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tmp));
             }
         }

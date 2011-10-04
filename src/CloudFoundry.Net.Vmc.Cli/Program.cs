@@ -210,6 +210,8 @@
                     password = String.Join("", passwordList);
                 }
 
+                Console.WriteLine();
+
                 if (email.IsNullOrWhiteSpace())
                 {
                     Console.Error.WriteLine(Resources.Vmc_NeedEmailPrompt_Text);
