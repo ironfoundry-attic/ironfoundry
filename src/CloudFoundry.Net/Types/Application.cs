@@ -4,6 +4,7 @@
     using Newtonsoft.Json;
     using System;
     using System.Collections.Specialized;
+    using System.Collections.Generic;
 
     [Serializable]
     public class Application : EntityBase
@@ -192,6 +193,19 @@
         {
             get { return this.created; }
             set { this.created = value; RaisePropertyChanged("Created"); }
+        }
+    }
+
+    public class ApplicationEqualityComparer : IEqualityComparer<Application>
+    {
+        public bool Equals(Application c1, Application c2)
+        {
+            return c1.Name.Equals(c2.Name);
+        }
+
+        public int GetHashCode(Application c)
+        {
+            return c.Name.GetHashCode();
         }
     }
 }

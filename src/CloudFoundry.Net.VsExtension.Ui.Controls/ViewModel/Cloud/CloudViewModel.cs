@@ -38,7 +38,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private ObservableCollection<AppService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
-        private VcapClient manager = new VcapClient();
+        private CloudFoundryProvider provider;
 
         BackgroundWorker getInstances = new BackgroundWorker();
         BackgroundWorker updateApplication = new BackgroundWorker();
@@ -47,13 +47,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public CloudViewModel(Cloud cloud)
         {
             this.Cloud = cloud;
-
-            InitializeCommands();
-            InitializeData();
-        }
-
-        private void InitializeCommands()
-        {
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
             ChangePasswordCommand = new RelayCommand(ChangePassword);
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanExecuteValidateAccount);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
@@ -62,29 +56,30 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             StopCommand = new RelayCommand(Stop, CanExecuteStopActions);
             RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
             UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);
-            ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);
+            ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);                        
         }
 
-        private void InitializeData()
+        private void LoadProvider(CloudFoundryProvider provider)
         {
+            this.provider = provider;
             instanceTimer.Interval = TimeSpan.FromSeconds(5);
             instanceTimer.Tick += RefreshInstances;
-            instanceTimer.Start();            
+            instanceTimer.Start();
             getInstances.DoWork += BeginGetInstances;
             getInstances.RunWorkerCompleted += EndGetInstances;
             updateApplication.DoWork += BeginUpdateApplication;
-            updateApplication.RunWorkerCompleted += EndUpdateApplication;            
-        }        
+            updateApplication.RunWorkerCompleted += EndUpdateApplication; 
+        }
 
         private void RefreshInstances(object sender, EventArgs e)
         {
-            var stats = manager.GetStats(SelectedApplication, Cloud);
+            var stats = provider.GetStats(SelectedApplication, Cloud);
             UpdateInstanceCollection(stats);
         }
 
         private void BeginGetInstances(object sender, DoWorkEventArgs e)
         {
-            e.Result = manager.GetStats(SelectedApplication, Cloud);
+            e.Result = provider.GetStats(SelectedApplication, Cloud);
         }
 
         private void EndGetInstances(object sender, RunWorkerCompletedEventArgs e)
@@ -96,7 +91,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void BeginUpdateApplication(object sender, DoWorkEventArgs e)
         {
             ApplicationErrorMessage = string.Empty;
-            e.Result = manager.UpdateApplicationSettings(SelectedApplication, Cloud);
+            e.Result = provider.UpdateApplicationSettings(SelectedApplication, Cloud);
         }
 
         private void EndUpdateApplication(object sender, RunWorkerCompletedEventArgs e)
@@ -202,12 +197,18 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void Connect()
         {
-
+            Cloud returnCloud = provider.Connect(this.Cloud);
+            if (returnCloud != null)
+            {
+                this.Cloud.AccessToken = returnCloud.AccessToken;
+                this.Cloud.Applications.Synchronize(returnCloud.Applications, new ApplicationEqualityComparer());
+                this.Cloud.Services.Synchronize(returnCloud.Services, new AppServiceEqualityComparer());
+            }
         }
 
         private void Disconnect()
         {
-
+            this.Cloud = provider.Disconnect(this.Cloud);
         }
 
         public Cloud Cloud
@@ -248,31 +249,30 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public void Start()
         {
-            manager.StartApp(SelectedApplication, Cloud);
+            provider.Start(SelectedApplication, Cloud);
             RefreshApplication();
         }
 
         public void Stop()
         {
-            manager.StopApp(SelectedApplication, Cloud);
+            provider.Stop(SelectedApplication, Cloud);
             RefreshApplication();
         }
 
         public void Restart()
         {
-            manager.RestartApp(SelectedApplication, Cloud);
+            provider.Restart(SelectedApplication, Cloud);
             RefreshApplication();
         }
 
         public void UpdateAndRestart()
         {
-            manager.UpdateApplicationSettings(SelectedApplication, Cloud);
-            Restart();
+            provider.UpdateAndRestart(SelectedApplication, Cloud);
         }
 
         private void RefreshApplication()
         {
-            var application = manager.GetAppInfo(SelectedApplication.Name, Cloud);
+            var application = provider.GetApplication(SelectedApplication, Cloud);
             var applicationToReplace = Cloud.Applications.SingleOrDefault((i) => i.Name == application.Name);
             if (applicationToReplace != null)
                 applicationToReplace = application;

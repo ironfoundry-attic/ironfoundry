@@ -115,6 +115,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\test\CloudFoundry.Net.Vmc\CloudFoundry.Net.Vmc.csproj">
+      <Project>{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32}</Project>
+      <Name>CloudFoundry.Net.Vmc %28test\CloudFoundry.Net.Vmc%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CloudFoundry.Net.VsExtension.Ui.Controls\CloudFoundry.Net.VsExtension.Ui.Controls.csproj">
       <Project>{C6E076BF-108A-4379-AE35-8F47059F4331}</Project>
       <Name>CloudFoundry.Net.VsExtension.Ui.Controls</Name>

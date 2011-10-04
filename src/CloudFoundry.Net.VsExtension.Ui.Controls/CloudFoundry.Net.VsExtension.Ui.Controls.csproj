@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Converters\CsvConverter.cs" />
     <Compile Include="Converters\TitleCaseConverter.cs" />
+    <Compile Include="Model\CloudFoundryProvider.cs" />
     <Compile Include="Model\Instance.cs" />
     <Compile Include="Model\Preferences.cs" />
     <Compile Include="Model\PreferencesProvider.cs" />

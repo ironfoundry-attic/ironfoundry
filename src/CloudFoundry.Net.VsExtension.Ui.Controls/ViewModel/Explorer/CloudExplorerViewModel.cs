@@ -13,42 +13,52 @@ using CloudFoundry.Net.Types;
 using System.ComponentModel;
 using CloudFoundry.Net.Vmc;
 using System.Windows.Input;
+using System.Collections.Specialized;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    [ExportViewModel("CloudExplorer", true)]
     public class CloudExplorerViewModel : ViewModelBase
     {
-        private ObservableCollection<Cloud> cloudList;
+        private CloudFoundryProvider provider;
         private ObservableCollection<CloudTreeViewItemViewModel> clouds = new ObservableCollection<CloudTreeViewItemViewModel>();        
         public RelayCommand AddCloudCommand { get; private set; }        
-        private BackgroundWorker connector = new BackgroundWorker();     
+        private BackgroundWorker connector = new BackgroundWorker();
 
-        public CloudExplorerViewModel(ObservableCollection<Cloud> cloudList)
-        {            
-            this.CloudList = cloudList;                        
-            AddCloudCommand = new RelayCommand(AddCloud);
-
-            connector.DoWork += new DoWorkEventHandler(BeginConnect);
-            connector.RunWorkerCompleted += new RunWorkerCompletedEventHandler(EndConnect);
-            connector.RunWorkerAsync(cloudList);               
-        }
-
-        public ObservableCollection<Cloud> CloudList
+        public CloudExplorerViewModel()
         {
-            get { return this.cloudList; }
-            set
-            {
-                this.cloudList = value;
-                foreach (var cloud in cloudList)
-                {
-                    var cloudView = clouds.SingleOrDefault((i) => i.Cloud.ID == cloud.ID);
-                    if (cloudView != null)
-                        cloudView.Cloud = cloud;
-                    else
-                        clouds.Add(new CloudTreeViewItemViewModel(cloud));
-                }                   
-            }
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));            
+            AddCloudCommand = new RelayCommand(AddCloud);
         }
+
+        private void LoadProvider(CloudFoundryProvider provider)
+        {
+            this.provider = provider;
+            foreach (var cloud in provider.Clouds)
+                clouds.Add(new CloudTreeViewItemViewModel(cloud));
+            this.provider.CloudsChanged += CloudsCollectionChanged;
+        }
+
+        private void CloudsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action.Equals(NotifyCollectionChangedAction.Add))
+            {
+                foreach (var obj in e.NewItems)
+                {
+                    var cloud = obj as Cloud;
+                    clouds.Add(new CloudTreeViewItemViewModel(cloud));
+                }
+            }
+            else if (e.Action.Equals(NotifyCollectionChangedAction.Remove))
+            {
+                foreach (var obj in e.OldItems)
+                {
+                    var cloud = obj as Cloud;
+                    var cloudTreeViewItem = clouds.SingleOrDefault((i) => i.Cloud.Equals(cloud));
+                    clouds.Remove(cloudTreeViewItem);
+                }
+            }
+        }  
 
         public ObservableCollection<CloudTreeViewItemViewModel> Clouds
         {
@@ -57,55 +67,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void AddCloud()
         {
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloud,
-                (confirmed) =>
-                {
-                    if (confirmed)
-                    {
-                        Messenger.Default.Send(new NotificationMessageAction<AddCloudViewModel>(Messages.GetAddCloudData,
-                            (viewModel) =>
-                            {
-                                CloudList.Add(viewModel.Cloud);
-                                clouds.Add(new CloudTreeViewItemViewModel(viewModel.Cloud));
-                            }));
-                    }
-                }));
-        }
-
-        private void BeginConnect(object sender, DoWorkEventArgs args)
-        {
-            var cloudList = args.Argument as ObservableCollection<Cloud>;
-            var manager = new VcapClient();
-            Dictionary<Cloud, List<Application>> dictionary = new Dictionary<Cloud, List<Application>>();            
-            foreach (var cloud in cloudList)
-            {
-                VcapClientResult result = manager.Login(cloud);
-                if (result.Success)
-                {
-                    Cloud serverCloud = result.Cloud;
-                    var applications = manager.ListApps(serverCloud);
-                    dictionary.Add(serverCloud, applications);
-                }
-            }
-            args.Result = dictionary;
-        }
-
-        private void EndConnect(object sender, RunWorkerCompletedEventArgs args)
-        {
-            var dictionary = args.Result as Dictionary<Cloud,List<Application>>;
-            foreach (var item in dictionary)
-            {
-                var cloud = this.CloudList.Single((i) => item.Key.ID == i.ID);
-                foreach (var application in item.Value)
-                {
-                    var current = cloud.Applications.SingleOrDefault((i) => i.Name == application.Name);
-                    if (current != null)
-                        current = application;
-                    else
-                        cloud.Applications.Add(application);
-                }                
-            }
-            CommandManager.InvalidateRequerySuggested();
-        }        
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloud,(confirmed) => {}));                
+        }              
     }
 }

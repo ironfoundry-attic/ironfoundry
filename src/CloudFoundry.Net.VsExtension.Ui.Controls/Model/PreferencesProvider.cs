@@ -16,51 +16,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
     {
         private string preferencesPath;
         private const string preferencesFileName = "preferences.bin";
-        private Preferences preferences;
 
         public PreferencesProvider(string preferencesPath)
         {
-            this.preferences = new Preferences()
+            this.preferencesPath = preferencesPath;            
+        }
+        
+        public Preferences LoadPreferences()
+        {
+            var preferences = new Preferences()
             {
                 Clouds = new ObservableCollection<Cloud>(),
                 CloudUrls = CloudUrl.GetDefaultCloudUrls()
             };
-            this.preferencesPath = preferencesPath;
 
-            Messenger.Default.Register<NotificationMessage<ObservableCollection<CloudUrl>>>(this, SaveCloudUrls);
-            Messenger.Default.Register<NotificationMessage<ObservableCollection<Cloud>>>(this, SaveClouds);
-            Messenger.Default.Register<NotificationMessageAction<Preferences>>(this, LoadPreferences);
-        }
-
-        private void SaveClouds(NotificationMessage<ObservableCollection<Cloud>> message)
-        {
-            if (message.Notification.Equals(Messages.SaveClouds))
-            {
-                this.preferences.Clouds = message.Content;
-                SavePreferences();
-            }
-        }
-
-        private void SaveCloudUrls(NotificationMessage<ObservableCollection<CloudUrl>> message)
-        {
-            if (message.Notification.Equals(Messages.SaveCloudUrls))
-            {
-                this.preferences.CloudUrls = message.Content;
-                SavePreferences();
-            }
-        }
-
-        private void LoadPreferences(NotificationMessageAction<Preferences> message)
-        {
-            if (message.Notification.Equals(Messages.LoadPreferences))
-            {
-                var preferences = LoadPreferences();
-                message.Execute(preferences);
-            }
-        }
-
-        public Preferences LoadPreferences()
-        {
             try
             {
                 var fullPath = this.preferencesPath + "/" + preferencesFileName;
@@ -81,8 +50,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             return preferences;
         }        
 
-        public void SavePreferences()
-        {
+        public void SavePreferences(Preferences preferences)
+        {           
             IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
             IsolatedStorageFileStream configStream;
             
@@ -95,7 +64,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             else
                 configStream = isoStore.OpenFile(fullPath, FileMode.Open);
             var binary = new BinaryFormatter();                      
-            binary.Serialize(configStream, this.preferences);            
+            binary.Serialize(configStream, preferences);            
             configStream.Flush();
             configStream.Close();
         }

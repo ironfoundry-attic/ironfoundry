@@ -41,6 +41,11 @@
             get { return this.application.Name; }
         }
 
+        public Application Application
+        {
+            get { return this.application; }
+        }
+
         private void OpenApplication(MouseButtonEventArgs e)
         {
             if (e == null || e.ClickCount >= 2)

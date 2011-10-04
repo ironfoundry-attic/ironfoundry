@@ -21,48 +21,32 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand ManageCloudUrlsCommand { get; private set; }
         public RelayCommand ValidateAccountCommand { get; private set; }
         public RelayCommand RegisterAccountCommand { get; private set; }
-
+        private CloudFoundryProvider provider;
         public Cloud Cloud { get; private set; }  
         private ObservableCollection<CloudUrl> cloudUrls;
 
         public AddCloudViewModel()
         {
-            this.Cloud = new Cloud();            
+            Cloud = new Types.Cloud();
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
+
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanValidate);
             RegisterAccountCommand = new RelayCommand(RegisterAccount, CanRegister);
             ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);
             ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-
-            InitializeData();
-            RegisterGetData();
+            CancelledCommand = new RelayCommand(Cancelled);                        
         }
 
-        private void InitializeData()
+        private void LoadProvider(CloudFoundryProvider provider)
         {
-            Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<CloudUrl>>(Messages.SetAddCloudData,
-                (cloudUrls) =>
-                {
-                    this.CloudUrls = cloudUrls;
-                    this.SelectedCloudUrl = cloudUrls.SingleOrDefault((i) => i.IsDefault);
-                }));
-        }
-
-        private void RegisterGetData()
-        {
-            Messenger.Default.Register<NotificationMessageAction<AddCloudViewModel>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.GetAddCloudData))
-                    {
-                        message.Execute(this);
-                        Messenger.Default.Unregister(this);
-                    }
-                });
-        }
+            this.provider = provider;
+            this.cloudUrls = provider.CloudUrls;
+            this.SelectedCloudUrl = cloudUrls.SingleOrDefault((i) => i.IsDefault);
+        }       
 
         private void Confirmed()
-        {           
+        {
+            this.provider.Clouds.Add(this.Cloud);
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddCloudDialogResult));
         }
 
@@ -111,27 +95,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         }
 
         private void ManageCloudUrls()
-        {
-            Messenger.Default.Register<NotificationMessageAction<ObservableCollection<CloudUrl>>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.SetManageCloudUrlsData))
-                        message.Execute(this.CloudUrls);
-                });
-
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ManageCloudUrls,
-                (confirmed) =>
-                {
-                    if (confirmed)
-                    {
-                        Messenger.Default.Send(new NotificationMessageAction<ManageCloudUrlsViewModel>(Messages.GetManageCloudUrlsData,
-                            (viewModel) =>
-                            {
-                                this.CloudUrls.Synchronize(viewModel.CloudUrls, new CloudUrlEqualityComparer());
-                                Messenger.Default.Send<NotificationMessage<ObservableCollection<CloudUrl>>>(new NotificationMessage<ObservableCollection<CloudUrl>>(this.CloudUrls,Messages.SaveCloudUrls));                             
-                            }));
-                    }
-                }));
+        {            
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ManageCloudUrls, (confirmed) => {}));
         }
 
         private CloudUrl selectedCloudUrl = new CloudUrl();

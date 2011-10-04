@@ -58,5 +58,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string LoadPreferences = "LoadPreferences";
         public const string SaveClouds = "SaveClouds";
         public const string SaveCloudUrls = "SaveCloudUrls";
+
+        public const string GetCloudFoundryProvider = "GetCloudFoundryProvider";
     }
 }

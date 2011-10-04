@@ -23,6 +23,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand RemoveCommand { get; private set; }
         private ObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
+        private CloudFoundryProvider provider;
 
         public ManageCloudUrlsViewModel()
         {
@@ -31,20 +32,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             RemoveCommand = new RelayCommand(Remove, CanRemove);
             ConfirmedCommand = new RelayCommand(Confirmed);
             CancelledCommand = new RelayCommand(Cancelled);
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
+        }
 
-            Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<CloudUrl>>(Messages.SetManageCloudUrlsData,
-                (cloudUrls) =>
-                {
-                    this.CloudUrls = cloudUrls.DeepCopy();
-                }));
-
-            Messenger.Default.Register<NotificationMessageAction<ManageCloudUrlsViewModel>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.GetManageCloudUrlsData))
-                        message.Execute(this);
-                    Messenger.Default.Unregister(this);
-                });
+        private void LoadProvider(CloudFoundryProvider provider)
+        {
+            this.provider = provider;
+            this.CloudUrls = provider.CloudUrls.DeepCopy();            
         }
 
         public CloudUrl SelectedCloudUrl
@@ -69,6 +63,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void Confirmed()
         {
+            provider.CloudUrls.Synchronize(this.CloudUrls, new CloudUrlEqualityComparer());
+            provider.SaveChanges();
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.ManageCloudUrlsDialogResult));
         }
 

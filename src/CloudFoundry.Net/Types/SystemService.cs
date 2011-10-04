@@ -5,7 +5,8 @@ using System.Text;
 using Newtonsoft.Json;
 
 namespace CloudFoundry.Net.Types
-{   
+{
+    [Serializable]
     public class SystemServices : EntityBase
     {
         [JsonProperty(PropertyName = "type")]
@@ -32,6 +33,7 @@ namespace CloudFoundry.Net.Types
         }
     }
 
+    [Serializable]
     public class Tiers : EntityBase
     {
         [JsonProperty(PropertyName = "free")]
@@ -46,6 +48,7 @@ namespace CloudFoundry.Net.Types
         }
     }
 
+    [Serializable]
     public class Type : EntityBase
     {
         [JsonProperty(PropertyName = "options")]
@@ -57,6 +60,7 @@ namespace CloudFoundry.Net.Types
         }
     }
     
+    [Serializable]
     public class Options : EntityBase
     {
 

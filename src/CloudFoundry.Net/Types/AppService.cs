@@ -72,8 +72,22 @@ namespace CloudFoundry.Net.Types
         public int Version { get; set; }
     }
     
+    [Serializable]
     public class Properties : EntityBase {
 
         //have to discover what this is off the ruby code
+    }
+
+    public class AppServiceEqualityComparer : IEqualityComparer<AppService>
+    {
+        public bool Equals(AppService c1, AppService c2)
+        {
+            return c1.Name.Equals(c2.Name);
+        }
+
+        public int GetHashCode(AppService c)
+        {
+            return c.Name.GetHashCode();
+        }
     }
 }

@@ -20,65 +20,41 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     [ExportViewModel("Container", true)]
     public class ContainerViewModel : ViewModelBase
     {
-        private CloudExplorerViewModel cloudExplorer;
+        private CloudFoundryProvider provider;
         private CloudViewModel currentCloudView;
-        private ObservableCollection<CloudUrl> cloudUrls;
-        private ObservableCollection<CloudViewModel> clouds;
+        private readonly ObservableCollection<CloudViewModel> clouds = new ObservableCollection<CloudViewModel>();
         private CloudViewModel selectedCloudView;
-        public RelayCommand<CloudViewModel> CloseCloud { get; private set; }
+        
+        public RelayCommand<CloudViewModel> CloseCloudCommand { get; private set; }
 
         public ContainerViewModel()
         {
-            CloseCloud = new RelayCommand<CloudViewModel>(RemoveCloud);            
-            Messenger.Default.Send<NotificationMessageAction<Preferences>>(new NotificationMessageAction<Preferences>(Messages.LoadPreferences, LoadPreferences));
-            Messenger.Default.Register<NotificationMessage<ObservableCollection<Cloud>>>(this, ProcessCloudListNotification);
+            CloseCloudCommand = new RelayCommand<CloudViewModel>(CloseCloud);
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider,LoadProvider));
             Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
-            Messenger.Default.Register<NotificationMessageAction<ObservableCollection<CloudUrl>>>(this, ProcessCloudUrlsNotification);            
         }
 
-        private void LoadPreferences(Preferences preferences)
+        private void LoadProvider(CloudFoundryProvider provider)
         {
-            this.CloudExplorer = new CloudExplorerViewModel(preferences.Clouds);
-            this.CloudExplorer.CloudList.CollectionChanged += CloudsChanged;
-            foreach (var cloud in this.CloudExplorer.CloudList)
-                cloud.PropertyChanged += CloudChanged;
-            this.cloudUrls = preferences.CloudUrls;
+            this.provider = provider;
+            this.provider.CloudsChanged += CloudsCollectionChanged;
         }
 
-        private void SaveClouds()
+        private void CloudsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Messenger.Default.Send<NotificationMessage<ObservableCollection<Cloud>>>(new NotificationMessage<ObservableCollection<Cloud>>(this.CloudExplorer.CloudList, Messages.SaveClouds));
-        }
-
-        private void CloudChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
+            if (e.Action.Equals(NotifyCollectionChangedAction.Remove))
             {
-                case "AccessToken":
-                case "Email":
-                case "ServerName":
-                case "HostName":
-                case "Url":
-                case "TimeoutStart":
-                case "TimeoutStop":
-                case "ID":
-                case "Password":
-                case "IsConnected":
-                case "IsDisconnected":
-                    SaveClouds();
-                    break;
-                default:
-                    break;
+                foreach (var obj in e.OldItems)
+                {
+                    var cloud = obj as Cloud;
+                    var cloudViewItem = clouds.SingleOrDefault((i) => i.Cloud.Equals(cloud));
+                    clouds.Remove(cloudViewItem);
+                }
             }
-        }
+        }  
 
-        public void CloudsChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            SaveClouds();
-        }
-           
-        private void RemoveCloud(CloudViewModel cloudView)
+        private void CloseCloud(CloudViewModel cloudView)
         {
             this.Clouds.Remove(cloudView);
         }
@@ -86,36 +62,24 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void OpenApplication(Application application)
         {
             if (application.Parent != null)
-                SelectCloud(application.Parent);
+            {
+                var selectedCloudViewModel = this.Clouds.SingleOrDefault((i) => i.Cloud.Equals(application.Parent));
+                if (selectedCloudViewModel == null)
+                {
+                    selectedCloudViewModel = new CloudViewModel(application.Parent);
+                    this.Clouds.Add(selectedCloudViewModel);
+                }
+                this.SelectedCloudView = selectedCloudViewModel;
+            }                
             this.SelectedCloudView.SelectedApplication = application;
             this.SelectedCloudView.IsApplicationViewSelected = true;
-        }
-
-        private void SelectCloud(Cloud cloud)
-        {
-            var selectedCloudViewModel = this.Clouds.SingleOrDefault((i) => i.Cloud == cloud);
-            if (selectedCloudViewModel == null)
-            {
-                selectedCloudViewModel = new CloudViewModel(cloud);
-                this.Clouds.Add(selectedCloudViewModel);
-            }
-            this.SelectedCloudView = selectedCloudViewModel;
-        }
-
-        private void ProcessCloudListNotification(NotificationMessage<ObservableCollection<Cloud>> message)
-        {
-            if (message.Notification.Equals(Messages.InitializeClouds))
-            {
-                var clouds = message.Content;
-                this.CloudExplorer = new CloudExplorerViewModel(clouds);
-            }
         }
 
         private void ProcessCloudNotification(NotificationMessage<Cloud> message)
         {
             if (message.Notification.Equals(Messages.OpenCloud))
             {
-                var selectedCloudViewModel = this.Clouds.SingleOrDefault((i) => i.Cloud == message.Content);
+                var selectedCloudViewModel = this.Clouds.SingleOrDefault((i) => i.Cloud.Equals(message.Content));
                 if (selectedCloudViewModel == null)
                 {
                     selectedCloudViewModel = new CloudViewModel(message.Content);
@@ -142,23 +106,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        private void ProcessCloudUrlsNotification(NotificationMessageAction<ObservableCollection<CloudUrl>> message)
-        {
-            if (message.Notification.Equals(Messages.SetAddCloudData))
-                message.Execute(this.cloudUrls);
-        }
-
         public ObservableCollection<CloudViewModel> Clouds
         {
             get { return this.clouds; }
-            set { this.clouds = value; RaisePropertyChanged("Clouds"); }
-        }
-
-        public CloudExplorerViewModel CloudExplorer
-        {
-            get { return this.cloudExplorer; }
-            set { this.cloudExplorer = value; RaisePropertyChanged("CloudExplorer"); }
-        }
+        }        
 
         public CloudViewModel CurrentCloudView
         {

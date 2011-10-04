@@ -98,7 +98,7 @@
             set { 
                 this.accessToken = value;
                 RaisePropertyChanged("AccessToken");
-                if (this.accessToken != null)
+                if (!String.IsNullOrEmpty(accessToken))
                 {
                     this.IsConnected = true;
                     this.IsDisconnected = false;
@@ -106,7 +106,7 @@
                 else
                 {
                     this.IsDisconnected = true;
-                    this.IsConnected = true;
+                    this.IsConnected = false;
                 }                
             }
         }
