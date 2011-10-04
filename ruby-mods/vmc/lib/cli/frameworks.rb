@@ -15,7 +15,7 @@ module VMC::Cli
       'Sinatra'  => ['sinatra', { :mem => '128M', :description => 'Sinatra Application'}],
       'Node'     => ['node',    { :mem => '64M',  :description => 'Node.js Application'}],
       'Erlang/OTP Rebar' => ['otp_rebar',  { :mem => '64M',  :description => 'Erlang/OTP Rebar Application'}],
-	  'Asp.Net 4.0'  => ['aspdotnet', { :mem => '64M', :description => 'Asp.Net 4.0 Application'}]
+      'ASP.NET 4.0'  => ['aspdotnet', { :mem => '64M', :description => 'ASP.NET 4.0 Application'}]
     }
 
     class << self
@@ -75,9 +75,9 @@ module VMC::Cli
               return Framework.lookup('Node')
             end
 		
-		  # Asp.net 4.0
-		  elsif !Dir.glob('*.config').empty?
-			if File.exist?('web.config')
+          # Asp.net 4.0
+          elsif !Dir.glob('*.config').empty?
+            if File.exist?('web.config')
               return Framework.lookup('Asp.Net 4.0')
             end
 			

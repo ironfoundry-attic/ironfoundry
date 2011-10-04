@@ -5,23 +5,26 @@
     using System.IO;
     using System.Security.Cryptography;
     using System.Threading;
+    using CloudFoundry.Net.Types;
     using ICSharpCode.SharpZipLib.Zip;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RestSharp;
-    using CloudFoundry.Net.Types;
 
-    internal class VmcApps
+    public class Apps
     {
-        internal string StartApp (string appname, string url, string accesstoken) 
+        private readonly string token;
+
+        public Apps(string argToken)
+        {
+            token = argToken;
+        }
+
+        public string StartApp(string appname, string url)
         {
             if (url == null)
             {
                 return ("Target URL has to be set");
-            }
-            else if (accesstoken == null)
-            {
-                return ("Please login first");
             }
             else
             {
@@ -30,41 +33,36 @@
                 var request = new RestRequest();
                 request.Method = Method.PUT;
                 request.Resource = "/apps/" + appname;
-                request.AddHeader("Authorization", accesstoken);
+                request.AddHeader("Authorization", token);
                 return client.Execute(request).Content;
             }
         }              
 
-        internal void StartApp(Application application, Cloud cloud)
+        public void StartApp(Application application, Cloud cloud)
         {
             application.State = Instance.InstanceState.STARTED;
             UpdateApplicationSettings(application, cloud);
         }
 
-        internal string GetAppInfo(string appname, string url, string accesstoken)
+        public string GetAppInfo(string argName, string argUrl)
         {
-            if (url == null)
+            if (argUrl == null)
             {
                 return ("Target URL has to be set");
-            }
-            else if (accesstoken == null)
-            {
-                return ("Please login first");
             }
             else
             {
                 var client = new RestClient();
-                client.BaseUrl = url;
+                client.BaseUrl = argUrl;
                 var request = new RestRequest();
                 request.Method = Method.GET;
-                request.Resource = "/apps/"+appname;
-                request.AddHeader("Authorization", accesstoken);
-                var response = client.Execute(request).Content;
-                return response;
+                request.Resource = Constants.APPS_PATH + "/" + argName;
+                request.AddHeader("AUTHORIZATION", token);
+                return client.Execute(request).Content;
             }
         }
 
-        internal Application GetAppInfo(String appname, Cloud cloud)
+        public Application GetAppInfo(String appname, Cloud cloud)
         {
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
@@ -76,13 +74,13 @@
             return (Application)JsonConvert.DeserializeObject(client.Execute(request).Content, typeof(Application));
         }
 
-        internal void StopApp(Application application, Cloud cloud)
+        public void StopApp(Application application, Cloud cloud)
         {
             application.State = Instance.InstanceState.STOPPED;
             UpdateApplicationSettings(application, cloud);
         }
 
-        internal VcapResponse UpdateApplicationSettings(Application application, Cloud cloud)
+        public VcapResponse UpdateApplicationSettings(Application application, Cloud cloud)
         {
             VcapResponse vmcResponse = null;
             var client = new RestClient();
@@ -99,7 +97,7 @@
             return vmcResponse;
         }
 
-        internal string DeleteApp(string appname, string url, string accesstoken)
+        public string DeleteApp(string appname, string url, string accesstoken)
         {
             if (url == null)
             {
@@ -121,7 +119,7 @@
             }
         }
 
-        internal void DeleteApp(Application application, Cloud cloud)
+        public void DeleteApp(Application application, Cloud cloud)
         {
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
@@ -132,137 +130,153 @@
             client.Execute(request);
         }
 
-        internal void RestartApp(Application application, Cloud cloud)
+        public void RestartApp(Application application, Cloud cloud)
         {
             StopApp(application, cloud);
             StartApp(application, cloud);
         }
 
-        public string PushApp (string Appname, Uri argUri, string Accesstoken, string Dirlocation, string Deployedurl, string Framework, string Runtime, string Memoryreservation, string Servicebindings )
+        public string Push(string argName, Uri argUri, DirectoryInfo argPath, string argDeployUrl,
+            string argFramework, string argRuntime, uint argMemoryReservation, string argServiceBindings)
         {
             if (argUri == null)
             {
                 return ("Target URL has to be set");
             }
-            else if (Accesstoken == null)
-            {
-                return ("Please login first");
-            }
-            else if (Dirlocation == null)
+            else if (argPath == null)
             {
                 return ("Application local location is needed");
             }
-            else if (Deployedurl == null)
+            else if (argDeployUrl == null)
             {
                 return ("Please specify the url to deploy as.");
             }
-            else if (Framework == null)
+            else if (argFramework == null)
             {
                 return ("Please specify application framework");
             }
-            else if (Memoryreservation == null)
-            {
-                return ("Please specify size of memory to allocate to application");
-            }
             else
-            {                
-                if (Servicebindings == null)
-                    Servicebindings = "none";
+            {
+                if (argServiceBindings == null)
+                {
+                    argServiceBindings = "none";
+                }
 
-                var client = new RestClient();
-                client.BaseUrl = argUri.AbsoluteUri;
-                
-                var request = new RestRequest();
-               // request.AddHeader("Authorization", Accesstoken);
                 //Try and create application
                 //{"name":"johndoe","staging":{"framework":"sinatra","runtime":null},"uris":["johndoe.cloudfoundry.com"],"instances":1,"resources":{"memory":128}}
-                VmcApplication appdetails = new VmcApplication();
-                appdetails.name = Appname;
-                appdetails.staging = new staging { framework = Framework, runtime = Runtime };
-                appdetails.uris = new string[] { Deployedurl };
-                appdetails.instances = 1;
-                appdetails.resources = new resources { memory = Convert.ToInt32(Memoryreservation) };
+                var manifest = new AppManifest
+                {
+                    Name = argName,
+                    Staging = new Staging { Framework = argFramework, Runtime = argRuntime },
+                    Uris = new string[] { argDeployUrl },
+                    Instances = 1,
+                    Resources = new Resources { Memory = argMemoryReservation },
+                };
 
+                var request = new RestRequest
+                {
+                    Method = Method.POST,
+                    RequestFormat = DataFormat.Json,
+                    Resource = Constants.APPS_PATH,
+                };
+                request.AddBody(manifest);
 
-                JsonSerializer js = new JsonSerializer();
-                request.Method = Method.POST;
-                request.RequestFormat = DataFormat.Json;
-                request.AddBody(appdetails);
-                request.Resource = "/apps";
-                client.AddDefaultHeader("Authorization", Accesstoken);
-                client.FollowRedirects = false;
-                client.Execute(request);
+                var client = new RestClient
+                {
+                    BaseUrl = argUri.AbsoluteUri,
+                    FollowRedirects = false,
+                };
+                client.AddDefaultHeader("AUTHORIZATION", token);
+                RestResponse response = client.Execute(request); // TODO process response
 
-                List<Resource> resourcesForPost = new List<Resource>();
-                DirectoryInfo di = new DirectoryInfo(Dirlocation);
-                AddDirectoryToResources(resourcesForPost, di, di.FullName);
-                var resources = resourcesForPost.ToArray();
-     
+                var resourcesForPost = new List<Resource>();
+                addDirectoryToResources(resourcesForPost, argPath, argPath.FullName);
+                Resource[] resources = resourcesForPost.ToArray();
 
-                var client4 = new RestClient();
-                client4.BaseUrl = argUri.AbsoluteUri;
-                client4.AddDefaultHeader("Authorization", Accesstoken);
-                client4.FollowRedirects = false;
+                client = new RestClient
+                {
+                    BaseUrl = argUri.AbsoluteUri,
+                    FollowRedirects = false,
+                };
+                client.AddDefaultHeader("AUTHORIZATION", token);
 
-                var request4 = new RestRequest();
-                request4.Method = Method.POST;
-                request4.RequestFormat = DataFormat.Json;
-                request4.AddHeader("Authorization", Accesstoken);
-                request4.Resource = "/resources";
-                request4.AddBody(resources);
-                var req4content = client4.Execute(request4);
+                request = new RestRequest
+                {
+                    Method = Method.POST,
+                    RequestFormat = DataFormat.Json,
+                    Resource = Constants.RESOURCES_PATH,
+                };
+                request.AddHeader("AUTHORIZATION", token);
+                request.AddBody(resources);
+                response = client.Execute(request); // TODO process response
 
                 // This is required in order to pass the JSON as a parameter
-                JsonSerializer serializer = new JsonSerializer();
                 string resourcesJson = JsonConvert.SerializeObject(resources);
 
-                var client2 = new RestClient();
-                client2.BaseUrl = argUri.AbsoluteUri;
-                client2.AddDefaultHeader("Authorization", Accesstoken);
+                client = new RestClient
+                {
+                    BaseUrl = argUri.AbsoluteUri,
+                    FollowRedirects = false,
+                };
+                client.AddDefaultHeader("AUTHORIZATION", token);
 
-                var request2 = new RestRequest();
-                
-                FastZip zipper = new FastZip();
-                zipper.CreateZip(Environment.GetEnvironmentVariable("TEMP")+"\\"+Appname + ".zip", Dirlocation, true,"");
+                string tempFile = Path.GetTempFileName();
+                try
+                {
+                    var zipper = new FastZip();
+                    zipper.CreateZip(tempFile, argPath.FullName, true, String.Empty);
 
-                request2.Method = Method.POST;
-                request2.AddHeader("Authorization", Accesstoken);
-                request2.Resource = "/apps/"+Appname+"/application";
-                request2.AddParameter("_method", "put");
-                request2.AddFile("application", (Environment.GetEnvironmentVariable("TEMP") + "\\" + Appname + ".zip"));
-                request2.AddParameter("resources", resourcesJson);
-                var content = client2.Execute(request2).Content;
+                    request = new RestRequest
+                    {
+                        Method = Method.POST,
+                        Resource = Constants.APPS_PATH + "/" + argName + "/application",
+                    };
+                    request.AddHeader("AUTHORIZATION", token);
+                    request.AddParameter("_method", "put");
+                    request.AddFile("application", tempFile);
+                    request.AddParameter("resources", resourcesJson);
+                    response = client.Execute(request);
+                }
+                finally
+                {
+                    File.Delete(tempFile);
+                }
 
-                var app = GetAppInfo(Appname, argUri.AbsoluteUri, Accesstoken);
+                string app = GetAppInfo(argName, argUri.AbsoluteUri);
                 JObject getInfo = JObject.Parse(app);
                 getInfo["state"] = "STARTED";
 
-                var client3 = new RestClient();
-                client3.BaseUrl = argUri.AbsoluteUri;
-                client3.AddDefaultHeader("Authorization", Accesstoken);
-                var request3 = new RestRequest();
-                request3.Method = Method.PUT;
-                request3.Resource = "/apps/" + Appname;
-                request3.RequestFormat = DataFormat.Json;
-                request3.AddHeader("Authorization", Accesstoken);
-                request3.AddBody(getInfo);
-                client3.FollowRedirects = false;
-                var resp = client3.Execute(request3).Content;
+                client = new RestClient
+                {
+                    BaseUrl = argUri.AbsoluteUri,
+                    FollowRedirects = false,
+                };
+                client.AddDefaultHeader("AUTHORIZATION", token);
+
+                request = new RestRequest
+                {
+                    Method = Method.PUT,
+                    Resource = Constants.APPS_PATH + "/" + argName,
+                    RequestFormat = DataFormat.Json,
+                };
+                request.AddHeader("AUTHORIZATION", token);
+                request.AddBody(getInfo);
+                response = client.Execute(request);
 
                 string info = string.Empty;
                 for (int i = 0; i < 4; i++)
                 {
-                    info = GetAppInfo(Appname, argUri.AbsoluteUri, Accesstoken);
-                    var crash = GetAppCrash(Appname, argUri.AbsoluteUri, Accesstoken);
+                    info = GetAppInfo(argName, argUri.AbsoluteUri);
+                    var crash = GetAppCrash(argName, argUri.AbsoluteUri);
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
 
                 return info;
-            
+
             }
         }
 
-        public void AddDirectoryToResources(List<Resource> resource,DirectoryInfo directory, string rootFullName)
+        private void addDirectoryToResources(List<Resource> resource, DirectoryInfo directory, string rootFullName)
         {
             foreach (var file in directory.GetFiles())
             {
@@ -273,23 +287,18 @@
                 // by the server to TAR up the file that gets pushed
                 // to the DEA.
                 filename = filename.Replace(rootFullName, string.Empty);
-                resource.Add(new Resource() { size = file.Length, sha1 = hash, fn = filename });
+                resource.Add(new Resource() { Size = (ulong)file.Length, SHA1 = hash, FN = filename });
             }
 
             foreach (var subdirectory in directory.GetDirectories())
-                AddDirectoryToResources(resource, subdirectory, rootFullName);
+                addDirectoryToResources(resource, subdirectory, rootFullName);
         }
 
-       
-        public string GetAppCrash (string appname, string url, string accesstoken)
+        public string GetAppCrash(string appname, string url)
         {
             if (url == null)
             {
                 return ("Target URL has to be set");
-            }
-            else if (accesstoken == null)
-            {
-                return ("Please login first");
             }
             else
             {
@@ -297,8 +306,8 @@
                 client.BaseUrl = url;
                 var request = new RestRequest();
                 request.Method = Method.GET;
-                request.Resource = "/apps/" + appname + "/crashes";
-                request.AddHeader("Authorization", accesstoken);
+                request.Resource = Constants.APPS_PATH + "/" + appname + "/crashes";
+                request.AddHeader("AUTHORIZATION", token);
                 return client.Execute(request).Content;
             }
         }

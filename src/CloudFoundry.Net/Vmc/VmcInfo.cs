@@ -9,7 +9,7 @@ using ICSharpCode.SharpZipLib.Zip;
 
 namespace CloudFoundry.Net.Vmc
 {
-    internal class VmcInfo
+    public class VmcInfo
     {
 
         

@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using RestSharp;
-using CloudFoundry.Net.Types;
-using Newtonsoft.Json;
-
-namespace CloudFoundry.Net.Vmc
+﻿namespace CloudFoundry.Net.Vmc
 {
-    internal class VmcServices
+    using System.Collections.Generic;
+    using CloudFoundry.Net.Types;
+    using Newtonsoft.Json;
+    using RestSharp;
+
+    public class Services
     {
-        public string GetServices(string url, string accesstoken)
+        private readonly string token;
+
+        public Services(string argToken)
+        {
+            token = argToken;
+        }
+
+        public string GetServices(string url)
         {
             if (url == null)
             {
                 return ("Target URL has to be set");
-            }
-            else if (accesstoken == null)
-            {
-                return ("Please login first");
             }
             else
             {
@@ -27,7 +27,7 @@ namespace CloudFoundry.Net.Vmc
                 var request = new RestRequest();
                 request.Method = Method.GET;
                 request.Resource = "/info/services";
-                request.AddHeader("Authorization", accesstoken);
+                request.AddHeader("Authorization", token);
                 return client.Execute(request).Content;
             }
         }
@@ -105,7 +105,7 @@ namespace CloudFoundry.Net.Vmc
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
             client.Execute(request);
-            VmcApps apps = new VmcApps();
+            var apps = new Apps(token);
             apps.RestartApp(application, cloud);
         }
 
@@ -120,7 +120,7 @@ namespace CloudFoundry.Net.Vmc
             request.AddObject(application);
             request.RequestFormat = DataFormat.Json;
             client.Execute(request);
-            VmcApps apps = new VmcApps();
+            var apps = new Apps(token);
             apps.RestartApp(application, cloud);
         }
     }

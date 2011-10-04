@@ -183,11 +183,12 @@ namespace CloudFoundry.Net.VsExtension
 
                     var cfm = new VcapClient("http://" + url);
                     VcapClientResult result = cfm.Login(username, password);
+                    // TODO process result
 
                     progressDialogDispatcher.BeginInvoke(update, string.Format("Pushing {0}", appurl), 65);
                     if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                    var response = cfm.Push(appname, appurl, precompiledSitePath, "aspdotnet", "64");
+                    VcapClientResult response = cfm.Push(appname, appurl, new DirectoryInfo(precompiledSitePath), 64);
                     progressDialogDispatcher.BeginInvoke(update, "Complete.", 100);
                     progressDialogDispatcher.BeginInvoke(updateResponse, response);
                 }

@@ -5,7 +5,7 @@ namespace CloudFoundry.Net.Vmc
     using Newtonsoft.Json.Linq;
     using RestSharp;
 
-    internal class VmcAdministration
+    public class VmcAdministration
     {
         bool ChangePassword(string username, string newpassword, string url, string accesstoken)
         {

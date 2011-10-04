@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using NDesk.Options;
     using Newtonsoft.Json;
@@ -21,12 +22,13 @@
 
         static void Main(string[] args)
         {
-            var commands = new Dictionary<string, Action<IList<string>>>
+            var commands = new Dictionary<string, Func<IList<string>, bool>>
             {
-                { "help", (arg)   => usage() },
-                { "info", (arg)   => info(arg) },
+                { "help",   (arg) => usage() },
+                { "info",   (arg) => info(arg) },
                 { "target", (arg) => target(arg) },
-                { "login", (arg)  => login(arg) },
+                { "login",  (arg) => login(arg) },
+                { "push",   (arg) => push(arg) },
             };
 
             var p = new OptionSet
@@ -64,13 +66,14 @@
                 showHelp(p);
             }
 
+            bool success = false;
             if (false == unparsed.IsNullOrEmpty())
             {
                 string verb = unparsed[0];
-                Action<IList<string>> action;
+                Func<IList<string>, bool> action;
                 if (commands.TryGetValue(verb, out action))
                 {
-                    action(unparsed.Skip(1).ToList());
+                    success = action(unparsed.Skip(1).ToList());
                 }
                 else
                 {
@@ -81,9 +84,11 @@
             {
                 showHelp(p);
             }
+
+            Environment.Exit(success ? 0 : 1);
         }
 
-        static void info(IList<string> unparsed)
+        static bool info(IList<string> unparsed)
         {
             var vc = new VcapClient();
             VcapClientResult rslt = vc.Info();
@@ -128,9 +133,11 @@
                 // TODO standardize errors
                 Console.Error.WriteLine(String.Format("Error: {0}", rslt.Message));
             }
+
+            return rslt.Success;
         }
 
-        static void target(IList<string> unparsed)
+        static bool target(IList<string> unparsed)
         {
             string url = command_url;
             if (false == unparsed.IsNullOrEmpty())
@@ -148,9 +155,11 @@
             {
                 Console.WriteLine(String.Format(Resources.Vmc_TargetNoSuccessDisplay_Fmt, vc.CurrentUri));
             }
+
+            return rslt.Success;
         }
 
-        static void login(IList<string> unparsed)
+        static bool login(IList<string> unparsed)
         {
             bool failed = true;
             ushort tries = 0;
@@ -204,13 +213,13 @@
                 if (email.IsNullOrWhiteSpace())
                 {
                     Console.Error.WriteLine(Resources.Vmc_NeedEmailPrompt_Text);
-                    return;
+                    return false;
                 }
 
                 if (password.IsNullOrWhiteSpace())
                 {
                     Console.Error.WriteLine(Resources.Vmc_NeedPasswordPrompt_Text);
-                    return;
+                    return false;
                 }
 
                 var vc = new VcapClient();
@@ -235,19 +244,56 @@
                 // TODO retry if (tries += 1) < 3 && prompt_ok && !@options[:password]
                 ++tries;
             }
+
+            return false == failed;
         }
 
-        static void usage()
+        static bool usage()
         {
             Console.WriteLine(Usage.COMMAND_USAGE);
+            return true;
         }
 
-        static void showHelp(OptionSet p)
+        static bool showHelp(OptionSet p)
         {
             Console.WriteLine("Usage: vmc [OPTIONS]+ message");
             Console.WriteLine();
             Console.WriteLine("Options:");
             p.WriteOptionDescriptions(Console.Out);
+            return true;
+        }
+
+        static bool push(IList<string> unparsed)
+        {
+            // TODO match ruby argument parsing
+            if (unparsed.Count != 3)
+            {
+                Console.Error.WriteLine("Usage: vmc push appname path url"); // TODO usage statement standardization
+                return false;
+            }
+
+            string appname = unparsed[0];
+            string path    = unparsed[1];
+            string url     = unparsed[2];
+
+            DirectoryInfo di = null;
+            if (Directory.Exists(path))
+            {
+                di = new DirectoryInfo(path);
+            }
+            else
+            {
+                Console.Error.WriteLine(String.Format("Directory '{0}' does not exist."));
+                return false;
+            }
+
+            var vc = new VcapClient();
+            VcapClientResult rv = vc.Push(appname, url, di, 64);
+            if (false == rv.Success)
+            {
+                Console.Error.WriteLine(rv.Message);
+            }
+            return rv.Success;
         }
 
         static void debug(string format, params object[] args)
@@ -283,42 +329,5 @@
 
             return String.Format("{0:F" + argPrec + "}G", argSize / (1024.0 * 1024.0 * 1024.0));
         }
-
-            /*
-            else if (args[0] == "Push")
-            {
-                url = readTargetFile();
-                accesstoken = readTokenFile();
-                if (url == String.Empty)
-                {
-                    Console.WriteLine("Please set a target");
-                }
-                else if (accesstoken.Length > 0)
-                {
-                    Console.Write("App Name: ");
-                    string appname = "johndoe" ; //Console.ReadLine();
-                    Console.Write("Directory Location (ex. c:\\appdir ): ");
-                    string dirlocation = "c:\\testapp"; //Console.ReadLine();
-                    Console.Write("Deployed URL (ex. xyz.cloudfoundry.com) ");
-                    string deployedURL = "johndoe.cloudfoundry.com"; //Console.ReadLine();
-                    Console.Write("Type of Application: (ex. sinatra, java) ");
-                    string apptype = "sinatra"; //Console.ReadLine();
-                    Console.Write("Memory Reservation: (ex. 128) ");
-                    string memalloc = "128"; //Console.ReadLine();
-
-                    JObject obj = JObject.Parse(accesstoken);
-                    VmcManager cfm = new VmcManager();
-                    cfm.AccessToken = (string)obj.Value<string>(url);
-                    cfm.URL = url;
-                    Console.Write("Return data: ");
-                    Console.WriteLine(cfm.Push(appname, deployedURL, dirlocation, apptype, memalloc));
-                    Console.ReadLine();
-                }
-                else
-                {
-                    Console.WriteLine("Please login first.");
-                }
-            }
-             */
     }
 }

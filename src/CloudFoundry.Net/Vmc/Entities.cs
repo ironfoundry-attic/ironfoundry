@@ -1,34 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CloudFoundry.Net.Vmc
+﻿namespace CloudFoundry.Net.Vmc
 {
-    internal class VmcApplication
+    using Newtonsoft.Json;
+
+    public class AppManifest
     {
-        public string name { get; set; }
-        public string[] uris { get; set; }
-        public int instances { get; set; }
-        public resources resources { get; set; }
-        public staging staging{ get; set;}
+        [JsonProperty(PropertyName="name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName="uris")]
+        public string[] Uris { get; set; }
+
+        [JsonProperty(PropertyName="instances")]
+        public ushort Instances { get; set; }
+
+        [JsonProperty(PropertyName="resources")]
+        public Resources Resources { get; set; }
+
+        [JsonProperty(PropertyName="staging")]
+        public Staging Staging { get; set;}
     }
 
-    internal class staging 
+    public class Staging 
     {
-        public string framework { get; set; }
-        public string runtime { get; set; }
+        [JsonProperty(PropertyName="framework")]
+        public string Framework { get; set; }
+
+        [JsonProperty(PropertyName="runtime")]
+        public string Runtime { get; set; }
     }
 
-    internal class resources 
+    public class Resources 
     {
-        public int memory { get; set; }
+        [JsonProperty(PropertyName="memory")]
+        public uint Memory { get; set; }
     }
 
-    internal class Resource
+    public class Resource
     {
-        public long size;
-        public string sha1;
-        public string fn;
+        [JsonProperty(PropertyName="size")]
+        public ulong Size { get; set; }
+
+        [JsonProperty(PropertyName="sha1")]
+        public string SHA1 { get; set; }
+
+        [JsonProperty(PropertyName="fn")]
+        public string FN { get; set; }
     }
 }

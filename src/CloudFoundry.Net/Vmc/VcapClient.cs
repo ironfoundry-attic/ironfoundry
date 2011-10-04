@@ -2,9 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using Newtonsoft.Json.Linq;
     using RestSharp;
     using Types;
-    using Newtonsoft.Json.Linq;
 
     public class VcapClient : IVcapClient
     {
@@ -91,85 +92,101 @@
             return Login(argCloud.Email, argCloud.Password);
         }
         
-        public string Push(string appname, string fdqn, string fileURI, string framework, string memorysize)
+        public VcapClientResult Push(string argName, string argDeployFQDN, DirectoryInfo argPath, uint argMemory)
         {
-            VmcApps cfapps = new VmcApps();
-            var app =  cfapps.PushApp(appname, credentialManager.CurrentTarget, credentialManager.CurrentToken, fileURI, fdqn, framework, null,memorysize, null);
-            return app;
+            VcapClientResult rv = checkLoginStatus();
+
+            if (rv.Success)
+            {
+                var apps = new Apps(credentialManager.CurrentToken);
+                string app =  apps.Push(argName, credentialManager.CurrentTarget, argPath, argDeployFQDN, "Asp.Net 4.0", "aspdotnet", argMemory, null);
+                rv = new VcapClientResult(true, app);
+            }
+            else
+            {
+                // TODO
+            }
+
+            return rv;
         }
 
         public void StopApp(Application application, Cloud cloud)
         {
-            VmcApps apps = new VmcApps();
+            var apps = new Apps(credentialManager.CurrentToken);
             apps.StopApp(application, cloud);
         }
 
         public void StartApp(Application application, Cloud cloud)
         {
-            VmcApps apps = new VmcApps();
+            var apps = new Apps(credentialManager.CurrentToken);
             apps.StartApp(application, cloud);
         }
 
         public Application GetAppInfo(string appname, Cloud cloud)
         {
-            VmcApps app = new VmcApps();
+            var app = new Apps(credentialManager.CurrentToken);
             return app.GetAppInfo(appname, cloud);
         }
 
         public VcapResponse UpdateApplicationSettings(Application application, Cloud cloud)
         {
-            VmcApps app = new VmcApps();
+            var app = new Apps(credentialManager.CurrentToken);
             return app.UpdateApplicationSettings(application, cloud);
         }
 
 
         public void RestartApp(Application application, Cloud cloud)
         {
-            VmcApps app = new VmcApps();
+            var app = new Apps(credentialManager.CurrentToken);
             app.RestartApp(application, cloud);
         }
 
 
         public string GetLogs(Application application, int instanceNumber, Cloud cloud)
         {
-            VmcInfo info = new VmcInfo();
+            var info = new VmcInfo();
             return info.GetLogs(application, instanceNumber, cloud);
         }
 
         public SortedDictionary<int,StatInfo> GetStats(Application application, Cloud cloud)
         {
-            VmcInfo info = new VmcInfo();
+            var info = new VmcInfo();
             return info.GetStats(application, cloud);
         }
 
         public List<ExternalInstance> GetInstances(Application application, Cloud cloud)
         {
-            VmcInfo info = new VmcInfo();
+            var info = new VmcInfo();
             return info.GetInstances(application, cloud);
         }
 
         public List<Crash> GetAppCrash(Application application, Cloud cloud)
         {
-            VmcApps apps = new VmcApps();
+            var apps = new Apps(credentialManager.CurrentToken);
             return apps.GetAppCrash(application, cloud);
         }
 
         public List<Application> ListApps(Cloud cloud)
         {
-            VmcApps apps = new VmcApps();
+            var apps = new Apps(credentialManager.CurrentToken);
             return apps.ListApps(cloud);
         }
 
         public List<SystemServices> GetAvailableServices(Cloud cloud)
         {
-            VmcServices services = new VmcServices();
+            var services = new Services(credentialManager.CurrentToken);
             return services.GetAvailableServices(cloud);
         }
 
         public List<AppService> GetProvisionedServices(Cloud cloud)
         {
-            VmcServices services = new VmcServices();
+            var services = new Services(credentialManager.CurrentToken);
             return services.GetProvisionedServices(cloud);
+        }
+
+        private VcapClientResult checkLoginStatus()
+        {
+            return Info();
         }
 
         private string executeRequest(string argResource, bool argUseCredentials = true)
@@ -178,7 +195,7 @@
             var request = new RestRequest { Resource = argResource };
             if (argUseCredentials && credentialManager.HasToken)
             {
-                request.AddHeader("Authorization", credentialManager.CurrentToken);
+                request.AddHeader("AUTHORIZATION", credentialManager.CurrentToken);
             }
             return client.Execute(request).Content;
         }

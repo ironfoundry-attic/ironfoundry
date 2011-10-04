@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using CloudFoundry.Net.Types;
 
     public interface IVcapClient
@@ -15,7 +16,7 @@
 
         // TODO VcapClientResult ChangePassword(string username, string newpassword, string url, string accesstoken)
 
-        string Push(string appname, string fdqn, string fileURI, string framework, string memorysize);
+        VcapClientResult Push(string argName, string argDeployFQDN, DirectoryInfo argPath, uint memorysize);
 
         void StopApp(Application application, Cloud cloud);
 

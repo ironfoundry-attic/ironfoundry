@@ -103,9 +103,9 @@
     <Compile Include="Vmc\VcapClientResult.cs" />
     <Compile Include="Vmc\VmcInfo.cs" />
     <Compile Include="Vmc\VmcAdministration.cs" />
-    <Compile Include="Vmc\VmcApps.cs" />
+    <Compile Include="Vmc\Apps.cs" />
     <Compile Include="Vmc\VcapClient.cs" />
-    <Compile Include="Vmc\VmcServices.cs" />
+    <Compile Include="Vmc\Services.cs" />
     <Compile Include="Vmc\Entities.cs" />
     <Compile Include="Vmc\IVcapClient.cs" />
   </ItemGroup>
