@@ -20,6 +20,8 @@ if "%DevEnvDir%"=="" (
     call %VCVARSALL% x86
 )
 
-msbuild /t:build /p:Configuration=Release %SLN%
+rem msbuild /v:n /t:build /p:Configuration=Debug %SLN%
+
+msbuild /v:n /t:build /p:Configuration=Release %SLN%
 
 exit /b %ERRORLEVEL%
