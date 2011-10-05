@@ -64,7 +64,7 @@
 
         public Uri CurrentTarget
         {
-            get { return currentTarget ?? Constants.DEFAULT_TARGET; }
+            get { return currentTarget ?? Constants.DEFAULT_LOCAL_TARGET; }
         }
 
         public string CurrentToken

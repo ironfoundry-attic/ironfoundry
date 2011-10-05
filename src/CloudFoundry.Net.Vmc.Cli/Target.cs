@@ -1,0 +1,31 @@
+﻿namespace CloudFoundry.Net.Vmc.Cli
+{
+    using System;
+    using System.Collections.Generic;
+    using Properties;
+
+    static partial class Program
+    {
+        static bool target(IList<string> unparsed)
+        {
+            string url = command_url;
+            if (false == unparsed.IsNullOrEmpty())
+            {
+                url = unparsed[0];
+            }
+
+            var vc = new VcapClient();
+            VcapClientResult rslt = vc.Target(url);
+            if (rslt.Success)
+            {
+                Console.WriteLine(String.Format(Resources.Vmc_TargetDisplay_Fmt, rslt.Message));
+            }
+            else
+            {
+                Console.WriteLine(String.Format(Resources.Vmc_TargetNoSuccessDisplay_Fmt, rslt.Message));
+            }
+
+            return rslt.Success;
+        }
+    }
+}

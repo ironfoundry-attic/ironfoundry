@@ -1,5 +1,26 @@
 ﻿namespace CloudFoundry.Net.Vmc.Cli
 {
+    using System;
+    using NDesk.Options;
+
+    static partial class Program
+    {
+        static bool usage()
+        {
+            Console.WriteLine(Usage.COMMAND_USAGE);
+            return true;
+        }
+
+        static bool showHelp(OptionSet p)
+        {
+            Console.WriteLine("Usage: vmc [OPTIONS]+ message");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(Console.Out);
+            return true;
+        }
+    }
+
     public class Usage
     {
         public static readonly string BASIC_USAGE = @"Usage: vmc [options] command [<args>] [command_options]
