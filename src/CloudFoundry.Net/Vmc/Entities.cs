@@ -38,12 +38,19 @@
     public class Resource
     {
         [JsonProperty(PropertyName="size")]
-        public ulong Size { get; set; }
+        public ulong Size { get; private set; }
 
         [JsonProperty(PropertyName="sha1")]
-        public string SHA1 { get; set; }
+        public string SHA1 { get; private set; }
 
         [JsonProperty(PropertyName="fn")]
-        public string FN { get; set; }
+        public string FN { get; private set; }
+
+        public Resource(ulong argSize, string argSha1, string argFN)
+        {
+            Size = argSize;
+            SHA1 = argSha1;
+            FN   = argFN;
+        }
     }
 }

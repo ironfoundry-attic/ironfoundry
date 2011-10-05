@@ -40,6 +40,9 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>CloudFoundrySmall.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight.Extras.WPF4">
       <HintPath>..\..\packages\MvvmLight.3.0.3\lib\net40\GalaSoft.MvvmLight.Extras.WPF4.dll</HintPath>
@@ -49,7 +52,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity">
       <HintPath>..\..\packages\MvvmLight.3.0.3\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -57,7 +59,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -115,10 +116,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\test\CloudFoundry.Net.Vmc\CloudFoundry.Net.Vmc.csproj">
-      <Project>{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32}</Project>
-      <Name>CloudFoundry.Net.Vmc %28test\CloudFoundry.Net.Vmc%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CloudFoundry.Net.VsExtension.Ui.Controls\CloudFoundry.Net.VsExtension.Ui.Controls.csproj">
       <Project>{C6E076BF-108A-4379-AE35-8F47059F4331}</Project>
       <Name>CloudFoundry.Net.VsExtension.Ui.Controls</Name>
@@ -127,6 +124,9 @@
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
       <Name>CloudFoundry.Net</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CloudFoundrySmall.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />

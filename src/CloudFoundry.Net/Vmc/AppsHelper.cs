@@ -112,6 +112,12 @@
             }
             else
             {
+                /*
+                 * Before creating the app, ensure we can build resource list
+                 */
+                var resources = new List<Resource>();
+                addDirectoryToResources(resources, argPath, argPath.FullName);
+
                 if (argServiceBindings == null)
                 {
                     argServiceBindings = "none";
@@ -131,17 +137,13 @@
                 request.AddBody(manifest);
                 RestResponse response = executeRequest(client, request);
 
-                var resourcesForPost = new List<Resource>();
-                addDirectoryToResources(resourcesForPost, argPath, argPath.FullName);
-                Resource[] resources = resourcesForPost.ToArray();
+                // This is required in order to pass the JSON as a parameter
+                string resourcesJson = JsonConvert.SerializeObject(resources.ToArrayOrNull());
 
                 client = buildClient();
                 request = buildRequest(Method.POST, DataFormat.Json, Constants.RESOURCES_PATH);
-                request.AddBody(resources);
+                request.AddBody(resourcesJson);
                 response = executeRequest(client, request);
-
-                // This is required in order to pass the JSON as a parameter
-                string resourcesJson = JsonConvert.SerializeObject(resources);
 
                 client = buildClient();
 
@@ -178,30 +180,11 @@
                 {
                     info = GetAppInfo(argName);
                     var crash = GetAppCrash(argName);
-                    Thread.Sleep(TimeSpan.FromSeconds(5));
+                    Thread.Sleep(TimeSpan.FromSeconds(2));
                 }
 
                 return info;
-
             }
-        }
-
-        private void addDirectoryToResources(List<Resource> resource, DirectoryInfo directory, string rootFullName)
-        {
-            foreach (var file in directory.GetFiles())
-            {
-                var hash = GenerateHash(file.FullName);
-                var size = file.Length;
-                var filename = file.FullName;
-                // The root path should be stripped. This is used
-                // by the server to TAR up the file that gets pushed
-                // to the DEA.
-                filename = filename.Replace(rootFullName, string.Empty);
-                resource.Add(new Resource() { Size = (ulong)file.Length, SHA1 = hash, FN = filename });
-            }
-
-            foreach (var subdirectory in directory.GetDirectories())
-                addDirectoryToResources(resource, subdirectory, rootFullName);
         }
 
         public string GetAppCrash(string argName)
@@ -262,21 +245,39 @@
             return rv;
         }
 
-        public static string GenerateHash(string filePathAndName)
+        private static void addDirectoryToResources(List<Resource> argResources, DirectoryInfo argDirectory, string argRootFullName)
         {
-            string hashText = "";
-            string hexValue = "";
+            var fileTrimStartChars = new[] { '\\', '/' };
 
-            byte[] fileData = File.ReadAllBytes(filePathAndName);
-            byte[] hashData = SHA1.Create().ComputeHash(fileData); // SHA1 or MD5
-
-            foreach (byte b in hashData)
+            foreach (FileInfo file in argDirectory.GetFiles())
             {
-                hexValue = b.ToString("X").ToLower(); // Lowercase for compatibility on case-sensitive systems
-                hashText += (hexValue.Length == 1 ? "0" : "") + hexValue;
+                string hash     = generateHash(file.FullName);
+                long size       = file.Length;
+                string filename = file.FullName;
+                // The root path should be stripped. This is used
+                // by the server to TAR up the file that gets pushed
+                // to the DEA.
+                filename = filename.Replace(argRootFullName, String.Empty);
+                filename = filename.TrimStart(fileTrimStartChars);
+                filename = filename.Replace('\\', '/');
+                argResources.Add(new Resource((ulong)file.Length, hash, filename));
             }
 
-            return hashText;
+            foreach (var subdirectory in argDirectory.GetDirectories())
+            {
+                addDirectoryToResources(argResources, subdirectory, argRootFullName);
+            }
+        }
+
+        private static string generateHash(string fileName)
+        {
+            using (FileStream fs = File.OpenRead(fileName))
+            {
+                using (var sha1 = new SHA1Managed())
+                {
+                    return BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", String.Empty).ToLowerInvariant();
+                }
+            }
         }
     }
 }
