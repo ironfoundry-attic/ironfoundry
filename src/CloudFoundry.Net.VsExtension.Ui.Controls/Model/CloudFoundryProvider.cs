@@ -144,7 +144,7 @@
         public Application GetApplication(Application argApp, Cloud argCloud)
         {
             IVcapClient client = new VcapClient(argCloud);
-            return client.GetAppInfo(argApp.Name);
+            return client.GetApplication(argApp.Name);
         }
     }
 }

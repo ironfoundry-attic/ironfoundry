@@ -31,7 +31,7 @@
         void Start(Application argApp);
         void Restart(Application argApp);
 
-        Application GetAppInfo(string argName);
+        Application GetApplication(string argName);
 
         string GetLogs(Application application, ushort instanceNumber);
 

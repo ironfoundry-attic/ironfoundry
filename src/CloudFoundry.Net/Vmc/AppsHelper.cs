@@ -153,8 +153,13 @@
                 {
                     string appJson = GetApplicationJson(argName);
                     JObject parsed = JObject.Parse(appJson);
-                    string appState = (string)parsed["state"];
-                    if (appState == VcapStates.RUNNING)
+
+                    // Ruby detects health a little differently
+                    string appState         = (string)parsed["state"];
+                    ushort instances        = (ushort)parsed["instances"];
+                    ushort runningInstances = (ushort)parsed["runningInstances"];
+
+                    if (appState == VcapStates.STARTED && (instances == runningInstances))
                     {
                         started = true;
                         break;

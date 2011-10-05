@@ -124,7 +124,7 @@
             apps.Stop(argApp);
         }
 
-        public Application GetAppInfo(string argName)
+        public Application GetApplication(string argName)
         {
             var app = new AppsHelper(credentialManager);
             return app.GetApplication(argName);
