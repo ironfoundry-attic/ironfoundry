@@ -54,16 +54,16 @@
 
         private bool CanStart()
         {
-            return !(application.State.Equals(Types.Instance.InstanceState.RUNNING) ||
-                     application.State.Equals(Types.Instance.InstanceState.STARTED) ||
-                     application.State.Equals(Types.Instance.InstanceState.STARTING));
+            return !(application.State.Equals(Types.VcapStates.RUNNING) ||
+                     application.State.Equals(Types.VcapStates.STARTED) ||
+                     application.State.Equals(Types.VcapStates.STARTING));
         }
 
         private bool CanStop()
         {
-            return  (application.State.Equals(Types.Instance.InstanceState.RUNNING) ||
-                     application.State.Equals(Types.Instance.InstanceState.STARTED) ||
-                     application.State.Equals(Types.Instance.InstanceState.STARTING));
+            return  (application.State.Equals(Types.VcapStates.RUNNING) ||
+                     application.State.Equals(Types.VcapStates.STARTED) ||
+                     application.State.Equals(Types.VcapStates.STARTING));
 
         }
 

@@ -42,13 +42,20 @@
         public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
         {
             var apps = new AppsHelper(credentialManager);
-            Application app = apps.GetAppInfo(argAppName);
+
+            Application app = apps.GetApplication(argAppName);
             app.Services.Add(argProvisionedServiceName);
             RestClient client = buildClient();
             RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, app.Name);
             request.AddBody(app);
             RestResponse response = executeRequest(client, request);
-            apps.Restart(app);
+
+            // Ruby code re-gets info
+            app = apps.GetApplication(argAppName);
+            if (app.Started)
+            {
+                apps.Restart(app);
+            }
             return new VcapClientResult();
         }
 

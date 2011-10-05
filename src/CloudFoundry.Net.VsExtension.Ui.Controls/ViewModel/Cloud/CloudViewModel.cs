@@ -91,7 +91,7 @@
         private void BeginUpdateApplication(object sender, DoWorkEventArgs e)
         {
             ApplicationErrorMessage = string.Empty;
-            e.Result = provider.UpdateApplicationSettings(SelectedApplication, Cloud);
+            e.Result = provider.UpdateApplication(SelectedApplication, Cloud);
         }
 
         private void EndUpdateApplication(object sender, RunWorkerCompletedEventArgs e)
@@ -113,9 +113,9 @@
             var instances = new ObservableCollection<Model.Instance>();
             foreach (var stat in stats)
             {
-                if (stat.State.Equals(Types.Instance.InstanceState.RUNNING) ||
-                    stat.State.Equals(Types.Instance.InstanceState.STARTED) ||
-                    stat.State.Equals(Types.Instance.InstanceState.STARTING))
+                if (stat.State.Equals(Types.VcapStates.RUNNING) ||
+                    stat.State.Equals(Types.VcapStates.STARTED) ||
+                    stat.State.Equals(Types.VcapStates.STARTING))
                 {
                     var actualstats = stat.Stats;
                     var instance = new Model.Instance()
@@ -234,17 +234,17 @@
         public bool CanExecuteStart()
         {
             return IsApplicationSelected && !(
-                   SelectedApplication.State.Equals(Types.Instance.InstanceState.RUNNING) ||
-                   SelectedApplication.State.Equals(Types.Instance.InstanceState.STARTED) ||
-                   SelectedApplication.State.Equals(Types.Instance.InstanceState.STARTING));
+                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
         }
 
         public bool CanExecuteStopActions()
         {
             return IsApplicationSelected && (
-                   SelectedApplication.State.Equals(Types.Instance.InstanceState.RUNNING) ||
-                   SelectedApplication.State.Equals(Types.Instance.InstanceState.STARTED) ||
-                   SelectedApplication.State.Equals(Types.Instance.InstanceState.STARTING));
+                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
         }
 
         public void Start()

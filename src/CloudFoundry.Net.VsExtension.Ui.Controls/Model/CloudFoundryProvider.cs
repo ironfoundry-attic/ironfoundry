@@ -110,10 +110,10 @@
             return client.GetStats(app);
         }
 
-        public VcapResponse UpdateApplicationSettings(Application app, Cloud cloud)
+        public VcapResponse UpdateApplication(Application app, Cloud cloud)
         {
             IVcapClient client = new VcapClient(cloud);
-            return client.UpdateApplicationSettings(app);
+            return client.UpdateApplication(app);
         }
 
         public void Start(Application app, Cloud cloud)
@@ -137,7 +137,7 @@
         public void UpdateAndRestart(Application argApp, Cloud argCloud)
         {
             IVcapClient client = new VcapClient(argCloud);
-            client.UpdateApplicationSettings(argApp);
+            client.UpdateApplication(argApp);
             client.Restart(argApp);
         }
 

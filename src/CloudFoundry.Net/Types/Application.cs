@@ -123,6 +123,18 @@
 
         [JsonIgnore]
         public Cloud Parent { get; set; }
+
+        [JsonIgnore]
+        public bool Started
+        {
+            get { return State == VcapStates.STARTED; }
+        }
+
+        [JsonIgnore]
+        public bool Stopped
+        {
+            get { return State == VcapStates.STOPPED; }
+        }
     }
 
     [Serializable]

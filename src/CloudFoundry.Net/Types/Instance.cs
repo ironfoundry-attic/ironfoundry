@@ -33,7 +33,7 @@
                 LogID         = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
             }
 
-            State          = InstanceState.STARTING;
+            State          = VcapStates.STARTING;
             Start          = DateTime.Now.ToString(Constants.JsonDateFormat);
             StateTimestamp = Utility.GetEpochTimestamp();
         }
@@ -113,25 +113,25 @@
         [JsonIgnore]
         public bool IsStarting
         {
-            get { return null != State && State == InstanceState.STARTING; }
+            get { return null != State && State == VcapStates.STARTING; }
         }
 
         [JsonIgnore]
         public bool IsRunning
         {
-            get { return null != State && State == InstanceState.RUNNING; }
+            get { return null != State && State == VcapStates.RUNNING; }
         }
 
         [JsonIgnore]
         public bool IsStartingOrRunning
         {
-            get { return null != State && (State == InstanceState.RUNNING || State == InstanceState.STARTING); }
+            get { return null != State && (State == VcapStates.RUNNING || State == VcapStates.STARTING); }
         }
 
         [JsonIgnore]
         public bool IsCrashed
         {
-            get { return null != State && State == InstanceState.CRASHED; }
+            get { return null != State && State == VcapStates.CRASHED; }
         }
 
         [JsonIgnore]
@@ -149,30 +149,9 @@
         [JsonIgnore]
         public bool IsNotified { get; set; }
 
-        public static class InstanceState
-        {
-            public const string STARTING      = "STARTING";
-            public const string STOPPED       = "STOPPED";
-            public const string RUNNING       = "RUNNING";
-            public const string STARTED       = "STARTED";
-            public const string SHUTTING_DOWN = "SHUTTING_DOWN";
-            public const string CRASHED       = "CRASHED";
-            public const string DELETED       = "DELETED";
-
-            public static bool IsValid(string argState)
-            {
-                return STARTING == argState ||
-                       STOPPED == argState ||
-                       RUNNING == argState ||
-                       SHUTTING_DOWN == argState ||
-                       CRASHED == argState ||
-                       DELETED == argState;
-            }
-        }
-
         public void Crashed()
         {
-            ExitReason = State = InstanceState.CRASHED;
+            ExitReason = State = VcapStates.CRASHED;
             StateTimestamp = Utility.GetEpochTimestamp();
         }
 
@@ -184,14 +163,14 @@
 
         public void OnDeaStop()
         {
-            if (State == InstanceState.STARTING || State == InstanceState.RUNNING)
+            if (State == VcapStates.STARTING || State == VcapStates.RUNNING)
             {
-                ExitReason = InstanceState.STOPPED;
+                ExitReason = VcapStates.STOPPED;
             }
 
-            if (State == InstanceState.CRASHED)
+            if (State == VcapStates.CRASHED)
             {
-                State = InstanceState.DELETED;
+                State = VcapStates.DELETED;
                 StopProcessed = false;
             }
         }
@@ -203,12 +182,12 @@
 
         public void OnDeaStart()
         {
-            State = Instance.InstanceState.RUNNING;
+            State = VcapStates.RUNNING;
         }
 
         public void UpdateState(string argNewState)
         {
-            if (InstanceState.IsValid(argNewState))
+            if (VcapStates.IsValid(argNewState))
             {
                 State = argNewState;
             }

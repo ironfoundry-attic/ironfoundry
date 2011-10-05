@@ -18,30 +18,39 @@
 
         public void Start(Application argApplication)
         {
-            argApplication.State = Instance.InstanceState.STARTED;
-            UpdateApplicationSettings(argApplication);
+            Application app = GetApplication(argApplication.Name);
+            if (false == app.Started)
+            {
+                argApplication.State = VcapStates.STARTED;
+                UpdateApplication(argApplication);
+                // NB: Ruby vmc does a LOT more steps here
+            }
         }
 
         public void Stop(Application argApplication)
         {
-            argApplication.State = Instance.InstanceState.STOPPED;
-            UpdateApplicationSettings(argApplication);
+            Application app = GetApplication(argApplication.Name);
+            if (false == app.Stopped)
+            {
+                argApplication.State = VcapStates.STOPPED;
+                UpdateApplication(argApplication);
+            }
         }
 
-        public string GetAppInfoJson(string argName)
+        public string GetApplicationJson(string argName)
         {
             RestClient client = buildClient();
             RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argName);
             return client.Execute(request).Content;
         }
 
-        public Application GetAppInfo(string argName)
+        public Application GetApplication(string argName)
         {
-            string json = GetAppInfoJson(argName);
+            string json = GetApplicationJson(argName);
             return JsonConvert.DeserializeObject<Application>(json);
         }
 
-        public VcapResponse UpdateApplicationSettings(Application argApp)
+        public VcapResponse UpdateApplication(Application argApp)
         {
             RestClient client = buildClient();
             RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argApp.Name);
@@ -62,20 +71,22 @@
             Start(argApp);
         }
 
-        public string Push(string argName, DirectoryInfo argPath, string argDeployUrl,
+        public VcapClientResult Push(string argName, DirectoryInfo argPath, string argDeployUrl,
             string argFramework, string argRuntime, uint argMemoryReservation, string argServiceBindings)
         {
+            VcapClientResult rv;
+
             if (argPath == null)
             {
-                return ("Application local location is needed");
+                rv = new VcapClientResult(false, "Application local location is needed");
             }
             else if (argDeployUrl == null)
             {
-                return ("Please specify the url to deploy as.");
+                rv = new VcapClientResult(false, "Please specify the url to deploy as.");
             }
             else if (argFramework == null)
             {
-                return ("Please specify application framework");
+                rv = new VcapClientResult(false, "Please specify application framework");
             }
             else
             {
@@ -99,12 +110,11 @@
                 request.AddBody(manifest);
                 RestResponse response = executeRequest(client, request);
 
-                // This is required in order to pass the JSON as a parameter
-                string resourcesJson = JsonConvert.SerializeObject(resources.ToArrayOrNull());
+                Resource[] resourceAry = resources.ToArrayOrNull();
 
                 client = buildClient();
                 request = buildRequest(Method.POST, DataFormat.Json, Constants.RESOURCES_PATH);
-                request.AddBody(resourcesJson);
+                request.AddBody(resourceAry);
                 response = executeRequest(client, request);
 
                 client = buildClient();
@@ -118,7 +128,8 @@
                     request = buildRequest(Method.POST, Constants.APPS_PATH, argName, "application");
                     request.AddParameter("_method", "put");
                     request.AddFile("application", tempFile);
-                    request.AddParameter("resources", resourcesJson);
+                    // This is required in order to pass the JSON as a parameter
+                    request.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
 
                     response = executeRequest(client, request);
                 }
@@ -127,7 +138,7 @@
                     File.Delete(tempFile);
                 }
 
-                string app = GetAppInfoJson(argName);
+                string app = GetApplicationJson(argName);
                 JObject getInfo = JObject.Parse(app);
                 getInfo["state"] = "STARTED";
 
@@ -137,16 +148,27 @@
                 request.AddBody(getInfo);
                 response = client.Execute(request);
 
-                string info = null;
-                for (int i = 0; i < 4; i++)
+                bool started = false;
+                for (int i = 0; i < 5; ++i)
                 {
-                    info = GetAppInfoJson(argName);
-                    var crash = GetAppCrash(argName);
-                    Thread.Sleep(TimeSpan.FromSeconds(2));
+                    string appJson = GetApplicationJson(argName);
+                    JObject parsed = JObject.Parse(appJson);
+                    string appState = (string)parsed["state"];
+                    if (appState == VcapStates.RUNNING)
+                    {
+                        started = true;
+                        break;
+                    }
+                    else
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(6));
+                    }
                 }
 
-                return info;
+                rv = new VcapClientResult(started);
             }
+
+            return rv;
         }
 
         public string GetAppCrash(string argName)

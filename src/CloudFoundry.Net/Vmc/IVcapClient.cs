@@ -43,6 +43,6 @@
 
         IEnumerable<Application> ListApps();
 
-        VcapResponse UpdateApplicationSettings(Application application);
+        VcapResponse UpdateApplication(Application application);
     }
 }

@@ -80,8 +80,7 @@
         {
             checkLoginStatus();
             var apps = new AppsHelper(credentialManager);
-            string app =  apps.Push(argName, argPath, argDeployFQDN, "aspdotnet", "aspdotnet40", argMemory, null);
-            return new VcapClientResult(true, app);
+            return apps.Push(argName, argPath, argDeployFQDN, "aspdotnet", "aspdotnet40", argMemory, null);
         }
 
         public VcapClientResult Delete(string argName)
@@ -128,15 +127,14 @@
         public Application GetAppInfo(string argName)
         {
             var app = new AppsHelper(credentialManager);
-            return app.GetAppInfo(argName);
+            return app.GetApplication(argName);
         }
 
-        public VcapResponse UpdateApplicationSettings(Application argApp)
+        public VcapResponse UpdateApplication(Application argApp)
         {
             var app = new AppsHelper(credentialManager);
-            return app.UpdateApplicationSettings(argApp);
+            return app.UpdateApplication(argApp);
         }
-
 
         public void Restart(Application argApp)
         {

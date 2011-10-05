@@ -313,7 +313,7 @@
                             var span = DateTime.Now - startDate;
                             var response = new FindDropletResponse(NATS.UniqueIdentifier, instance, span);
 
-                            if (response.State != Instance.InstanceState.RUNNING)
+                            if (response.State != VcapStates.RUNNING)
                             {
                                 response.Stats = null;
                             }
@@ -442,7 +442,7 @@
         private string getApplicationState(string name)
         {
             if (false == IIS.DoesApplicationExist(name))
-                return Instance.InstanceState.DELETED;
+                return VcapStates.DELETED;
 
             ApplicationInstanceStatus status = IIS.GetStatus(name);
 
@@ -451,22 +451,22 @@
             switch (status)
             {
                 case ApplicationInstanceStatus.Started:
-                    rv = Instance.InstanceState.RUNNING;
+                    rv = VcapStates.RUNNING;
                     break;
                 case ApplicationInstanceStatus.Starting:
-                    rv = Instance.InstanceState.STARTING;
+                    rv = VcapStates.STARTING;
                     break;
                 case ApplicationInstanceStatus.Stopping:
-                    rv = Instance.InstanceState.SHUTTING_DOWN;
+                    rv = VcapStates.SHUTTING_DOWN;
                     break;
                 case ApplicationInstanceStatus.Stopped:
-                    rv = Instance.InstanceState.STOPPED;
+                    rv = VcapStates.STOPPED;
                     break;
                 case ApplicationInstanceStatus.Unknown:
-                    rv = Instance.InstanceState.CRASHED;
+                    rv = VcapStates.CRASHED;
                     break;
                 default:
-                    rv = Instance.InstanceState.CRASHED;
+                    rv = VcapStates.CRASHED;
                     break;
             }
 
