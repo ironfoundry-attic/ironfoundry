@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.PlatformUI;
 using EnvDTE;
 using VsWebSite;
 using System.IO;
-using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Build.Utilities;

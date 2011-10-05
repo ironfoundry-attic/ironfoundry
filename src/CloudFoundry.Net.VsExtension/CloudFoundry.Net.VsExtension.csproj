@@ -24,7 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,9 +51,6 @@
       <Private>false</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.4.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="RestSharp">
@@ -129,6 +126,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProvideBindingPathAttribute.cs" />
+    <Compile Include="UserInterface\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserInterface\ManageWindow.xaml.cs">
       <DependentUpon>ManageWindow.xaml</DependentUpon>
     </Compile>
@@ -200,8 +201,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="app.config" />
     <None Include="CloudFoundry.snk" />
-    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -213,6 +214,10 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UserInterface\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UserInterface\ManageWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -223,6 +228,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CloudFoundry.Net.VsExtension.Ui.Controls\CloudFoundry.Net.VsExtension.Ui.Controls.csproj">
+      <Project>{C6E076BF-108A-4379-AE35-8F47059F4331}</Project>
+      <Name>CloudFoundry.Net.VsExtension.Ui.Controls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CloudFoundry.Net\CloudFoundry.Net.csproj">
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
       <Name>CloudFoundry.Net</Name>

@@ -12,6 +12,7 @@
             using (var ms = new MemoryStream())
             {
                 var formatter = new BinaryFormatter();
+                formatter.Binder = new Binder();
                 formatter.Serialize(ms, obj);
                 ms.Position = 0;
 

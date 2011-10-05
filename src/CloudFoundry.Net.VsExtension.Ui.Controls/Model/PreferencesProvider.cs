@@ -38,8 +38,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                 {
                     using (IsolatedStorageFileStream configStream = isoStore.OpenFile(fullPath, FileMode.Open))
                     {
-                        var binary = new BinaryFormatter();
-                        preferences = binary.Deserialize(configStream) as Preferences;
+                        var formatter = new BinaryFormatter();
+                        preferences = formatter.Deserialize(configStream) as Preferences;
                     }
                 }
             }
@@ -63,8 +63,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                 configStream = isoStore.CreateFile(fullPath);
             else
                 configStream = isoStore.OpenFile(fullPath, FileMode.Open);
-            var binary = new BinaryFormatter();                      
-            binary.Serialize(configStream, preferences);            
+            var formatter = new BinaryFormatter();            
+            formatter.Serialize(configStream, preferences);            
             configStream.Flush();
             configStream.Close();
         }

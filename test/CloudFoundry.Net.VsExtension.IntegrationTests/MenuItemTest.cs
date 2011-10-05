@@ -42,7 +42,7 @@ namespace CloudFoundry.VS2k10_IntegrationTests
         {
             UIThreadInvoker.Invoke((ThreadInvoker)delegate()
             {
-                CommandID menuItemCmd = new CommandID(CloudFoundry.Net.VsExtension.GuidList.guidCloudFoundryCmdSet, (int)CloudFoundry.Net.VsExtension.PkgCmdIDList.cmdidManageCloudFoundry);
+                CommandID menuItemCmd = new CommandID(CloudFoundry.Net.VsExtension.GuidList.guidCloudFoundryCmdSet, (int)CloudFoundry.Net.VsExtension.PkgCmdIDList.cmdidCloudFoundryExplorer);
 
                 // Create the DialogBoxListener Thread.
                 string expectedDialogBoxText = string.Format(CultureInfo.CurrentCulture, "{0}\n\nInside {1}.MenuItemCallback()", "CloudFoundry.VS2k10", "CloudFoundry.CloudFoundry_VS2k10.CloudFoundry_VS2k10Package");
