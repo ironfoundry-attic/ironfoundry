@@ -38,8 +38,12 @@ Currently available vmc commands are:
   Application Creation
     push <appname> <path> <url>                  Create, push, map, and start a new application
 
+  Application Operations
+    delete <appname>                             Delete the application
+
   Services
     services                                     Lists of services available and provisioned
+    bind-service <servicename> <appname>         Bind a service to an application
 
   Help
     help                                         Get general help

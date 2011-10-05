@@ -35,5 +35,22 @@
 
             return true;
         }
+
+        static bool bind_service(IList<string> unparsed)
+        {
+            var vc = new VcapClient();
+            // TODO match ruby argument parsing
+            if (unparsed.Count != 2)
+            {
+                Console.Error.WriteLine("Usage: vmc bind-service <servicename> <appname>"); // TODO usage statement standardization
+                return false;
+            }
+
+            string svcname = unparsed[0];
+            string appname = unparsed[1];
+
+            VcapClientResult rslt = vc.Bind(svcname, appname);
+            return rslt.Success;
+        }
     }
 }

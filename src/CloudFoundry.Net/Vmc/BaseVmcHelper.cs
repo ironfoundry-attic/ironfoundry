@@ -7,7 +7,7 @@
     using Newtonsoft.Json.Linq;
     using RestSharp;
 
-    public abstract class BaseVmcHelper
+    internal abstract class BaseVmcHelper
     {
         private static readonly ushort[] VMC_HTTP_ERROR_CODES = { 400, 403, 404, 500 };
 

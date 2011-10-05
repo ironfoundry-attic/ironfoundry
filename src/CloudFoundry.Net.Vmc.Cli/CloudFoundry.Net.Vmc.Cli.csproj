@@ -51,6 +51,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Delete.cs" />
     <Compile Include="Info.cs" />
     <Compile Include="Login.cs" />
     <Compile Include="Misc.cs" />

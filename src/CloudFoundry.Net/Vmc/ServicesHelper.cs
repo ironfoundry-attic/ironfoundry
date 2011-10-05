@@ -5,7 +5,7 @@
     using Newtonsoft.Json;
     using RestSharp;
 
-    public class ServicesHelper : BaseVmcHelper
+    internal class ServicesHelper : BaseVmcHelper
     {
         public ServicesHelper(VcapCredentialManager argCredentialManager)
             : base(argCredentialManager) { }
@@ -39,6 +39,19 @@
             return executeRequest<ProvisionedService[]>(client, request);
         }
 
+        public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
+        {
+            var apps = new AppsHelper(credentialManager);
+            Application app = apps.GetAppInfo(argAppName);
+            app.Services.Add(argProvisionedServiceName);
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, app.Name);
+            request.AddBody(app);
+            RestResponse response = executeRequest(client, request);
+            apps.Restart(app);
+            return new VcapClientResult();
+        }
+
 #if UNUSED
         public void CreateService(AppService appservice, Cloud cloud) {
             /*
@@ -64,22 +77,6 @@
             request.AddHeader("Authorization", cloud.AccessToken);
             client.Execute(request);
             //should prolly put a try-catch in here to catch the exception when the service is not in the current running list
-        }
-
-        public void BindService (AppService appservice, Application application, Cloud cloud) {
-
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.PUT;
-            request.Resource = "/apps/"+application.Name;
-            request.AddHeader("Authorization", cloud.AccessToken);
-            application.Services.Add(appservice.Name);
-            request.AddObject(application);
-            request.RequestFormat = DataFormat.Json;
-            client.Execute(request);
-            var apps = new AppsHelper(token);
-            apps.RestartApp(application, cloud);
         }
 
         public void UnbindService (AppService appservice, Application application, Cloud cloud) {

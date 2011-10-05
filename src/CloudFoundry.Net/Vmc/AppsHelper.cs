@@ -11,19 +11,10 @@
     using Newtonsoft.Json.Linq;
     using RestSharp;
 
-    public class AppsHelper : BaseVmcHelper
+    internal class AppsHelper : BaseVmcHelper
     {
         public AppsHelper(VcapCredentialManager argCredentialManager)
             : base(argCredentialManager) { }
-
-#if UNUSED
-        public string Start(string argName) // TODO error return, require login?
-        {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.PUT, String.Format("{0}/{1}", Constants.APPS_PATH, argName));
-            return executeRequest(client, request);
-        }
-#endif
 
         public void Start(Application argApplication)
         {
@@ -56,11 +47,6 @@
             RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argApp.Name);
             request.AddBody(argApp);
             return executeRequest<VcapResponse>(client, request);
-        }
-
-        public void Delete(Application argApp)
-        {
-            Delete(argApp.Name);
         }
 
         public void Delete(string argName)
@@ -98,11 +84,6 @@
                  */
                 var resources = new List<Resource>();
                 addDirectoryToResources(resources, argPath, argPath.FullName);
-
-                if (argServiceBindings == null)
-                {
-                    argServiceBindings = "none";
-                }
 
                 var manifest = new AppManifest
                 {
@@ -156,7 +137,7 @@
                 request.AddBody(getInfo);
                 response = client.Execute(request);
 
-                string info = string.Empty;
+                string info = null;
                 for (int i = 0; i < 4; i++)
                 {
                     info = GetAppInfoJson(argName);

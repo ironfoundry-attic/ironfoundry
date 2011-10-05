@@ -84,6 +84,21 @@
             return new VcapClientResult(true, app);
         }
 
+        public VcapClientResult Delete(string argName)
+        {
+            checkLoginStatus();
+            var apps = new AppsHelper(credentialManager);
+            apps.Delete(argName);
+            return new VcapClientResult();
+        }
+
+        public VcapClientResult Bind(string argProvisionedServiceName, string argAppName)
+        {
+            checkLoginStatus();
+            var services = new ServicesHelper(credentialManager);
+            return services.BindService(argProvisionedServiceName, argAppName);
+        }
+
         public IEnumerable<SystemService> GetSystemServices()
         {
             checkLoginStatus();

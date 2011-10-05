@@ -22,12 +22,14 @@
 
             var commands = new Dictionary<string, Func<IList<string>, bool>>
             {
-                { "help",     (arg) => usage() },
-                { "info",     (arg) => info(arg) },
-                { "target",   (arg) => target(arg) },
-                { "login",    (arg) => login(arg) },
-                { "push",     (arg) => push(arg) },
-                { "services", (arg) => services(arg) },
+                { "help",         (arg) => usage() },
+                { "info",         (arg) => info(arg) },
+                { "target",       (arg) => target(arg) },
+                { "login",        (arg) => login(arg) },
+                { "push",         (arg) => push(arg) },
+                { "services",     (arg) => services(arg) },
+                { "bind-service", (arg) => bind_service(arg) },
+                { "delete",       (arg) => delete(arg) },
             };
 
             var p = new OptionSet

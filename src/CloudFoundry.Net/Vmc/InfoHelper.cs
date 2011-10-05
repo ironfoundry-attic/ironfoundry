@@ -6,7 +6,7 @@
     using Newtonsoft.Json;
     using RestSharp;
 
-    public class InfoHelper : BaseVmcHelper
+    internal class InfoHelper : BaseVmcHelper
     {
         public InfoHelper(VcapCredentialManager argCredentialManager)
             : base(argCredentialManager) { }

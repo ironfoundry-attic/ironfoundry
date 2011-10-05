@@ -96,7 +96,7 @@
         }
 
         [JsonProperty(PropertyName = "services")]
-        public ObservableCollection<string> Services
+        public ObservableCollection<string> Services // TODO should be string[], not observable collection. This should not do dual-duty as message object and view model.
         {
             get { return this.services; }
         }

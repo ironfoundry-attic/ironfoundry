@@ -21,6 +21,8 @@
         // TODO VcapClientResult ChangePassword(string username, string newpassword, string url, string accesstoken)
 
         VcapClientResult Push(string argName, string argDeployFQDN, DirectoryInfo argPath, uint memorysize);
+        VcapClientResult Delete(string argName);
+        VcapClientResult Bind(string argAppName, string argProvisionedServiceName);
 
         IEnumerable<SystemService> GetSystemServices();
         IEnumerable<ProvisionedService> GetProvisionedServices();

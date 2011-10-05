@@ -4,7 +4,7 @@
     using RestSharp;
     using Types;
 
-    public class MiscHelper : BaseVmcHelper
+    internal class MiscHelper : BaseVmcHelper
     {
         public MiscHelper(VcapCredentialManager argCredentialManager)
             : base(argCredentialManager) { }

@@ -4,7 +4,7 @@
     using Properties;
     using RestSharp;
 
-    public class UserHelper : BaseVmcHelper
+    internal class UserHelper : BaseVmcHelper
     {
         public UserHelper(VcapCredentialManager argCredentialManager)
             : base(argCredentialManager) { }
