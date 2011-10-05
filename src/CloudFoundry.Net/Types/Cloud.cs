@@ -3,6 +3,7 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using System.Windows;    
 
     [Serializable]
     public class Cloud : EntityBase, IEquatable<Cloud>
@@ -149,7 +150,7 @@
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj == null || obj == DependencyProperty.UnsetValue)
                 return false;
             return ((Cloud)obj).ID == this.ID;
         }

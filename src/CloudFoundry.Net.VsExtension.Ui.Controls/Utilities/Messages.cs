@@ -56,5 +56,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string SaveCloudUrls = "SaveCloudUrls";
 
         public const string GetCloudFoundryProvider = "GetCloudFoundryProvider";
+      
+        public const string PushApp = "PushApp";
+        public const string GetPushAppData = "GetPushAppData";
+        public const string SetPushAppData = "SetPushAppData";
+        public const string PushDialogResult = "PushDialogResult";
+        
+        public const string UpdateApp = "UpdateApp";
+        public const string UpdateDialogResult = "UpdateDialogResult";
+        public const string GetUpdateAppData = "GetPushAppData";
+        public const string SetUpdateAppData = "SetPushAppData";
+        
+        public const string ManageClouds = "ManageClouds";
+        
+        public const string AddAppService = "AddAppService";        
+        public const string AddAppServiceDialogResult = "AddAppServiceDialogResult";
     }
 }

@@ -88,6 +88,8 @@
     <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
+    <Compile Include="ViewModel\UpdateViewModel.cs" />
+    <Compile Include="ViewModel\PushViewModel.cs" />
     <Compile Include="ViewModel\Explorer\ApplicationTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModel\Explorer\CloudExplorerViewModel.cs" />
@@ -96,7 +98,7 @@
     <Compile Include="ViewModel\AddCloud\RegisterAccountViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\CreateMicrocloudTargetViewModel.cs" />
     <Compile Include="ViewModel\Explorer\InstanceTreeViewItemViewModel.cs" />
-    <Compile Include="ViewModel\ContainerViewModel.cs" />
+    <Compile Include="ViewModel\ExplorerViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\ManageCloudUrlsViewModel.cs" />
     <Compile Include="Mvvm\TreeViewItemViewModel.cs" />
     <Compile Include="Views\AddCloud.xaml.cs">
@@ -128,11 +130,17 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Views\Container.xaml.cs">
-      <DependentUpon>Container.xaml</DependentUpon>
+    <Compile Include="Views\Update.xaml.cs">
+      <DependentUpon>Update.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Explorer.xaml.cs">
+      <DependentUpon>Explorer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AddApplicationUrl.xaml.cs">
       <DependentUpon>AddApplicationUrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Push.xaml.cs">
+      <DependentUpon>Push.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ManageApplicationUrls.xaml.cs">
       <DependentUpon>ManageApplicationUrls.xaml</DependentUpon>
@@ -197,11 +205,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Container.xaml">
+    <Page Include="Views\Update.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Explorer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\AddApplicationUrl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Push.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

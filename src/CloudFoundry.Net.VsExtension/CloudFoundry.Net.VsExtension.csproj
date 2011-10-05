@@ -36,6 +36,13 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GalaSoft.MvvmLight.Extras.WPF4, Version=3.0.0.32852, Culture=neutral, PublicKeyToken=1673db7d5906b0ad, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\MvvmLight.3.0.3\lib\net40\GalaSoft.MvvmLight.Extras.WPF4.dll</HintPath>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.WPF4, Version=3.0.0.32852, Culture=neutral, PublicKeyToken=63eb5c012e0b3c1c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MvvmLight.3.0.3\lib\net40\GalaSoft.MvvmLight.WPF4.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\dependencies\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -62,6 +69,9 @@
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MvvmLight.3.0.3\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="VsWebSite.Interop, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -127,12 +137,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProvideBindingPathAttribute.cs" />
-    <Compile Include="UserInterface\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UserInterface\ManageWindow.xaml.cs">
-      <DependentUpon>ManageWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="UserInterface\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
@@ -205,6 +209,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="CloudFoundry.snk" />
+    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -216,14 +221,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UserInterface\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UserInterface\ManageWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UserInterface\ProgressDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

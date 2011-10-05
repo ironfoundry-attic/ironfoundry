@@ -22,13 +22,18 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     {
         private CloudFoundryProvider provider;
         private ObservableCollection<CloudTreeViewItemViewModel> clouds = new ObservableCollection<CloudTreeViewItemViewModel>();        
-        public RelayCommand AddCloudCommand { get; private set; }        
+        public RelayCommand AddCloudCommand { get; private set; }
+        public RelayCommand PushAppCommand { get; private set; }
+        public RelayCommand UpdateAppCommand { get; private set; }  
+
         private BackgroundWorker connector = new BackgroundWorker();
 
         public CloudExplorerViewModel()
         {
             Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));            
             AddCloudCommand = new RelayCommand(AddCloud);
+            PushAppCommand = new RelayCommand(PushApp);
+            UpdateAppCommand = new RelayCommand(UpdateApp);
         }
 
         private void LoadProvider(CloudFoundryProvider provider)
@@ -68,6 +73,17 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void AddCloud()
         {
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloud,(confirmed) => {}));                
-        }              
+        }
+
+        private void PushApp()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.PushApp, (confirmed) => { }));
+        }
+
+        private void UpdateApp()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.UpdateApp, (confirmed) => { }));
+        }
+          
     }
 }

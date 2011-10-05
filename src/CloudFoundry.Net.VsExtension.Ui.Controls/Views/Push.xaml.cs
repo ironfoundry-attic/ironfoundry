@@ -12,23 +12,39 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GalaSoft.MvvmLight.Messaging;
+using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 
-namespace CloudFoundry.Net.VsExtension.Ui.Controls
+namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
     /// <summary>
-    /// Interaction logic for CloudExplorer.xaml
+    /// Interaction logic for FoundryProperties.xaml
     /// </summary>
-    public partial class CloudExplorer : UserControl
+    public partial class Push : Window
     {
-        public CloudExplorer()
+        public Push()
         {
             InitializeComponent();
+
             Messenger.Default.Register<NotificationMessageAction<bool>>(
                 this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.AddCloud))
+                    if (message.Notification.Equals(Messages.ManageClouds))
+                    {
+                        var view = new Views.Explorer();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
+                        var result = view.ShowDialog();
+                        message.Execute(result.GetValueOrDefault());
+                    }
+                });
+
+            Messenger.Default.Register<NotificationMessageAction<bool>>(
+                this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.AddAppService))
                     {
                         var view = new Views.AddCloud();
                         Window parentWindow = Window.GetWindow(this);
@@ -38,33 +54,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                     }
                 });
 
-            Messenger.Default.Register<NotificationMessageAction<bool>>(
-                this,
+            Messenger.Default.Register<NotificationMessage<bool>>(this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.PushApp))
+                    if (message.Notification.Equals(Messages.PushDialogResult))
                     {
-                        var view = new Views.Push();
-                        Window parentWindow = Window.GetWindow(this);
-                        view.Owner = parentWindow;
-                        var result = view.ShowDialog();
-                        message.Execute(result.GetValueOrDefault());
+                        this.DialogResult = message.Content;
+                        this.Close();
+                        Messenger.Default.Unregister(this);
                     }
-                });
-
-            Messenger.Default.Register<NotificationMessageAction<bool>>(
-                this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.UpdateApp))
-                    {
-                        var view = new Views.Update();
-                        Window parentWindow = Window.GetWindow(this);
-                        view.Owner = parentWindow;
-                        var result = view.ShowDialog();
-                        message.Execute(result.GetValueOrDefault());
-                    }
-                });
+                });            
         }
     }
 }

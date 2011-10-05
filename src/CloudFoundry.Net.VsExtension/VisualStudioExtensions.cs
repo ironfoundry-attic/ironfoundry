@@ -3,11 +3,17 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 using System.Runtime.InteropServices;
+using Microsoft.Build.Utilities;
 
 namespace CloudFoundry.Net.VsExtension
 {
     public static class VisualStudioExtensions
     {
+        private const int Fx40 = 262144;
+        private const int Fx35 = 196613;
+        private const int Fx30 = 196608;
+        private const int Fx20 = 131072;
+
         public static Project GetActiveProject(this IVsMonitorSelection vsMonitorSelection)
         {
             IntPtr ptrHeirarchy = IntPtr.Zero;
@@ -42,6 +48,51 @@ namespace CloudFoundry.Net.VsExtension
                 if (intPtrResult != IntPtr.Zero)
                     Marshal.Release(intPtrResult);
             }
+        }
+
+        public static string GetFrameworkPath(this Project project)
+        {
+            var targetPlatform = project.ConfigurationManager.ActiveConfiguration.Properties.Item("PlatformTarget").Value as string;
+            int targetFramework = Convert.ToInt32(project.Properties.Item("TargetFramework").Value);
+
+            TargetDotNetFrameworkVersion version = TargetDotNetFrameworkVersion.Version40;
+            switch (targetFramework)
+            {
+                case Fx40:
+                    version = TargetDotNetFrameworkVersion.Version40;
+                    break;
+                case Fx35:
+                    version = TargetDotNetFrameworkVersion.Version35;
+                    break;
+                case Fx30:
+                    version = TargetDotNetFrameworkVersion.Version30;
+                    break;
+                case Fx20:
+                    version = TargetDotNetFrameworkVersion.Version20;
+                    break;
+            }
+
+            DotNetFrameworkArchitecture arch = DotNetFrameworkArchitecture.Bitness32;
+            if (targetPlatform == "AnyCpu")
+                arch = DotNetFrameworkArchitecture.Current;
+            if (targetPlatform == "x64")
+                arch = DotNetFrameworkArchitecture.Bitness64;
+
+            return ToolLocationHelper.GetPathToDotNetFramework(version, arch);
+        }
+
+        public static string GetGlobalVariable(this Project project, string key)
+        {
+            string returnValue = string.Empty;
+            if (project.Globals.get_VariableExists(key))
+                returnValue = project.Globals[key] as string;
+            return returnValue;
+        }
+
+        public static void SetGlobalVariable(this Project project, string key, string value)
+        {
+            project.Globals[key] = value;
+            project.Globals.set_VariablePersists(key, true);
         }
     }
 }
