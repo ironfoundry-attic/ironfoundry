@@ -214,7 +214,7 @@ namespace CloudFoundry.Net.VsExtension
 
                     VcapClientResult response = cfm.Push(name, url, new DirectoryInfo(precompiledSitePath),Convert.ToUInt32(memory));
                     progressDialogDispatcher.BeginInvoke(update, "Complete.", 100);
-                    progressDialogDispatcher.BeginInvoke(updateResponse, response);
+                    progressDialogDispatcher.BeginInvoke(updateResponse, response.Message);
                 }
                 catch (Exception ex)
                 {

@@ -58,7 +58,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void BeginConnect(object sender, DoWorkEventArgs args)
         {
-            args.Result = provider.Connect(this.Cloud);
+            try
+            {
+                args.Result = provider.Connect(this.Cloud);
+            }
+            catch (Exception ex)
+            {
+                args.Result = ex;
+            }
         }
 
         private void EndConnect(object sender, RunWorkerCompletedEventArgs args)
