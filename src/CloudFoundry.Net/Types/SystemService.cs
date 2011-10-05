@@ -4,7 +4,7 @@
     using Newtonsoft.Json;
 
     [Serializable]
-    public class SystemServices : EntityBase
+    public class SystemService : EntityBase
     {
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; } //Types supported are key/value, generic, database... could potentially be a static class or enum

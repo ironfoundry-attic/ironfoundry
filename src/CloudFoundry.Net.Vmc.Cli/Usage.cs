@@ -35,6 +35,25 @@ Currently available vmc commands are:
     login  [email] [--email, --passwd]           Login
     info                                         System and account information
 
+  Application Creation
+    push <appname> <path> <url>                  Create, push, map, and start a new application
+
+  Services
+    services                                     Lists of services available and provisioned
+
+  Help
+    help                                         Get general help
+";
+
+        public static readonly string FULL_COMMAND_USAGE = BASIC_USAGE + @"
+
+Currently available vmc commands are:
+
+  Getting Started
+    target [url]                                 Reports current target or sets a new target
+    login  [email] [--email, --passwd]           Login
+    info                                         System and account information
+
   Applications
     apps                                         List deployed applications
 

@@ -142,6 +142,9 @@ Client:   v{4}</value>
   <data name="Vmc_LoginFail_Fmt" xml:space="preserve">
     <value>Problem with login to [{0}] invalid account or password.</value>
   </data>
+  <data name="Vmc_LoginRequired_Message" xml:space="preserve">
+    <value>Login Required</value>
+  </data>
   <data name="Vmc_LoginSuccess_Fmt" xml:space="preserve">
     <value>Successfully logged into [{0}]</value>
   </data>

@@ -12,8 +12,9 @@
 
         public App()
         {            
+            // NB: even though these look unused they set up messaging
             preferencesProvider = new PreferencesProvider("CloudFoundryExplorerApp");
-            cloudFoundryProvider = new CloudFoundryProvider(preferencesProvider, new Vmc.VcapClient(), new Vmc.VcapCredentialManager());
+            cloudFoundryProvider = new CloudFoundryProvider(preferencesProvider);
         }        
     }
 }

@@ -2,77 +2,63 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using CloudFoundry.Net.Types;
     using Newtonsoft.Json;
     using RestSharp;
 
     public class InfoHelper : BaseVmcHelper
     {
-        public string GetLogs(Application application, int instanceNumber, Cloud cloud)
+        public InfoHelper(VcapCredentialManager argCredentialManager)
+            : base(argCredentialManager) { }
+
+        public string GetLogs(Application argApp, ushort argInstance)
         {
             string logoutput = "";
 
             logoutput = "====stderr.log====\n";
-            logoutput = logoutput + GetStdErrLog(application, instanceNumber, cloud);
+            logoutput = logoutput + GetStdErrLog(argApp, argInstance);
             logoutput = logoutput + "\n====stdout.log====\n";
-            logoutput = logoutput + GetStdOutLog(application, instanceNumber, cloud);
+            logoutput = logoutput + GetStdOutLog(argApp, argInstance);
             logoutput = logoutput + "\n====startup.log====\n";
-            logoutput = logoutput + GetStartupLog(application, instanceNumber, cloud);
+            logoutput = logoutput + GetStartupLog(argApp, argInstance);
 
             return logoutput;
         }
 
-        public string GetStdErrLog(Application application, int instanceNumber, Cloud cloud) 
+        public string GetStdErrLog(Application argApp, ushort argInstance)
         {
-            //GET /apps/sroytest1/instances/0/files/logs/stderr.log
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.GET;
-            request.Resource = "/apps/" + application.Name +"/"+instanceNumber+"/files/logs/stderr.log";
-            request.AddHeader("Authorization", cloud.AccessToken);
-            return client.Execute(request).Content;
-
-        }
-
-        public string GetStdOutLog(Application application, int instanceNumber, Cloud cloud)
-        {
-            //GET /apps/sroytest1/instances/0/files/logs/stdout.log
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.GET;
-            request.Resource = "/apps/" + application.Name + "/" + instanceNumber + "/files/logs/stdout.log";
-            request.AddHeader("Authorization", cloud.AccessToken);
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stderr.log");
             return client.Execute(request).Content;
         }
 
-        public string GetStartupLog(Application application, int instanceNumber, Cloud cloud)
+        public string GetStdOutLog(Application argApp, ushort argInstance)
         {
-            //Get /apps/sroytest1/instances/0/files/logs/startup.log
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.GET;
-            request.Resource = "/apps/" + application.Name + "/" + instanceNumber + "/files/logs/startup.log";
-            request.AddHeader("Authorization", cloud.AccessToken);
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stdout.log");
             return client.Execute(request).Content;
         }
 
-        public void GetFiles(Application application, int instanceNumber, Cloud cloud)
+        public string GetStartupLog(Application argApp, ushort argInstance)
         {
-            
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/startup.log");
+            return client.Execute(request).Content;
         }
 
-        public IEnumerable<StatInfo> GetStats(Application argApplication, Cloud argCloud)
+        public void GetFiles(Application argApp, ushort argInstance)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<StatInfo> GetStats(Application argApp)
         {
             SortedDictionary<int, StatInfo> tmp = null;
 
             try
             {
-                RestClient client = buildClient(argCloud);
-                RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApplication.Name, "stats");
+                RestClient client = buildClient();
+                RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "stats");
                 RestResponse response = executeRequest(client, request);
                 tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
 
@@ -92,10 +78,10 @@
             return rv.ToArrayOrNull();
         }
 
-        public IEnumerable<ExternalInstance> GetInstances(Application argApplication, Cloud argCloud) 
+        public IEnumerable<ExternalInstance> GetInstances(Application argApp)
         {
-            RestClient client = buildClient(argCloud);
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApplication.Name, "instances");
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "instances");
             var instances = executeRequest<Dictionary<string, ExternalInstance>>(client, request);
             return instances.Values.ToArrayOrNull();
         }

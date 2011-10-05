@@ -91,9 +91,9 @@
             currentTarget = new Uri(argUri);
         }
 
-        public void RegisterFor(Uri argUri, string argToken)
+        public void RegisterToken(string argToken)
         {
-            var accessToken = new AccessToken(argUri, argToken);
+            var accessToken = new AccessToken(CurrentTarget, argToken);
             tokenDict[accessToken.Uri] = accessToken;
             writeTokenFile();
         }
@@ -107,7 +107,7 @@
         {
             if (shouldWrite)
             {
-                File.WriteAllText(targetFile, currentTarget.AbsoluteUriTrimmed()); // NB: trim end!
+                File.WriteAllText(targetFile, CurrentTarget.AbsoluteUriTrimmed()); // NB: trim end!
             }
         }
 

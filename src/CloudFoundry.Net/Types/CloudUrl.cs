@@ -1,15 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.Collections;
-
-namespace CloudFoundry.Net.Types
+﻿namespace CloudFoundry.Net.Types
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+
     [Serializable]
     public class CloudUrl : EntityBase
     {
+        private static ObservableCollection<CloudUrl> defaultCloudUrls = new ObservableCollection<CloudUrl>
+        {
+            new CloudUrl { ServerType = "Local cloud", Url = "http://api.vcap.me", IsConfigurable = false},
+            new CloudUrl { ServerType = "Microcloud", Url = "http://api.{mycloud}.cloudfoundry.me", IsConfigurable = true, IsMicroCloud = true },
+            new CloudUrl { ServerType = "VMware Cloud Foundry", Url = "https://api.cloudfoundry.com", IsDefault = true },
+            new CloudUrl { ServerType = "vmforce", Url = "http://api.alpha.vmforce.com", IsConfigurable = false },
+        };
+
         public string ServerType { get; set; }
         public string Url { get; set; }
         public bool IsConfigurable { get; set; }
@@ -17,15 +22,9 @@ namespace CloudFoundry.Net.Types
         public bool IsDefault { get; set; }
         public bool IsMicroCloud { get; set; }
 
-        public static ObservableCollection<CloudUrl> GetDefaultCloudUrls()
+        public static ObservableCollection<CloudUrl> DefaultCloudUrls
         {
-            ObservableCollection<CloudUrl> cloudUrls = new ObservableCollection<CloudUrl>() {
-                new CloudUrl() { ServerType = "Local cloud", Url = "http://api.vcap.me", IsConfigurable = false},
-                new CloudUrl() { ServerType = "Microcloud", Url = "http://api.{mycloud}.cloudfoundry.me", IsConfigurable = true, IsMicroCloud = true },
-                new CloudUrl() { ServerType = "VMware Cloud Foundry", Url = "https://api.cloudfoundry.com", IsDefault = true },
-                new CloudUrl() { ServerType = "vmforce", Url = "http://api.alpha.vmforce.com", IsConfigurable = false}
-            };
-            return cloudUrls;
+            get { return defaultCloudUrls; }
         }
     }
 

@@ -122,6 +122,15 @@ namespace CloudFoundry.Net.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Login Required.
+        /// </summary>
+        public static string Vmc_LoginRequired_Message {
+            get {
+                return ResourceManager.GetString("Vmc_LoginRequired_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Successfully logged into [{0}].
         /// </summary>
         public static string Vmc_LoginSuccess_Fmt {

@@ -6,7 +6,6 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RestSharp;
-    using Types;
 
     public abstract class BaseVmcHelper
     {
@@ -20,6 +19,13 @@
                 "{0}/{1}/{2}",     // 3
                 "{0}/{1}/{2}/{3}", // 4
             };
+
+        protected readonly VcapCredentialManager credentialManager;
+
+        public BaseVmcHelper(VcapCredentialManager argCredentialManager)
+        {
+            credentialManager = argCredentialManager;
+        }
 
         protected RestResponse executeRequest(RestClient argClient, RestRequest argRequest)
         {
@@ -42,7 +48,7 @@
             }
         }
 
-        protected RestRequest buildRequest(Method argMethod, params string[] args)
+        protected RestRequest buildRequest(Method argMethod, params object[] args)
         {
             var rv = new RestRequest
             {
@@ -51,7 +57,7 @@
             return processRequestArgs(rv, args);
         }
 
-        protected RestRequest buildRequest(Method argMethod, DataFormat argFormat, params string[] args)
+        protected RestRequest buildRequest(Method argMethod, DataFormat argFormat, params object[] args)
         {
             var rv = new RestRequest
             {
@@ -61,65 +67,34 @@
             return processRequestArgs(rv, args);
         }
 
-        /// <summary>
-        /// Uses current target and current token
-        /// </summary>
         protected RestClient buildClient()
         {
-            return doBuildClient();
+            return buildClient(true);
         }
 
-        /// <summary>
-        /// Uses argument target and associated token
-        /// </summary>
-        protected RestClient buildClient(Uri argUri)
+        protected RestClient buildClient(bool argUseAuth, Uri argUri = null)
         {
-            return doBuildClient(argUri);
-        }
-
-        protected RestClient buildClientNoAuth(Uri argUri)
-        {
-            return doBuildClient(argUri, false);
-        }
-
-        /// <summary>
-        /// Uses url and token from cloud
-        /// </summary>
-        protected RestClient buildClient(Cloud argCloud)
-        {
-            return doBuildClient(new Uri(argCloud.Url));
-        }
-
-        private static RestClient doBuildClient(Uri argUri = null, bool argUseAuth = true)
-        {
-            /*
-             * TODO: newing this up each time entails disk hits
-             */
-            VcapCredentialManager credMgr;
-            if (null == argUri)
+            string baseUrl = credentialManager.CurrentTarget.AbsoluteUri;
+            if (null != argUri)
             {
-                credMgr = new VcapCredentialManager();
-            }
-            else
-            {
-                credMgr = new VcapCredentialManager(argUri);
+                baseUrl = argUri.AbsoluteUri;
             }
 
             var rv = new RestClient
             {
-                BaseUrl = credMgr.CurrentTarget.AbsoluteUri,
+                BaseUrl = baseUrl,
                 FollowRedirects = false,
             };
 
-            if (argUseAuth && credMgr.HasToken)
+            if (argUseAuth && credentialManager.HasToken)
             {
-                rv.AddDefaultHeader("AUTHORIZATION", credMgr.CurrentToken);
+                rv.AddDefaultHeader("AUTHORIZATION", credentialManager.CurrentToken);
             }
 
             return rv;
         }
 
-        private static RestRequest processRequestArgs(RestRequest argRequest, params string[] args)
+        private static RestRequest processRequestArgs(RestRequest argRequest, params object[] args)
         {
             if (null == argRequest)
             {

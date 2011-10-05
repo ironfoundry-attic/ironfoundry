@@ -1,30 +1,19 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
-    using System;
     using Newtonsoft.Json.Linq;
-    using RestSharp;
-    using Types;
     using Properties;
+    using RestSharp;
 
     public class UserHelper : BaseVmcHelper
     {
-        private readonly VcapCredentialManager credentialManager = new VcapCredentialManager();
-
-        public VcapClientResult Login(Cloud argCloud)
-        {
-            return Login(new Uri(argCloud.Url), argCloud.Email, argCloud.Password);
-        }
+        public UserHelper(VcapCredentialManager argCredentialManager)
+            : base(argCredentialManager) { }
 
         public VcapClientResult Login(string argEmail, string argPassword)
         {
-            return Login(credentialManager.CurrentTarget, argEmail, argPassword);
-        }
-
-        public VcapClientResult Login(Uri argUri, string argEmail, string argPassword)
-        {
             VcapClientResult rv;
 
-            RestClient client = buildClient(argUri);
+            RestClient client = buildClient(false);
 
             RestRequest request = buildRequest(Method.POST, DataFormat.Json, Constants.USERS_PATH, argEmail, "tokens");
             request.AddBody(new { password = argPassword });
@@ -38,7 +27,7 @@
             {
                 var parsed = JObject.Parse(response.Content);
                 string token = parsed.Value<string>("token");
-                credentialManager.RegisterFor(argUri, token);
+                credentialManager.RegisterToken(token);
                 rv = new VcapClientResult();
             }
 

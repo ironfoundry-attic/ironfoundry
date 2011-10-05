@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using CloudFoundry.Net.Types;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using System.Collections.ObjectModel;
-using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -21,9 +19,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand ManageCloudUrlsCommand { get; private set; }
         public RelayCommand ValidateAccountCommand { get; private set; }
         public RelayCommand RegisterAccountCommand { get; private set; }
-        private CloudFoundryProvider provider;
         public Cloud Cloud { get; private set; }  
+
+        private CloudFoundryProvider provider;
         private ObservableCollection<CloudUrl> cloudUrls;
+        private CloudUrl selectedCloudUrl;
 
         public AddCloudViewModel()
         {
@@ -55,10 +55,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddCloudDialogResult));
         }
 
-        private void ValidateAccount()
-        {
-
-        }
+        private void ValidateAccount() { }
 
         private void RegisterAccount()
         {
@@ -91,7 +88,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private bool CanRegister()
         {
-            return SelectedCloudUrl.ServerType.Equals("Local cloud",StringComparison.InvariantCultureIgnoreCase);
+            return SelectedCloudUrl.ServerType.Equals("Local cloud", StringComparison.InvariantCultureIgnoreCase);
         }
 
         private void ManageCloudUrls()
@@ -99,7 +96,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ManageCloudUrls, (confirmed) => {}));
         }
 
-        private CloudUrl selectedCloudUrl = new CloudUrl();
         public CloudUrl SelectedCloudUrl
         {
             get { return this.selectedCloudUrl; }

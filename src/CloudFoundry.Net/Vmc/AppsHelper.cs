@@ -13,6 +13,9 @@
 
     public class AppsHelper : BaseVmcHelper
     {
+        public AppsHelper(VcapCredentialManager argCredentialManager)
+            : base(argCredentialManager) { }
+
 #if UNUSED
         public string Start(string argName) // TODO error return, require login?
         {
@@ -22,77 +25,55 @@
         }
 #endif
 
-        public void Start(Cloud argCloud, Application argApplication)
+        public void Start(Application argApplication)
         {
             argApplication.State = Instance.InstanceState.STARTED;
-            UpdateApplicationSettings(argCloud, argApplication);
+            UpdateApplicationSettings(argApplication);
         }
 
-        public void Stop(Cloud argCloud, Application argApplication)
+        public void Stop(Application argApplication)
         {
             argApplication.State = Instance.InstanceState.STOPPED;
-            UpdateApplicationSettings(argCloud, argApplication);
+            UpdateApplicationSettings(argApplication);
         }
 
-        public string GetAppInfo(string argName)
+        public string GetAppInfoJson(string argName)
         {
             RestClient client = buildClient();
             RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argName);
             return client.Execute(request).Content;
         }
 
-        public Application GetAppInfo(Cloud argCloud, String argName)
+        public Application GetAppInfo(string argName)
         {
-            RestClient client = buildClient(argCloud);
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argName);
-            return executeRequest<Application>(client, request);
+            string json = GetAppInfoJson(argName);
+            return JsonConvert.DeserializeObject<Application>(json);
         }
 
-        public VcapResponse UpdateApplicationSettings(Cloud argCloud, Application argApplication)
+        public VcapResponse UpdateApplicationSettings(Application argApp)
         {
-            RestClient client = buildClient(argCloud);
-            RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argApplication.Name);
-            request.AddBody(argApplication);
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argApp.Name);
+            request.AddBody(argApp);
             return executeRequest<VcapResponse>(client, request);
         }
 
-        public string DeleteApp(string appname, string url, string accesstoken)
+        public void Delete(Application argApp)
         {
-            if (url == null)
-            {
-                return ("Target URL has to be set");
-            }
-            else if (accesstoken == null)
-            {
-                return ("Please login first");
-            }
-            else
-            {
-                var client = new RestClient();
-                client.BaseUrl = url;
-                var request = new RestRequest();
-                request.Method = Method.DELETE;
-                request.Resource = "/apps/" + appname;
-                request.AddHeader("Authorization", accesstoken);
-                return client.Execute(request).Content;
-            }
+            Delete(argApp.Name);
         }
 
-        public void DeleteApp(Application application, Cloud cloud)
+        public void Delete(string argName)
         {
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.DELETE;
-            request.Resource = "/apps/" + application.Name;
-            request.AddHeader("Authorization", cloud.AccessToken);
-            client.Execute(request);
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.DELETE, Constants.APPS_PATH, argName);
+            executeRequest(client, request);
         }
 
-        public void RestartApp(Application application, Cloud cloud)
+        public void Restart(Application argApp)
         {
-            Stop(cloud, application);
-            Start(cloud, application);
+            Stop(argApp);
+            Start(argApp);
         }
 
         public string Push(string argName, DirectoryInfo argPath, string argDeployUrl,
@@ -165,7 +146,7 @@
                     File.Delete(tempFile);
                 }
 
-                string app = GetAppInfo(argName);
+                string app = GetAppInfoJson(argName);
                 JObject getInfo = JObject.Parse(app);
                 getInfo["state"] = "STARTED";
 
@@ -178,7 +159,7 @@
                 string info = string.Empty;
                 for (int i = 0; i < 4; i++)
                 {
-                    info = GetAppInfo(argName);
+                    info = GetAppInfoJson(argName);
                     var crash = GetAppCrash(argName);
                     Thread.Sleep(TimeSpan.FromSeconds(2));
                 }
@@ -195,45 +176,18 @@
             return response.Content;
         }
 
-        public IEnumerable<Crash> GetAppCrash(Application argApplication, Cloud argCloud)
+        public IEnumerable<Crash> GetAppCrash(Application argApp)
         {
-            RestClient client = buildClient(argCloud);
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApplication.Name, "crashes");
-            return executeRequest<List<Crash>>(client, request);
+            RestClient client = buildClient();
+            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "crashes");
+            return executeRequest<Crash[]>(client, request);
         }
-
-#if UNUSED
-        public string ListApps(string url, string accesstoken)
-        {
-            if (url == null)
-            {
-                return ("Target URL has to be set");
-            } 
-            else if (accesstoken == null)
-            {
-                return ("Please login first");
-            }
-            else
-            {
-                var client = new RestClient();
-                client.BaseUrl = url;
-                var request = new RestRequest();
-                request.Method = Method.GET;
-                request.Resource = "/apps";
-                request.AddHeader("Authorization", accesstoken);
-                return client.Execute(request).Content;
-            }
-        }
-#endif
 
         public IEnumerable<Application> ListApps(Cloud argCloud)
         {
-            RestClient client = buildClient(argCloud);
-
+            RestClient client = buildClient();
             RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH);
-
             IEnumerable<Application> rv = executeRequest<List<Application>>(client, request);
-
             if (null != rv)
             {
                 foreach (Application app in rv)

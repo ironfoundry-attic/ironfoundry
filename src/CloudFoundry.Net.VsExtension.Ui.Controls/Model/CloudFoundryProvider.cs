@@ -12,20 +12,16 @@
     public class CloudFoundryProvider
     {
         private PreferencesProvider preferencesProvider;
-        private VcapCredentialManager credentialManager;
-        private IVcapClient client;
         public ObservableCollection<Cloud> Clouds { get; private set;}
         public ObservableCollection<CloudUrl> CloudUrls { get; private set; }
         public event NotifyCollectionChangedEventHandler CloudsChanged;
 
-        public CloudFoundryProvider(PreferencesProvider preferencesProvider, IVcapClient client, VcapCredentialManager credentialManager)
+        public CloudFoundryProvider(PreferencesProvider preferencesProvider)
         {
-            this.client = client;
             this.preferencesProvider = preferencesProvider;
-            this.credentialManager = credentialManager;
-            var preferences = preferencesProvider.LoadPreferences();
-            this.Clouds = preferences.Clouds.DeepCopy();            
-            this.CloudUrls = preferences.CloudUrls.DeepCopy();
+            var preferences          = preferencesProvider.LoadPreferences();
+            this.Clouds              = preferences.Clouds.DeepCopy();            
+            this.CloudUrls           = preferences.CloudUrls.DeepCopy();
 
             this.Clouds.CollectionChanged += Clouds_CollectionChanged;
             foreach (var cloud in Clouds)
@@ -37,7 +33,9 @@
         private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<CloudFoundryProvider> message)
         {
             if (message.Notification.Equals(Messages.GetCloudFoundryProvider))
+            {
                 message.Execute(this);
+            }
         }
 
         private void CloudChanged(object sender, PropertyChangedEventArgs e)
@@ -76,17 +74,18 @@
 
         public Cloud Connect(Cloud cloud)
         {            
-            Cloud local = cloud.DeepCopy();            
+            Cloud local = cloud.DeepCopy();
+            IVcapClient client = new VcapClient(local);
 
-            VcapClientResult result = client.Login(local);
+            VcapClientResult result = client.Login();
             if (result.Success)
             {
-                local.AccessToken = credentialManager.CurrentToken;
-                var applications = client.ListApps(local);
+                local.AccessToken = client.CurrentToken;
+                var applications = client.ListApps();
                 if (null != applications)
                 {
                     local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());
-                    var provisionedServices = client.GetProvisionedServices(local);
+                    var provisionedServices = client.GetProvisionedServices();
                     local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
                 }
                 return local;
@@ -107,38 +106,45 @@
 
         public IEnumerable<StatInfo> GetStats(Application app, Cloud cloud)
         {
-            return client.GetStats(app, cloud);
+            IVcapClient client = new VcapClient(cloud);
+            return client.GetStats(app);
         }
 
         public VcapResponse UpdateApplicationSettings(Application app, Cloud cloud)
         {
-            return client.UpdateApplicationSettings(app, cloud);
+            IVcapClient client = new VcapClient(cloud);
+            return client.UpdateApplicationSettings(app);
         }
 
         public void Start(Application app, Cloud cloud)
         {
-            client.Start(cloud, app);
+            IVcapClient client = new VcapClient(cloud);
+            client.Start(app);
         }
 
-        public void Stop(Application app, Cloud cloud)
+        public void Stop(Application argApp, Cloud argCloud)
         {
-            client.Stop(cloud, app);
+            IVcapClient client = new VcapClient(argCloud);
+            client.Stop(argApp);
         }
 
-        public void Restart(Application app, Cloud cloud)
+        public void Restart(Application argApp, Cloud argCloud)
         {
-            client.RestartApp(app, cloud);
+            IVcapClient client = new VcapClient(argCloud);
+            client.Restart(argApp);
         }
 
-        public void UpdateAndRestart(Application app, Cloud cloud)
+        public void UpdateAndRestart(Application argApp, Cloud argCloud)
         {
-            client.UpdateApplicationSettings(app, cloud);
-            client.RestartApp(app, cloud);
+            IVcapClient client = new VcapClient(argCloud);
+            client.UpdateApplicationSettings(argApp);
+            client.Restart(argApp);
         }
 
-        public Application GetApplication(Application app, Cloud cloud)
+        public Application GetApplication(Application argApp, Cloud argCloud)
         {
-            return client.GetAppInfo(cloud, app.Name);
+            IVcapClient client = new VcapClient(argCloud);
+            return client.GetAppInfo(argApp.Name);
         }
     }
 }

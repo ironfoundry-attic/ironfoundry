@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
-using Microsoft.Win32;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell;
+using System.Runtime.InteropServices;
+using System.Windows;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 //using System.Windows.Forms;
 using EnvDTE;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using System.Windows;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace CloudFoundry.Net.VsExtension
 {
@@ -26,9 +21,7 @@ namespace CloudFoundry.Net.VsExtension
 
         private CloudFoundryProvider provider;
 
-        public CloudFoundryPackage()
-        {            
-        }
+        public CloudFoundryPackage() { }
 
         protected override void Initialize()
         {
@@ -41,7 +34,7 @@ namespace CloudFoundry.Net.VsExtension
             if (provider == null)
             {
                 PreferencesProvider preferences = new PreferencesProvider("VisualStudio2010");
-                provider = new CloudFoundryProvider(preferences, new Vmc.VcapClient(), new Vmc.VcapCredentialManager());
+                provider = new CloudFoundryProvider(preferences);
             }
 
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -59,7 +52,6 @@ namespace CloudFoundry.Net.VsExtension
 
         private void CloudFoundryExplorer(object sender, EventArgs e)
         {
-            
             var window = new MainWindow();
             //var parentWindow = System.Windows.Window.GetWindow();
             //window.Owner = parentWindow;

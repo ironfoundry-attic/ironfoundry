@@ -6,7 +6,8 @@
 
     public class MiscHelper : BaseVmcHelper
     {
-        private readonly VcapCredentialManager credentialManager = new VcapCredentialManager();
+        public MiscHelper(VcapCredentialManager argCredentialManager)
+            : base(argCredentialManager) { }
 
         public VcapClientResult Info()
         {
@@ -16,7 +17,7 @@
             return new VcapClientResult(true, info);
         }
 
-        public VcapClientResult Target(Uri argUri)
+        public VcapClientResult Target(Uri argUri = null)
         {
             VcapClientResult rv;
 
@@ -30,7 +31,7 @@
                 // "target" does the same thing as "info", but not logged in
                 // considered valid if name, build, version and support are all non-null
                 // without argument, displays current target
-                RestClient client = buildClientNoAuth(argUri);
+                RestClient client = buildClient(false, argUri);
                 RestRequest request = buildRequest(Method.GET, Constants.INFO_PATH);
                 var info = executeRequest<Info>(client, request);
                 bool success = false == info.Name.IsNullOrWhiteSpace() &&

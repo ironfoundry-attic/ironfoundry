@@ -3,11 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using Properties;
     using Types;
 
     public class VcapClient : IVcapClient
     {
         private readonly VcapCredentialManager credentialManager;
+        private readonly Cloud cloud;
 
         public VcapClient()
         {
@@ -20,24 +22,41 @@
             credentialManager.SetTarget(argUri);
         }
 
+        public VcapClient(Cloud argCloud)
+        {
+            credentialManager = new VcapCredentialManager();
+            credentialManager.SetTarget(argCloud.Url);
+            cloud = argCloud;
+        }
+
         public string CurrentUri
         {
             get { return credentialManager.CurrentTarget.AbsoluteUriTrimmed(); }
         }
 
+        public Uri CurrentTarget
+        {
+            get { return credentialManager.CurrentTarget; }
+        }
+
+        public string CurrentToken
+        {
+            get { return credentialManager.CurrentToken; }
+        }
+
         public VcapClientResult Info()
         {
-            var helper = new MiscHelper();
+            var helper = new MiscHelper(credentialManager);
             return helper.Info();
         }
 
         public VcapClientResult Target(string argUri)
         {
-            var helper = new MiscHelper();
+            var helper = new MiscHelper(credentialManager);
 
             if (argUri.IsNullOrWhiteSpace())
             {
-                return helper.Target(null);
+                return helper.Target();
             }
             else
             {
@@ -45,122 +64,108 @@
             }
         }
 
-        public VcapClientResult Login(Cloud argCloud)
+        public VcapClientResult Login()
         {
-            var helper = new UserHelper();
-            return helper.Login(argCloud);
+            return Login(cloud.Email, cloud.Password);
         }
 
         public VcapClientResult Login(string argEmail, string argPassword)
         {
-            var helper = new UserHelper();
-            return helper.Login(argEmail, argPassword);
-        }
-
-        public VcapClientResult Push(Cloud argCloud, string argName, string argDeployFQDN, DirectoryInfo argPath, uint argMemory)
-        {
-            return doPush(new Uri(argCloud.Url), argName, argDeployFQDN, argPath, argMemory);
+            var helper = new UserHelper(credentialManager);
+            string email = argEmail, password = argPassword;
+            return helper.Login(email, password);
         }
 
         public VcapClientResult Push(string argName, string argDeployFQDN, DirectoryInfo argPath, uint argMemory)
         {
-            return doPush(credentialManager.CurrentTarget, argName, argDeployFQDN, argPath, argMemory);
+            checkLoginStatus();
+            var apps = new AppsHelper(credentialManager);
+            string app =  apps.Push(argName, argPath, argDeployFQDN, "aspdotnet", "aspdotnet40", argMemory, null);
+            return new VcapClientResult(true, app);
         }
 
-        public void Start(Cloud argCloud, Application argApplication)
+        public IEnumerable<SystemService> GetSystemServices()
         {
-            var apps = new AppsHelper();
-            apps.Start(argCloud, argApplication);
+            checkLoginStatus();
+            var services = new ServicesHelper(credentialManager);
+            return services.GetSystemServices();
         }
 
-        public void Stop(Cloud argCloud, Application argApplication)
+        public IEnumerable<ProvisionedService> GetProvisionedServices()
         {
-            var apps = new AppsHelper();
-            apps.Stop(argCloud, argApplication);
+            checkLoginStatus();
+            var services = new ServicesHelper(credentialManager);
+            return services.GetProvisionedServices();
         }
 
-        public Application GetAppInfo(Cloud argCloud, string argName)
+        public void Start(Application argApp)
         {
-            var app = new AppsHelper();
-            return app.GetAppInfo(argCloud, argName);
+            var apps = new AppsHelper(credentialManager);
+            apps.Start(argApp);
         }
 
-        public VcapResponse UpdateApplicationSettings(Application application, Cloud cloud)
+        public void Stop(Application argApp)
         {
-            var app = new AppsHelper();
-            return app.UpdateApplicationSettings(cloud, application);
+            var apps = new AppsHelper(credentialManager);
+            apps.Stop(argApp);
+        }
+
+        public Application GetAppInfo(string argName)
+        {
+            var app = new AppsHelper(credentialManager);
+            return app.GetAppInfo(argName);
+        }
+
+        public VcapResponse UpdateApplicationSettings(Application argApp)
+        {
+            var app = new AppsHelper(credentialManager);
+            return app.UpdateApplicationSettings(argApp);
         }
 
 
-        public void RestartApp(Application application, Cloud cloud)
+        public void Restart(Application argApp)
         {
-            var app = new AppsHelper();
-            app.RestartApp(application, cloud);
+            var app = new AppsHelper(credentialManager);
+            app.Restart(argApp);
         }
 
-        public string GetLogs(Application application, int instanceNumber, Cloud cloud)
+        public string GetLogs(Application argApp, ushort instanceNumber)
         {
-            var info = new InfoHelper();
-            return info.GetLogs(application, instanceNumber, cloud);
+            var info = new InfoHelper(credentialManager);
+            return info.GetLogs(argApp, instanceNumber);
         }
 
-        public IEnumerable<StatInfo> GetStats(Application argApplication, Cloud argCloud)
+        public IEnumerable<StatInfo> GetStats(Application argApp)
         {
-            var info = new InfoHelper();
-            return info.GetStats(argApplication, argCloud);
+            var info = new InfoHelper(credentialManager);
+            return info.GetStats(argApp);
         }
 
-        public IEnumerable<ExternalInstance> GetInstances(Application argApplication, Cloud argCloud)
+        public IEnumerable<ExternalInstance> GetInstances(Application argApp)
         {
-            var info = new InfoHelper();
-            return info.GetInstances(argApplication, argCloud);
+            var info = new InfoHelper(credentialManager);
+            return info.GetInstances(argApp);
         }
 
-        public IEnumerable<Crash> GetAppCrash(Application argApplication, Cloud argCloud)
+        public IEnumerable<Crash> GetAppCrash(Application argApp)
         {
-            var apps = new AppsHelper();
-            return apps.GetAppCrash(argApplication, argCloud);
+            var apps = new AppsHelper(credentialManager);
+            return apps.GetAppCrash(argApp);
         }
 
-        public IEnumerable<Application> ListApps(Cloud argCloud)
+        public IEnumerable<Application> ListApps()
         {
-            var apps = new AppsHelper();
-            return apps.ListApps(argCloud);
+            var apps = new AppsHelper(credentialManager);
+            return apps.ListApps(cloud);
         }
 
-        public IEnumerable<SystemServices> GetAvailableServices(Cloud cloud)
+        private void checkLoginStatus()
         {
-            var services = new ServicesHelper();
-            return services.GetAvailableServices(cloud);
-        }
-
-        public IEnumerable<ProvisionedService> GetProvisionedServices(Cloud argCloud)
-        {
-            var services = new ServicesHelper();
-            return services.GetProvisionedServices(argCloud);
-        }
-
-        private VcapClientResult checkLoginStatus()
-        {
-            return Info();
-        }
-
-        private VcapClientResult doPush(Uri argUri, string argName, string argDeployFQDN, DirectoryInfo argPath, uint argMemory)
-        {
-            VcapClientResult rv = checkLoginStatus();
-
-            if (rv.Success)
+            VcapClientResult rslt = Info();
+            if (false == rslt.Success)
             {
-                var apps = new AppsHelper();
-                string app =  apps.Push(argName, argPath, argDeployFQDN, "aspdotnet", "aspdotnet40", argMemory, null);
-                rv = new VcapClientResult(true, app);
+                throw new VmcAuthException(Resources.Vmc_LoginRequired_Message);
             }
-            else
-            {
-                // TODO
-            }
-
-            return rv;
         }
     }
 }

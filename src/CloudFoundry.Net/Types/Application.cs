@@ -1,10 +1,10 @@
 ﻿namespace CloudFoundry.Net.Types
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using Newtonsoft.Json;
-    using System.Collections.Generic;
 
     [Serializable]
     public class Application : EntityBase

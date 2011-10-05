@@ -27,7 +27,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             var preferences = new Preferences()
             {
                 Clouds = new ObservableCollection<Cloud>(),
-                CloudUrls = CloudUrl.GetDefaultCloudUrls()
+                CloudUrls = CloudUrl.DefaultCloudUrls,
             };
 
             try

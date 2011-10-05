@@ -7,14 +7,17 @@
 
     public class ServicesHelper : BaseVmcHelper
     {
-        public IEnumerable<SystemServices> GetAvailableServices(Cloud argCloud) 
+        public ServicesHelper(VcapCredentialManager argCredentialManager)
+            : base(argCredentialManager) { }
+
+        public IEnumerable<SystemService> GetSystemServices()
         {
-            RestClient client = buildClient(argCloud);
+            RestClient client = buildClient();
             RestRequest request = buildRequest(Method.GET, Constants.GLOBAL_SERVICES_PATH);
             RestResponse response = executeRequest(client, request);
 
-            var datastores = new List<SystemServices>();
-            var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemServices>>>>(response.Content);
+            var datastores = new List<SystemService>();
+            var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemService>>>>(response.Content);
             foreach (var val in list.Values)
             {
                 foreach (var val1 in val.Values)
@@ -29,9 +32,9 @@
             return datastores.ToArrayOrNull(); 
         }
 
-        public IEnumerable<ProvisionedService> GetProvisionedServices(Cloud argCloud)
+        public IEnumerable<ProvisionedService> GetProvisionedServices()
         {            
-            RestClient client = buildClient(argCloud);
+            RestClient client = buildClient();
             RestRequest request = buildRequest(Method.GET, Constants.SERVICES_PATH);
             return executeRequest<ProvisionedService[]>(client, request);
         }
