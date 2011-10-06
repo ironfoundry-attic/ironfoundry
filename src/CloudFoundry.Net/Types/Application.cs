@@ -16,7 +16,7 @@
         private int? runningInstances;
         private AppResources resources;
         private string state;
-        private AppMeta metadata;
+        // private AppMeta metadata;
         private readonly ObservableCollection<string> uris = new ObservableCollection<string>();
         private readonly ObservableCollection<string> services = new ObservableCollection<string>();        
         private readonly ObservableCollection<string> environment = new ObservableCollection<string>();
@@ -29,7 +29,7 @@
 
             Staging = new Staging();
             Resources = new AppResources();
-            MetaData = new AppMeta();
+            // MetaData = new AppMeta();
         }
 
         void EnvironmentChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -114,12 +114,15 @@
             get { return this.environment; }
         }
 
+        /*
+         * Unused in ruby vmc
         [JsonProperty(PropertyName = "meta")]
         public AppMeta MetaData
         {
             get { return this.metadata; }
             set { this.metadata = value; RaisePropertyChanged("MetaData"); }
         }
+         */
 
         [JsonIgnore]
         public Cloud Parent { get; set; }
@@ -187,14 +190,16 @@
         }
     }
 
+    /*
+     * Unused in ruby vmc
     [Serializable]
     public class AppMeta : EntityBase
     {
-        private int version;
+        private uint version;
         private long created;
 
         [JsonProperty(PropertyName = "version")]
-        public int Version 
+        public uint Version 
         {
             get { return this.version; }
             set { this.version = value; RaisePropertyChanged("Version"); }
@@ -207,6 +212,7 @@
             set { this.created = value; RaisePropertyChanged("Created"); }
         }
     }
+     */
 
     public class ApplicationEqualityComparer : IEqualityComparer<Application>
     {
