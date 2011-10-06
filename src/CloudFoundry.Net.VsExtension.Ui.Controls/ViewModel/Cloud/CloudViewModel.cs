@@ -12,6 +12,8 @@
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using System.Threading;
 
     public class CloudViewModel : ViewModelBase
     {
@@ -27,19 +29,21 @@
         public RelayCommand UpdateInstanceCountCommand { get; private set; }
 
         public RelayCommand ManageApplicationUrlsCommand { get; private set; }
+        public RelayCommand RemoveApplicationServiceCommand { get; private set; }
 
         private Cloud cloud;
         private Application selectedApplication;
+        private ProvisionedService selectedApplicationService;
         private bool isApplicationViewSelected;
         private string overviewErrorMessage;
         private string applicationErrorMessage;
+        private IDragSource provisionedServicesSource;
+        private IDropTarget applicationServicesTarget;
 
         private ObservableCollection<ProvisionedService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
         private CloudFoundryProvider provider;
-
-        BackgroundWorker getInstances = new BackgroundWorker();
-        BackgroundWorker updateApplication = new BackgroundWorker();
+        
         DispatcherTimer instanceTimer = new DispatcherTimer();
 
         public CloudViewModel(Cloud cloud)
@@ -54,7 +58,8 @@
             StopCommand = new RelayCommand(Stop, CanExecuteStopActions);
             RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
             UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);
-            ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);                        
+            ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);
+            RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);       
         }
 
         private void LoadProvider(CloudFoundryProvider provider)
@@ -63,10 +68,6 @@
             instanceTimer.Interval = TimeSpan.FromSeconds(5);
             instanceTimer.Tick += RefreshInstances;
             instanceTimer.Start();
-            getInstances.DoWork += BeginGetInstances;
-            getInstances.RunWorkerCompleted += EndGetInstances;
-            updateApplication.DoWork += BeginUpdateApplication;
-            updateApplication.RunWorkerCompleted += EndUpdateApplication; 
         }
 
         private void RefreshInstances(object sender, EventArgs e)
@@ -79,12 +80,14 @@
         }
 
         private void BeginGetInstances(object sender, DoWorkEventArgs e)
-        {
+        {            
             e.Result = provider.GetStats(SelectedApplication, Cloud);
         }
 
         private void EndGetInstances(object sender, RunWorkerCompletedEventArgs e)
         {
+            if (e.Cancelled)
+                return;
             UpdateInstanceCollection((IEnumerable<StatInfo>)e.Result);
         }
 
@@ -110,9 +113,18 @@
 
         private void UpdateInstanceCollection(IEnumerable<StatInfo> stats)
         {
+            UpdateInstanceCollection(stats, null);
+        }
+
+        private void UpdateInstanceCollection(IEnumerable<StatInfo> stats, RunWorkerCompletedEventArgs e)
+        {
             var instances = new ObservableCollection<Model.Instance>();
+
             foreach (var stat in stats)
             {
+                if (e != null && e.Cancelled == true)
+                    return;
+
                 if (stat.State.Equals(Types.VcapStates.RUNNING) ||
                     stat.State.Equals(Types.VcapStates.STARTED) ||
                     stat.State.Equals(Types.VcapStates.STARTING))
@@ -149,7 +161,7 @@
                 this.overviewErrorMessage = value;
                 RaisePropertyChanged("OverviewErrorMessage");
             }
-        }
+        }        
 
         private void ChangePassword()
         {
@@ -228,6 +240,16 @@
             {
                 this.applicationErrorMessage = value;
                 RaisePropertyChanged("ApplicationErrorMessage");
+            }
+        }
+
+        public ProvisionedService SelectedApplicationService
+        {
+            get { return this.selectedApplicationService; }
+            set
+            {
+                this.selectedApplicationService = value;
+                RaisePropertyChanged("SelectedApplicationService");
             }
         }
 
@@ -323,12 +345,19 @@
 
                 RaisePropertyChanged("SelectedApplication");
                 RaisePropertyChanged("IsApplicationSelected");
-                getInstances.RunWorkerAsync();
+                BackgroundWorker instanceWorker = new BackgroundWorker();
+                instanceWorker.DoWork += BeginGetInstances;
+                instanceWorker.RunWorkerCompleted += EndGetInstances;
+                instanceWorker.WorkerSupportsCancellation = true;
+                instanceWorker.RunWorkerAsync();
             }
         }
 
         private void selectedApplication_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            BackgroundWorker updateApplication = new BackgroundWorker();
+            updateApplication.DoWork += BeginUpdateApplication;
+            updateApplication.RunWorkerCompleted += EndUpdateApplication; 
             updateApplication.RunWorkerAsync();
         }       
 
@@ -374,6 +403,75 @@
                     }
                 }));
         }
+
+        private void RemoveApplicationService()
+        {
+            if (SelectedApplicationService != null)
+            {
+                if (SelectedApplication.Services.Contains(SelectedApplicationService.Name))
+                {
+                    SelectedApplication.Services.Remove(SelectedApplicationService.Name);
+                    RaisePropertyChanged("ApplicationServices");
+                }
+                this.ApplicationServices.Remove(SelectedApplicationService);
+                
+            }
+        }
+
+        #endregion
+
+        #region DragDropProvisionedServices        
+
+        public IDragSource SourceOfProvisionedServices
+        {
+            get
+            {
+                if (provisionedServicesSource == null)
+                    provisionedServicesSource = new DragSource<ProvisionedService>(GetBindProvisionedServicesDragEffects, GetBindProvisionedServicesData);
+                return provisionedServicesSource;
+            }
+        }    
+    
+        public IDropTarget ApplicationServiceSink
+        {
+            get
+            {
+                if (this.applicationServicesTarget == null)
+                    this.applicationServicesTarget = new DropTarget<ProvisionedService>(GetApplicationServicesDropEffects, DropApplicationServices);
+                return applicationServicesTarget;
+            }
+        }
+
+        private System.Windows.DragDropEffects GetBindProvisionedServicesDragEffects(ProvisionedService provisionedService)
+        {
+            return this.Cloud.Services.Any() ? System.Windows.DragDropEffects.Move : System.Windows.DragDropEffects.None;
+        }
+
+        private object GetBindProvisionedServicesData(ProvisionedService provisionedService)
+        {
+            return provisionedService;
+        }
+
+        private void DropApplicationServices(ProvisionedService provisionedService)
+        {
+            this.ApplicationServices.Add(provisionedService);
+            foreach (var service in this.ApplicationServices)
+            {
+                if (!SelectedApplication.Services.Contains(service.Name))
+                {                    
+                    SelectedApplication.Services.Add(service.Name);
+                    RaisePropertyChanged("ApplicationServices");
+                }
+            }          
+        }
+
+        private System.Windows.DragDropEffects GetApplicationServicesDropEffects(ProvisionedService provisionedService)
+        {
+            var existingService = ApplicationServices.SingleOrDefault(i => i.Name.Equals(provisionedService.Name, StringComparison.InvariantCultureIgnoreCase));            
+            return (existingService != null) ? System.Windows.DragDropEffects.None : System.Windows.DragDropEffects.Move;
+        }
+
+        
 
         #endregion
     }

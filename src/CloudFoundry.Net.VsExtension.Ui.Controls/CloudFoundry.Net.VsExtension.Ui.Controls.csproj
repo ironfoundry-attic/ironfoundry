@@ -80,6 +80,7 @@
     <Compile Include="Model\Instance.cs" />
     <Compile Include="Model\Preferences.cs" />
     <Compile Include="Model\PreferencesProvider.cs" />
+    <Compile Include="Mvvm\DragDropMvvm.cs" />
     <Compile Include="Mvvm\ExportViewModel.cs" />
     <Compile Include="Mvvm\ViewModelLocator.cs" />
     <Compile Include="Utilities\Messages.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
+    <Compile Include="ViewModel\Cloud\DragDropEffects.cs" />
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
     <Compile Include="ViewModel\UpdateViewModel.cs" />
     <Compile Include="ViewModel\PushViewModel.cs" />
