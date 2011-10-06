@@ -78,11 +78,11 @@
 
         public VcapClientResult Push(
             string argName, string argDeployFQDN, ushort argInstances,
-            DirectoryInfo argPath, uint argMemoryKB, string[] argProvisionedServiceNames)
+            DirectoryInfo argPath, uint argMemoryMB, string[] argProvisionedServiceNames)
         {
             checkLoginStatus();
             var apps = new AppsHelper(credentialManager);
-            return apps.Push(argName, argDeployFQDN, argInstances, argPath, argMemoryKB,
+            return apps.Push(argName, argDeployFQDN, argInstances, argPath, argMemoryMB,
                 argProvisionedServiceNames, "aspdotnet", "aspdotnet40");
         }
 

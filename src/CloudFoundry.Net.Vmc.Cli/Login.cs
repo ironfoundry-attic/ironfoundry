@@ -6,7 +6,7 @@
 
     static partial class Program
     {
-        static bool login(IList<string> unparsed)
+        static bool Login(IList<string> unparsed)
         {
             bool failed = true;
             ushort tries = 0;

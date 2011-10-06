@@ -9,7 +9,7 @@
 
     static partial class Program
     {
-        static bool info(IList<string> unparsed)
+        static bool Info(IList<string> unparsed)
         {
             var vc = new VcapClient();
             VcapClientResult rslt = vc.Info();

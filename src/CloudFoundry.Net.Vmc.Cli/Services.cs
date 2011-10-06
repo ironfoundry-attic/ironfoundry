@@ -9,7 +9,7 @@
         const string systemHeader = @"============== System Services ==============";
         const string provisionedHeader = @"=========== Provisioned Services ============";
 
-        static bool services(IList<string> unparsed)
+        static bool Services(IList<string> unparsed)
         {
             var vc = new VcapClient();
             IEnumerable<SystemService> systemServices = vc.GetSystemServices();
@@ -36,7 +36,7 @@
             return true;
         }
 
-        static bool bind_service(IList<string> unparsed)
+        static bool BindService(IList<string> unparsed)
         {
             var vc = new VcapClient();
             // TODO match ruby argument parsing

@@ -5,23 +5,20 @@
 
     static partial class Program
     {
-        static bool usage()
+        static bool Usage(OptionSet options = null)
         {
-            Console.WriteLine(Usage.COMMAND_USAGE);
-            return true;
-        }
-
-        static bool showHelp(OptionSet p)
-        {
-            Console.WriteLine("Usage: vmc [OPTIONS]+ message");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            p.WriteOptionDescriptions(Console.Out);
+            if (null != options)
+            {
+                Console.WriteLine("Options:");
+                options.WriteOptionDescriptions(Console.Out);
+                Console.WriteLine();
+            }
+            Console.WriteLine(UsageStrings.COMMAND_USAGE);
             return true;
         }
     }
 
-    public class Usage
+    public static class UsageStrings
     {
         public static readonly string BASIC_USAGE = @"Usage: vmc [options] command [<args>] [command_options]
 Try 'vmc help [command]' or 'vmc help options' for more information.";

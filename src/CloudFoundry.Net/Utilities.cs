@@ -38,10 +38,7 @@
         /// </summary>
         public static IPAddress LocalIPAddress
         {
-            get
-            {
-                return getLocalIPAddresses().Last();
-            }
+            get { return GetLocalIPAddresses().Last(); }
         }
 
         // NB: this allows "break on all exceptions" to be enabled in VS without having the SocketException break
@@ -65,7 +62,7 @@
             return ushort.MinValue;
         }
 
-        private static IEnumerable<IPAddress> getLocalIPAddresses()
+        private static IEnumerable<IPAddress> GetLocalIPAddresses()
         {
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToListOrNull();

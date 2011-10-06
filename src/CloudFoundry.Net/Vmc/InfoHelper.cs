@@ -27,23 +27,26 @@
 
         public string GetStdErrLog(Application argApp, ushort argInstance)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stderr.log");
-            return client.Execute(request).Content;
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stderr.log");
+            RestResponse response = ExecuteRequest(client, request);
+            return response.Content;
         }
 
         public string GetStdOutLog(Application argApp, ushort argInstance)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stdout.log");
-            return client.Execute(request).Content;
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stdout.log");
+            RestResponse response = ExecuteRequest(client, request);
+            return response.Content;
         }
 
         public string GetStartupLog(Application argApp, ushort argInstance)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/startup.log");
-            return client.Execute(request).Content;
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/startup.log");
+            RestResponse response = ExecuteRequest(client, request);
+            return response.Content;
         }
 
         public void GetFiles(Application argApp, ushort argInstance)
@@ -57,9 +60,9 @@
 
             try
             {
-                RestClient client = buildClient();
-                RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "stats");
-                RestResponse response = executeRequest(client, request);
+                RestClient client = BuildClient();
+                RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "stats");
+                RestResponse response = ExecuteRequest(client, request);
                 tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
 
             }
@@ -80,9 +83,9 @@
 
         public IEnumerable<ExternalInstance> GetInstances(Application argApp)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "instances");
-            var instances = executeRequest<Dictionary<string, ExternalInstance>>(client, request);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "instances");
+            var instances = ExecuteRequest<Dictionary<string, ExternalInstance>>(client, request);
             return instances.Values.ToArrayOrNull();
         }
     }

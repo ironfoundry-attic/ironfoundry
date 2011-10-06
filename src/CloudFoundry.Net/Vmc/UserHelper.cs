@@ -13,12 +13,12 @@
         {
             VcapClientResult rv;
 
-            RestClient client = buildClient(false);
+            RestClient client = BuildClient(false);
 
-            RestRequest request = buildRequest(Method.POST, DataFormat.Json, Constants.USERS_PATH, argEmail, "tokens");
+            RestRequest request = BuildRequest(Method.POST, DataFormat.Json, Constants.USERS_PATH, argEmail, "tokens");
             request.AddBody(new { password = argPassword });
 
-            RestResponse response = executeRequest(client, request);
+            RestResponse response = ExecuteRequest(client, request);
             if (response.Content.IsNullOrEmpty())
             {
                 rv = new VcapClientResult(false, Resources.Vmc_NoContentReturned_Text);

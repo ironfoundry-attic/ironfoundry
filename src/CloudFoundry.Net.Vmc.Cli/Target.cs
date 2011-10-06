@@ -6,7 +6,7 @@
 
     static partial class Program
     {
-        static bool target(IList<string> unparsed)
+        static bool Target(IList<string> unparsed)
         {
             string url = command_url;
             if (false == unparsed.IsNullOrEmpty())

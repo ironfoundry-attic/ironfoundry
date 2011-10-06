@@ -41,9 +41,10 @@
 
         public string GetApplicationJson(string argName)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argName);
-            return client.Execute(request).Content;
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argName);
+            RestResponse response = ExecuteRequest(client, request);
+            return response.Content;
         }
 
         public Application GetApplication(string argName)
@@ -54,17 +55,17 @@
 
         public VcapResponse UpdateApplication(Application argApp)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argApp.Name);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argApp.Name);
             request.AddBody(argApp);
-            return executeRequest<VcapResponse>(client, request);
+            return ExecuteRequest<VcapResponse>(client, request);
         }
 
         public void Delete(string argName)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.DELETE, Constants.APPS_PATH, argName);
-            executeRequest(client, request);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.DELETE, Constants.APPS_PATH, argName);
+            ExecuteRequest(client, request);
         }
 
         public void Restart(Application argApp)
@@ -74,7 +75,7 @@
         }
 
         public VcapClientResult Push(string argName, string argDeployFQDN, ushort argInstances,
-            DirectoryInfo argPath, uint argMemoryKB, string[] argProvisionedServiceNames, string argFramework, string argRuntime)
+            DirectoryInfo argPath, uint argMemoryMB, string[] argProvisionedServiceNames, string argFramework, string argRuntime)
         {
             VcapClientResult rv;
 
@@ -104,22 +105,22 @@
                     Staging = new Staging { Framework = argFramework, Runtime = argRuntime },
                     Uris = new string[] { argDeployFQDN },
                     Instances = argInstances,
-                    Resources = new AppResources { Memory = argMemoryKB },
+                    Resources = new AppResources { Memory = argMemoryMB },
                 };
 
-                RestClient client = buildClient();
-                RestRequest request = buildRequest(Method.POST, DataFormat.Json, Constants.APPS_PATH);
+                RestClient client = BuildClient();
+                RestRequest request = BuildRequest(Method.POST, DataFormat.Json, Constants.APPS_PATH);
                 request.AddBody(manifest);
-                RestResponse response = executeRequest(client, request);
+                RestResponse response = ExecuteRequest(client, request);
 
                 Resource[] resourceAry = resources.ToArrayOrNull();
 
-                client = buildClient();
-                request = buildRequest(Method.POST, DataFormat.Json, Constants.RESOURCES_PATH);
+                client = BuildClient();
+                request = BuildRequest(Method.POST, DataFormat.Json, Constants.RESOURCES_PATH);
                 request.AddBody(resourceAry);
-                response = executeRequest(client, request);
+                response = ExecuteRequest(client, request);
 
-                client = buildClient();
+                client = BuildClient();
 
                 string tempFile = Path.GetTempFileName();
                 try
@@ -127,13 +128,13 @@
                     var zipper = new FastZip();
                     zipper.CreateZip(tempFile, argPath.FullName, true, String.Empty);
 
-                    request = buildRequest(Method.POST, Constants.APPS_PATH, argName, "application");
+                    request = BuildRequest(Method.POST, Constants.APPS_PATH, argName, "application");
                     request.AddParameter("_method", "put");
                     request.AddFile("application", tempFile);
                     // This is required in order to pass the JSON as a parameter
                     request.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
 
-                    response = executeRequest(client, request);
+                    response = ExecuteRequest(client, request);
                 }
                 finally
                 {
@@ -143,13 +144,12 @@
                 string app = GetApplicationJson(argName);
                 JObject getInfo = JObject.Parse(app);
                 string appName = (string)getInfo["name"];
-                getInfo["state"] = "STARTED";
+                getInfo["state"] = VcapStates.STARTED;
 
-                client = buildClient();
-
-                request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argName);
+                client = BuildClient();
+                request = BuildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argName);
                 request.AddBody(getInfo);
-                response = client.Execute(request);
+                response = ExecuteRequest(client, request);
 
                 bool started = isStarted(appName);
 
@@ -170,24 +170,24 @@
 
         public string GetAppCrash(string argName)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argName, "crashes");
-            RestResponse response = executeRequest(client, request);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argName, "crashes");
+            RestResponse response = ExecuteRequest(client, request);
             return response.Content;
         }
 
         public IEnumerable<Crash> GetAppCrash(Application argApp)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "crashes");
-            return executeRequest<Crash[]>(client, request);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "crashes");
+            return ExecuteRequest<Crash[]>(client, request);
         }
 
         public IEnumerable<Application> ListApps(Cloud argCloud)
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.APPS_PATH);
-            IEnumerable<Application> rv = executeRequest<List<Application>>(client, request);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH);
+            IEnumerable<Application> rv = ExecuteRequest<List<Application>>(client, request);
             if (null != rv)
             {
                 foreach (Application app in rv)

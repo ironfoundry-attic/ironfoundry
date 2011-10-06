@@ -19,18 +19,18 @@
 
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException += currentDomain_UnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             var commands = new Dictionary<string, Func<IList<string>, bool>>
             {
-                { "help",         (arg) => usage() },
-                { "info",         (arg) => info(arg) },
-                { "target",       (arg) => target(arg) },
-                { "login",        (arg) => login(arg) },
-                { "push",         (arg) => push(arg) },
-                { "services",     (arg) => services(arg) },
-                { "bind-service", (arg) => bind_service(arg) },
-                { "delete",       (arg) => delete(arg) },
+                { "help",         (arg) => Usage() },
+                { "info",         (arg) => Info(arg) },
+                { "target",       (arg) => Target(arg) },
+                { "login",        (arg) => Login(arg) },
+                { "push",         (arg) => Push(arg) },
+                { "services",     (arg) => Services(arg) },
+                { "bind-service", (arg) => BindService(arg) },
+                { "delete",       (arg) => Delete(arg) },
             };
 
             var p = new OptionSet
@@ -52,7 +52,7 @@
 
                 { "noprompts", "set prompting", v => { prompt_ok = v.IsNullOrWhiteSpace(); } },
 
-                { "instances", "set instances", v => { instances = Convert.ToUInt16(v); } },
+                { "instances=", "set instances", v => { instances = Convert.ToUInt16(v); } },
             };
 
             IList<string> unparsed = null;
@@ -62,13 +62,13 @@
             }
             catch (OptionException)
             {
-                Console.WriteLine(Usage.BASIC_USAGE);
+                Usage();
             }
 
             bool success = true;
             if (show_help)
             {
-                showHelp(p);
+                Usage(p);
             }
             else
             {
@@ -90,19 +90,19 @@
                     }
                     else
                     {
-                        showHelp(p);
+                        Usage(p);
                     }
                 }
                 else
                 {
-                    showHelp(p);
+                    Usage(p);
                 }
             }
 
             Environment.Exit(success ? 0 : 1);
         }
 
-        static void currentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Console.Error.WriteLine("Unhandled exception!");
             var ex = e.ExceptionObject as Exception;

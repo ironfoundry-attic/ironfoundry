@@ -6,7 +6,7 @@
 
     static partial class Program
     {
-        static bool push(IList<string> unparsed)
+        static bool Push(IList<string> unparsed)
         {
             // TODO match ruby argument parsing
             if (unparsed.Count < 3 || unparsed.Count > 5)
@@ -37,7 +37,7 @@
             }
 
             var vc = new VcapClient();
-            VcapClientResult rv = vc.Push(appname, url, instances, di, 65536, serviceNames);
+            VcapClientResult rv = vc.Push(appname, url, instances, di, 64, serviceNames);
             if (false == rv.Success)
             {
                 Console.Error.WriteLine(rv.Message);

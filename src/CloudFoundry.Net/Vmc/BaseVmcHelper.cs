@@ -9,7 +9,14 @@
 
     internal abstract class BaseVmcHelper
     {
-        private static readonly ushort[] VMC_HTTP_ERROR_CODES = { 400, 403, 404, 500 };
+        private static readonly ushort[] VMC_HTTP_ERROR_CODES =
+        {
+            (ushort)HttpStatusCode.BadRequest,          // 400
+            (ushort)HttpStatusCode.Forbidden,           // 403
+            (ushort)HttpStatusCode.NotFound,            // 404
+            (ushort)HttpStatusCode.MethodNotAllowed,    // 405
+            (ushort)HttpStatusCode.InternalServerError, // 500
+        };
 
         private static readonly string[] argFormats = new[]
             {
@@ -27,17 +34,17 @@
             credentialManager = argCredentialManager;
         }
 
-        protected RestResponse executeRequest(RestClient argClient, RestRequest argRequest)
+        protected RestResponse ExecuteRequest(RestClient argClient, RestRequest argRequest)
         {
             RestResponse response = argClient.Execute(argRequest);
-            processResponse(response);
+            ProcessResponse(response);
             return response;
         }
 
-        protected TResponse executeRequest<TResponse>(RestClient argClient, RestRequest argRequest)
+        protected TResponse ExecuteRequest<TResponse>(RestClient argClient, RestRequest argRequest)
         {
             RestResponse response = argClient.Execute(argRequest);
-            processResponse(response);
+            ProcessResponse(response);
             if (response.Content.IsNullOrWhiteSpace())
             {
                 return default(TResponse);
@@ -48,31 +55,31 @@
             }
         }
 
-        protected RestRequest buildRequest(Method argMethod, params object[] args)
+        protected RestRequest BuildRequest(Method argMethod, params object[] args)
         {
             var rv = new RestRequest
             {
                 Method = argMethod,
             };
-            return processRequestArgs(rv, args);
+            return ProcessRequestArgs(rv, args);
         }
 
-        protected RestRequest buildRequest(Method argMethod, DataFormat argFormat, params object[] args)
+        protected RestRequest BuildRequest(Method argMethod, DataFormat argFormat, params object[] args)
         {
             var rv = new RestRequest
             {
                 Method = argMethod,
                 RequestFormat = argFormat,
             };
-            return processRequestArgs(rv, args);
+            return ProcessRequestArgs(rv, args);
         }
 
-        protected RestClient buildClient()
+        protected RestClient BuildClient()
         {
-            return buildClient(true);
+            return BuildClient(true);
         }
 
-        protected RestClient buildClient(bool argUseAuth, Uri argUri = null)
+        protected RestClient BuildClient(bool argUseAuth, Uri argUri = null)
         {
             string baseUrl = credentialManager.CurrentTarget.AbsoluteUri;
             if (null != argUri)
@@ -94,7 +101,7 @@
             return rv;
         }
 
-        private static RestRequest processRequestArgs(RestRequest argRequest, params object[] args)
+        private static RestRequest ProcessRequestArgs(RestRequest argRequest, params object[] args)
         {
             if (null == argRequest)
             {
@@ -111,7 +118,7 @@
             return argRequest;
         }
 
-        private static void processResponse(RestResponse argResponse)
+        private static void ProcessResponse(RestResponse argResponse)
         {
             // TODO process error codes!
             if (VMC_HTTP_ERROR_CODES.Contains((ushort)argResponse.StatusCode))

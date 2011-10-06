@@ -12,9 +12,9 @@
 
         public IEnumerable<SystemService> GetSystemServices()
         {
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.GLOBAL_SERVICES_PATH);
-            RestResponse response = executeRequest(client, request);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.GLOBAL_SERVICES_PATH);
+            RestResponse response = ExecuteRequest(client, request);
 
             var datastores = new List<SystemService>();
             var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemService>>>>(response.Content);
@@ -34,9 +34,9 @@
 
         public IEnumerable<ProvisionedService> GetProvisionedServices()
         {            
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.GET, Constants.SERVICES_PATH);
-            return executeRequest<ProvisionedService[]>(client, request);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.GET, Constants.SERVICES_PATH);
+            return ExecuteRequest<ProvisionedService[]>(client, request);
         }
 
         public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
@@ -45,10 +45,10 @@
 
             Application app = apps.GetApplication(argAppName);
             app.Services.Add(argProvisionedServiceName);
-            RestClient client = buildClient();
-            RestRequest request = buildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, app.Name);
+            RestClient client = BuildClient();
+            RestRequest request = BuildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, app.Name);
             request.AddBody(app);
-            RestResponse response = executeRequest(client, request);
+            RestResponse response = ExecuteRequest(client, request);
 
             // Ruby code re-gets info
             app = apps.GetApplication(argAppName);
