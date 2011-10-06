@@ -133,22 +133,25 @@ namespace CloudFoundry.Net.VsExtension
                     {
                         if (message.Notification.Equals(Messages.SetUpdateAppData))
                             message.Execute(cloudGuid);
-                    });
+                    });                
 
                 var window = new Update();
                 WindowInteropHelper helper = new WindowInteropHelper(window);
                 helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
                 var result = window.ShowDialog();
 
-                UpdateViewModel modelData = null;
-                Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData,
-                    model =>
-                    {
-                        modelData = model;
-                    }));
+                if (result.GetValueOrDefault())
+                {
+                    UpdateViewModel modelData = null;
+                    Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData,
+                        model =>
+                        {
+                            modelData = model;
+                        }));
 
-                SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                // Update app
+                    SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
+                    // Update app
+                }
             }
         }
 

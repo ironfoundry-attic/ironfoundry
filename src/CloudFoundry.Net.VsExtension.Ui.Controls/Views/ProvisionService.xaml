@@ -6,6 +6,7 @@
 	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.ProvisionService"
     WindowStartupLocation="CenterOwner"	
 	Title="Provision Service"
+        Icon="../Images/CloudFoundrySmall.ico"
 	Width="464" Height="165"
 	DataContext="{Binding ProvisionService, Source={StaticResource Locator}}">
     <Window.Resources>

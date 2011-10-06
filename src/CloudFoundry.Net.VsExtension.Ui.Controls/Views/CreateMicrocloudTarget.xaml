@@ -7,6 +7,7 @@
 	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.CreateMicrocloudTarget"
 	x:Name="Window"
 	Title="Create Microcloud Target"
+    Icon="../Images/CloudFoundrySmall.ico"
 	Width="330" Height="179"
 	DataContext="{Binding CreateMicrocloudTarget, Source={StaticResource Locator}}">
     <Window.Resources>

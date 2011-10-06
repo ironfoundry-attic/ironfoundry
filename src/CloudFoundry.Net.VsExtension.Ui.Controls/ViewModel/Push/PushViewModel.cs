@@ -88,7 +88,14 @@
         public Cloud SelectedCloud
         {
             get { return this.selectedCloud; }
-            set { this.selectedCloud = value; RaisePropertyChanged("SelectedCloud"); }
+            set { this.selectedCloud = value;
+                this.selectedCloud = value;
+                Cloud local = this.provider.Connect(this.selectedCloud);
+                this.selectedCloud.Services.Synchronize(local.Services, new ProvisionedServiceEqualityComparer());
+                this.selectedCloud.Applications.Synchronize(local.Applications, new ApplicationEqualityComparer());
+                this.selectedCloud.AvailableServices.Synchronize(local.AvailableServices, new SystemServiceEqualityComparer());
+                RaisePropertyChanged("SelectedCloud");                
+            }
         }
 
         public int[] MemoryLimits { get { return Constants.MemoryLimits; } }      

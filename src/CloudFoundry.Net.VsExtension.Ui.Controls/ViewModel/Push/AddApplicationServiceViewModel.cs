@@ -23,7 +23,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public AddApplicationServiceViewModel()
         {
-            ConfirmedCommand = new RelayCommand(Confirmed);
+            ConfirmedCommand = new RelayCommand(Confirmed,CanExecuteConfirmed);
             CancelledCommand = new RelayCommand(Cancelled);
 
             InitializeData();
@@ -53,6 +53,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void Confirmed()
         {           
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddApplicationServiceDialogResult));
+        }
+
+        private bool CanExecuteConfirmed()
+        {
+            return this.SelectedService != null;
         }
 
         private void Cancelled()

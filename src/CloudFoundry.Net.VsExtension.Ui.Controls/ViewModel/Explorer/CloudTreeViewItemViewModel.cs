@@ -47,9 +47,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public Cloud Cloud
         {
             get { return this.cloud; }
-            set { this.cloud = value; RaisePropertyChanged("Cloud"); }
-        }        
-
+            set { this.cloud = value; 
+                
+                RaisePropertyChanged("Cloud"); }
+        }
+       
         private void OpenCloud(MouseButtonEventArgs e)
         {
             if (e == null || e.ClickCount >= 2)

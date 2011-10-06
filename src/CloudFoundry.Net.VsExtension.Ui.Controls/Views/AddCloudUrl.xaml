@@ -6,6 +6,7 @@
 	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.AddCloudUrl"
     WindowStartupLocation="CenterOwner"	
 	Title="AddCloudUrl"
+        Icon="../Images/CloudFoundrySmall.ico"
 	Width="400" Height="150"
 	DataContext="{Binding AddCloudUrl, Source={StaticResource Locator}}">
     <Window.Resources>

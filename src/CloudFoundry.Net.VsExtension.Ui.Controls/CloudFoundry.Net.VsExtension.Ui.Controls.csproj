@@ -55,6 +55,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MvvmLight.3.0.3\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -266,7 +267,9 @@
     <Resource Include="Images\cloud_droplet.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\CloudFoundrySmall.ico" />
+    <Resource Include="Images\CloudFoundrySmall.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CloudFoundry.Net\CloudFoundry.Net.csproj">
@@ -293,7 +296,6 @@
   <ItemGroup>
     <Resource Include="Images\cloud_foundry_logo_400.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>

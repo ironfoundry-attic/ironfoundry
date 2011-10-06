@@ -8,7 +8,9 @@
         mc:Ignorable="d" 
         Height="740" Width="1200" 
         DataContext="{Binding Explorer, Source={StaticResource Locator}}"
-        WindowStartupLocation="CenterOwner">    
+        WindowStartupLocation="CenterOwner"
+        Title="Cloud Foundry Explorer"
+        Icon="../Images/CloudFoundrySmall.ico">    
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
