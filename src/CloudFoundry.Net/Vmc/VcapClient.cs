@@ -76,11 +76,14 @@
             return helper.Login(email, password);
         }
 
-        public VcapClientResult Push(string argName, string argDeployFQDN, DirectoryInfo argPath, uint argMemory)
+        public VcapClientResult Push(
+            string argName, string argDeployFQDN, ushort argInstances,
+            DirectoryInfo argPath, uint argMemoryKB, string[] argProvisionedServiceNames)
         {
             checkLoginStatus();
             var apps = new AppsHelper(credentialManager);
-            return apps.Push(argName, argPath, argDeployFQDN, "aspdotnet", "aspdotnet40", argMemory, null);
+            return apps.Push(argName, argDeployFQDN, argInstances, argPath, argMemoryKB,
+                argProvisionedServiceNames, "aspdotnet", "aspdotnet40");
         }
 
         public VcapClientResult Delete(string argName)

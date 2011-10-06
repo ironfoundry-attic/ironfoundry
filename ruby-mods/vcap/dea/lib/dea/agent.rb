@@ -609,7 +609,7 @@ module DEA
           # app_env is ary of ENV=VAL pairs
           # we can translate into appSettings for now
           app_env = setup_instance_env(instance, app_env, services)
-          iis_create(instance, app_env, services)
+          iis_create(instance, app_env, services, mem)
         else
           prepare_script = File.join(instance_dir, 'prepare')
           # once EM allows proper close_on_exec we can remove
@@ -1738,16 +1738,19 @@ module DEA
       stdout.strip if st == 0
     end
 
-    def iis_create(instance, app_env=[], services=[]) # instance = {}, app_env = [], services=[]
+    def iis_create(instance, app_env=[], services=[], mem) # instance = {}, app_env = [], services=[]
+
       site_name = instance[:win_site_name]
       site_port = instance[:port]
       site_path = instance[:win_site_path]
+      mem_kbytes = (mem * 1024).to_i
+
       @logger.debug("APPCMD add apppool /name:#{site_name}")
       if not system(@dea_appcmd, 'add', 'apppool', "/name:#{site_name}")
         return false
       end
-      @logger.debug("APPCMD set apppool #{site_name} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated")
-      if not system(@dea_appcmd, 'set', 'apppool', site_name, '/autoStart:true', '/managedRuntimeVersion:v4.0', '/managedPipelineMode:Integrated')
+      @logger.debug("APPCMD set apppool #{site_name} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated /recycling.periodicRestart.privateMemory:#{mem_kbytes}")
+      if not system(@dea_appcmd, 'set', 'apppool', site_name, '/autoStart:true', '/managedRuntimeVersion:v4.0', '/managedPipelineMode:Integrated', "/recycling.periodicRestart.privateMemory:#{mem_kbytes}")
         return false
       end
       @logger.debug("APPCMD add site /name:#{site_name} /bindings:http/*:#{site_port}: /physicalPath:#{site_path}")
@@ -1761,12 +1764,12 @@ module DEA
       if not app_env.nil?
         app_env.each do |env|
           key, value = env.split('=', 2)
-          if not value.nil?
-            # TODO T3CF determine better way to figure out if it's JSON
-            # delete leading/trailing quotes
-            value.sub!(/^["']/, '')
-            value.sub!(/["']$/, '') if not value.nil?
-          end
+
+          # TODO T3CF determine better way to figure out if it's JSON
+          # delete leading/trailing quotes
+          value.sub!(/^["']/, '') if not value.nil?
+          value.sub!(/["']$/, '') if not value.nil?
+
           @logger.debug("APPCMD set config #{site_name} /commit:site /section:appSettings /+[key='#{key}',value='#{value}']")
           if not system(@dea_appcmd, 'set', 'config', site_name, '/commit:site', '/section:appSettings', "/+[key='#{key}',value='#{value}']")
             # TODO log error

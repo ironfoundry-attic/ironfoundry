@@ -23,8 +23,8 @@
         private CloudFoundryProvider provider;
         private string name;
         private string url;
-        private int selectedMemory;
-        private int instances;
+        private uint selectedMemory;
+        private ushort instances;
         public RelayCommand ConfirmedCommand { get; private set; }
         public RelayCommand CancelledCommand { get; private set; }
         public RelayCommand ManageCloudsCommand { get; private set; }
@@ -92,13 +92,13 @@
 
         public int[] MemoryLimits { get { return Constants.MemoryLimits; } }      
         
-        public int SelectedMemory
+        public uint SelectedMemory
         {
             get { return this.selectedMemory; }
             set { this.selectedMemory = value; RaisePropertyChanged("SelectedMemory"); }
         }
 
-        public int Instances
+        public ushort Instances
         {
             get { return this.instances; }
             set { this.instances = value; RaisePropertyChanged("Instances"); }

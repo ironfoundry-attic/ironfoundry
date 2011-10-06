@@ -73,8 +73,8 @@
             Start(argApp);
         }
 
-        public VcapClientResult Push(string argName, DirectoryInfo argPath, string argDeployUrl,
-            string argFramework, string argRuntime, uint argMemoryReservation, string argServiceBindings)
+        public VcapClientResult Push(string argName, string argDeployFQDN, ushort argInstances,
+            DirectoryInfo argPath, uint argMemoryKB, string[] argProvisionedServiceNames, string argFramework, string argRuntime)
         {
             VcapClientResult rv;
 
@@ -82,7 +82,7 @@
             {
                 rv = new VcapClientResult(false, "Application local location is needed");
             }
-            else if (argDeployUrl == null)
+            else if (argDeployFQDN == null)
             {
                 rv = new VcapClientResult(false, "Please specify the url to deploy as.");
             }
@@ -102,9 +102,9 @@
                 {
                     Name = argName,
                     Staging = new Staging { Framework = argFramework, Runtime = argRuntime },
-                    Uris = new string[] { argDeployUrl },
-                    Instances = 1,
-                    Resources = new AppResources { Memory = argMemoryReservation },
+                    Uris = new string[] { argDeployFQDN },
+                    Instances = argInstances,
+                    Resources = new AppResources { Memory = argMemoryKB },
                 };
 
                 RestClient client = buildClient();
@@ -142,6 +142,7 @@
 
                 string app = GetApplicationJson(argName);
                 JObject getInfo = JObject.Parse(app);
+                string appName = (string)getInfo["name"];
                 getInfo["state"] = "STARTED";
 
                 client = buildClient();
@@ -150,7 +151,16 @@
                 request.AddBody(getInfo);
                 response = client.Execute(request);
 
-                bool started = isStarted(argName);
+                bool started = isStarted(appName);
+
+                if (started && false == argProvisionedServiceNames.IsNullOrEmpty())
+                {
+                    foreach (string svcName in argProvisionedServiceNames)
+                    {
+                        var servicesHelper = new ServicesHelper(credentialManager);
+                        servicesHelper.BindService(svcName, appName);
+                    }
+                }
 
                 rv = new VcapClientResult(started);
             }

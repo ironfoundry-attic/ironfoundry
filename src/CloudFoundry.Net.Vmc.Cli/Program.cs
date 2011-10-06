@@ -15,6 +15,7 @@
         static string command_email    = null;
         static string command_password = null;
         static bool prompt_ok          = true;
+        static ushort instances        = 1;
 
         static void Main(string[] args)
         {
@@ -50,6 +51,8 @@
                 { "passwd=", "set command password", v => { command_password = v; } },
 
                 { "noprompts", "set prompting", v => { prompt_ok = v.IsNullOrWhiteSpace(); } },
+
+                { "instances", "set instances", v => { instances = Convert.ToUInt16(v); } },
             };
 
             IList<string> unparsed = null;

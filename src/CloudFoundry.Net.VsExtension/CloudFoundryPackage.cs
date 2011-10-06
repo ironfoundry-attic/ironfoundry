@@ -1,27 +1,22 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.InteropServices;
+using System.ComponentModel;
 using System.ComponentModel.Design;
-using Microsoft.Win32;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell;
-//using System.Windows.Forms;
-using EnvDTE;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Views;
-using System.IO;
-using Microsoft.Build.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
-using System.ComponentModel;
 using CloudFoundry.Net.Types;
 using CloudFoundry.Net.Vmc;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Views;
+//using System.Windows.Forms;
+using EnvDTE;
+using GalaSoft.MvvmLight.Messaging;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace CloudFoundry.Net.VsExtension
 {
@@ -113,7 +108,7 @@ namespace CloudFoundry.Net.VsExtension
                     }));
 
                 SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                PerformPush(project, modelData.SelectedCloud, modelData.Name, modelData.Url, modelData.SelectedMemory,modelData.Instances);
+                PerformPush(project, modelData.SelectedCloud, modelData.Name, modelData.Url, modelData.SelectedMemory, modelData.Instances);
             }
         }
 
@@ -149,12 +144,7 @@ namespace CloudFoundry.Net.VsExtension
             }
         }
 
-        private void PerformPush(Project project, 
-                                 Cloud cloud, 
-                                 string name, 
-                                 string url,
-                                 int memory,
-                                 int instances)
+        private void PerformPush(Project project, Cloud cloud, string name, string url, uint memory, ushort instances)
         {            
             progressDialog = new ProgressDialog("Push Application...", "Saving project...");
             progressDialog.Cancel += (s,e) => worker.CancelAsync();
@@ -212,7 +202,7 @@ namespace CloudFoundry.Net.VsExtension
                     progressDialogDispatcher.BeginInvoke(update, string.Format("Pushing {0}", cloud.Url), 65);
                     if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                    VcapClientResult response = cfm.Push(name, url, new DirectoryInfo(precompiledSitePath),Convert.ToUInt32(memory));
+                    VcapClientResult response = cfm.Push(name, url, instances, new DirectoryInfo(precompiledSitePath), memory, null);
                     progressDialogDispatcher.BeginInvoke(update, "Complete.", 100);
                     progressDialogDispatcher.BeginInvoke(updateResponse, response.Message);
                 }
