@@ -20,19 +20,26 @@
         private int timeoutStop;
         private string accessToken;
 
-        private readonly ObservableCollection<Application> applications = new ObservableCollection<Application>();
-        private readonly ObservableCollection<ProvisionedService> services = new ObservableCollection<ProvisionedService>();
+        private ObservableCollection<Application> applications = new ObservableCollection<Application>();
+        private ObservableCollection<SystemService> availableServices = new ObservableCollection<SystemService>();
+        private ObservableCollection<ProvisionedService> services = new ObservableCollection<ProvisionedService>();
 
         public Cloud()
         {            
             applications.CollectionChanged += ApplicationsChanged;
             services.CollectionChanged += ServicesChanged;
+            availableServices.CollectionChanged += AvailableServicesChanged;
 
             id = Guid.NewGuid();
             TimeoutStart = 600;
             TimeoutStop = 60;
             IsConnected = false;
             IsDisconnected = true;
+        }
+
+        private void AvailableServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("AvailableServices");
         }
 
         private void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -125,22 +132,45 @@
 
         public ObservableCollection<Application> Applications 
         {
-            get { return this.applications; }            
+            get
+            {
+                if (this.applications == null)
+                    this.applications = new ObservableCollection<Application>();
+                return this.applications; 
+            }            
         }
 
         public ObservableCollection<ProvisionedService> Services
         {
-            get { return services; }
+            get {
+                if (this.services == null)
+                    this.services = new ObservableCollection<ProvisionedService>();
+                return this.services; 
+            }
+        }
+
+        public ObservableCollection<SystemService> AvailableServices
+        {
+            get {
+                if (this.availableServices == null)
+                    this.availableServices = new ObservableCollection<SystemService>();
+                return this.availableServices; 
+            }
         }
 
         public void ClearServices()
         {
-            services.Clear();
+            Services.Clear();
         }
 
         public void ClearApplications()
         {
-            applications.Clear();
+            Applications.Clear();
+        }
+
+        public void ClearAvailableServices()
+        {
+            AvailableServices.Clear();
         }
 
         public bool Equals(Cloud other)

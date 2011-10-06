@@ -53,6 +53,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                         message.Execute(result.GetValueOrDefault());
                     }
                 });
+
+            Messenger.Default.Register<NotificationMessageAction<bool>>(
+                this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.ProvisionService))
+                    {
+                        var view = new Views.ProvisionService();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
+                        var result = view.ShowDialog();
+                        message.Execute(result.GetValueOrDefault());
+                    }
+                });
         }
     }
 }

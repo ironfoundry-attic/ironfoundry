@@ -14,6 +14,7 @@
     using GalaSoft.MvvmLight.Messaging;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
     using System.Threading;
+    using System.Windows.Input;
 
     public class CloudViewModel : ViewModelBase
     {
@@ -30,6 +31,8 @@
 
         public RelayCommand ManageApplicationUrlsCommand { get; private set; }
         public RelayCommand RemoveApplicationServiceCommand { get; private set; }
+        public RelayCommand ProvisionServiceCommand { get; private set; }
+        public RelayCommand RefreshCommand { get; private set; }
 
         private Cloud cloud;
         private Application selectedApplication;
@@ -43,6 +46,7 @@
         private ObservableCollection<ProvisionedService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
         private CloudFoundryProvider provider;
+        private bool applicationStarting;
         
         DispatcherTimer instanceTimer = new DispatcherTimer();
 
@@ -59,7 +63,9 @@
             RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
             UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);
             ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);
-            RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);       
+            RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);
+            ProvisionServiceCommand = new RelayCommand(ProvisionService);
+            RefreshCommand = new RelayCommand(RefreshApplication, CanExecuteRefresh);
         }
 
         private void LoadProvider(CloudFoundryProvider provider)
@@ -255,7 +261,7 @@
 
         public bool CanExecuteStart()
         {
-            return IsApplicationSelected && !(
+            return IsApplicationSelected && !applicationStarting && !(
                    SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
                    SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
                    SelectedApplication.State.Equals(Types.VcapStates.STARTING));
@@ -271,25 +277,35 @@
 
         public void Start()
         {
-            provider.Start(SelectedApplication, Cloud);
-            RefreshApplication();
+            applicationStarting = true;
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += (s, args) => provider.Start(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
+            worker.RunWorkerCompleted += (s, args) => { RefreshApplication(); applicationStarting = false; };
+            worker.RunWorkerAsync();
         }
 
         public void Stop()
         {
-            provider.Stop(SelectedApplication, Cloud);
-            RefreshApplication();
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += (s, args) => provider.Stop(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
+            worker.RunWorkerCompleted += (s, args) => RefreshApplication();
+            worker.RunWorkerAsync();
         }
 
         public void Restart()
         {
-            provider.Restart(SelectedApplication, Cloud);
-            RefreshApplication();
+            Start();
+            Stop();          
         }
 
         public void UpdateAndRestart()
         {
-            provider.UpdateAndRestart(SelectedApplication, Cloud);
+            Restart();
+        }
+
+        private bool CanExecuteRefresh()
+        {
+            return SelectedApplication != null;
         }
 
         private void RefreshApplication()
@@ -299,6 +315,7 @@
             if (applicationToReplace != null)
                 applicationToReplace = application;
             SelectedApplication = application;
+            CommandManager.InvalidateRequerySuggested();
         }
 
         public int[] MemoryLimits { get { return Constants.MemoryLimits; } }
@@ -336,6 +353,8 @@
                 this.selectedApplication = value;
                 this.selectedApplication.PropertyChanged += selectedApplication_PropertyChanged;
                 this.selectedApplication.Resources.PropertyChanged += selectedApplication_PropertyChanged;
+                RaisePropertyChanged("SelectedApplication");
+                RaisePropertyChanged("IsApplicationSelected");
 
                 this.ApplicationServices = new ObservableCollection<ProvisionedService>();
                 foreach (var svc in this.selectedApplication.Services)
@@ -343,8 +362,6 @@
                         if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
                             this.ApplicationServices.Add(appService);
 
-                RaisePropertyChanged("SelectedApplication");
-                RaisePropertyChanged("IsApplicationSelected");
                 BackgroundWorker instanceWorker = new BackgroundWorker();
                 instanceWorker.DoWork += BeginGetInstances;
                 instanceWorker.RunWorkerCompleted += EndGetInstances;
@@ -379,6 +396,34 @@
                 this.applicationServices = value;
                 RaisePropertyChanged("ApplicationServices");
             }
+        }
+
+        private void ProvisionService()
+        {
+            Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetProvisionServiceData))
+                        message.Execute(this.Cloud);
+                });
+
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ProvisionService,
+                (confirmed) =>
+                {
+                    if (confirmed)
+                    {
+                        Messenger.Default.Send(new NotificationMessageAction<ProvisionedServiceViewModel>(Messages.GetProvisionServiceData,
+                        (viewModel) =>
+                        {
+                            //ProvisionedService service = new ProvisionedService() {
+                            //    Name = viewModel.Name,
+                            //    Type = viewModel.SelectedSystemService.Type,
+                            //    Vendor = viewModel.SelectedSystemService.Vendor
+                            //};
+                            //Cloud.Services.Add()
+                        }));
+                    }
+                }));
         }
 
         private void ManageApplicationUrls()

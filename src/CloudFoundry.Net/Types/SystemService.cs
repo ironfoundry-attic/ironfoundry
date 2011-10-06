@@ -2,6 +2,7 @@
 {
     using System;
     using Newtonsoft.Json;
+    using System.Collections.Generic;
 
     [Serializable]
     public class SystemService : EntityBase
@@ -26,6 +27,19 @@
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
+    }
+
+    public class SystemServiceEqualityComparer : IEqualityComparer<SystemService>
+    {
+        public bool Equals(SystemService c1, SystemService c2)
+        {
+            return c1.Vendor.Equals(c2.Vendor);
+        }
+
+        public int GetHashCode(SystemService c)
+        {
+            return c.Vendor.GetHashCode();
+        }
     }
 
     /*

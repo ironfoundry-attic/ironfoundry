@@ -75,6 +75,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             {
                 this.Cloud.AccessToken = returnCloud.AccessToken;                
                 this.Cloud.Applications.Synchronize(returnCloud.Applications, new ApplicationEqualityComparer());
+                this.Cloud.AvailableServices.Synchronize(returnCloud.AvailableServices, new SystemServiceEqualityComparer());
                 this.Cloud.Services.Synchronize(returnCloud.Services, new ProvisionedServiceEqualityComparer());
             }
         }

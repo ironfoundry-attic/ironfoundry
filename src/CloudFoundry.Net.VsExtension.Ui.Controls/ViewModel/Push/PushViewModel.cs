@@ -1,26 +1,29 @@
 ﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Linq;
+    using System.Windows.Threading;
     using CloudFoundry.Net.Types;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 
     [ExportViewModel("Push",false)]
     public class PushViewModel : ViewModelBase
     {
         private Cloud selectedCloud;
         private string errorMessage;
-        private ObservableCollection<ProvisionedService> applicationServices;
+        private ObservableCollection<ProvisionedService> applicationServices = new ObservableCollection<ProvisionedService>();
         private CloudFoundryProvider provider;
         private string name;
         private string url;
-        private uint selectedMemory;
+        private int selectedMemory;
         private ushort instances;
         public RelayCommand ConfirmedCommand { get; private set; }
         public RelayCommand CancelledCommand { get; private set; }
@@ -33,7 +36,8 @@
             ConfirmedCommand = new RelayCommand(Confirmed);
             CancelledCommand = new RelayCommand(Cancelled);
             ManageCloudsCommand = new RelayCommand(ManageClouds);
-            AddAppServiceCommand = new RelayCommand(AddAppService);
+            AddAppServiceCommand = new RelayCommand(AddAppService, CanAddAppService);
+            SelectedMemory = MemoryLimits[0];
             InitializeData();
             RegisterGetData();
         }
@@ -89,7 +93,7 @@
 
         public int[] MemoryLimits { get { return Constants.MemoryLimits; } }      
         
-        public uint SelectedMemory
+        public int SelectedMemory
         {
             get { return this.selectedMemory; }
             set { this.selectedMemory = value; RaisePropertyChanged("SelectedMemory"); }
@@ -121,10 +125,32 @@
         {
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ManageClouds, (confirmed) => { }));
         }
-
+       
         private void AddAppService()
         {
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddAppService, (confirmed) => { }));
+            
+            Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetAddApplicationServiceData))
+                        message.Execute(this.SelectedCloud);
+                });
+
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddApplicationService, (confirmed) =>
+            {
+                Messenger.Default.Send(new NotificationMessageAction<AddApplicationServiceViewModel>(Messages.GetAddApplicationServiceData,
+                    (viewModel) =>
+                    {
+                        if (!this.ApplicationServices.Contains(viewModel.SelectedService,new ProvisionedServiceEqualityComparer()))
+                            this.ApplicationServices.Add(viewModel.SelectedService);
+                    }));
+            }));
+            
+        }
+
+        private bool CanAddAppService()
+        {
+            return this.SelectedCloud != null && this.SelectedCloud.Services.Count > 0;
         }
     }
 }

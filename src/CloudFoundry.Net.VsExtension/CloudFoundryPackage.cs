@@ -17,6 +17,7 @@ using EnvDTE;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.Collections.Generic;
 
 namespace CloudFoundry.Net.VsExtension
 {
@@ -100,15 +101,22 @@ namespace CloudFoundry.Net.VsExtension
                 helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
                 var result = window.ShowDialog();
 
-                PushViewModel modelData = null;
-                Messenger.Default.Send(new NotificationMessageAction<PushViewModel>(Messages.GetPushAppData,
-                    model => 
-                    {
-                        modelData = model;
-                    }));
+                if (result.GetValueOrDefault())
+                {
+                    PushViewModel modelData = null;
+                    Messenger.Default.Send(new NotificationMessageAction<PushViewModel>(Messages.GetPushAppData,
+                        model =>
+                        {
+                            modelData = model;
+                        }));
 
-                SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                PerformPush(project, modelData.SelectedCloud, modelData.Name, modelData.Url, modelData.SelectedMemory, modelData.Instances);
+                    SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
+
+                    List<string> services = new List<string>();
+                    foreach (var provisionedService in modelData.ApplicationServices)
+                        services.Add(provisionedService.Name);
+                    PerformPush(project, modelData.SelectedCloud, modelData.Name, modelData.Url, Convert.ToUInt32(modelData.SelectedMemory), modelData.Instances, services.ToArray());
+                }
             }
         }
 
@@ -144,7 +152,7 @@ namespace CloudFoundry.Net.VsExtension
             }
         }
 
-        private void PerformPush(Project project, Cloud cloud, string name, string url, uint memory, ushort instances)
+        private void PerformPush(Project project, Cloud cloud, string name, string url, uint memory, ushort instances, string[] services)
         {            
             progressDialog = new ProgressDialog("Push Application...", "Saving project...");
             progressDialog.Cancel += (s,e) => worker.CancelAsync();
@@ -202,7 +210,7 @@ namespace CloudFoundry.Net.VsExtension
                     progressDialogDispatcher.BeginInvoke(update, string.Format("Pushing {0}", cloud.Url), 65);
                     if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                    VcapClientResult response = cfm.Push(name, url, instances, new DirectoryInfo(precompiledSitePath), memory, null);
+                    VcapClientResult response = cfm.Push(name, url, instances, new DirectoryInfo(precompiledSitePath), memory, services);
                     progressDialogDispatcher.BeginInvoke(update, "Complete.", 100);
                     progressDialogDispatcher.BeginInvoke(updateResponse, response.Message);
                 }
@@ -246,7 +254,5 @@ namespace CloudFoundry.Net.VsExtension
         {            
             project.SetGlobalVariable("CloudId", guid.ToString());
         }
-
-        
     }
 }

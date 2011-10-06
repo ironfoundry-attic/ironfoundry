@@ -211,7 +211,9 @@
                 // Ruby detects health a little differently
                 string appState         = (string)parsed["state"];
                 ushort instances        = (ushort)parsed["instances"];
-                ushort runningInstances = (ushort)parsed["runningInstances"];
+                var running = parsed["runningInstances"];
+                
+                ushort runningInstances = ( running.Type == JTokenType.Null) ? (ushort) 0 : (ushort)running;
 
                 if (appState == VcapStates.STARTED && (instances == runningInstances))
                 {

@@ -23,6 +23,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                 {
                     cloud.ClearServices();
                     cloud.ClearApplications();
+                    cloud.ClearAvailableServices();
                 }
             }
         }

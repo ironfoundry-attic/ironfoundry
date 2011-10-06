@@ -86,7 +86,9 @@
                 {
                     local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());
                     var provisionedServices = client.GetProvisionedServices();
+                    var availableServices = client.GetSystemServices();
                     local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
+                    local.AvailableServices.Synchronize(new ObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
                 }
                 return local;
             }
@@ -99,8 +101,9 @@
         public Cloud Disconnect(Cloud cloud)
         {
             cloud.AccessToken = string.Empty;
-            cloud.Applications.Clear();
-            cloud.Services.Clear();
+            cloud.ClearApplications();
+            cloud.ClearServices();
+            cloud.ClearAvailableServices();
             return cloud;
         }
 

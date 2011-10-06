@@ -29,7 +29,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void RegisterGetData()
         {
-            Messenger.Default.Register<NotificationMessageAction<AddApplicationUrlViewModel>>(this,
+            Messenger.Default.Register<NotificationMessageAction<ProvisionedServiceViewModel>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.GetAddApplicationUrlData))

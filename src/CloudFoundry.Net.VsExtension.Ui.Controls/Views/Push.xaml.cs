@@ -44,9 +44,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                 this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.AddAppService))
+                    if (message.Notification.Equals(Messages.AddApplicationService))
                     {
-                        var view = new Views.AddCloud();
+                        var view = new Views.AddApplicationService();
                         Window parentWindow = Window.GetWindow(this);
                         view.Owner = parentWindow;
                         var result = view.ShowDialog();

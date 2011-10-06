@@ -88,10 +88,12 @@
     <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
+    <Compile Include="ViewModel\Cloud\ProvisionedServiceViewModel.cs" />
     <Compile Include="ViewModel\Cloud\DragDropEffects.cs" />
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
+    <Compile Include="ViewModel\Push\AddApplicationServiceViewModel.cs" />
     <Compile Include="ViewModel\UpdateViewModel.cs" />
-    <Compile Include="ViewModel\PushViewModel.cs" />
+    <Compile Include="ViewModel\Push\PushViewModel.cs" />
     <Compile Include="ViewModel\Explorer\ApplicationTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModel\Explorer\CloudExplorerViewModel.cs" />
@@ -131,6 +133,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Views\AddApplicationService.xaml.cs">
+      <DependentUpon>AddApplicationService.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProvisionService.xaml.cs">
+      <DependentUpon>ProvisionService.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Update.xaml.cs">
       <DependentUpon>Update.xaml</DependentUpon>
@@ -207,6 +215,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\AddApplicationService.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProvisionService.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Update.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -262,7 +278,7 @@
     <Resource Include="Images\appsadd.png" />
     <Resource Include="Images\editurls.png" />
     <Resource Include="Images\refresh.png" />
-    <Resource Include="Images\serveradd.png" />
+    <Resource Include="Images\serviceadd.png" />
     <Resource Include="Images\service.png" />
   </ItemGroup>
   <ItemGroup>
