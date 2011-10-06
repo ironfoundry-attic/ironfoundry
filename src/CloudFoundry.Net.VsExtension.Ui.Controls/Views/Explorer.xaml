@@ -38,7 +38,7 @@
                     <DataTemplate DataType="{x:Type vm:CloudViewModel}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Cloud.ServerName}" VerticalAlignment="Center"/>
-                            <Button Width="15" Height="17" Content="X" Command="{Binding DataContext.CloseCloudCommand, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type UserControl}}}" 
+                            <Button Width="15" Height="17" Content="X" Command="{Binding DataContext.CloseCloudCommand, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type Window}}}" 
                                                                    CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}" Margin="5,0,0,0" FontSize="8" FontWeight="Bold" />
                         </StackPanel>
                     </DataTemplate>
