@@ -24,6 +24,8 @@
                 argApplication.State = VcapStates.STARTED;
                 UpdateApplication(argApplication);
                 // NB: Ruby vmc does a LOT more steps here
+                // TODO wait for start?
+                isStarted(argApplication.Name);
             }
         }
 
@@ -148,27 +150,7 @@
                 request.AddBody(getInfo);
                 response = client.Execute(request);
 
-                bool started = false;
-                for (int i = 0; i < 5; ++i)
-                {
-                    string appJson = GetApplicationJson(argName);
-                    JObject parsed = JObject.Parse(appJson);
-
-                    // Ruby detects health a little differently
-                    string appState         = (string)parsed["state"];
-                    ushort instances        = (ushort)parsed["instances"];
-                    ushort runningInstances = (ushort)parsed["runningInstances"];
-
-                    if (appState == VcapStates.STARTED && (instances == runningInstances))
-                    {
-                        started = true;
-                        break;
-                    }
-                    else
-                    {
-                        Thread.Sleep(TimeSpan.FromSeconds(6));
-                    }
-                }
+                bool started = isStarted(argName);
 
                 rv = new VcapClientResult(started);
             }
@@ -207,6 +189,34 @@
             return rv;
         }
 
+        private bool isStarted(string argName)
+        {
+            bool started = false;
+
+            for (int i = 0; i < 5; ++i)
+            {
+                string appJson = GetApplicationJson(argName);
+                JObject parsed = JObject.Parse(appJson);
+
+                // Ruby detects health a little differently
+                string appState         = (string)parsed["state"];
+                ushort instances        = (ushort)parsed["instances"];
+                ushort runningInstances = (ushort)parsed["runningInstances"];
+
+                if (appState == VcapStates.STARTED && (instances == runningInstances))
+                {
+                    started = true;
+                    break;
+                }
+                else
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(6));
+                }
+            }
+
+            return started;
+        }
+
         private static void addDirectoryToResources(List<Resource> argResources, DirectoryInfo argDirectory, string argRootFullName)
         {
             var fileTrimStartChars = new[] { '\\', '/' };
@@ -225,7 +235,7 @@
                 argResources.Add(new Resource((ulong)file.Length, hash, filename));
             }
 
-            foreach (var subdirectory in argDirectory.GetDirectories())
+            foreach (DirectoryInfo subdirectory in argDirectory.GetDirectories())
             {
                 addDirectoryToResources(argResources, subdirectory, argRootFullName);
             }

@@ -43,7 +43,6 @@
     <Compile Include="Binder.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="IEnumerableExtensionMethods.cs" />
-    <Compile Include="FatalErrorEventArgs.cs" />
     <Compile Include="JsonConverters\VcapGuidArrayConverter.cs" />
     <Compile Include="JsonConverters\VcapGuidConverter.cs" />
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
