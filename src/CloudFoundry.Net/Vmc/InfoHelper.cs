@@ -8,8 +8,7 @@
 
     internal class InfoHelper : BaseVmcHelper
     {
-        public InfoHelper(VcapCredentialManager argCredentialManager)
-            : base(argCredentialManager) { }
+        public InfoHelper(VcapCredentialManager credMgr) : base(credMgr) { }
 
         public string GetLogs(Application argApp, ushort argInstance)
         {
@@ -27,26 +26,20 @@
 
         public string GetStdErrLog(Application argApp, ushort argInstance)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stderr.log");
-            RestResponse response = ExecuteRequest(client, request);
-            return response.Content;
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stderr.log");
+            return r.Execute().Content;
         }
 
         public string GetStdOutLog(Application argApp, ushort argInstance)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stdout.log");
-            RestResponse response = ExecuteRequest(client, request);
-            return response.Content;
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stdout.log");
+            return r.Execute().Content;
         }
 
         public string GetStartupLog(Application argApp, ushort argInstance)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/startup.log");
-            RestResponse response = ExecuteRequest(client, request);
-            return response.Content;
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/startup.log");
+            return r.Execute().Content;
         }
 
         public void GetFiles(Application argApp, ushort argInstance)
@@ -56,20 +49,9 @@
 
         public IEnumerable<StatInfo> GetStats(Application argApp)
         {
-            SortedDictionary<int, StatInfo> tmp = null;
-
-            try
-            {
-                RestClient client = BuildClient();
-                RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "stats");
-                RestResponse response = ExecuteRequest(client, request);
-                tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, "stats");
+            RestResponse response = r.Execute();
+            var tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
 
             var rv = new List<StatInfo>();
             foreach (KeyValuePair<int, StatInfo> kvp in tmp)
@@ -83,9 +65,8 @@
 
         public IEnumerable<ExternalInstance> GetInstances(Application argApp)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "instances");
-            var instances = ExecuteRequest<Dictionary<string, ExternalInstance>>(client, request);
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, "instances");
+            var instances = r.Execute<Dictionary<string, ExternalInstance>>();
             return instances.Values.ToArrayOrNull();
         }
     }

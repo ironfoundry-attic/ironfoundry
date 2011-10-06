@@ -105,6 +105,7 @@
     <Compile Include="Vmc\UserHelper.cs" />
     <Compile Include="Vmc\VcapCredentialManager.cs" />
     <Compile Include="Vmc\VmcExceptions.cs" />
+    <Compile Include="Vmc\VcapRequest.cs" />
     <Compile Include="WinSockErrorCode.cs" />
     <Compile Include="Vmc\VcapClientResult.cs" />
     <Compile Include="Vmc\InfoHelper.cs" />

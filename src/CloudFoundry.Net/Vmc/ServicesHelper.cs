@@ -1,20 +1,19 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
     using System.Collections.Generic;
+    using System.Linq;
     using CloudFoundry.Net.Types;
     using Newtonsoft.Json;
     using RestSharp;
 
     internal class ServicesHelper : BaseVmcHelper
     {
-        public ServicesHelper(VcapCredentialManager argCredentialManager)
-            : base(argCredentialManager) { }
+        public ServicesHelper(VcapCredentialManager credMgr) : base(credMgr) { }
 
         public IEnumerable<SystemService> GetSystemServices()
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.GLOBAL_SERVICES_PATH);
-            RestResponse response = ExecuteRequest(client, request);
+            var r = new VcapRequest(credMgr,  Constants.GLOBAL_SERVICES_PATH);
+            RestResponse response = r.Execute();
 
             var datastores = new List<SystemService>();
             var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemService>>>>(response.Content);
@@ -34,21 +33,62 @@
 
         public IEnumerable<ProvisionedService> GetProvisionedServices()
         {            
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.SERVICES_PATH);
-            return ExecuteRequest<ProvisionedService[]>(client, request);
+            var r = new VcapRequest(credMgr,  Constants.SERVICES_PATH);
+            return r.Execute<ProvisionedService[]>();
+        }
+
+        public VcapClientResult CreateService(string argServiceName, string argProvisionedServiceName)
+        {
+            VcapClientResult rv;
+
+            IEnumerable<SystemService> services = GetSystemServices();
+            if (services.IsNullOrEmpty())
+            {
+                rv = new VcapClientResult(false);
+            }
+            else
+            {
+                SystemService svc = services.FirstOrDefault(s => s.Vendor == argServiceName);
+                if (null == svc)
+                {
+                    rv = new VcapClientResult(false);
+                }
+                else
+                {
+                    // from vmc client.rb
+                    var data = new
+                    {
+                        name    = argProvisionedServiceName,
+                        type    = svc.Type,
+                        tier    = "free",
+                        vendor  = svc.Vendor,
+                        version = svc.Version,
+                    };
+                    var r = new VcapJsonRequest(credMgr, Method.POST, data, Constants.SERVICES_PATH);
+                    RestResponse response = r.Execute();
+                    rv = new VcapClientResult();
+                }
+            }
+
+            return rv;
+        }
+
+        public VcapClientResult DeleteService(string argProvisionedServiceName)
+        {
+            var request = new VcapJsonRequest(credMgr, Method.DELETE, Constants.SERVICES_PATH, argProvisionedServiceName);
+            request.Execute();
+            return new VcapClientResult();
         }
 
         public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
         {
-            var apps = new AppsHelper(credentialManager);
+            var apps = new AppsHelper(credMgr);
 
             Application app = apps.GetApplication(argAppName);
             app.Services.Add(argProvisionedServiceName);
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, app.Name);
-            request.AddBody(app);
-            RestResponse response = ExecuteRequest(client, request);
+
+            var request = new VcapJsonRequest(credMgr, Method.PUT, app, Constants.APPS_PATH, app.Name);
+            RestResponse response = request.Execute();
 
             // Ruby code re-gets info
             app = apps.GetApplication(argAppName);
@@ -59,34 +99,8 @@
             return new VcapClientResult();
         }
 
-#if UNUSED
-        public void CreateService(AppService appservice, Cloud cloud) {
-            /*
-             *"type":"database","tier":"free","vendor":"mysql","version":"5.1","name":"mysql-870f3"
-             *
-             */
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.POST;
-            request.Resource = "/services";
-            request.AddHeader("Authorization", cloud.AccessToken);
-            request.AddObject(appservice);
-            request.RequestFormat = DataFormat.Json;
-            client.Execute(request);
-
-        public void DeleteService (AppService appservice, Cloud cloud) {
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.DELETE;
-            request.Resource = "/services/" + appservice.Name;
-            request.AddHeader("Authorization", cloud.AccessToken);
-            client.Execute(request);
-            //should prolly put a try-catch in here to catch the exception when the service is not in the current running list
-        }
-
-        public void UnbindService (AppService appservice, Application application, Cloud cloud) {
+        public void UnbindService(AppService appservice, Application application, Cloud cloud)
+        {
             var client = new RestClient();
             client.BaseUrl = cloud.Url;
             var request = new RestRequest();
@@ -100,6 +114,5 @@
             var apps = new AppsHelper(token);
             apps.RestartApp(application, cloud);
         }
-#endif
     }
 }

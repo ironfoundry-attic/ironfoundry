@@ -23,14 +23,17 @@
 
             var commands = new Dictionary<string, Func<IList<string>, bool>>
             {
-                { "help",         (arg) => Usage() },
-                { "info",         (arg) => Info(arg) },
-                { "target",       (arg) => Target(arg) },
-                { "login",        (arg) => Login(arg) },
-                { "push",         (arg) => Push(arg) },
-                { "services",     (arg) => Services(arg) },
-                { "bind-service", (arg) => BindService(arg) },
-                { "delete",       (arg) => Delete(arg) },
+                { "help",           (arg) => Usage() },
+                { "info",           (arg) => Info(arg) },
+                { "target",         (arg) => Target(arg) },
+                { "login",          (arg) => Login(arg) },
+                { "push",           (arg) => Push(arg) },
+                { "services",       (arg) => Services(arg) },
+                { "bind-service",   (arg) => BindService(arg) },
+                { "create-service", (arg) => CreateService(arg) },
+                { "delete-service", (arg) => DeleteService(arg) },
+                { "unbind-service", (arg) => UnbindService(arg) },
+                { "delete",         (arg) => Delete(arg) },
             };
 
             var p = new OptionSet

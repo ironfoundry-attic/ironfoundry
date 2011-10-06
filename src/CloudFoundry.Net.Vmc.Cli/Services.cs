@@ -38,7 +38,6 @@
 
         static bool BindService(IList<string> unparsed)
         {
-            var vc = new VcapClient();
             // TODO match ruby argument parsing
             if (unparsed.Count != 2)
             {
@@ -49,7 +48,56 @@
             string svcname = unparsed[0];
             string appname = unparsed[1];
 
-            VcapClientResult rslt = vc.Bind(svcname, appname);
+            var vc = new VcapClient();
+            VcapClientResult rslt = vc.BindService(svcname, appname);
+            return rslt.Success;
+        }
+
+        static bool UnindService(IList<string> unparsed)
+        {
+            // TODO match ruby argument parsing
+            if (unparsed.Count != 1)
+            {
+                Console.Error.WriteLine("Usage: vmc unbind-service <servicename>"); // TODO usage statement standardization
+                return false;
+            }
+
+            string svcname = unparsed[0];
+            string appname = unparsed[1];
+
+            var vc = new VcapClient();
+            VcapClientResult rslt = vc.UnbindService(svcname, appname);
+            return rslt.Success;
+        }
+
+        static bool CreateService(IList<string> unparsed)
+        {
+            if (unparsed.Count != 2)
+            {
+                Console.Error.WriteLine("Usage: vmc create-service <service> <servicename>"); // TODO usage statement standardization
+                return false;
+            }
+
+            string svc     = unparsed[0];
+            string svcname = unparsed[1];
+
+            var vc = new VcapClient();
+            VcapClientResult rslt = vc.CreateService(svc, svcname);
+            return rslt.Success;
+        }
+
+        static bool DeleteService(IList<string> unparsed)
+        {
+            if (unparsed.Count != 1)
+            {
+                Console.Error.WriteLine("Usage: vmc delete-service <servicename>"); // TODO usage statement standardization
+                return false;
+            }
+
+            string svcname = unparsed[0];
+
+            var vc = new VcapClient();
+            VcapClientResult rslt = vc.DeleteService(svcname);
             return rslt.Success;
         }
     }

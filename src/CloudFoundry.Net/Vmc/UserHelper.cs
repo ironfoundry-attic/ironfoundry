@@ -6,19 +6,15 @@
 
     internal class UserHelper : BaseVmcHelper
     {
-        public UserHelper(VcapCredentialManager argCredentialManager)
-            : base(argCredentialManager) { }
+        public UserHelper(VcapCredentialManager credMgr) : base(credMgr) { }
 
         public VcapClientResult Login(string argEmail, string argPassword)
         {
             VcapClientResult rv;
 
-            RestClient client = BuildClient(false);
-
-            RestRequest request = BuildRequest(Method.POST, DataFormat.Json, Constants.USERS_PATH, argEmail, "tokens");
-            request.AddBody(new { password = argPassword });
-
-            RestResponse response = ExecuteRequest(client, request);
+            var body = new { password = argPassword };
+            var r = new VcapJsonRequest(credMgr, Method.POST, body, Constants.USERS_PATH, argEmail, "tokens");
+            RestResponse response = r.Execute();
             if (response.Content.IsNullOrEmpty())
             {
                 rv = new VcapClientResult(false, Resources.Vmc_NoContentReturned_Text);
@@ -27,7 +23,7 @@
             {
                 var parsed = JObject.Parse(response.Content);
                 string token = parsed.Value<string>("token");
-                credentialManager.RegisterToken(token);
+                credMgr.RegisterToken(token);
                 rv = new VcapClientResult();
             }
 

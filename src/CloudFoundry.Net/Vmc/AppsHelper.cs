@@ -13,8 +13,7 @@
 
     internal class AppsHelper : BaseVmcHelper
     {
-        public AppsHelper(VcapCredentialManager argCredentialManager)
-            : base(argCredentialManager) { }
+        public AppsHelper(VcapCredentialManager credMgr) : base(credMgr) { }
 
         public void Start(Application argApplication)
         {
@@ -41,10 +40,8 @@
 
         public string GetApplicationJson(string argName)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argName);
-            RestResponse response = ExecuteRequest(client, request);
-            return response.Content;
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argName);
+            return r.Execute().Content;
         }
 
         public Application GetApplication(string argName)
@@ -55,17 +52,14 @@
 
         public VcapResponse UpdateApplication(Application argApp)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argApp.Name);
-            request.AddBody(argApp);
-            return ExecuteRequest<VcapResponse>(client, request);
+            var r = new VcapJsonRequest(credMgr, Method.PUT, argApp, Constants.APPS_PATH, argApp.Name);
+            return r.Execute<VcapResponse>();
         }
 
         public void Delete(string argName)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.DELETE, Constants.APPS_PATH, argName);
-            ExecuteRequest(client, request);
+            var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.APPS_PATH, argName);
+            r.Execute();
         }
 
         public void Restart(Application argApp)
@@ -108,19 +102,13 @@
                     Resources = new AppResources { Memory = argMemoryMB },
                 };
 
-                RestClient client = BuildClient();
-                RestRequest request = BuildRequest(Method.POST, DataFormat.Json, Constants.APPS_PATH);
-                request.AddBody(manifest);
-                RestResponse response = ExecuteRequest(client, request);
+                var r = new VcapJsonRequest(credMgr, Method.POST, manifest, Constants.APPS_PATH);
+                RestResponse response = r.Execute();
 
                 Resource[] resourceAry = resources.ToArrayOrNull();
 
-                client = BuildClient();
-                request = BuildRequest(Method.POST, DataFormat.Json, Constants.RESOURCES_PATH);
-                request.AddBody(resourceAry);
-                response = ExecuteRequest(client, request);
-
-                client = BuildClient();
+                r = new VcapJsonRequest(credMgr, Method.POST, resourceAry, Constants.RESOURCES_PATH);
+                response = r.Execute();
 
                 string tempFile = Path.GetTempFileName();
                 try
@@ -128,13 +116,11 @@
                     var zipper = new FastZip();
                     zipper.CreateZip(tempFile, argPath.FullName, true, String.Empty);
 
-                    request = BuildRequest(Method.POST, Constants.APPS_PATH, argName, "application");
-                    request.AddParameter("_method", "put");
-                    request.AddFile("application", tempFile);
-                    // This is required in order to pass the JSON as a parameter
-                    request.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
-
-                    response = ExecuteRequest(client, request);
+                    r = new VcapJsonRequest(credMgr, Method.POST, Constants.APPS_PATH, argName, "application");
+                    r.AddParameter("_method", "put");
+                    r.AddFile("application", tempFile);
+                    r.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
+                    response = r.Execute();
                 }
                 finally
                 {
@@ -146,10 +132,8 @@
                 string appName = (string)getInfo["name"];
                 getInfo["state"] = VcapStates.STARTED;
 
-                client = BuildClient();
-                request = BuildRequest(Method.PUT, DataFormat.Json, Constants.APPS_PATH, argName);
-                request.AddBody(getInfo);
-                response = ExecuteRequest(client, request);
+                r = new VcapJsonRequest(credMgr, Method.PUT, getInfo, Constants.APPS_PATH, argName);
+                response = r.Execute();
 
                 bool started = isStarted(appName);
 
@@ -157,7 +141,7 @@
                 {
                     foreach (string svcName in argProvisionedServiceNames)
                     {
-                        var servicesHelper = new ServicesHelper(credentialManager);
+                        var servicesHelper = new ServicesHelper(credMgr);
                         servicesHelper.BindService(svcName, appName);
                     }
                 }
@@ -170,24 +154,20 @@
 
         public string GetAppCrash(string argName)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argName, "crashes");
-            RestResponse response = ExecuteRequest(client, request);
-            return response.Content;
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argName, "crashes");
+            return r.Execute().Content;
         }
 
         public IEnumerable<Crash> GetAppCrash(Application argApp)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH, argApp.Name, "crashes");
-            return ExecuteRequest<Crash[]>(client, request);
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, "crashes");
+            return r.Execute<Crash[]>();
         }
 
         public IEnumerable<Application> ListApps(Cloud argCloud)
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.APPS_PATH);
-            IEnumerable<Application> rv = ExecuteRequest<List<Application>>(client, request);
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH);
+            IEnumerable<Application> rv = r.Execute<List<Application>>();
             if (null != rv)
             {
                 foreach (Application app in rv)

@@ -1,20 +1,16 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
     using System;
-    using RestSharp;
     using Types;
 
     internal class MiscHelper : BaseVmcHelper
     {
-        public MiscHelper(VcapCredentialManager argCredentialManager)
-            : base(argCredentialManager) { }
+        public MiscHelper(VcapCredentialManager credMgr) : base(credMgr) { }
 
         public VcapClientResult Info()
         {
-            RestClient client = BuildClient();
-            RestRequest request = BuildRequest(Method.GET, Constants.INFO_PATH);
-            Info info = ExecuteRequest<Info>(client, request);
-            return new VcapClientResult(true, info);
+            var r = new VcapRequest(credMgr, Constants.INFO_PATH);
+            return new VcapClientResult(true, r.Execute<Info>());
         }
 
         public VcapClientResult Target(Uri argUri = null)
@@ -24,16 +20,15 @@
             if (null == argUri)
             {
                 // Just return current target
-                rv = new VcapClientResult(false, credentialManager.CurrentTarget.AbsoluteUriTrimmed());
+                rv = new VcapClientResult(false, credMgr.CurrentTarget.AbsoluteUriTrimmed());
             }
             else
             {
                 // "target" does the same thing as "info", but not logged in
                 // considered valid if name, build, version and support are all non-null
                 // without argument, displays current target
-                RestClient client = BuildClient(false, argUri);
-                RestRequest request = BuildRequest(Method.GET, Constants.INFO_PATH);
-                var info = ExecuteRequest<Info>(client, request);
+                var r = new VcapRequest(credMgr, false, argUri, Constants.INFO_PATH);
+                Info info = r.Execute<Info>();
                 bool success = false == info.Name.IsNullOrWhiteSpace() &&
                                false == info.Build.IsNullOrWhiteSpace() &&
                                false == info.Version.IsNullOrWhiteSpace() &&
@@ -41,11 +36,11 @@
 
                 if (success)
                 {
-                    credentialManager.SetTarget(argUri);
-                    credentialManager.StoreTarget();
+                    credMgr.SetTarget(argUri);
+                    credMgr.StoreTarget();
                 }
 
-                rv = new VcapClientResult(success, credentialManager.CurrentTarget.AbsoluteUriTrimmed());
+                rv = new VcapClientResult(success, credMgr.CurrentTarget.AbsoluteUriTrimmed());
             }
 
             return rv;

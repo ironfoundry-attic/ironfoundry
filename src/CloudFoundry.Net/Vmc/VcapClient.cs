@@ -94,11 +94,25 @@
             return new VcapClientResult();
         }
 
-        public VcapClientResult Bind(string argProvisionedServiceName, string argAppName)
+        public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
         {
             checkLoginStatus();
             var services = new ServicesHelper(credentialManager);
             return services.BindService(argProvisionedServiceName, argAppName);
+        }
+
+        public VcapClientResult CreateService(string argServiceName, string argProvisionedServiceName)
+        {
+            checkLoginStatus();
+            var services = new ServicesHelper(credentialManager);
+            return services.CreateService(argServiceName, argProvisionedServiceName);
+        }
+
+        public VcapClientResult DeleteService(string argProvisionedServiceName)
+        {
+            checkLoginStatus();
+            var services = new ServicesHelper(credentialManager);
+            return services.DeleteService(argProvisionedServiceName);
         }
 
         public IEnumerable<SystemService> GetSystemServices()
