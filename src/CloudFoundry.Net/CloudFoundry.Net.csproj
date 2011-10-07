@@ -65,6 +65,8 @@
     <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\ExternalInstance.cs" />
     <Compile Include="Types\Service.cs" />
+    <Compile Include="Types\StatInfo.cs" />
+    <Compile Include="Types\Usage.cs" />
     <Compile Include="Types\VcapComponentAnnounce.cs" />
     <Compile Include="Types\RouterRegister.cs" />
     <Compile Include="Types\InstanceExited.cs" />

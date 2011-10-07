@@ -138,6 +138,24 @@
         {
             get { return State == VcapStates.STOPPED; }
         }
+
+        [JsonIgnore]
+        public bool CanStart
+        {
+            get
+            {
+                return ! (State == VcapStates.RUNNING || State == VcapStates.STARTED || State == VcapStates.STARTING);
+            }
+        }
+
+        [JsonIgnore]
+        public bool CanStop
+        {
+            get
+            {
+                return State == VcapStates.RUNNING || State == VcapStates.STARTED || State == VcapStates.STARTING;
+            }
+        }
     }
 
     [Serializable]

@@ -3,24 +3,9 @@
     using System;
     using Newtonsoft.Json;
 
-    public class StatInfo : EntityBase
-    {
-        [JsonProperty(PropertyName = "state")]
-        public string State { get; set; }
-
-        [JsonProperty(PropertyName = "stats")]
-        public Stats Stats { get; set; }
-
-        [JsonIgnore]
-        public int ID { get; set; }
-    }
-
     public class Stats : Message
     {
-        public Stats()
-        {
-
-        }
+        public Stats() { }
 
         public Stats(Instance argInstance, TimeSpan argUptime)
         {
@@ -66,20 +51,5 @@
 
         [JsonProperty(PropertyName = "usage")]
         public Usage Usage { get; set; }
-    }
-
-     public class Usage
-     {
-        [JsonProperty(PropertyName="time")]
-        public DateTime CurrentTime { get; set; }
-
-        [JsonProperty(PropertyName="cpu")]
-        public float CpuTime { get; set; }
-
-        [JsonProperty(PropertyName="mem")]
-        public float MemoryUsage { get; set; }
-
-        [JsonProperty(PropertyName="disk")]
-        public float DiskUsage { get; set; }
     }
 }

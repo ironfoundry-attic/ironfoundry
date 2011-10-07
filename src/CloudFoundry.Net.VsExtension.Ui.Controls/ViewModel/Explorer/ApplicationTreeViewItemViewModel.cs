@@ -1,16 +1,11 @@
 ﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-    using GalaSoft.MvvmLight.Command;
     using System.Windows.Input;
-    using GalaSoft.MvvmLight.Messaging;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using CloudFoundry.Net.Types;
     using CloudFoundry.Net.Vmc;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
 
     public class ApplicationTreeViewItemViewModel : TreeViewItemViewModel
     {
@@ -54,17 +49,12 @@
 
         private bool CanStart()
         {
-            return !(application.State.Equals(Types.VcapStates.RUNNING) ||
-                     application.State.Equals(Types.VcapStates.STARTED) ||
-                     application.State.Equals(Types.VcapStates.STARTING));
+            return application.CanStart;
         }
 
         private bool CanStop()
         {
-            return  (application.State.Equals(Types.VcapStates.RUNNING) ||
-                     application.State.Equals(Types.VcapStates.STARTED) ||
-                     application.State.Equals(Types.VcapStates.STARTING));
-
+            return application.CanStop;
         }
 
         private void StartApplication()

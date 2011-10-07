@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.Types;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using Types;
+
     public class InstanceTreeViewItemViewModel : TreeViewItemViewModel
     {
         readonly StatInfo statInfo;
@@ -18,7 +13,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public string Host
         {
-            get { return this.statInfo.Stats.Host; }
+            get
+            {
+                string host = null;
+                if (null != statInfo.Stats) // TODO probably not a null check we want to do
+                {
+                    host = statInfo.Stats.Host;
+                }
+                return host;
+            }
         }
     }
 }

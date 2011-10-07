@@ -32,6 +32,9 @@ Currently available vmc commands are:
     login  [email] [--email, --passwd]           Login
     info                                         System and account information
 
+  Applications
+    apps                                         List deployed applications
+
   Application Creation
     push <appname> <path> <url>                  Create, push, map, and start a new application
 
@@ -40,7 +43,10 @@ Currently available vmc commands are:
 
   Services
     services                                     Lists of services available and provisioned
+    create-service <service> <servicename>       Create a provisioned service and assign it <servicename>
+    delete-service <servicename>                 Delete a provisioned service
     bind-service <servicename> <appname>         Bind a service to an application
+    unbind-service <servicename> <appname>       Unbind service from the application
 
   Help
     help                                         Get general help

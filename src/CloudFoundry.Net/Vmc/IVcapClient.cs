@@ -8,7 +8,6 @@
     public interface IVcapClient
     {
         string CurrentToken { get; }
-        Uri CurrentTarget { get; }
         string CurrentUri { get; }
 
         VcapClientResult Info();
