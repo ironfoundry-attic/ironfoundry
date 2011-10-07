@@ -22,16 +22,8 @@
             Console.Write(deleteFmt, appname);
 
             IVcapClient vc = new VcapClient();
-            VcapClientResult rv = vc.Delete(appname);
-            if (false == rv.Success)
-            {
-                Console.Error.WriteLine(rv.Message);
-            }
-            else
-            {
-                Console.WriteLine("OK");
-            }
-            return rv.Success;
+            vc.Delete(appname);
+            return true;
         }
     }
 }

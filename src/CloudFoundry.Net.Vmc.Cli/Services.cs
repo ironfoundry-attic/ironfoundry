@@ -53,19 +53,19 @@
             return rslt.Success;
         }
 
-        static bool UnindService(IList<string> unparsed)
+        static bool UnbindService(IList<string> unparsed)
         {
             // TODO match ruby argument parsing
-            if (unparsed.Count != 1)
+            if (unparsed.Count != 2)
             {
-                Console.Error.WriteLine("Usage: vmc unbind-service <servicename>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc unbind-service <servicename> <appname>"); // TODO usage statement standardization
                 return false;
             }
 
             string svcname = unparsed[0];
             string appname = unparsed[1];
 
-            var vc = new VcapClient();
+            IVcapClient vc = new VcapClient();
             VcapClientResult rslt = vc.UnbindService(svcname, appname);
             return rslt.Success;
         }

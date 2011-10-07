@@ -15,27 +15,37 @@
     {
         public AppsHelper(VcapCredentialManager credMgr) : base(credMgr) { }
 
-        public void Start(Application argApplication)
+        public void Start(string argApplicationName)
         {
-            Application app = GetApplication(argApplication.Name);
+            Application app = GetApplication(argApplicationName);
             if (false == app.Started)
             {
-                argApplication.State = VcapStates.STARTED;
-                UpdateApplication(argApplication);
+                app.State = VcapStates.STARTED;
+                UpdateApplication(app);
                 // NB: Ruby vmc does a LOT more steps here
                 // TODO wait for start?
-                isStarted(argApplication.Name);
+                isStarted(app.Name);
+            }
+        }
+
+        public void Start(Application argApplication)
+        {
+            Start(argApplication.Name);
+        }
+
+        public void Stop(string argApplicationName)
+        {
+            Application app = GetApplication(argApplicationName);
+            if (false == app.Stopped)
+            {
+                app.State = VcapStates.STOPPED;
+                UpdateApplication(app);
             }
         }
 
         public void Stop(Application argApplication)
         {
-            Application app = GetApplication(argApplication.Name);
-            if (false == app.Stopped)
-            {
-                argApplication.State = VcapStates.STOPPED;
-                UpdateApplication(argApplication);
-            }
+            Stop(argApplication.Name);
         }
 
         public string GetApplicationJson(string argName)
@@ -60,6 +70,12 @@
         {
             var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.APPS_PATH, argName);
             r.Execute();
+        }
+
+        public void Restart(string argAppName)
+        {
+            Stop(argAppName);
+            Start(argAppName);
         }
 
         public void Restart(Application argApp)

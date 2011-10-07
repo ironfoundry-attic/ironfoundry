@@ -4,6 +4,7 @@
     using System.Linq;
     using CloudFoundry.Net.Types;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using RestSharp;
 
     internal class ServicesHelper : BaseVmcHelper
@@ -99,20 +100,22 @@
             return new VcapClientResult();
         }
 
-        public void UnbindService(AppService appservice, Application application, Cloud cloud)
+        public VcapClientResult UnbindService(string argProvisionedServiceName, string argAppName)
         {
-            var client = new RestClient();
-            client.BaseUrl = cloud.Url;
-            var request = new RestRequest();
-            request.Method = Method.PUT;
-            request.Resource = "/apps/" + application.Name;
-            request.AddHeader("Authorization", cloud.AccessToken);
-            application.Services.Remove(appservice.Name);
-            request.AddObject(application);
-            request.RequestFormat = DataFormat.Json;
-            client.Execute(request);
-            var apps = new AppsHelper(token);
-            apps.RestartApp(application, cloud);
+            var apps = new AppsHelper(credMgr);
+            string appJson = apps.GetApplicationJson(argAppName);
+            var appParsed = JObject.Parse(appJson);
+            var services = (JArray)appParsed["services"];
+            appParsed["services"] = new JArray(services.Where(s => ((string)s) != argProvisionedServiceName));
+
+
+            var r = new VcapJsonRequest(credMgr, Method.PUT, appParsed, Constants.APPS_PATH, argAppName);
+            RestResponse response = r.Execute();
+
+            apps = new AppsHelper(credMgr);
+            apps.Restart(argAppName);
+
+            return new VcapClientResult();
         }
     }
 }

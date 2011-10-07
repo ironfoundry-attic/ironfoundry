@@ -27,6 +27,7 @@
         VcapClientResult BindService(string argAppName, string argProvisionedServiceName);
         VcapClientResult CreateService(string argServiceName, string argProvisionedServiceName);
         VcapClientResult DeleteService(string argProvisionedServiceName);
+        VcapClientResult UnbindService(string argProvisionedServiceName, string argAppName);
 
         IEnumerable<SystemService> GetSystemServices();
         IEnumerable<ProvisionedService> GetProvisionedServices();
@@ -34,7 +35,7 @@
         void Stop(Application argApp);
         void Start(Application argApp);
         void Restart(Application argApp);
-        VcapClientResult Delete(string argAppName);
+        void Delete(string argAppName);
 
         Application GetApplication(string argName);
 
