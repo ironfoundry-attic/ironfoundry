@@ -65,7 +65,8 @@
                         vendor  = svc.Vendor,
                         version = svc.Version,
                     };
-                    var r = new VcapJsonRequest(credMgr, Method.POST, data, Constants.SERVICES_PATH);
+                    var r = new VcapJsonRequest(credMgr, Method.POST, Constants.SERVICES_PATH);
+                    r.AddBody(data);
                     RestResponse response = r.Execute();
                     rv = new VcapClientResult();
                 }
@@ -88,7 +89,8 @@
             Application app = apps.GetApplication(argAppName);
             app.Services.Add(argProvisionedServiceName);
 
-            var request = new VcapJsonRequest(credMgr, Method.PUT, app, Constants.APPS_PATH, app.Name);
+            var request = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, app.Name);
+            request.AddBody(app);
             RestResponse response = request.Execute();
 
             // Ruby code re-gets info
@@ -108,8 +110,8 @@
             var services = (JArray)appParsed["services"];
             appParsed["services"] = new JArray(services.Where(s => ((string)s) != argProvisionedServiceName));
 
-
-            var r = new VcapJsonRequest(credMgr, Method.PUT, appParsed, Constants.APPS_PATH, argAppName);
+            var r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, argAppName);
+            r.AddBody(appParsed);
             RestResponse response = r.Execute();
 
             apps = new AppsHelper(credMgr);

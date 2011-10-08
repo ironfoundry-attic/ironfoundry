@@ -11,11 +11,16 @@
     {
         private static readonly ushort[] VMC_HTTP_ERROR_CODES =
         {
-            (ushort)HttpStatusCode.BadRequest,          // 400
-            (ushort)HttpStatusCode.Forbidden,           // 403
-            (ushort)HttpStatusCode.NotFound,            // 404
-            (ushort)HttpStatusCode.MethodNotAllowed,    // 405
-            (ushort)HttpStatusCode.InternalServerError, // 500
+            (ushort)HttpStatusCode.BadRequest,              // 400
+            (ushort)HttpStatusCode.Forbidden,               // 403
+            (ushort)HttpStatusCode.NotFound,                // 404
+            (ushort)HttpStatusCode.MethodNotAllowed,        // 405
+            (ushort)HttpStatusCode.InternalServerError,     // 500
+            (ushort)HttpStatusCode.NotImplemented,          // 501
+            (ushort)HttpStatusCode.BadGateway,              // 502
+            (ushort)HttpStatusCode.ServiceUnavailable,      // 503
+            (ushort)HttpStatusCode.GatewayTimeout,          // 504
+            (ushort)HttpStatusCode.HttpVersionNotSupported, // 505
         };
 
         private static readonly string[] argFormats = new[]
@@ -45,12 +50,23 @@
 
         public RestResponse Execute()
         {
-            return ExecuteRequest(client, request);
+            RestResponse response = client.Execute(request);
+            ProcessResponse(response);
+            return response;
         }
 
         public TResponse Execute<TResponse>()
         {
-            return ExecuteRequest<TResponse>(client, request);
+            RestResponse response = client.Execute(request);
+            ProcessResponse(response);
+            if (response.Content.IsNullOrWhiteSpace())
+            {
+                return default(TResponse);
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<TResponse>(response.Content);
+            }
         }
 
         protected RestRequest BuildRequest(Method argMethod, params object[] args)
@@ -70,27 +86,6 @@
                 RequestFormat = argFormat,
             };
             return ProcessRequestArgs(rv, args);
-        }
-
-        private RestResponse ExecuteRequest(RestClient argClient, RestRequest argRequest)
-        {
-            RestResponse response = argClient.Execute(argRequest);
-            ProcessResponse(response);
-            return response;
-        }
-
-        private TResponse ExecuteRequest<TResponse>(RestClient argClient, RestRequest argRequest)
-        {
-            RestResponse response = argClient.Execute(argRequest);
-            ProcessResponse(response);
-            if (response.Content.IsNullOrWhiteSpace())
-            {
-                return default(TResponse);
-            }
-            else
-            {
-                return JsonConvert.DeserializeObject<TResponse>(response.Content);
-            }
         }
 
         private RestClient BuildClient()
@@ -142,28 +137,51 @@
             // TODO process error codes!
             if (VMC_HTTP_ERROR_CODES.Contains((ushort)argResponse.StatusCode))
             {
-                string errorMessage;
-
-                JObject parsed = JObject.Parse(argResponse.Content);
-                JToken codeToken;
-                JToken descToken;
-                if (parsed.TryGetValue("code", out codeToken) && parsed.TryGetValue("description", out descToken))
+                Exception parseException = null;
+                string errorMessage = null;
+                if (argResponse.Content.IsNullOrWhiteSpace())
                 {
-                    errorMessage = String.Format("Error {0}: {1}", codeToken, descToken);
+                    errorMessage = String.Format("Error (HTTP {0})", argResponse.StatusCode);
                 }
                 else
                 {
-                    errorMessage = String.Format("Error (HTTP {0}): {1}", argResponse.StatusCode, argResponse.Content);
+                    try
+                    {
+                        JObject parsed = JObject.Parse(argResponse.Content);
+                        JToken codeToken;
+                        JToken descToken;
+                        if (parsed.TryGetValue("code", out codeToken) && parsed.TryGetValue("description", out descToken))
+                        {
+                            errorMessage = String.Format("Error {0}: {1}", codeToken, descToken);
+                        }
+                        else
+                        {
+                            errorMessage = String.Format("Error (HTTP {0}): {1}", argResponse.StatusCode, argResponse.Content);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        parseException = ex;
+                    }
                 }
 
-                if (argResponse.StatusCode == HttpStatusCode.BadRequest ||
-                    argResponse.StatusCode == HttpStatusCode.NotFound)
+                if (null != parseException)
                 {
-                    throw new VmcNotFoundException(errorMessage);
+                    errorMessage = String.Format("Error parsing (HTTP {0}):{1}{2}{3}{4}",
+                        argResponse.StatusCode, Environment.NewLine, argResponse.Content, Environment.NewLine, parseException.Message);
+                    throw new VmcTargetException(errorMessage, parseException);
                 }
                 else
                 {
-                    throw new VmcTargetException(errorMessage);
+                    if (argResponse.StatusCode == HttpStatusCode.BadRequest ||
+                        argResponse.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        throw new VmcNotFoundException(errorMessage);
+                    }
+                    else
+                    {
+                        throw new VmcTargetException(errorMessage);
+                    }
                 }
             }
         }
@@ -183,17 +201,15 @@
 
     public class VcapJsonRequest : VcapRequestBase
     {
-        public VcapJsonRequest(VcapCredentialManager credentialManager, Method method, params object[] resourceParams)
-            : this(credentialManager, method, null, resourceParams) { }
-
-        public VcapJsonRequest(VcapCredentialManager credentialManager, Method method, object body, params object[] resourceParams)
-            : base(credentialManager)
+        public VcapJsonRequest(VcapCredentialManager credMgr, Method method, params string[] resourceParams)
+            : base(credMgr)
         {
             request = BuildRequest(method, DataFormat.Json, resourceParams);
-            if (null != body)
-            {
-                request.AddBody(body);
-            }
+        }
+
+        public void AddBody(object body)
+        {
+            this.request.AddBody(body);
         }
 
         public void AddParameter(string param, object value)

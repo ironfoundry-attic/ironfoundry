@@ -61,6 +61,15 @@ namespace CloudFoundry.Net.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application &apos;{0}&apos; already exists..
+        /// </summary>
+        public static string AppsHelper_PushApplicationExists_Fmt {
+            get {
+                return ResourceManager.GetString("AppsHelper_PushApplicationExists_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email: .
         /// </summary>
         public static string Vmc_EmailPrompt_Text {

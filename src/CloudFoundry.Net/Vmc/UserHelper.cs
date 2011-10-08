@@ -12,8 +12,8 @@
         {
             VcapClientResult rv;
 
-            var body = new { password = argPassword };
-            var r = new VcapJsonRequest(credMgr, Method.POST, body, Constants.USERS_PATH, argEmail, "tokens");
+            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.USERS_PATH, argEmail, "tokens");
+            r.AddBody(new { password = argPassword });
             RestResponse response = r.Execute();
             if (response.Content.IsNullOrEmpty())
             {

@@ -9,7 +9,7 @@
         static bool Push(IList<string> unparsed)
         {
             // TODO match ruby argument parsing
-            if (unparsed.Count < 3 || unparsed.Count > 5)
+            if (unparsed.Count < 3 || unparsed.Count > 4)
             {
                 Console.Error.WriteLine("Usage: vmc push appname path url <service> --instances N"); // TODO usage statement standardization
                 return false;
@@ -17,7 +17,7 @@
 
             string appname = unparsed[0];
             string path    = unparsed[1];
-            string url     = unparsed[2];
+            string fqdn    = unparsed[2];
 
             string[] serviceNames = null;
             if (unparsed.Count == 4)
@@ -37,13 +37,12 @@
             }
 
             var vc = new VcapClient();
-            VcapClientResult rv = vc.Push(appname, url, instances, di, 64, serviceNames);
+            VcapClientResult rv = vc.Push(appname, fqdn, instances, di, 64, serviceNames);
             if (false == rv.Success)
             {
                 Console.Error.WriteLine(rv.Message);
             }
             return rv.Success;
         }
-
     }
 }

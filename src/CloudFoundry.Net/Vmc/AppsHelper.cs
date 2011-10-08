@@ -5,6 +5,7 @@
     using System.IO;
     using System.Security.Cryptography;
     using System.Threading;
+    using CloudFoundry.Net.Properties;
     using CloudFoundry.Net.Types;
     using ICSharpCode.SharpZipLib.Zip;
     using Newtonsoft.Json;
@@ -48,21 +49,10 @@
             Stop(argApplication.Name);
         }
 
-        public string GetApplicationJson(string argName)
+        public VcapResponse UpdateApplication(Application app)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argName);
-            return r.Execute().Content;
-        }
-
-        public Application GetApplication(string argName)
-        {
-            string json = GetApplicationJson(argName);
-            return JsonConvert.DeserializeObject<Application>(json);
-        }
-
-        public VcapResponse UpdateApplication(Application argApp)
-        {
-            var r = new VcapJsonRequest(credMgr, Method.PUT, argApp, Constants.APPS_PATH, argApp.Name);
+            var r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, app.Name);
+            r.AddBody(app);
             return r.Execute<VcapResponse>();
         }
 
@@ -84,85 +74,92 @@
             Start(argApp);
         }
 
-        public VcapClientResult Push(string argName, string argDeployFQDN, ushort argInstances,
-            DirectoryInfo argPath, uint argMemoryMB, string[] argProvisionedServiceNames, string argFramework, string argRuntime)
+        public VcapClientResult Push(string name, string deployFQDN, ushort instances,
+            DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames, string framework, string runtime)
         {
             VcapClientResult rv;
 
-            if (argPath == null)
+            if (path == null)
             {
                 rv = new VcapClientResult(false, "Application local location is needed");
             }
-            else if (argDeployFQDN == null)
+            else if (deployFQDN == null)
             {
                 rv = new VcapClientResult(false, "Please specify the url to deploy as.");
             }
-            else if (argFramework == null)
+            else if (framework == null)
             {
                 rv = new VcapClientResult(false, "Please specify application framework");
             }
             else
             {
-                /*
-                 * Before creating the app, ensure we can build resource list
-                 */
-                var resources = new List<Resource>();
-                addDirectoryToResources(resources, argPath, argPath.FullName);
-
-                var manifest = new AppManifest
+                if (AppExists(name))
                 {
-                    Name = argName,
-                    Staging = new Staging { Framework = argFramework, Runtime = argRuntime },
-                    Uris = new string[] { argDeployFQDN },
-                    Instances = argInstances,
-                    Resources = new AppResources { Memory = argMemoryMB },
-                };
-
-                var r = new VcapJsonRequest(credMgr, Method.POST, manifest, Constants.APPS_PATH);
-                RestResponse response = r.Execute();
-
-                Resource[] resourceAry = resources.ToArrayOrNull();
-
-                r = new VcapJsonRequest(credMgr, Method.POST, resourceAry, Constants.RESOURCES_PATH);
-                response = r.Execute();
-
-                string tempFile = Path.GetTempFileName();
-                try
-                {
-                    var zipper = new FastZip();
-                    zipper.CreateZip(tempFile, argPath.FullName, true, String.Empty);
-
-                    r = new VcapJsonRequest(credMgr, Method.POST, Constants.APPS_PATH, argName, "application");
-                    r.AddParameter("_method", "put");
-                    r.AddFile("application", tempFile);
-                    r.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
-                    response = r.Execute();
+                    rv = new VcapClientResult(false, String.Format(Resources.AppsHelper_PushApplicationExists_Fmt, name));
                 }
-                finally
+                else
                 {
-                    File.Delete(tempFile);
-                }
+                    /*
+                     * Before creating the app, ensure we can build resource list
+                     */
+                    var resources = new List<Resource>();
+                    addDirectoryToResources(resources, path, path.FullName);
 
-                string app = GetApplicationJson(argName);
-                JObject getInfo = JObject.Parse(app);
-                string appName = (string)getInfo["name"];
-                getInfo["state"] = VcapStates.STARTED;
-
-                r = new VcapJsonRequest(credMgr, Method.PUT, getInfo, Constants.APPS_PATH, argName);
-                response = r.Execute();
-
-                bool started = isStarted(appName);
-
-                if (started && false == argProvisionedServiceNames.IsNullOrEmpty())
-                {
-                    foreach (string svcName in argProvisionedServiceNames)
+                    var manifest = new AppManifest
                     {
-                        var servicesHelper = new ServicesHelper(credMgr);
-                        servicesHelper.BindService(svcName, appName);
-                    }
-                }
+                        Name = name,
+                        Staging = new Staging { Framework = framework, Runtime = runtime },
+                        Uris = new string[] { deployFQDN },
+                        Instances = instances,
+                        Resources = new AppResources { Memory = memoryMB },
+                    };
 
-                rv = new VcapClientResult(started);
+                    var r = new VcapJsonRequest(credMgr, Method.POST, Constants.APPS_PATH);
+                    r.AddBody(manifest);
+                    RestResponse response = r.Execute();
+
+                    Resource[] resourceAry = resources.ToArrayOrNull();
+
+                    r = new VcapJsonRequest(credMgr, Method.POST, Constants.RESOURCES_PATH);
+                    r.AddBody(resourceAry);
+                    response = r.Execute();
+
+                    string tempFile = Path.GetTempFileName();
+                    try
+                    {
+                        var zipper = new FastZip();
+                        zipper.CreateZip(tempFile, path.FullName, true, String.Empty);
+
+                        r = new VcapJsonRequest(credMgr, Method.POST, Constants.APPS_PATH, name, "application");
+                        r.AddParameter("_method", "put");
+                        r.AddFile("application", tempFile);
+                        r.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
+                        response = r.Execute();
+                    }
+                    finally
+                    {
+                        File.Delete(tempFile);
+                    }
+
+                    Application app = GetApplication(name);
+                    app.State = VcapStates.STARTED;
+                    r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name);
+                    r.AddBody(app);
+                    response = r.Execute();
+
+                    bool started = isStarted(app.Name);
+
+                    if (started && false == provisionedServiceNames.IsNullOrEmpty())
+                    {
+                        foreach (string svcName in provisionedServiceNames)
+                        {
+                            var servicesHelper = new ServicesHelper(credMgr);
+                            servicesHelper.BindService(svcName, app.Name);
+                        }
+                    }
+
+                    rv = new VcapClientResult(started);
+                }
             }
 
             return rv;
