@@ -95,7 +95,7 @@
 
             // Ruby code re-gets info
             app = apps.GetApplication(argAppName);
-            if (app.Started)
+            if (app.IsStarted)
             {
                 apps.Restart(app);
             }

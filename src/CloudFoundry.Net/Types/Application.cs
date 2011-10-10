@@ -128,13 +128,13 @@
         public Cloud Parent { get; set; }
 
         [JsonIgnore]
-        public bool Started
+        public bool IsStarted
         {
             get { return State == VcapStates.STARTED; }
         }
 
         [JsonIgnore]
-        public bool Stopped
+        public bool IsStopped
         {
             get { return State == VcapStates.STOPPED; }
         }

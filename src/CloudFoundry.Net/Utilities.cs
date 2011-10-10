@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
+    using Microsoft.VisualBasic.Devices;
 
     public static class Utility
     {
@@ -16,21 +17,8 @@
 
         public static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
         {
-            if (false == Directory.Exists(target.FullName))
-            {
-                Directory.CreateDirectory(target.FullName);
-            }
-
-            foreach (FileInfo file in source.GetFiles())
-            {
-                file.CopyTo(Path.Combine(target.ToString(), file.Name), true);
-            }
-
-            foreach (DirectoryInfo directory in source.GetDirectories())
-            {
-                DirectoryInfo nextDirectory = target.CreateSubdirectory(directory.Name);
-                CopyDirectory(directory, nextDirectory);
-            }
+            var c = new Computer();
+            c.FileSystem.CopyDirectory(source.FullName, target.FullName, true);
         }
 
         /// <summary>

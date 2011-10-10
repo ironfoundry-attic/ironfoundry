@@ -6,24 +6,17 @@
 
     static partial class Program
     {
-        static bool Push(IList<string> unparsed)
+        static bool Update(IList<string> unparsed)
         {
             // TODO match ruby argument parsing
-            if (unparsed.Count < 3 || unparsed.Count > 4)
+            if (unparsed.Count != 2)
             {
-                Console.Error.WriteLine("Usage: vmc push <appname> <path> <url> [service] --instances N"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc update <appname> <path>"); // TODO usage statement standardization
                 return false;
             }
 
             string appname = unparsed[0];
             string path    = unparsed[1];
-            string fqdn    = unparsed[2];
-
-            string[] serviceNames = null;
-            if (unparsed.Count == 4)
-            {
-                serviceNames = new[] { unparsed[3] };
-            }
 
             DirectoryInfo di = null;
             if (Directory.Exists(path))
@@ -36,8 +29,8 @@
                 return false;
             }
 
-            var vc = new VcapClient();
-            VcapClientResult rv = vc.Push(appname, fqdn, instances, di, 64, serviceNames);
+            IVcapClient vc = new VcapClient();
+            VcapClientResult rv = vc.Update(appname, di);
             if (false == rv.Success)
             {
                 Console.Error.WriteLine(rv.Message);

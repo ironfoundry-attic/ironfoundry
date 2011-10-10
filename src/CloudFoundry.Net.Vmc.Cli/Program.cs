@@ -28,6 +28,7 @@
                 { "info",           (arg) => Info(arg) },
                 { "apps",           (arg) => Apps(arg) },
                 { "push",           (arg) => Push(arg) },
+                { "update",         (arg) => Update(arg) },
                 { "services",       (arg) => Services(arg) },
                 { "bind-service",   (arg) => BindService(arg) },
                 { "unbind-service", (arg) => UnbindService(arg) },

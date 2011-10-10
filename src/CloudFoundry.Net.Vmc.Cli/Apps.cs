@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Types;
 
     static partial class Program
     {
@@ -14,8 +15,16 @@
                 Console.Error.WriteLine("Usage: vmc apps"); // TODO usage statement standardization
                 return false;
             }
-            // TODO IVcapClient vc = new VcapClient();
-            // vc.Delete(appname);
+            IVcapClient vc = new VcapClient();
+            IEnumerable<Application> apps = vc.GetApplications();
+            if (false == apps.IsNullOrEmpty())
+            {
+                foreach (Application a in apps)
+                {
+                    Console.WriteLine("App name: {0} Instances: {1} State: {2} Services: {3}",
+                        a.Name, a.RunningInstances, a.State, String.Join(", ", a.Services));
+                }
+            }
             return true;
         }
     }

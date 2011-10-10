@@ -16,10 +16,10 @@
     {
         public AppsHelper(VcapCredentialManager credMgr) : base(credMgr) { }
 
-        public void Start(string argApplicationName)
+        public void Start(string applicationName)
         {
-            Application app = GetApplication(argApplicationName);
-            if (false == app.Started)
+            Application app = GetApplication(applicationName);
+            if (false == app.IsStarted)
             {
                 app.State = VcapStates.STARTED;
                 UpdateApplication(app);
@@ -29,24 +29,24 @@
             }
         }
 
-        public void Start(Application argApplication)
+        public void Start(Application application)
         {
-            Start(argApplication.Name);
+            Start(application.Name);
         }
 
-        public void Stop(string argApplicationName)
+        public void Stop(string applicationName)
         {
-            Application app = GetApplication(argApplicationName);
-            if (false == app.Stopped)
+            Application app = GetApplication(applicationName);
+            if (false == app.IsStopped)
             {
                 app.State = VcapStates.STOPPED;
                 UpdateApplication(app);
             }
         }
 
-        public void Stop(Application argApplication)
+        public void Stop(Application application)
         {
-            Stop(argApplication.Name);
+            Stop(application.Name);
         }
 
         public VcapResponse UpdateApplication(Application app)
@@ -56,22 +56,22 @@
             return r.Execute<VcapResponse>();
         }
 
-        public void Delete(string argName)
+        public void Delete(string name)
         {
-            var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.APPS_PATH, argName);
+            var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.APPS_PATH, name);
             r.Execute();
         }
 
-        public void Restart(string argAppName)
+        public void Restart(string appName)
         {
-            Stop(argAppName);
-            Start(argAppName);
+            Stop(appName);
+            Start(appName);
         }
 
-        public void Restart(Application argApp)
+        public void Restart(Application app)
         {
-            Stop(argApp);
-            Start(argApp);
+            Stop(app);
+            Start(app);
         }
 
         public VcapClientResult Push(string name, string deployFQDN, ushort instances,
@@ -118,28 +118,7 @@
                     r.AddBody(manifest);
                     RestResponse response = r.Execute();
 
-                    Resource[] resourceAry = resources.ToArrayOrNull();
-
-                    r = new VcapJsonRequest(credMgr, Method.POST, Constants.RESOURCES_PATH);
-                    r.AddBody(resourceAry);
-                    response = r.Execute();
-
-                    string tempFile = Path.GetTempFileName();
-                    try
-                    {
-                        var zipper = new FastZip();
-                        zipper.CreateZip(tempFile, path.FullName, true, String.Empty);
-
-                        r = new VcapJsonRequest(credMgr, Method.POST, Constants.APPS_PATH, name, "application");
-                        r.AddParameter("_method", "put");
-                        r.AddFile("application", tempFile);
-                        r.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
-                        response = r.Execute();
-                    }
-                    finally
-                    {
-                        File.Delete(tempFile);
-                    }
+                    uploadAppBits(name, path);
 
                     Application app = GetApplication(name);
                     app.State = VcapStates.STARTED;
@@ -165,19 +144,41 @@
             return rv;
         }
 
-        public string GetAppCrash(string argName)
+        public VcapClientResult Update(string name, DirectoryInfo path)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argName, "crashes");
+            VcapClientResult rv;
+
+            if (path == null)
+            {
+                rv = new VcapClientResult(false, "Application local location is needed");
+            }
+            else
+            {
+                uploadAppBits(name, path);
+                Application app = GetApplication(name);
+                if (app.IsStarted)
+                {
+                    Restart(app);
+                }
+                rv = new VcapClientResult();
+            }
+
+            return rv;
+        }
+
+        public string GetAppCrash(string name)
+        {
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, name, "crashes");
             return r.Execute().Content;
         }
 
-        public IEnumerable<Crash> GetAppCrash(Application argApp)
+        public IEnumerable<Crash> GetAppCrash(Application app)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, "crashes");
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, app.Name, "crashes");
             return r.Execute<Crash[]>();
         }
 
-        public IEnumerable<Application> ListApps(Cloud argCloud)
+        public IEnumerable<Application> ListApps(Cloud cloud)
         {
             var r = new VcapRequest(credMgr, Constants.APPS_PATH);
             IEnumerable<Application> rv = r.Execute<List<Application>>();
@@ -185,20 +186,20 @@
             {
                 foreach (Application app in rv)
                 {
-                    app.Parent = argCloud; // TODO
+                    app.Parent = cloud; // TODO
                 }
             }
 
             return rv;
         }
 
-        private bool isStarted(string argName)
+        private bool isStarted(string name)
         {
             bool started = false;
 
             for (int i = 0; i < 5; ++i)
             {
-                string appJson = GetApplicationJson(argName);
+                string appJson = GetApplicationJson(name);
                 JObject parsed = JObject.Parse(appJson);
 
                 // Ruby detects health a little differently
@@ -222,11 +223,42 @@
             return started;
         }
 
-        private static void addDirectoryToResources(List<Resource> argResources, DirectoryInfo argDirectory, string argRootFullName)
+        private void uploadAppBits(string name, DirectoryInfo path)
+        {
+            /*
+             * Before creating the app, ensure we can build resource list
+             */
+            var resources = new List<Resource>();
+            addDirectoryToResources(resources, path, path.FullName);
+            Resource[] resourceAry = resources.ToArrayOrNull();
+
+            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.RESOURCES_PATH);
+            r.AddBody(resourceAry);
+            RestResponse response = r.Execute();
+            // TODO only upload files that have changed
+
+            string tempFile = Path.GetTempFileName();
+            try
+            {
+                var zipper = new FastZip();
+                zipper.CreateZip(tempFile, path.FullName, true, String.Empty);
+
+                r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name, "application");
+                r.AddFile("application", tempFile);
+                r.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
+                response = r.Execute();
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        private static void addDirectoryToResources(ICollection<Resource> resources, DirectoryInfo directory, string rootFullName)
         {
             var fileTrimStartChars = new[] { '\\', '/' };
 
-            foreach (FileInfo file in argDirectory.GetFiles())
+            foreach (FileInfo file in directory.GetFiles())
             {
                 string hash     = generateHash(file.FullName);
                 long size       = file.Length;
@@ -234,15 +266,15 @@
                 // The root path should be stripped. This is used
                 // by the server to TAR up the file that gets pushed
                 // to the DEA.
-                filename = filename.Replace(argRootFullName, String.Empty);
+                filename = filename.Replace(rootFullName, String.Empty);
                 filename = filename.TrimStart(fileTrimStartChars);
                 filename = filename.Replace('\\', '/');
-                argResources.Add(new Resource((ulong)file.Length, hash, filename));
+                resources.Add(new Resource((ulong)file.Length, hash, filename));
             }
 
-            foreach (DirectoryInfo subdirectory in argDirectory.GetDirectories())
+            foreach (DirectoryInfo subdirectory in directory.GetDirectories())
             {
-                addDirectoryToResources(argResources, subdirectory, argRootFullName);
+                addDirectoryToResources(resources, subdirectory, rootFullName);
             }
         }
 

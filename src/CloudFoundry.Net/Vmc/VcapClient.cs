@@ -16,17 +16,17 @@
             credMgr = new VcapCredentialManager();
         }
 
-        public VcapClient(string argUri)
+        public VcapClient(string uri)
         {
             credMgr = new VcapCredentialManager();
-            credMgr.SetTarget(argUri);
+            credMgr.SetTarget(uri);
         }
 
-        public VcapClient(Cloud argCloud)
+        public VcapClient(Cloud cloud)
         {
             credMgr = new VcapCredentialManager();
-            credMgr.SetTarget(argCloud.Url);
-            cloud = argCloud;
+            credMgr.SetTarget(cloud.Url);
+            this.cloud = cloud;
         }
 
         public string CurrentUri
@@ -45,17 +45,17 @@
             return helper.Info();
         }
 
-        public VcapClientResult Target(string argUri)
+        public VcapClientResult Target(string uri)
         {
             var helper = new MiscHelper(credMgr);
 
-            if (argUri.IsNullOrWhiteSpace())
+            if (uri.IsNullOrWhiteSpace())
             {
                 return helper.Target();
             }
             else
             {
-                return helper.Target(new Uri(argUri));
+                return helper.Target(new Uri(uri));
             }
         }
 
@@ -64,35 +64,41 @@
             return Login(cloud.Email, cloud.Password);
         }
 
-        public VcapClientResult Login(string argEmail, string argPassword)
+        public VcapClientResult Login(string email, string password)
         {
             var helper = new UserHelper(credMgr);
-            string email = argEmail, password = argPassword;
             return helper.Login(email, password);
         }
 
         public VcapClientResult Push(
-            string argName, string argDeployFQDN, ushort argInstances,
-            DirectoryInfo argPath, uint argMemoryMB, string[] argProvisionedServiceNames)
+            string name, string deployFQDN, ushort instances,
+            DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames)
         {
             checkLoginStatus();
-            var apps = new AppsHelper(credMgr);
-            return apps.Push(argName, argDeployFQDN, argInstances, argPath, argMemoryMB,
-                argProvisionedServiceNames, "aspdotnet", "aspdotnet40");
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.Push(name, deployFQDN, instances, path, memoryMB,
+                provisionedServiceNames, "aspdotnet", "aspdotnet40");
         }
 
-        public void Delete(string argName)
+        public VcapClientResult Update(string name, DirectoryInfo path)
         {
             checkLoginStatus();
-            var apps = new AppsHelper(credMgr);
-            apps.Delete(argName);
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.Update(name, path);
         }
 
-        public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
+        public void Delete(string name)
+        {
+            checkLoginStatus();
+            var hlpr = new AppsHelper(credMgr);
+            hlpr.Delete(name);
+        }
+
+        public VcapClientResult BindService(string provisionedServiceName, string appName)
         {
             checkLoginStatus();
             var services = new ServicesHelper(credMgr);
-            return services.BindService(argProvisionedServiceName, argAppName);
+            return services.BindService(provisionedServiceName, appName);
         }
 
         public VcapClientResult UnbindService(string provisionedServiceName, string appName)
@@ -102,18 +108,18 @@
             return services.UnbindService(provisionedServiceName, appName);
         }
 
-        public VcapClientResult CreateService(string argServiceName, string argProvisionedServiceName)
+        public VcapClientResult CreateService(string serviceName, string provisionedServiceName)
         {
             checkLoginStatus();
             var services = new ServicesHelper(credMgr);
-            return services.CreateService(argServiceName, argProvisionedServiceName);
+            return services.CreateService(serviceName, provisionedServiceName);
         }
 
-        public VcapClientResult DeleteService(string argProvisionedServiceName)
+        public VcapClientResult DeleteService(string provisionedServiceName)
         {
             checkLoginStatus();
             var services = new ServicesHelper(credMgr);
-            return services.DeleteService(argProvisionedServiceName);
+            return services.DeleteService(provisionedServiceName);
         }
 
         public IEnumerable<SystemService> GetSystemServices()
@@ -130,74 +136,81 @@
             return services.GetProvisionedServices();
         }
 
-        public void Start(Application argApp)
+        public void Start(Application app)
         {
             checkLoginStatus();
-            var apps = new AppsHelper(credMgr);
-            apps.Start(argApp);
+            var hlpr = new AppsHelper(credMgr);
+            hlpr.Start(app);
         }
 
-        public void Stop(Application argApp)
+        public void Stop(Application app)
         {
             checkLoginStatus();
-            var apps = new AppsHelper(credMgr);
-            apps.Stop(argApp);
+            var hlpr = new AppsHelper(credMgr);
+            hlpr.Stop(app);
         }
 
-        public Application GetApplication(string argName)
+        public Application GetApplication(string name)
         {
             checkLoginStatus();
-            var app = new AppsHelper(credMgr);
-            return app.GetApplication(argName);
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.GetApplication(name);
         }
 
-        public VcapResponse UpdateApplication(Application argApp)
+        public IEnumerable<Application> GetApplications()
         {
             checkLoginStatus();
-            var app = new AppsHelper(credMgr);
-            return app.UpdateApplication(argApp);
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.GetApplications();
         }
 
-        public void Restart(Application argApp)
+        public VcapResponse UpdateApplication(Application app)
         {
             checkLoginStatus();
-            var app = new AppsHelper(credMgr);
-            app.Restart(argApp);
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.UpdateApplication(app);
         }
 
-        public string GetLogs(Application argApp, ushort instanceNumber)
+        public void Restart(Application app)
+        {
+            checkLoginStatus();
+            var hlpr = new AppsHelper(credMgr);
+            hlpr.Restart(app);
+        }
+
+        public string GetLogs(Application app, ushort instanceNumber)
         {
             checkLoginStatus();
             var info = new InfoHelper(credMgr);
-            return info.GetLogs(argApp, instanceNumber);
+            return info.GetLogs(app, instanceNumber);
         }
 
-        public IEnumerable<StatInfo> GetStats(Application argApp)
+        public IEnumerable<StatInfo> GetStats(Application app)
         {
             checkLoginStatus();
             var info = new InfoHelper(credMgr);
-            return info.GetStats(argApp);
+            return info.GetStats(app);
         }
 
-        public IEnumerable<ExternalInstance> GetInstances(Application argApp)
+        public IEnumerable<ExternalInstance> GetInstances(Application app)
         {
             checkLoginStatus();
             var info = new InfoHelper(credMgr);
-            return info.GetInstances(argApp);
+            return info.GetInstances(app);
         }
 
-        public IEnumerable<Crash> GetAppCrash(Application argApp)
+        public IEnumerable<Crash> GetAppCrash(Application app)
         {
             checkLoginStatus();
-            var apps = new AppsHelper(credMgr);
-            return apps.GetAppCrash(argApp);
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.GetAppCrash(app);
         }
 
         public IEnumerable<Application> ListApps()
         {
             checkLoginStatus();
-            var apps = new AppsHelper(credMgr);
-            return apps.ListApps(cloud);
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.ListApps(cloud);
         }
 
         private void checkLoginStatus()

@@ -1,6 +1,5 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using Types;
@@ -12,7 +11,7 @@
 
         VcapClientResult Info();
 
-        VcapClientResult Target(string argUri);
+        VcapClientResult Target(string uri);
 
         VcapClientResult Login();
         VcapClientResult Login(string email, string password);
@@ -20,23 +19,26 @@
         // TODO VcapClientResult ChangePassword(string username, string newpassword, string url, string accesstoken)
 
         VcapClientResult Push(
-            string argName, string argDeployFQDN, ushort argInstances, DirectoryInfo argPath,
-            uint argMemoryKB, string[] argProvisionedServiceNames);
+            string name, string deployFQDN, ushort instances, DirectoryInfo path,
+            uint memoryKB, string[] provisionedServiceNames);
 
-        VcapClientResult BindService(string argAppName, string argProvisionedServiceName);
-        VcapClientResult CreateService(string argServiceName, string argProvisionedServiceName);
-        VcapClientResult DeleteService(string argProvisionedServiceName);
-        VcapClientResult UnbindService(string argProvisionedServiceName, string argAppName);
+        VcapClientResult Update(string appname, DirectoryInfo di);
+
+        VcapClientResult BindService(string appName, string provisionedServiceName);
+        VcapClientResult CreateService(string serviceName, string provisionedServiceName);
+        VcapClientResult DeleteService(string provisionedServiceName);
+        VcapClientResult UnbindService(string provisionedServiceName, string appName);
 
         IEnumerable<SystemService> GetSystemServices();
         IEnumerable<ProvisionedService> GetProvisionedServices();
 
-        void Stop(Application argApp);
-        void Start(Application argApp);
-        void Restart(Application argApp);
-        void Delete(string argAppName);
+        void Stop(Application app);
+        void Start(Application app);
+        void Restart(Application app);
+        void Delete(string appName);
 
-        Application GetApplication(string argName);
+        Application GetApplication(string name);
+        IEnumerable<Application> GetApplications();
 
         string GetLogs(Application application, ushort instanceNumber);
 

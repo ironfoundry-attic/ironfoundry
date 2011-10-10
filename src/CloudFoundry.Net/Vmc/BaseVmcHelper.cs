@@ -1,5 +1,6 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
     using Types;
 
@@ -22,6 +23,12 @@
         {
             string json = GetApplicationJson(name);
             return JsonConvert.DeserializeObject<Application>(json);
+        }
+
+        public IEnumerable<Application> GetApplications()
+        {
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH);
+            return r.Execute<Application[]>();
         }
 
         protected bool AppExists(string name)
