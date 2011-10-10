@@ -28,33 +28,7 @@
                 if (prompt_ok && password.IsNullOrWhiteSpace())
                 {
                     Console.Write(Resources.Vmc_PasswordPrompt_Text);
-
-                    var passwordList = new LinkedList<char>();
-                    bool reading_pwd = true;
-                    while (reading_pwd)
-                    {
-                        ConsoleKeyInfo info = Console.ReadKey(true);
-                        switch (info.Key)
-                        {
-                            case ConsoleKey.Enter:
-                                reading_pwd = false;
-                                break;
-                            case ConsoleKey.Delete:
-                            case ConsoleKey.Backspace:
-                                if (false == passwordList.IsNullOrEmpty())
-                                {
-                                    Console.Write("\b \b");
-                                    passwordList.RemoveLast();
-                                }
-                                break;
-                            default:
-                                passwordList.AddLast(info.KeyChar);
-                                Console.Write('*');
-                                break;
-                        }
-                    }
-
-                    password = String.Join("", passwordList);
+                    password = readPassword();
                 }
 
                 Console.WriteLine();

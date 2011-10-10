@@ -11,6 +11,13 @@
     {
         static bool Info(IList<string> unparsed)
         {
+            // TODO match ruby argument parsing
+            if (unparsed.Count != 0)
+            {
+                Console.Error.WriteLine("Usage: vmc info"); // TODO usage statement standardization
+                return false;
+            }
+
             var vc = new VcapClient();
             VcapClientResult rslt = vc.Info();
             if (rslt.Success)

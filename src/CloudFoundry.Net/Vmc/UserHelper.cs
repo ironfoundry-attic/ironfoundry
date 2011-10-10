@@ -29,5 +29,20 @@
 
             return rv;
         }
+
+        public VcapClientResult ChangePassword(string user, string newpassword)
+        {
+            var r = new VcapRequest(credMgr, Constants.USERS_PATH, user);
+            RestResponse response = r.Execute();
+
+            JObject parsed = JObject.Parse(response.Content);
+            parsed["password"] = newpassword;
+
+            var put = new VcapJsonRequest(credMgr, Method.PUT, Constants.USERS_PATH, user);
+            put.AddBody(parsed);
+            response = put.Execute();
+
+            return new VcapClientResult();
+        }
     }
 }

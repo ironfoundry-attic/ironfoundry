@@ -203,11 +203,11 @@
                 JObject parsed = JObject.Parse(appJson);
 
                 // Ruby detects health a little differently
-                string appState         = (string)parsed["state"];
-                ushort instances        = (ushort)parsed["instances"];
-                var running = parsed["runningInstances"];
+                string appState  = (string)parsed["state"];
+                ushort instances = (ushort)parsed["instances"];
+                JToken running   = parsed["runningInstances"];
                 
-                ushort runningInstances = ( running.Type == JTokenType.Null) ? (ushort) 0 : (ushort)running;
+                ushort runningInstances = (running.Type == JTokenType.Null) ? (ushort) 0 : (ushort)running;
 
                 if (appState == VcapStates.STARTED && (instances == runningInstances))
                 {

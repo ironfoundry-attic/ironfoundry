@@ -1,6 +1,7 @@
 ﻿namespace CloudFoundry.Net.Vmc.Cli
 {
     using System;
+    using System.Collections.Generic;
 
     static partial class Program
     {
@@ -36,6 +37,35 @@
             }
 
             return String.Format("{0:F" + argPrec + "}G", argSize / (1024.0 * 1024.0 * 1024.0));
+        }
+
+        private static string readPassword()
+        {
+            var passwordList = new LinkedList<char>();
+            bool reading_pwd = true;
+            while (reading_pwd)
+            {
+                ConsoleKeyInfo info = Console.ReadKey(true);
+                switch (info.Key)
+                {
+                    case ConsoleKey.Enter:
+                        reading_pwd = false;
+                        break;
+                    case ConsoleKey.Delete:
+                    case ConsoleKey.Backspace:
+                        if (false == passwordList.IsNullOrEmpty())
+                        {
+                            Console.Write("\b \b");
+                            passwordList.RemoveLast();
+                        }
+                        break;
+                    default:
+                        passwordList.AddLast(info.KeyChar);
+                        Console.Write('*');
+                        break;
+                }
+            }
+            return String.Join("", passwordList);
         }
     }
 }

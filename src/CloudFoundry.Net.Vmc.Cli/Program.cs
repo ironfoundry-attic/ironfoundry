@@ -36,6 +36,7 @@
                 { "delete-service", (arg) => DeleteService(arg) },
                 { "delete",         (arg) => Delete(arg) },
                 { "help",           (arg) => Usage() },
+                { "passwd",         (arg) => Passwd(arg) },
             };
 
             var p = new OptionSet

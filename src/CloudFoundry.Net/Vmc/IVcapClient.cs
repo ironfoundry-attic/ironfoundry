@@ -15,8 +15,7 @@
 
         VcapClientResult Login();
         VcapClientResult Login(string email, string password);
-
-        // TODO VcapClientResult ChangePassword(string username, string newpassword, string url, string accesstoken)
+        VcapClientResult ChangePassword(string newpassword);
 
         VcapClientResult Push(
             string name, string deployFQDN, ushort instances, DirectoryInfo path,

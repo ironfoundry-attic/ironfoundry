@@ -10,6 +10,7 @@
     {
         private readonly VcapCredentialManager credMgr;
         private readonly Cloud cloud;
+        private Info info;
 
         public VcapClient()
         {
@@ -68,6 +69,13 @@
         {
             var helper = new UserHelper(credMgr);
             return helper.Login(email, password);
+        }
+
+        public VcapClientResult ChangePassword(string newpassword)
+        {
+            checkLoginStatus();
+            var hlpr = new UserHelper(credMgr);
+            return hlpr.ChangePassword(info.User, newpassword);
         }
 
         public VcapClientResult Push(
@@ -215,11 +223,27 @@
 
         private void checkLoginStatus()
         {
-            VcapClientResult rslt = Info();
-            if (false == rslt.Success)
+            if (null == info)
             {
-                throw new VmcAuthException(Resources.Vmc_LoginRequired_Message);
+                if (false == loggedIn())
+                {
+                    throw new VmcAuthException(Resources.Vmc_LoginRequired_Message);
+                }
             }
+        }
+
+        private bool loggedIn()
+        {
+            bool rv = false;
+
+            VcapClientResult rslt = Info();
+            if (rslt.Success)
+            {
+                info = rslt.GetResponseMessage<Info>();
+                rv = true;
+            }
+
+            return rv;
         }
     }
 }
