@@ -18,7 +18,7 @@
                 return false;
             }
 
-            var vc = new VcapClient();
+            IVcapClient vc = new VcapClient();
             VcapClientResult rslt = vc.Info();
             if (rslt.Success)
             {

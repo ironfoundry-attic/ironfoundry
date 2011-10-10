@@ -6,6 +6,9 @@
 
     public interface IVcapClient
     {
+        /*
+         * TODO: better way to indicate success for methods that don't return VcapClientResult? hm.
+         */
         string CurrentToken { get; }
         string CurrentUri { get; }
 
@@ -39,6 +42,7 @@
 
         Application GetApplication(string name);
         IEnumerable<Application> GetApplications();
+        string Files(string name, string path, ushort instance);
 
         string GetLogs(Application application, ushort instanceNumber);
 
@@ -47,8 +51,6 @@
         IEnumerable<ExternalInstance> GetInstances(Application application);
 
         IEnumerable<Crash> GetAppCrash(Application application);
-
-        IEnumerable<Application> ListApps();
 
         VcapResponse UpdateApplication(Application application);
     }

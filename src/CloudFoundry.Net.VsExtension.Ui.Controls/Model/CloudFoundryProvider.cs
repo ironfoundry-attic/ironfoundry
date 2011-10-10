@@ -81,7 +81,7 @@
             if (result.Success)
             {
                 local.AccessToken = client.CurrentToken;
-                var applications = client.ListApps();
+                var applications = client.GetApplications();
                 if (null != applications)
                 {
                     local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());

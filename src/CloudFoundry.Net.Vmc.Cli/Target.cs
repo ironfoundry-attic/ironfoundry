@@ -14,7 +14,7 @@
                 url = unparsed[0];
             }
 
-            var vc = new VcapClient();
+            IVcapClient vc = new VcapClient();
             VcapClientResult rslt = vc.Target(url);
             if (rslt.Success)
             {

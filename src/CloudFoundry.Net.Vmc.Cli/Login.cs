@@ -45,7 +45,7 @@
                     return false;
                 }
 
-                var vc = new VcapClient();
+                IVcapClient vc = new VcapClient();
                 try
                 {
                     VcapClientResult rslt = vc.Login(email, password);

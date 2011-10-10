@@ -168,14 +168,25 @@
         {
             checkLoginStatus();
             var hlpr = new AppsHelper(credMgr);
-            return hlpr.GetApplication(name);
+            Application rv =  hlpr.GetApplication(name);
+            rv.Parent = cloud; // TODO not thrilled about this
+            return rv;
         }
 
         public IEnumerable<Application> GetApplications()
         {
             checkLoginStatus();
             var hlpr = new AppsHelper(credMgr);
-            return hlpr.GetApplications();
+            IEnumerable<Application> apps = hlpr.GetApplications();
+            foreach (var a in apps) { a.Parent = cloud; } // TODO not thrilled about this
+            return apps;
+        }
+
+        public string Files(string name, string path, ushort instance)
+        {
+            checkLoginStatus();
+            var hlpr = new AppsHelper(credMgr);
+            return hlpr.Files(name, path, instance);
         }
 
         public VcapResponse UpdateApplication(Application app)
@@ -218,13 +229,6 @@
             checkLoginStatus();
             var hlpr = new AppsHelper(credMgr);
             return hlpr.GetAppCrash(app);
-        }
-
-        public IEnumerable<Application> ListApps()
-        {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
-            return hlpr.ListApps(cloud);
         }
 
         private void checkLoginStatus()

@@ -11,7 +11,7 @@
 
         static bool Services(IList<string> unparsed)
         {
-            var vc = new VcapClient();
+            IVcapClient vc = new VcapClient();
             IEnumerable<SystemService> systemServices = vc.GetSystemServices();
             if (false == systemServices.IsNullOrEmpty())
             {
@@ -48,7 +48,7 @@
             string svcname = unparsed[0];
             string appname = unparsed[1];
 
-            var vc = new VcapClient();
+            IVcapClient vc = new VcapClient();
             VcapClientResult rslt = vc.BindService(svcname, appname);
             return rslt.Success;
         }
@@ -81,7 +81,7 @@
             string svc     = unparsed[0];
             string svcname = unparsed[1];
 
-            var vc = new VcapClient();
+            IVcapClient vc = new VcapClient();
             VcapClientResult rslt = vc.CreateService(svc, svcname);
             return rslt.Success;
         }
@@ -96,7 +96,7 @@
 
             string svcname = unparsed[0];
 
-            var vc = new VcapClient();
+            IVcapClient vc = new VcapClient();
             VcapClientResult rslt = vc.DeleteService(svcname);
             return rslt.Success;
         }

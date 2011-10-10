@@ -41,6 +41,12 @@ Currently available vmc commands are:
   Application Operations
     delete <appname>                             Delete the application
 
+  Application Updates
+    update <appname> <path>                      Update the application bits
+
+  Application Information
+    files <appname> <path>                       Display directory listing or file download for path
+
   Services
     services                                     Lists of services available and provisioned
     create-service <service> <servicename>       Create a provisioned service and assign it <servicename>

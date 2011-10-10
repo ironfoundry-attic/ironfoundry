@@ -23,15 +23,6 @@
             (ushort)HttpStatusCode.HttpVersionNotSupported, // 505
         };
 
-        private static readonly string[] argFormats = new[]
-            {
-                null,              // 0
-                "{0}",             // 1
-                "{0}/{1}",         // 2
-                "{0}/{1}/{2}",     // 3
-                "{0}/{1}/{2}/{3}", // 4
-            };
-
         protected readonly VcapCredentialManager credentialManager;
         protected readonly RestClient client;
         protected RestRequest request;
@@ -69,21 +60,21 @@
             }
         }
 
-        protected RestRequest BuildRequest(Method argMethod, params object[] args)
+        protected RestRequest BuildRequest(Method method, params object[] args)
         {
             var rv = new RestRequest
             {
-                Method = argMethod,
+                Method = method,
             };
             return ProcessRequestArgs(rv, args);
         }
 
-        protected RestRequest BuildRequest(Method argMethod, DataFormat argFormat, params object[] args)
+        protected RestRequest BuildRequest(Method method, DataFormat format, params object[] args)
         {
             var rv = new RestRequest
             {
-                Method = argMethod,
-                RequestFormat = argFormat,
+                Method = method,
+                RequestFormat = format,
             };
             return ProcessRequestArgs(rv, args);
         }
@@ -93,12 +84,12 @@
             return BuildClient(true);
         }
 
-        private RestClient BuildClient(bool argUseAuth, Uri argUri = null)
+        private RestClient BuildClient(bool useAuth, Uri uri = null)
         {
             string baseUrl = credentialManager.CurrentTarget.AbsoluteUri;
-            if (null != argUri)
+            if (null != uri)
             {
-                baseUrl = argUri.AbsoluteUri;
+                baseUrl = uri.AbsoluteUri;
             }
 
             var rv = new RestClient
@@ -107,7 +98,7 @@
                 FollowRedirects = false,
             };
 
-            if (argUseAuth && credentialManager.HasToken)
+            if (useAuth && credentialManager.HasToken)
             {
                 rv.AddDefaultHeader("AUTHORIZATION", credentialManager.CurrentToken);
             }
@@ -115,39 +106,35 @@
             return rv;
         }
 
-        private static RestRequest ProcessRequestArgs(RestRequest argRequest, params object[] args)
+        private static RestRequest ProcessRequestArgs(RestRequest request, params object[] args)
         {
-            if (null == argRequest)
+            if (null == request)
             {
-                throw new ArgumentNullException("argRequest");
+                throw new ArgumentNullException("request");
             }
             if (false == args.IsNullOrEmpty())
             {
-                if (args.Length > argFormats.Length)
-                {
-                    throw new InvalidOperationException();
-                }
-                argRequest.Resource = String.Format(argFormats[args.Length], args);
+                request.Resource = String.Join("/", args).Replace("//", "/");
             }
-            return argRequest;
+            return request;
         }
 
-        private static void ProcessResponse(RestResponse argResponse)
+        private static void ProcessResponse(RestResponse response)
         {
             // TODO process error codes!
-            if (VMC_HTTP_ERROR_CODES.Contains((ushort)argResponse.StatusCode))
+            if (VMC_HTTP_ERROR_CODES.Contains((ushort)response.StatusCode))
             {
                 Exception parseException = null;
                 string errorMessage = null;
-                if (argResponse.Content.IsNullOrWhiteSpace())
+                if (response.Content.IsNullOrWhiteSpace())
                 {
-                    errorMessage = String.Format("Error (HTTP {0})", argResponse.StatusCode);
+                    errorMessage = String.Format("Error (HTTP {0})", response.StatusCode);
                 }
                 else
                 {
                     try
                     {
-                        JObject parsed = JObject.Parse(argResponse.Content);
+                        JObject parsed = JObject.Parse(response.Content);
                         JToken codeToken;
                         JToken descToken;
                         if (parsed.TryGetValue("code", out codeToken) && parsed.TryGetValue("description", out descToken))
@@ -156,7 +143,7 @@
                         }
                         else
                         {
-                            errorMessage = String.Format("Error (HTTP {0}): {1}", argResponse.StatusCode, argResponse.Content);
+                            errorMessage = String.Format("Error (HTTP {0}): {1}", response.StatusCode, response.Content);
                         }
                     }
                     catch (Exception ex)
@@ -168,13 +155,13 @@
                 if (null != parseException)
                 {
                     errorMessage = String.Format("Error parsing (HTTP {0}):{1}{2}{3}{4}",
-                        argResponse.StatusCode, Environment.NewLine, argResponse.Content, Environment.NewLine, parseException.Message);
+                        response.StatusCode, Environment.NewLine, response.Content, Environment.NewLine, parseException.Message);
                     throw new VmcTargetException(errorMessage, parseException);
                 }
                 else
                 {
-                    if (argResponse.StatusCode == HttpStatusCode.BadRequest ||
-                        argResponse.StatusCode == HttpStatusCode.NotFound)
+                    if (response.StatusCode == HttpStatusCode.BadRequest ||
+                        response.StatusCode == HttpStatusCode.NotFound)
                     {
                         throw new VmcNotFoundException(errorMessage);
                     }

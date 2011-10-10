@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Apps.cs" />
     <Compile Include="AddUser.cs" />
+    <Compile Include="Files.cs" />
     <Compile Include="Passwd.cs" />
     <Compile Include="Update.cs" />
     <Compile Include="Delete.cs" />

@@ -8,7 +8,6 @@
         private readonly string message;
         private readonly VcapResponse vcapResponse;
         private readonly Message responseMessage;
-        private readonly Cloud cloud; // TODO
 
         public VcapClientResult()
         {
@@ -38,11 +37,6 @@
             responseMessage = argResponseMessage;
         }
 
-        public VcapClientResult(Cloud argCloud)
-        {
-            cloud = argCloud;
-        }
-
         public bool Success
         {
             get { return success; }
@@ -70,11 +64,6 @@
 
                 return rv;
             }
-        }
-
-        public Cloud Cloud // TODO should not be here??
-        {
-            get { return cloud; }
         }
     }
 }

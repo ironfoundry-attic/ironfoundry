@@ -38,6 +38,7 @@
                 { "help",           (arg) => Usage() },
                 { "passwd",         (arg) => Passwd(arg) },
                 { "add-user",       (arg) => AddUser(arg) },
+                { "files",          (arg) => Files(arg) },
             };
 
             var p = new OptionSet

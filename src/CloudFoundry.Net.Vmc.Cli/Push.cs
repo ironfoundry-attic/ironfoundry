@@ -36,8 +36,8 @@
                 return false;
             }
 
-            var vc = new VcapClient();
-            VcapClientResult rv = vc.Push(appname, fqdn, instances, di, 64, serviceNames);
+            IVcapClient vc = new VcapClient();
+            VcapClientResult rv = vc.Push(appname, fqdn, instances, di, 128, serviceNames); // TODO MEM
             if (false == rv.Success)
             {
                 Console.Error.WriteLine(rv.Message);

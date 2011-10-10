@@ -74,6 +74,13 @@
             Start(app);
         }
 
+        public string Files(string name, string path, ushort instance)
+        {
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, name, "instances", instance, "files", path);
+            RestResponse response = r.Execute();
+            return response.Content;
+        }
+
         public VcapClientResult Push(string name, string deployFQDN, ushort instances,
             DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames, string framework, string runtime)
         {
@@ -176,21 +183,6 @@
         {
             var r = new VcapRequest(credMgr, Constants.APPS_PATH, app.Name, "crashes");
             return r.Execute<Crash[]>();
-        }
-
-        public IEnumerable<Application> ListApps(Cloud cloud)
-        {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH);
-            IEnumerable<Application> rv = r.Execute<List<Application>>();
-            if (null != rv)
-            {
-                foreach (Application app in rv)
-                {
-                    app.Parent = cloud; // TODO
-                }
-            }
-
-            return rv;
         }
 
         private bool isStarted(string name)
