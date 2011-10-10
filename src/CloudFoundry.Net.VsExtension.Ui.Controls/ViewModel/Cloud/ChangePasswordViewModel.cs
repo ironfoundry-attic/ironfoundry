@@ -7,15 +7,16 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     [ExportViewModel("ChangePassword",false)]
     public class ChangePasswordViewModel : ViewModelBase
     {
-        private string newPassword = string.Empty;
-        private string verifyPassword = string.Empty;
-        private string eMail = string.Empty;
+        private string newPassword;
+        private string verifyPassword;
+        private string eMail;
 
         public RelayCommand ConfirmedCommand { get; private set; }
         public RelayCommand CancelledCommand { get; private set; }
@@ -24,20 +25,29 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         {
             ConfirmedCommand = new RelayCommand(Confirmed);
             CancelledCommand = new RelayCommand(Cancelled);
-            
-            // Send a message back to the caller, to intialize data
-            // in this case - email address.
-            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.ChangePasswordEmailAddress,
-                (emailAddress) => {
-                    this.EMail = emailAddress;
+
+            RegisterGetData();
+            InitializeData();
+        }
+
+        private void RegisterGetData()
+        {
+            Messenger.Default.Register<NotificationMessageAction<ChangePasswordViewModel>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.GetChangePasswordData))
+                        message.Execute(this);
+                    Messenger.Default.Unregister(this);
+                });
+        }
+
+        private void InitializeData()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetChangePasswordData,
+                (cloud) =>
+                {
+                    this.EMail = cloud.Email;
                 }));
-            
-            if (IsInDesignMode)
-            {
-                this.NewPassword = "TestPassword";
-                this.VerifyPassword = "TestPassword";
-                this.EMail = "test.email@cloudfoundry.com";
-            }
         }
 
         public string NewPassword
@@ -69,7 +79,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 RaisePropertyChanged("VerifyPassword");
             }
         }
-
 
         private void Confirmed()
         {

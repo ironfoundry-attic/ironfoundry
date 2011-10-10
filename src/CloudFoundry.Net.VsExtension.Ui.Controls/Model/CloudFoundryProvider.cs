@@ -33,9 +33,7 @@
         private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<CloudFoundryProvider> message)
         {
             if (message.Notification.Equals(Messages.GetCloudFoundryProvider))
-            {
                 message.Execute(this);
-            }
         }
 
         private void CloudChanged(object sender, PropertyChangedEventArgs e)
@@ -148,6 +146,24 @@
         {
             IVcapClient client = new VcapClient(argCloud);
             return client.GetApplication(argApp.Name);
+        }
+
+        public VcapClientResult CreateService(Cloud argCloud, string serviceName, string provisionedServiceName)
+        {
+            IVcapClient client = new VcapClient(argCloud);
+            return client.CreateService(serviceName,provisionedServiceName);
+        }
+
+        public ObservableCollection<ProvisionedService> GetProvisionedServices(Cloud argCloud)
+        {
+            IVcapClient client = new VcapClient(argCloud);
+            return new ObservableCollection<ProvisionedService>(client.GetProvisionedServices());
+        }
+
+        public VcapClientResult ChangePassword(Cloud argCloud, string newPassword)
+        {
+            IVcapClient client = new VcapClient(argCloud);
+            return client.ChangePassword(newPassword);
         }
     }
 }

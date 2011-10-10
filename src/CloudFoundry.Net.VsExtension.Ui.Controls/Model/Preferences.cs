@@ -24,6 +24,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                     cloud.ClearServices();
                     cloud.ClearApplications();
                     cloud.ClearAvailableServices();
+                    cloud.IsConnected = false;
+                    cloud.IsDisconnected = true;
                 }
             }
         }
@@ -33,7 +35,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             set
             {
                 this.cloudUrls = value.DeepCopy();
-                
             }
         }
     }

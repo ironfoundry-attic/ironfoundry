@@ -171,22 +171,24 @@
 
         private void ChangePassword()
         {
-            // Register to initialize data in dialog
-            Messenger.Default.Register<NotificationMessageAction<string>>(this,
+            Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.ChangePasswordEmailAddress))
-                        message.Execute(Cloud.Email);
+                    if (message.Notification.Equals(Messages.SetChangePasswordData))
+                        message.Execute(Cloud);
                 });
 
-            // Fire message to open dialog
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ChangePassword,
                 (confirmed) =>
                 {
                     if (confirmed)
                     {
-                        // Send Message to grab ViewModel
-                        // Process Results from ViewModel
+                        Messenger.Default.Send(new NotificationMessageAction<ChangePasswordViewModel>(Messages.GetChangePasswordData,
+                        (viewModel) =>
+                        {
+                            var result = provider.ChangePassword(Cloud, viewModel.NewPassword);
+                            //this.Cloud.Password = viewModel.NewPassword;                               
+                        }));
                     }
                 }));
         }
@@ -330,6 +332,11 @@
             get { return this.SelectedApplication != null; }
         }
 
+        public bool IsNotApplicationViewSelected
+        {
+            get { return !this.isApplicationViewSelected; }
+        }
+
         public bool IsApplicationViewSelected
         {
             get { return this.isApplicationViewSelected; }
@@ -415,12 +422,9 @@
                         Messenger.Default.Send(new NotificationMessageAction<ProvisionedServiceViewModel>(Messages.GetProvisionServiceData,
                         (viewModel) =>
                         {
-                            //ProvisionedService service = new ProvisionedService() {
-                            //    Name = viewModel.Name,
-                            //    Type = viewModel.SelectedSystemService.Type,
-                            //    Vendor = viewModel.SelectedSystemService.Vendor
-                            //};
-                            //Cloud.Services.Add()
+                            var result = provider.CreateService(this.Cloud,viewModel.SelectedSystemService.Vendor, viewModel.Name);
+                            var systemServices = provider.GetProvisionedServices(this.Cloud);
+                            this.Cloud.Services.Synchronize(systemServices, new ProvisionedServiceEqualityComparer());
                         }));
                     }
                 }));

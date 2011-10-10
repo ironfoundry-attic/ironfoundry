@@ -3,23 +3,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
 {
     public static class Messages
     {
-        public const string ChangePassword = "ChangePassword";
-        public const string ChangePasswordDialogResult = "ChangePasswordDialogResult";
-        public const string ChangePasswordEmailAddress = "ChangePasswordEmailAddress";
-
-        public const string InitializeClouds = "InitializeClouds";
+        // Action Commands       
         public const string OpenCloud = "OpenCloud";
-
         public const string OpenApplication = "OpenApplication";
         public const string StartApplication = "StartApplication";
         public const string StopApplication = "StopApplication";
         public const string RestartApplication = "RestartApplication";
+        public const string ManageClouds = "ManageClouds";
+        public const string GetCloudFoundryProvider = "GetCloudFoundryProvider";
 
+        // Dialog Interactions
         public const string AddCloud = "AddCloud";
         public const string AddCloudDialogResult = "AddCloudDialogResult";
         public const string GetAddCloudData = "GetAddCloudData";
         public const string SetAddCloudData = "SetAddCloudData";
-
 
         public const string AddCloudUrl = "AddCloudUrl";
         public const string AddCloudUrlDialogResult  = "AddCloudUrlDialogResult";
@@ -51,6 +48,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string GetProvisionServiceData = "GetProvisionServiceData";
         public const string SetProvisionServiceData = "SetProvisionServiceData";
 
+        public const string ChangePassword = "ChangePassword";
+        public const string ChangePasswordDialogResult = "ChangePasswordDialogResult";
+        public const string GetChangePasswordData = "GetChangePasswordData";
+        public const string SetChangePasswordData = "SetChangePasswordData";
+
         public const string AddApplicationService = "AddApplicationService";
         public const string AddApplicationServiceDialogResult = "AddApplicationServiceDialogResult";
         public const string GetAddApplicationServiceData = "GetAddApplicationServiceData";
@@ -60,12 +62,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string RegisterAccountDialogResult = "RegisterAccountDialogResult";
         public const string GetRegisterAccountData = "GetRegisterAccountData";
         public const string SetRegisterAccountData = "SetRegisterAccountData";
-
-        public const string LoadPreferences = "LoadPreferences";
-        public const string SaveClouds = "SaveClouds";
-        public const string SaveCloudUrls = "SaveCloudUrls";
-
-        public const string GetCloudFoundryProvider = "GetCloudFoundryProvider";
       
         public const string PushApp = "PushApp";
         public const string GetPushAppData = "GetPushAppData";
@@ -76,7 +72,5 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string UpdateDialogResult = "UpdateDialogResult";
         public const string GetUpdateAppData = "GetPushAppData";
         public const string SetUpdateAppData = "SetPushAppData";
-        
-        public const string ManageClouds = "ManageClouds";
     }
 }
