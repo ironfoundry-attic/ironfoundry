@@ -37,6 +37,7 @@
                 { "delete",         (arg) => Delete(arg) },
                 { "help",           (arg) => Usage() },
                 { "passwd",         (arg) => Passwd(arg) },
+                { "add-user",       (arg) => AddUser(arg) },
             };
 
             var p = new OptionSet

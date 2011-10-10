@@ -44,5 +44,13 @@
 
             return new VcapClientResult();
         }
+
+        public VcapClientResult AddUser(string email, string password)
+        {
+            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.USERS_PATH);
+            r.AddBody(new { email = email, password = password });
+            RestResponse response = r.Execute();
+            return new VcapClientResult();
+        }
     }
 }

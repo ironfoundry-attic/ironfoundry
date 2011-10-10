@@ -16,6 +16,7 @@
         VcapClientResult Login();
         VcapClientResult Login(string email, string password);
         VcapClientResult ChangePassword(string newpassword);
+        VcapClientResult AddUser(string email, string password);
 
         VcapClientResult Push(
             string name, string deployFQDN, ushort instances, DirectoryInfo path,

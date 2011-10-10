@@ -48,6 +48,10 @@ Currently available vmc commands are:
     bind-service <servicename> <appname>         Bind a service to an application
     unbind-service <servicename> <appname>       Unbind service from the application
 
+  Administration
+    passwd                                       Change the password for the current user
+    add-user                                     Register a new user (requires admin privileges)
+
   Help
     help                                         Get general help
 ";

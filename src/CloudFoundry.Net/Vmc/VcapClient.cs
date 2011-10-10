@@ -78,6 +78,12 @@
             return hlpr.ChangePassword(info.User, newpassword);
         }
 
+        public VcapClientResult AddUser(string email, string password)
+        {
+            var hlpr = new UserHelper(credMgr);
+            return hlpr.AddUser(email, password);
+        }
+
         public VcapClientResult Push(
             string name, string deployFQDN, ushort instances,
             DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames)
