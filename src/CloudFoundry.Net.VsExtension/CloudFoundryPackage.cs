@@ -122,7 +122,6 @@ namespace CloudFoundry.Net.VsExtension
 
         private void UpdateApplication(object sender, EventArgs e)
         {
-
             Project project = vsMonitorSelection.GetActiveProject();
             if (project != null)
             {
