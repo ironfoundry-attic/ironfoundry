@@ -31,10 +31,6 @@ namespace CloudFoundry.Net.VsExtension
         private IVsMonitorSelection vsMonitorSelection;
         private DTE dte;       
         private CloudFoundryProvider provider;
-        private BackgroundWorker worker;
-        private ProgressDialog progressDialog;
-        public delegate void UpdateResponseDelegate(string response);
-        public delegate void UpdateProgressDelegate(string logtext, int percentage);
 
         public CloudFoundryPackage()
         {            
@@ -115,7 +111,11 @@ namespace CloudFoundry.Net.VsExtension
                     List<string> services = new List<string>();
                     foreach (var provisionedService in modelData.ApplicationServices)
                         services.Add(provisionedService.Name);
-                    PerformPush(project, modelData.SelectedCloud, modelData.Name, modelData.Url, Convert.ToUInt32(modelData.SelectedMemory), modelData.Instances, services.ToArray());
+                    PerformAction(project, modelData.SelectedCloud, (client, directoryPath) =>
+                    {
+                        var response = client.Push(modelData.Name, modelData.Url, modelData.Instances, directoryPath, Convert.ToUInt32(modelData.SelectedMemory), services.ToArray());
+                        return response;
+                    });
                 }
             }
         }
@@ -150,18 +150,24 @@ namespace CloudFoundry.Net.VsExtension
                         }));
 
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                    // Update app
+                    PerformAction(project, modelData.SelectedCloud, (client, directoryPath) =>
+                    {
+                        var response = client.Update(modelData.SelectedApplication.Name, directoryPath);
+                        return response;
+                    });           
                 }
             }
-        }
+        }        
 
-        private void PerformPush(Project project, Cloud cloud, string name, string url, uint memory, ushort instances, string[] services)
-        {            
-            progressDialog = new ProgressDialog("Push Application...", "Saving project...");
-            progressDialog.Cancel += (s,e) => worker.CancelAsync();
-            var progressDialogDispatcher = progressDialog.Dispatcher;
-
-            worker = new BackgroundWorker();
+        private void PerformAction(Project project, Cloud cloud, Func<VcapClient,DirectoryInfo,VcapClientResult> function)
+        {    
+            var worker = new BackgroundWorker();
+            var progress = new ProgressDialog("Push Application...", "Saving project...");
+            var dispatcher = progress.Dispatcher;
+            var helper = new WindowInteropHelper(progress);
+            helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
+            progress.Cancel += (s,e) => worker.CancelAsync();            
+           
             worker.WorkerSupportsCancellation = true;
             worker.DoWork += (s,args) =>
             {
@@ -172,7 +178,7 @@ namespace CloudFoundry.Net.VsExtension
                 var stagingPath = Path.Combine(defaultProjectLocation, "CloudFoundry_Staging");
                 var projectDirectory = Path.GetDirectoryName(project.FullName);
                 var projectName = Path.GetFileNameWithoutExtension(projectDirectory).ToLower();
-                var site = project.Object as VsWebSite.VSWebSite;
+                //var site = project.Object as VsWebSite.VSWebSite;
                 var precompiledSitePath = Path.Combine(stagingPath, projectName);
                 var frameworkPath = project.GetFrameworkPath();
 
@@ -182,8 +188,8 @@ namespace CloudFoundry.Net.VsExtension
                 if (Directory.Exists(precompiledSitePath))
                     Directory.Delete(precompiledSitePath, true);
 
-                var update = new UpdateProgressDelegate(UpdateProgressText);
-                var updateResponse = new UpdateResponseDelegate(UpdateResponse);
+                Action<string,int> update = (logtext,percent) => { progress.LogInfo = logtext; progress.ProgressValue = percent; };
+                Action<string> updateResponse = (response) => progress.Response = response;
                                                       
                 try
                 {
@@ -206,43 +212,36 @@ namespace CloudFoundry.Net.VsExtension
                         throw new Exception("Asp Compile Error: " + output);
 
                     if (worker.CancellationPending) { args.Cancel = true; return; }
+                    var client = new VcapClient(cloud);
+                    var result = client.Login();
+                    if (result.Success == false)
+                        throw new Exception("Vcap Login Failure: " + result.Message);
 
-                    var cfm = new VcapClient(cloud);
-                    VcapClientResult result = cfm.Login();
-
-                    progressDialogDispatcher.BeginInvoke(update, string.Format("Pushing {0}", cloud.Url), 65);
+                    dispatcher.BeginInvoke(update, string.Format("Sending to {0}", cloud.Url), 65);
                     if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                    VcapClientResult response = cfm.Push(name, url, instances, new DirectoryInfo(precompiledSitePath), memory, services);
-                    progressDialogDispatcher.BeginInvoke(update, "Complete.", 100);
-                    progressDialogDispatcher.BeginInvoke(updateResponse, response.Message);
+                    var response = function(client,new DirectoryInfo(precompiledSitePath));
+                    if (response.Success == false)
+                        throw new Exception("Vcap Action Failure: " + response.Message);
+                    
+                    dispatcher.BeginInvoke(update, "Complete.", 100);
+                    dispatcher.BeginInvoke(updateResponse, response.Message);
                 }
                 catch (Exception ex)
                 {
-                    progressDialogDispatcher.BeginInvoke(updateResponse, ex.Message + ":" + ex.StackTrace);
+                    dispatcher.BeginInvoke(updateResponse, ex.Message + ":" + ex.StackTrace);
                 }
             };
 
             worker.RunWorkerCompleted += (s,args) =>
             {
-                progressDialog.OkButtonEnabled = true;
-                progressDialog.CancelButtonEnabled = false;
+                progress.OkButtonEnabled = true;
+                progress.CancelButtonEnabled = false;
             };
 
             worker.RunWorkerAsync();
-            progressDialog.ShowDialog();
-        }
-
-        private void UpdateProgressText(string logtext, int percentage)
-        {
-            progressDialog.LogInfo = logtext;
-            progressDialog.ProgressValue = percentage;
-        }
-
-        private void UpdateResponse(string response)
-        {
-            progressDialog.Response = response;
-        }               
+            progress.ShowDialog();
+        }                    
 
         private static Guid GetCurrentCloudGuid(Project project)
         {

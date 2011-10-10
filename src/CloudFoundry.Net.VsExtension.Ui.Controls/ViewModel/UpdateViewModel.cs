@@ -14,7 +14,7 @@
     using GalaSoft.MvvmLight.Messaging;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 
-    [ExportViewModel("Update", true)]
+    [ExportViewModel("Update", false)]
     public class UpdateViewModel : ViewModelBase
     {
         private Cloud selectedCloud;
@@ -32,6 +32,29 @@
             ConfirmedCommand = new RelayCommand(Confirmed, () => SelectedCloud != null && SelectedApplication != null);
             CancelledCommand = new RelayCommand(Cancelled);
             ManageCloudsCommand = new RelayCommand(ManageClouds);
+
+            InitializeData();
+            RegisterGetData();
+        }
+
+        private void RegisterGetData()
+        {
+            Messenger.Default.Register<NotificationMessageAction<UpdateViewModel>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.GetUpdateAppData))
+                        message.Execute(this);
+                    Messenger.Default.Unregister(this);
+                });
+        }
+
+        private void InitializeData()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<Guid>(Messages.SetUpdateAppData,
+                (id) =>
+                {                    
+                    this.SelectedCloud = Clouds.SingleOrDefault(i => i.ID == id);
+                }));
         }
 
         public string ErrorMessage
