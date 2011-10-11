@@ -294,8 +294,8 @@ class VCAP::Services::Mssql::Node
     service = ProvisionedService.get(name)
     raise MssqlError.new(MssqlError::MSSQL_CONFIG_NOT_FOUND, name) unless service
     # validate the existence of credential, in case we delete a normal account because of a malformed credential
-    res = @dbh.query("SELECT * from mssql.user WHERE user='#{user}' AND password=PASSWORD('#{passwd}')")
-    raise MssqlError.new(MssqlError::MSSQL_CRED_NOT_FOUND, credential.inspect) if res.num_rows()<=0
+    # TODO T3CF res = @dbh.query("SELECT * from mssql.user WHERE user='#{user}' AND password=PASSWORD('#{passwd}')")
+    # TODO T3CF raise MssqlError.new(MssqlError::MSSQL_CRED_NOT_FOUND, credential.inspect) if res.num_rows()<=0
     delete_database_user(name, user)
     true
   end

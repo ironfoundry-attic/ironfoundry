@@ -22,6 +22,6 @@ if "%DevEnvDir%"=="" (
 
 rem msbuild /v:n /t:build /p:Configuration=Debug %SLN%
 
-msbuild /v:n /t:build /p:Configuration=Release %SLN%
+msbuild /v:n /t:rebuild /p:Configuration=Release %SLN%
 
 exit /b %ERRORLEVEL%
