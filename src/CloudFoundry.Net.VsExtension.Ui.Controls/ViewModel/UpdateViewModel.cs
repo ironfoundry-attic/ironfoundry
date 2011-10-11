@@ -79,11 +79,14 @@
             get { return this.selectedCloud; }
             set
             {
-                this.selectedCloud = value;                                
-                Cloud local = this.provider.Connect(this.selectedCloud);
-                this.selectedCloud.Services.Synchronize(local.Services, new ProvisionedServiceEqualityComparer());
-                this.selectedCloud.Applications.Synchronize(local.Applications, new ApplicationEqualityComparer());
-                this.selectedCloud.AvailableServices.Synchronize(local.AvailableServices, new SystemServiceEqualityComparer());                
+                this.selectedCloud = value;
+                if (this.selectedCloud != null)
+                {
+                    Cloud local = this.provider.Connect(this.selectedCloud);
+                    this.selectedCloud.Services.Synchronize(local.Services, new ProvisionedServiceEqualityComparer());
+                    this.selectedCloud.Applications.Synchronize(local.Applications, new ApplicationEqualityComparer());
+                    this.selectedCloud.AvailableServices.Synchronize(local.AvailableServices, new SystemServiceEqualityComparer());
+                }
                 RaisePropertyChanged("SelectedCloud");
                 RaisePropertyChanged("Applications");
             }
