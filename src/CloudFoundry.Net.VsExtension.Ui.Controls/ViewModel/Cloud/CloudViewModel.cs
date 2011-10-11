@@ -223,6 +223,7 @@
                 this.Cloud.AccessToken = returnCloud.AccessToken;
                 this.Cloud.Applications.Synchronize(returnCloud.Applications, new ApplicationEqualityComparer());
                 this.Cloud.Services.Synchronize(returnCloud.Services, new ProvisionedServiceEqualityComparer());
+                this.Cloud.AvailableServices.Synchronize(returnCloud.AvailableServices, new SystemServiceEqualityComparer());
             }
         }
 

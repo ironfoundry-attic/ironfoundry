@@ -63,6 +63,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void Cancelled()
         {
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddApplicationServiceDialogResult));
+            Messenger.Default.Unregister(this);
         }
 
         public ObservableCollection<ProvisionedService> Services

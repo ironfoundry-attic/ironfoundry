@@ -66,11 +66,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             provider.CloudUrls.Synchronize(this.CloudUrls, new CloudUrlEqualityComparer());
             provider.SaveChanges();
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.ManageCloudUrlsDialogResult));
+            Messenger.Default.Unregister(this);
         }
 
         private void Cancelled()
         {
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.ManageCloudUrlsDialogResult));
+            Messenger.Default.Unregister(this);
         }
 
         private void Add()

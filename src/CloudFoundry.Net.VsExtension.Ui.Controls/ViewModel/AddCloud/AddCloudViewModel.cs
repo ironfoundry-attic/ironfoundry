@@ -53,6 +53,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void Cancelled()
         {
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddCloudDialogResult));
+            Messenger.Default.Unregister(this);
         }
 
         private void ValidateAccount() { }

@@ -24,6 +24,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
         public CloudExplorer()
         {
             InitializeComponent();
+            this.Unloaded += (s,e) => Messenger.Default.Unregister(this);
+            
             Messenger.Default.Register<NotificationMessageAction<bool>>(
                 this,
                 message =>
@@ -34,7 +36,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                         Window parentWindow = Window.GetWindow(this);
                         view.Owner = parentWindow;
                         var result = view.ShowDialog();
-                        message.Execute(result.GetValueOrDefault());
+                        message.Execute(result.GetValueOrDefault());                        
                     }
                 });
 

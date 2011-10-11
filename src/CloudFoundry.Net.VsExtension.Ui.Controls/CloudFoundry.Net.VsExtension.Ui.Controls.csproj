@@ -90,7 +90,6 @@
     <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ProvisionedServiceViewModel.cs" />
-    <Compile Include="ViewModel\Cloud\DragDropEffects.cs" />
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
     <Compile Include="ViewModel\Push\AddApplicationServiceViewModel.cs" />
     <Compile Include="ViewModel\UpdateViewModel.cs" />

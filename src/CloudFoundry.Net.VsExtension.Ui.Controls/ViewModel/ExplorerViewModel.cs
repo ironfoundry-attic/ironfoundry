@@ -56,6 +56,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void CloseCloud(CloudViewModel cloudView)
         {
+            Messenger.Default.Unregister(cloudView);
             this.Clouds.Remove(cloudView);
         }
 

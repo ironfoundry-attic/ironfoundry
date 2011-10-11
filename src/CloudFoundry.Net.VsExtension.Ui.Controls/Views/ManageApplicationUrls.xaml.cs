@@ -12,6 +12,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
         public ManageApplicationUrls()
 		{
 			this.InitializeComponent();
+            this.Closed += (s, e) => Messenger.Default.Unregister(this);
+
             Messenger.Default.Register<NotificationMessage<bool>>(this,
                 message =>
                 {

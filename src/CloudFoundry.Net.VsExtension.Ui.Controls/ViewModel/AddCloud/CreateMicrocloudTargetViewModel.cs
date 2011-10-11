@@ -39,6 +39,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void Cancelled()
         {
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.CreateMicrocloudTargetDialogResult));
+            Messenger.Default.Unregister(this);
         }
 
         private void RegisterGetData()

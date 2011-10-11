@@ -25,6 +25,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
         public CloudView()
         {
             InitializeComponent();
+            this.Unloaded += (s, e) => Messenger.Default.Unregister(this);
 
             Messenger.Default.Register<NotificationMessageAction<bool>>(
                 this,

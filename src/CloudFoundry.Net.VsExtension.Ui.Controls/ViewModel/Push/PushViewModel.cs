@@ -130,6 +130,7 @@
         private void Cancelled()
         {
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.PushDialogResult));
+            Messenger.Default.Unregister(this);
         }
 
         private void ManageClouds()

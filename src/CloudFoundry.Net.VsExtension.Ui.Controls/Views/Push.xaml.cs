@@ -25,6 +25,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
         public Push()
         {
             InitializeComponent();
+            this.Closed += (s, e) => Messenger.Default.Unregister(this);
 
             Messenger.Default.Register<NotificationMessageAction<bool>>(
                 this,
