@@ -189,19 +189,19 @@
         {
             bool started = false;
 
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 20; ++i)
             {
                 string appJson = GetApplicationJson(name);
                 JObject parsed = JObject.Parse(appJson);
 
                 // Ruby detects health a little differently
-                string appState  = (string)parsed["state"];
-                ushort instances = (ushort)parsed["instances"];
-                JToken running   = parsed["runningInstances"];
-                
-                ushort runningInstances = (running.Type == JTokenType.Null) ? (ushort) 0 : (ushort)running;
+                string appState          = (string)parsed["state"];
+                ushort instances         = (ushort)parsed["instances"];
+                ushort? runningInstances = (ushort?)parsed["runningInstances"];
 
-                if (appState == VcapStates.STARTED && (instances == runningInstances))
+                if ((appState == VcapStates.STARTED) &&
+                    (runningInstances.HasValue) &&
+                    (instances == runningInstances.Value))
                 {
                     started = true;
                     break;
