@@ -56,7 +56,15 @@
             }
             else
             {
-                return helper.Target(new Uri(uri));
+                Uri tmp;
+                if (Uri.TryCreate(uri, UriKind.Absolute, out tmp))
+                {
+                    return helper.Target(tmp);
+                }
+                else
+                {
+                    return helper.Target(new Uri("http://" + uri));
+                }
             }
         }
 
