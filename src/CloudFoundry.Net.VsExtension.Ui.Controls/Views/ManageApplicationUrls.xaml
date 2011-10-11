@@ -5,9 +5,10 @@
     xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
 	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.ManageApplicationUrls"
 	WindowStartupLocation="CenterOwner"
-	Title="Manage Application Urls"
+	Title="Manage Application Urls..."
         Icon="../Images/CloudFoundrySmall.ico"
-	Width="700" Height="245"
+	Width="725" Height="296"
+        ResizeMode="NoResize"
 	DataContext="{Binding ManageApplicationUrls, Source={StaticResource Locator}}">
     <Window.Resources>
         <ResourceDictionary>
@@ -16,50 +17,50 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-	<DockPanel Margin="10">     
-		<StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-			<DockPanel>
-                <ListBox DockPanel.Dock="Left" ItemsSource="{Binding Urls}"
+    <Border BorderBrush="#FFBACADB" BorderThickness="2" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+        <DockPanel LastChildFill="True">
+            <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="40" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
+                <DockPanel>
+                    <Image DockPanel.Dock="Left" Source="../Images/editurls.png" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="None" Margin="10,0" />
+                    <Label DockPanel.Dock="Left" Content="Manage Application Urls" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" FontWeight="Bold" FontSize="18" Padding="0" />
+                    <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Red" FontSize="12" Margin="10,0,0,0" Content="{Binding ErrorMessage}" />
+                    <Image DockPanel.Dock="Right" Source="../Images/cloud_foundry_eclipse_icon.png" HorizontalAlignment="Right" />
+                </DockPanel>
+            </Border>
+            <Grid DockPanel.Dock="Bottom" Margin="5">
+                <DockPanel Margin="10">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                        <DockPanel>
+                            <ListBox DockPanel.Dock="Left" ItemsSource="{Binding Urls}"
                                              SelectedItem="{Binding SelectedUrl}" Width="600" Height="155">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                
-                                <TextBlock Margin="5,0,0,0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+
+                                            <TextBlock Margin="5,0,0,0">
 									<TextBlock.Text>
 										<MultiBinding StringFormat="{}{0}">
 											<Binding Path="."/>
 										</MultiBinding>
 									</TextBlock.Text>
-                                </TextBlock>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right">
+                                <Button FontSize="10.667" Width="50" Content="Add..." Command="{Binding AddCommand}" />
+                                <Button FontSize="10.667" Width="50" Margin="0,5,0,0" Content="Edit..." Command="{Binding EditCommand}" />
+                                <Button FontSize="10.667" Width="50" Margin="0,5,0,0" Content="Remove" Command="{Binding RemoveCommand}" />
                             </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <!--<DataGrid DockPanel.Dock="Left" AutoGenerateColumns="False" ItemsSource="{Binding CloudUrls}" 
-                          SelectedItem="{Binding SelectedCloudUrl}"
-                          HeadersVisibility="Column"
-                          Background="{x:Null}"
-                          HorizontalGridLinesBrush="{x:Null}"
-                          Width="600" Height="155" FontSize="10.667">
-                    <DataGrid.VerticalGridLinesBrush>
-                        <SolidColorBrush Color="{DynamicResource BorderBlueColor}"/>
-                    </DataGrid.VerticalGridLinesBrush>
-                    <DataGrid.Columns>
-						<DataGridTextColumn Header="Server Type" Binding="{Binding ServerType}" Width="233" />
-						<DataGridTextColumn Header="URL" Binding="{Binding Url}" Width="*"/>
-					</DataGrid.Columns>
-				</DataGrid>-->
-				<StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right">
-					<Button FontSize="10.667" Width="50" Content="Add..." Command="{Binding AddCommand}" />
-                    <Button FontSize="10.667" Width="50" Margin="0,5,0,0" Content="Edit..." Command="{Binding EditCommand}" />
-                    <Button FontSize="10.667" Width="50" Margin="0,5,0,0" Content="Remove" Command="{Binding RemoveCommand}" />	
-				</StackPanel>
-			</DockPanel>
-		</StackPanel>  
-		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-			<Button FontSize="10.667" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Ok" Command="{Binding ConfirmedCommand}" />
-			<Button FontSize="10.667" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Cancel" Command="{Binding CancelledCommand}" />
-		</StackPanel>       
-	</DockPanel>
+                        </DockPanel>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Button FontSize="10.667" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Ok" Command="{Binding ConfirmedCommand}" />
+                        <Button FontSize="10.667" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Cancel" Command="{Binding CancelledCommand}" />
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+    </Border>
 </Window>

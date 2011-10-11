@@ -6,9 +6,10 @@
         xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
 	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.CreateMicrocloudTarget"
 	x:Name="Window"
-	Title="Create Microcloud Target"
+	Title="Create Microcloud Target..."
     Icon="../Images/CloudFoundrySmall.ico"
-	Width="330" Height="179"
+	Width="400" Height="230"
+    ResizeMode="NoResize"
 	DataContext="{Binding CreateMicrocloudTarget, Source={StaticResource Locator}}">
     <Window.Resources>
         <ResourceDictionary>
@@ -17,18 +18,32 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-	<DockPanel>     
-    	<StackPanel DockPanel.Dock="Top" Margin="10,10,10,0" Orientation="Vertical">
-	        <StackPanel Orientation="Vertical">
-	        	<TextBlock Text="Enter the value to replace {mycloud}:" FontSize="10.667" Margin="0,0,0,5"/>
-				<TextBox FontSize="10.667" x:Name="ReplaceTextBox" Text="{Binding ReplacementText}" VerticalAlignment="Center" Margin="0,0,0,10" />
-				<TextBlock Text="Enter the name for this Cloud URL:" FontSize="10.667" Margin="0,0,0,5"/>
-				<TextBox  FontSize="10.667" x:Name="CloudUrlName" Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,0,0" />			        	
-	        </StackPanel> 
-		</StackPanel>  
-		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Ok" Command="{Binding ConfirmedCommand}" />
-            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Cancel" Command="{Binding CancelledCommand}" />
-        </StackPanel>             
-    </DockPanel>
+    <Border BorderBrush="#FFBACADB" BorderThickness="2" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+        <DockPanel LastChildFill="True">
+            <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="40" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
+                <DockPanel>
+                    <Image DockPanel.Dock="Left" Source="../Images/editurls.png" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="None" Margin="10,0" />
+                    <Label DockPanel.Dock="Left" Content="Create Microcloud Target" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" FontWeight="Bold" FontSize="18" Padding="0" />
+                    <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Red" FontSize="12" Margin="10,0,0,0" Content="{Binding ErrorMessage}" />
+                    <Image DockPanel.Dock="Right" Source="../Images/cloud_foundry_eclipse_icon.png" HorizontalAlignment="Right" />
+                </DockPanel>
+            </Border>
+            <Grid DockPanel.Dock="Bottom" Margin="5">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="10,10,10,0" Orientation="Vertical">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Enter the value to replace {mycloud}:" FontSize="10.667" Margin="0,0,0,5"/>
+                            <TextBox FontSize="10.667" x:Name="ReplaceTextBox" Text="{Binding ReplacementText}" VerticalAlignment="Center" Margin="0,0,0,10" />
+                            <TextBlock Text="Enter the name for this Cloud URL:" FontSize="10.667" Margin="0,0,0,5"/>
+                            <TextBox  FontSize="10.667" x:Name="CloudUrlName" Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Ok" Command="{Binding ConfirmedCommand}" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Cancel" Command="{Binding CancelledCommand}" />
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+    </Border>
 </Window>

@@ -5,8 +5,9 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 		xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
         WindowStartupLocation="CenterOwner"
-		Title="Add Cloud" Height="320" Width="613"
+		Title="Add Cloud..." Height="370" Width="620"
         Icon="../Images/CloudFoundrySmall.ico"
+        ResizeMode="NoResize"
 		DataContext="{Binding AddCloud, Source={StaticResource Locator}}">
     <Window.Resources>
         <ResourceDictionary>
@@ -15,78 +16,92 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Margin="10,0,10,0" Orientation="Vertical">
-            <StackPanel Orientation="Vertical">
+    <Border BorderBrush="#FFBACADB" BorderThickness="2" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+        <DockPanel LastChildFill="True">
+            <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="40" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
+                <DockPanel>
+                    <Image DockPanel.Dock="Left" Source="../Images/cloud_add.png" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="None" Margin="10,0" />
+                    <Label DockPanel.Dock="Left" Content="Add Cloud" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" FontWeight="Bold" FontSize="18" Padding="0" />
+                    <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Red" FontSize="12" Margin="10,0,0,0" Content="{Binding ErrorMessage}" />
+                    <Image DockPanel.Dock="Right" Source="../Images/cloud_foundry_eclipse_icon.png" HorizontalAlignment="Right" />
+                </DockPanel>
+            </Border>
+            <Grid DockPanel.Dock="Bottom" Margin="5">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="10,0,10,0" Orientation="Vertical">
+                        <StackPanel Orientation="Vertical">
 
-                <Grid Margin="10,2.5,0,2.5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Specify the host name and other common settings." Margin="-10,0,0,0" />
+                            <Grid Margin="10,2.5,0,2.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Specify the host name and other common settings." Margin="-10,0,0,0" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Content="Server Name:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="ServerNameTextBox" Text="{Binding ServerName, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"/>
+                                <Label Grid.Row="1" Grid.Column="0" Content="Server Name:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="ServerNameTextBox" Text="{Binding ServerName, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"/>
 
-                    <Label Grid.Row="2" Grid.Column="0" Content="Host Name:" Foreground="{StaticResource DarkBlueBrushKey}" />
-                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding HostName, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"/>
+                                <Label Grid.Row="2" Grid.Column="0" Content="Host Name:" Foreground="{StaticResource DarkBlueBrushKey}" />
+                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding HostName, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"/>
 
-                    <Label Grid.Row="3" Grid.Column="0" Content="Runtime Environment:" Foreground="{StaticResource DarkBlueBrushKey}" />
-                    <ComboBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,3">
-                        <ComboBoxItem Content="Cloud Foundry (Runtime) v1.0" IsSelected="True" />
-                    </ComboBox>
+                                <Label Grid.Row="3" Grid.Column="0" Content="Runtime Environment:" Foreground="{StaticResource DarkBlueBrushKey}" />
+                                <ComboBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,3">
+                                    <ComboBoxItem Content="Cloud Foundry (Runtime) v1.0" IsSelected="True" />
+                                </ComboBox>
 
-                    <Label Grid.Row="4" Grid.ColumnSpan="2" Content="Register or log in to Cloud Foundry account." Margin="-10,0,0,0" />
+                                <Label Grid.Row="4" Grid.ColumnSpan="2" Content="Register or log in to Cloud Foundry account." Margin="-10,0,0,0" />
 
-                    <Label Grid.Row="5" Grid.Column="0" Content="Email:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding EMail, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" Margin="10,0,0,3" />
+                                <Label Grid.Row="5" Grid.Column="0" Content="Email:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding EMail, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" Margin="10,0,0,3" />
 
-                    <Label Grid.Row="6" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-                    <PasswordBox Grid.Row="6" Grid.Column="1" u:PasswordHelper.Attach="True" u:PasswordHelper.Password="{Binding Password, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"  />
+                                <Label Grid.Row="6" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                                <PasswordBox Grid.Row="6" Grid.Column="1" u:PasswordHelper.Attach="True" u:PasswordHelper.Password="{Binding Password, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"  />
 
-                    <Label Grid.Row="7" Grid.Column="0" Content="URL:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-                    <DockPanel Grid.Row="7" Grid.Column="1" HorizontalAlignment="Stretch">
-                        <ComboBox DockPanel.Dock="Left" Margin="10,2,10,2" Width="315" ItemsSource="{Binding CloudUrls}" 
+                                <Label Grid.Row="7" Grid.Column="0" Content="URL:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                                <DockPanel Grid.Row="7" Grid.Column="1" HorizontalAlignment="Stretch">
+                                    <ComboBox DockPanel.Dock="Left" Margin="10,2,10,2" Width="315" ItemsSource="{Binding CloudUrls}" 
 							  SelectedItem="{Binding SelectedCloudUrl}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock>
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
                                         <TextBlock.Text>
                                           <MultiBinding StringFormat="{}{0} - {1}">
                                             <Binding Path="ServerType"/>
                                             <Binding Path="Url"/>
                                           </MultiBinding>
                                         </TextBlock.Text>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <Button DockPanel.Dock="Right" Height="22" Margin="0" Command="{Binding ManageCloudUrlsCommand}">Manage Cloud...</Button>
-                    </DockPanel>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <Button DockPanel.Dock="Right" Height="22" Margin="0" Command="{Binding ManageCloudUrlsCommand}">Manage Cloud...</Button>
+                                </DockPanel>
 
-                    <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="-10,10,0,0" >
-                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Content="Validate Account" Command="{Binding ValidateAccountCommand}" Width="115" />
-                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Content="Register Account..." Command="{Binding RegisterAccountCommand}" Width="115" />
+                                <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="-10,10,0,0" >
+                                    <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Content="Validate Account" Command="{Binding ValidateAccountCommand}" Width="115" />
+                                    <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Content="Register Account..." Command="{Binding RegisterAccountCommand}" Width="115" />
+                                </StackPanel>
+
+                            </Grid>
+                        </StackPanel>
                     </StackPanel>
-
-                </Grid>
-            </StackPanel>
-        </StackPanel>
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Ok" Command="{Binding ConfirmedCommand}" />
-            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Cancel" Command="{Binding CancelledCommand}" />
-        </StackPanel>
-    </DockPanel>
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Ok" Command="{Binding ConfirmedCommand}" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Cancel" Command="{Binding CancelledCommand}" />
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+    </Border>
 </Window>

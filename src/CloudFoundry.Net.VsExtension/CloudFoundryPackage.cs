@@ -111,7 +111,7 @@ namespace CloudFoundry.Net.VsExtension
                     List<string> services = new List<string>();
                     foreach (var provisionedService in modelData.ApplicationServices)
                         services.Add(provisionedService.Name);
-                    PerformAction(project, modelData.SelectedCloud, (client, directoryPath) =>
+                    PerformAction("Push Application", project, modelData.SelectedCloud, (client, directoryPath) =>
                     {
                         var response = client.Push(modelData.Name, modelData.Url, modelData.Instances, directoryPath, Convert.ToUInt32(modelData.SelectedMemory), services.ToArray());
                         return response;
@@ -149,7 +149,7 @@ namespace CloudFoundry.Net.VsExtension
                         }));
 
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                    PerformAction(project, modelData.SelectedCloud, (client, directoryPath) =>
+                    PerformAction("Update Application",project, modelData.SelectedCloud, (client, directoryPath) =>
                     {
                         var response = client.Update(modelData.SelectedApplication.Name, directoryPath);
                         return response;
@@ -158,10 +158,10 @@ namespace CloudFoundry.Net.VsExtension
             }
         }        
 
-        private void PerformAction(Project project, Cloud cloud, Func<VcapClient,DirectoryInfo,VcapClientResult> function)
+        private void PerformAction(string action, Project project, Cloud cloud, Func<VcapClient,DirectoryInfo,VcapClientResult> function)
         {    
             var worker = new BackgroundWorker();
-            var progress = new ProgressDialog("Push Application...", "Saving project...");
+            var progress = new ProgressDialog(action, "Saving project...");
             var dispatcher = progress.Dispatcher;
             var helper = new WindowInteropHelper(progress);
             helper.Owner = (IntPtr)(dte.MainWindow.HWnd);

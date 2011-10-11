@@ -138,6 +138,9 @@
     <Compile Include="Views\AddApplicationService.xaml.cs">
       <DependentUpon>AddApplicationService.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ProgressDialog.xaml.cs">
+      <DependentUpon>ProgressDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ProvisionService.xaml.cs">
       <DependentUpon>ProvisionService.xaml</DependentUpon>
     </Compile>
@@ -217,6 +220,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\AddApplicationService.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProgressDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -5,9 +5,10 @@
         xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
 	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.AddApplicationUrl"
     WindowStartupLocation="CenterOwner"	
-	Title="Add Application Url"
+	Title="Add Application Url..."
     Icon="../Images/CloudFoundrySmall.ico"
-	Width="400" Height="150"
+	Width="400" Height="190"
+        ResizeMode="NoResize"
 	DataContext="{Binding AddApplicationUrl, Source={StaticResource Locator}}">
     <Window.Resources>
         <ResourceDictionary>
@@ -16,31 +17,44 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-<DockPanel>     
-    	<StackPanel DockPanel.Dock="Top" Margin="10,0,10,0" Orientation="Vertical">
-        <StackPanel Orientation="Vertical">
-        	
-        	<Grid Margin="0,2.5,0,2.5">
-        		<Grid.ColumnDefinitions>
-        			<ColumnDefinition Width="Auto" />
-        			<ColumnDefinition Width="*" />
-        		</Grid.ColumnDefinitions>
-        		<Grid.RowDefinitions>
-        			<RowDefinition Height="Auto" />  
-					<RowDefinition Height="Auto" />      			
-        			<RowDefinition Height="*" />
-        		</Grid.RowDefinitions>
-				<Label Grid.Row="0" Grid.ColumnSpan="2" Content="URL Cannot Be Empty." Margin="0,0,0,0" FontSize="10.667" />
-				
-        		<Label Grid.Row="2" Grid.Column="0" FontSize="10.667" Content="URL:" />
-        		<TextBox Grid.Row="2" Grid.Column="1" FontSize="10.667" Text="{Binding Url}" VerticalAlignment="Center" Margin="0,0,0,3"/>        		
-        	</Grid>
-        </StackPanel> 
-		</StackPanel>  
-		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Ok" Command="{Binding ConfirmedCommand}" />
-            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Cancel" Command="{Binding CancelledCommand}" />
-        </StackPanel>             
-    </DockPanel>
-	
+    <Border BorderBrush="#FFBACADB" BorderThickness="2" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+        <DockPanel LastChildFill="True">
+            <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="40" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
+                <DockPanel>
+                    <Image DockPanel.Dock="Left" Source="../Images/apps.png" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="None" Margin="10,0" />
+                    <Label DockPanel.Dock="Left" Content="Add Application Url" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" FontWeight="Bold" FontSize="18" Padding="0" />
+                    <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Red" FontSize="12" Margin="10,0,0,0" Content="{Binding ErrorMessage}" />
+                    <Image DockPanel.Dock="Right" Source="../Images/cloud_foundry_eclipse_icon.png" HorizontalAlignment="Right" />
+                </DockPanel>
+            </Border>
+            <Grid DockPanel.Dock="Bottom" Margin="5">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="10,0,10,0" Orientation="Vertical">
+                        <StackPanel Orientation="Vertical">
+
+                            <Grid Margin="0,2.5,0,2.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.ColumnSpan="2" Content="URL Cannot Be Empty." Margin="0,0,0,0" FontSize="10.667" />
+
+                                <Label Grid.Row="2" Grid.Column="0" FontSize="10.667" Content="URL:" />
+                                <TextBox Grid.Row="2" Grid.Column="1" FontSize="10.667" Text="{Binding Url}" VerticalAlignment="Center" Margin="0,0,0,3"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Ok" Command="{Binding ConfirmedCommand}" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Cancel" Command="{Binding CancelledCommand}" />
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+    </Border>
 </Window>
