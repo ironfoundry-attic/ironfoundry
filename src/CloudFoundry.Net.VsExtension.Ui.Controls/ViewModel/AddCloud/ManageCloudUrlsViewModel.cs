@@ -63,7 +63,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void Confirmed()
         {
-            provider.CloudUrls.Synchronize(this.CloudUrls, new CloudUrlEqualityComparer());
+            provider.CloudUrls.Synchronize(this.CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
             provider.SaveChanges();
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.ManageCloudUrlsDialogResult));
             Messenger.Default.Unregister(this);
