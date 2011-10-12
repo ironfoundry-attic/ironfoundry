@@ -359,22 +359,26 @@
                     this.SelectedApplication.Resources.PropertyChanged -= selectedApplication_PropertyChanged;
                 }
                 this.selectedApplication = value;
-                this.selectedApplication.PropertyChanged += selectedApplication_PropertyChanged;
-                this.selectedApplication.Resources.PropertyChanged += selectedApplication_PropertyChanged;
+                if (this.selectedApplication != null)
+                {
+                    this.selectedApplication.PropertyChanged += selectedApplication_PropertyChanged;
+                    this.selectedApplication.Resources.PropertyChanged += selectedApplication_PropertyChanged;
+                    
+
+                    this.ApplicationServices = new ObservableCollection<ProvisionedService>();
+                    foreach (var svc in this.selectedApplication.Services)
+                        foreach (var appService in Cloud.Services)
+                            if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
+                                this.ApplicationServices.Add(appService);
+
+                    BackgroundWorker instanceWorker = new BackgroundWorker();
+                    instanceWorker.DoWork += BeginGetInstances;
+                    instanceWorker.RunWorkerCompleted += EndGetInstances;
+                    instanceWorker.WorkerSupportsCancellation = true;
+                    instanceWorker.RunWorkerAsync();
+                }
                 RaisePropertyChanged("SelectedApplication");
                 RaisePropertyChanged("IsApplicationSelected");
-
-                this.ApplicationServices = new ObservableCollection<ProvisionedService>();
-                foreach (var svc in this.selectedApplication.Services)
-                    foreach (var appService in Cloud.Services)
-                        if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
-                            this.ApplicationServices.Add(appService);
-
-                BackgroundWorker instanceWorker = new BackgroundWorker();
-                instanceWorker.DoWork += BeginGetInstances;
-                instanceWorker.RunWorkerCompleted += EndGetInstances;
-                instanceWorker.WorkerSupportsCancellation = true;
-                instanceWorker.RunWorkerAsync();
             }
         }
 

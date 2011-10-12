@@ -14,7 +14,6 @@
     using GalaSoft.MvvmLight.Messaging;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 
-    [ExportViewModel("Push",false)]
     public class PushViewModel : ViewModelBase
     {
         private Cloud selectedCloud;

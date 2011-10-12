@@ -8,8 +8,7 @@
         WindowStartupLocation="CenterOwner"
         Title="Register Account..." Height="241" Width="500"
         ResizeMode="NoResize"
-        Icon="../Images/CloudFoundrySmall.ico"
-        DataContext="{Binding RegisterAccount, Source={StaticResource Locator}}">
+        Icon="../Images/CloudFoundrySmall.ico">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

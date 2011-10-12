@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
@@ -11,6 +12,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
         public Explorer()
         {
             InitializeComponent();
+            this.DataContext = new ExplorerViewModel();
         }
     }
 }

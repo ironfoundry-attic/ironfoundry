@@ -13,8 +13,7 @@
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-
-    [ExportViewModel("Update", false)]
+    
     public class UpdateViewModel : ViewModelBase
     {
         private Cloud selectedCloud;

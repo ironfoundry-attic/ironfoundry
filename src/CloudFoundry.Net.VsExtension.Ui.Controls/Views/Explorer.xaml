@@ -7,10 +7,16 @@
         xmlns:vm="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel"
         mc:Ignorable="d" 
         Height="740" Width="1200" 
-        DataContext="{Binding Explorer, Source={StaticResource Locator}}"
         WindowStartupLocation="CenterOwner"
         Title="Cloud Foundry Explorer"
-        Icon="../Images/CloudFoundrySmall.ico">    
+        Icon="../Images/CloudFoundrySmall.ico">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Resources\Resources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />

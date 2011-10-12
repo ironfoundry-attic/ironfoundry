@@ -8,8 +8,7 @@
 	Title="Create Service..."
         Icon="../Images/CloudFoundrySmall.ico"
 	Width="464" Height="213"
-        ResizeMode="NoResize"
-	DataContext="{Binding ProvisionService, Source={StaticResource Locator}}">
+        ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

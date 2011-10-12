@@ -13,7 +13,6 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("ManageCloudUrls", false)]
     public class ManageCloudUrlsViewModel : ViewModelBase
     {
         public RelayCommand ConfirmedCommand { get; private set; }

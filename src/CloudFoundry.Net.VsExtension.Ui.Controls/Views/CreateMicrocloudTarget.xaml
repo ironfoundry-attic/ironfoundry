@@ -9,8 +9,7 @@
 	Title="Create Microcloud Target..."
     Icon="../Images/CloudFoundrySmall.ico"
 	Width="400" Height="230"
-    ResizeMode="NoResize"
-	DataContext="{Binding CreateMicrocloudTarget, Source={StaticResource Locator}}">
+    ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

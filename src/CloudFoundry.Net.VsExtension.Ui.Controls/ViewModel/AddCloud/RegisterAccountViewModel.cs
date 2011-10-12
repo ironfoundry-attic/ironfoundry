@@ -12,7 +12,6 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("RegisterAccount",false)]
     public class RegisterAccountViewModel : ViewModelBase
     {
         private string newPassword = string.Empty;

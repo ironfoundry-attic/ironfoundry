@@ -12,7 +12,6 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Views;
-//using System.Windows.Forms;
 using EnvDTE;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.VisualStudio.Shell;
@@ -42,10 +41,7 @@ namespace CloudFoundry.Net.VsExtension
 
             vsMonitorSelection = (IVsMonitorSelection)GetService(typeof(IVsMonitorSelection));
             dte = GetService(typeof(SDTE)) as DTE;
-
-            System.Windows.Application.Current.Resources.MergedDictionaries.Add(System.Windows.Application.LoadComponent(new Uri("CloudFoundry.Net.VsExtension.Ui.Controls;component/Resources/Expander.xaml", UriKind.Relative)) as ResourceDictionary);
-            System.Windows.Application.Current.Resources.MergedDictionaries.Add(System.Windows.Application.LoadComponent(new Uri("CloudFoundry.Net.VsExtension.Ui.Controls;component/Resources/Resources.xaml", UriKind.Relative)) as ResourceDictionary);
-
+            
             if (provider == null)
             {
                 PreferencesProvider preferences = new PreferencesProvider("VisualStudio2010");
@@ -66,7 +62,6 @@ namespace CloudFoundry.Net.VsExtension
                 mcs.AddCommand(new MenuCommand(UpdateApplication,
                                new CommandID(GuidList.guidCloudFoundryCmdSet,
                                (int)PkgCmdIDList.cmdidUpdateCloudFoundryApplication)));
-                
             }
         }
 
@@ -100,22 +95,14 @@ namespace CloudFoundry.Net.VsExtension
                 if (result.GetValueOrDefault())
                 {
                     PushViewModel modelData = null;
-                    Messenger.Default.Send(new NotificationMessageAction<PushViewModel>(Messages.GetPushAppData,
-                        model =>
-                        {
-                            modelData = model;
-                        }));
-
+                    Messenger.Default.Send(new NotificationMessageAction<PushViewModel>(Messages.GetPushAppData, model => modelData = model));
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
 
                     List<string> services = new List<string>();
                     foreach (var provisionedService in modelData.ApplicationServices)
                         services.Add(provisionedService.Name);
-                    PerformAction("Push Application", project, modelData.SelectedCloud, (client, directoryPath) =>
-                    {
-                        var response = client.Push(modelData.Name, modelData.Url, modelData.Instances, directoryPath, Convert.ToUInt32(modelData.SelectedMemory), services.ToArray());
-                        return response;
-                    });
+                    PerformAction("Push Application", project, modelData.SelectedCloud, (c, d) => 
+                        c.Push(modelData.Name, modelData.Url, modelData.Instances, d, Convert.ToUInt32(modelData.SelectedMemory), services.ToArray()));
                 }
             }
         }
@@ -142,18 +129,11 @@ namespace CloudFoundry.Net.VsExtension
                 if (result.GetValueOrDefault())
                 {
                     UpdateViewModel modelData = null;
-                    Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData,
-                        model =>
-                        {
-                            modelData = model;
-                        }));
+                    Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData, model => modelData = model));
 
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                    PerformAction("Update Application",project, modelData.SelectedCloud, (client, directoryPath) =>
-                    {
-                        var response = client.Update(modelData.SelectedApplication.Name, directoryPath);
-                        return response;
-                    });           
+                    PerformAction("Update Application",project, modelData.SelectedCloud, (c, d) => 
+                        c.Update(modelData.SelectedApplication.Name, d));
                 }
             }
         }        

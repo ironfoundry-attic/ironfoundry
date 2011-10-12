@@ -11,7 +11,6 @@ using GalaSoft.MvvmLight.Messaging;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("AddCloud", false)]
     public class AddCloudViewModel : ViewModelBase
     {
         public RelayCommand ConfirmedCommand { get; private set; }
@@ -47,14 +46,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void Confirmed()
         {
             this.provider.Clouds.Add(this.Cloud.DeepCopy());
-            this.Cloud = new Cloud();
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddCloudDialogResult));
             Messenger.Default.Unregister(this);
         }
 
         private void Cancelled()
-        {
-            this.Cloud = new Types.Cloud();
+        {         
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddCloudDialogResult));
             Messenger.Default.Unregister(this);
         }

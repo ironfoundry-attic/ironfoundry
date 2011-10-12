@@ -13,7 +13,6 @@ using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("ProvisionService", false)]
     public class ProvisionedServiceViewModel : ViewModelBase
     {
         public RelayCommand ConfirmedCommand { get; private set; }

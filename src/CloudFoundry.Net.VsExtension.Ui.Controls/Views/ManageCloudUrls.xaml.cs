@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
@@ -12,6 +13,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 		public ManageCloudUrls()
 		{
 			this.InitializeComponent();
+            this.DataContext = new ManageCloudUrlsViewModel();
             this.Closed += (s, e) => Messenger.Default.Unregister(this);
 
             Messenger.Default.Register<NotificationMessage<bool>>(this,

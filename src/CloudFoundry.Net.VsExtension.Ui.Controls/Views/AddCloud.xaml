@@ -7,8 +7,7 @@
         WindowStartupLocation="CenterOwner"
 		Title="Add Cloud..." Height="370" Width="620"
         Icon="../Images/CloudFoundrySmall.ico"
-        ResizeMode="NoResize"
-		DataContext="{Binding Source={StaticResource Locator}, Path=AddCloud}">
+        ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

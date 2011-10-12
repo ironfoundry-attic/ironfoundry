@@ -11,7 +11,6 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("ChangePassword",false)]
     public class ChangePasswordViewModel : ViewModelBase
     {
         private string newPassword;

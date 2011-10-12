@@ -17,7 +17,6 @@ using System.Collections.Specialized;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("CloudExplorer", true)]
     public class CloudExplorerViewModel : ViewModelBase
     {
         private CloudFoundryProvider provider;

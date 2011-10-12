@@ -82,8 +82,6 @@
     <Compile Include="Model\Preferences.cs" />
     <Compile Include="Model\PreferencesProvider.cs" />
     <Compile Include="Mvvm\DragDropMvvm.cs" />
-    <Compile Include="Mvvm\ExportViewModel.cs" />
-    <Compile Include="Mvvm\ViewModelLocator.cs" />
     <Compile Include="Utilities\Messages.cs" />
     <Compile Include="Utilities\PasswordHelper.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
@@ -209,10 +207,6 @@
     <Page Include="Views\CloudExplorer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\Expander.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Resources.xaml">
       <Generator>MSBuild:Compile</Generator>

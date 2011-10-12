@@ -12,7 +12,6 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("ManageApplicationUrls", false)]
     public class ManageApplicationUrlsViewModel : ViewModelBase
     {
         public RelayCommand ConfirmedCommand { get; private set; }

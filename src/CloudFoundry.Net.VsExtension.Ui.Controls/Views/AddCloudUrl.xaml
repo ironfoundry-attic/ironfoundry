@@ -8,8 +8,7 @@
 	Title="Add Cloud Url..."
         Icon="../Images/CloudFoundrySmall.ico"
 	Width="400" Height="203"
-	ResizeMode="NoResize"
-	DataContext="{Binding AddCloudUrl, Source={StaticResource Locator}}">
+	ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls
 {
@@ -24,6 +25,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
         public CloudExplorer()
         {
             InitializeComponent();
+            this.DataContext = new CloudExplorerViewModel();
             this.Unloaded += (s,e) => Messenger.Default.Unregister(this);
             
             Messenger.Default.Register<NotificationMessageAction<bool>>(

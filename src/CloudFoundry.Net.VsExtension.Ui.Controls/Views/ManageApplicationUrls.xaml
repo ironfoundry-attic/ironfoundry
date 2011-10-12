@@ -8,8 +8,7 @@
 	Title="Manage Application Urls..."
         Icon="../Images/CloudFoundrySmall.ico"
 	Width="725" Height="279"
-        ResizeMode="NoResize"
-	DataContext="{Binding ManageApplicationUrls, Source={StaticResource Locator}}">
+        ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using GalaSoft.MvvmLight.Messaging;
+using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
@@ -23,6 +24,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
         public AddCloud()
         {
             InitializeComponent();
+            this.DataContext = new AddCloudViewModel();
             this.Closed += (s, e) => Messenger.Default.Unregister(this);
 
             Messenger.Default.Register<NotificationMessage<bool>>(this,

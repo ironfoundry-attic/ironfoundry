@@ -13,7 +13,6 @@ using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    [ExportViewModel("AddApplicationService", false)]
     public class AddApplicationServiceViewModel : ViewModelBase
     {
         public RelayCommand ConfirmedCommand { get; private set; }

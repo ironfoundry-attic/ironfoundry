@@ -8,8 +8,7 @@
 	Title="Add Application Service..."
 	Width="464" Height="186"
     Icon="../Images/CloudFoundrySmall.ico"
-    ResizeMode="NoResize"
-	DataContext="{Binding AddApplicationService, Source={StaticResource Locator}}">
+    ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

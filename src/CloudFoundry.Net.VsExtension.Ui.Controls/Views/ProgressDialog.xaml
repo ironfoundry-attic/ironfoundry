@@ -8,7 +8,14 @@
 	    Title="Performing Action..."
         Icon="../Images/CloudFoundrySmall.ico"
 	    Width="479" Height="265"
-        ResizeMode="NoResize">         
+        ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Resources\Resources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Border BorderBrush="#FFBACADB" BorderThickness="2" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
         <DockPanel LastChildFill="True">
             <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="40" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
