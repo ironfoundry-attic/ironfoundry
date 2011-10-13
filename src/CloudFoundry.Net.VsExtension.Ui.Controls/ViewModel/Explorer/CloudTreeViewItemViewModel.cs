@@ -26,30 +26,27 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public CloudTreeViewItemViewModel(Cloud cloud) : base(null,false)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             OpenCloudCommand = new RelayCommand<MouseButtonEventArgs>(OpenCloud);
             RemoveCloudCommand = new RelayCommand(RemoveCloud);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
             DisconnectCommand = new RelayCommand(Disconnect, CanExecuteDisconnect);
             
             this.Cloud = cloud;
+            if (Cloud.IsConnected)
+                foreach(var application in Cloud.Applications)
+                    Children.Add(new ApplicationTreeViewItemViewModel(application, this));
+
             this.Cloud.Applications.CollectionChanged += Applications_CollectionChanged;
             connector.DoWork += BeginConnect;
             connector.RunWorkerCompleted += EndConnect;
             connector.RunWorkerAsync(); 
         }
 
-        private void LoadProvider(CloudFoundryProvider provider)
-        {
-            this.provider = provider;
-        }
-
         public Cloud Cloud
         {
             get { return this.cloud; }
-            set { this.cloud = value; 
-                
-                RaisePropertyChanged("Cloud"); }
+            set { this.cloud = value; RaisePropertyChanged("Cloud"); }
         }
        
         private void OpenCloud(MouseButtonEventArgs e)
@@ -60,25 +57,22 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void BeginConnect(object sender, DoWorkEventArgs args)
         {
-            try
-            {
-                args.Result = provider.Connect(this.Cloud);
-            }
-            catch (Exception ex)
-            {
-                args.Result = ex;
-            }
+            args.Result = provider.Connect(this.Cloud);
         }
 
         private void EndConnect(object sender, RunWorkerCompletedEventArgs args)
         {
-            Cloud returnCloud = args.Result as Cloud;
-            if (returnCloud != null)
+            var result = args.Result as ProviderResponse<Cloud>;
+            if (result.Response != null)
             {
-                this.Cloud.AccessToken = returnCloud.AccessToken;                
-                this.Cloud.Applications.Synchronize(returnCloud.Applications, new ApplicationEqualityComparer());
-                this.Cloud.AvailableServices.Synchronize(returnCloud.AvailableServices, new SystemServiceEqualityComparer());
-                this.Cloud.Services.Synchronize(returnCloud.Services, new ProvisionedServiceEqualityComparer());
+                this.Cloud.AccessToken = result.Response.AccessToken;
+                this.Cloud.Applications.Synchronize(result.Response.Applications, new ApplicationEqualityComparer());
+                this.Cloud.AvailableServices.Synchronize(result.Response.AvailableServices, new SystemServiceEqualityComparer());
+                this.Cloud.Services.Synchronize(result.Response.Services, new ProvisionedServiceEqualityComparer());
+            }
+            else
+            {
+                // Set error info here.
             }
         }
 

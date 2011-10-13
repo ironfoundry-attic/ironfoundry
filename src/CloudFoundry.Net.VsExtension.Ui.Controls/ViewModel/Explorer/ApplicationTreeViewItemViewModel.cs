@@ -23,12 +23,10 @@
             RestartApplicationCommand = new RelayCommand(RestartApplication, CanStop);
 
             this.application = application;
-            var manager = new VcapClient(this.Application.Parent);
-            var stats = manager.GetStats(this.application);
-            foreach (StatInfo statInfo in stats)
-            {
-                base.Children.Add(new InstanceTreeViewItemViewModel(statInfo, this));
-            }
+            //var manager = new VcapClient(this.Application.Parent);
+            //var stats = manager.GetStats(this.application);
+            //foreach (StatInfo statInfo in stats)
+            //    base.Children.Add(new InstanceTreeViewItemViewModel(statInfo, this));
         }
 
         public string Name

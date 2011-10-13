@@ -12,68 +12,48 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class ManageApplicationUrlsViewModel : ViewModelBase
+    public class ManageApplicationUrlsViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
         public RelayCommand AddCommand { get; private set; }
         public RelayCommand EditCommand { get; private set; }
         public RelayCommand RemoveCommand { get; private set; }
+
         private ObservableCollection<string> urls;
         private string selectedUrl;
 
-        public ManageApplicationUrlsViewModel()
+        public ManageApplicationUrlsViewModel() : base(Messages.ManageApplicationUrlsDialogResult)
         {
             AddCommand = new RelayCommand(Add);
             EditCommand = new RelayCommand(Edit, CanEdit);
             RemoveCommand = new RelayCommand(Remove, CanRemove);
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
+        }
 
-            Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<string>>(Messages.SetManageApplicationUrlsData,
-                (urls) =>
-                {
-                    this.Urls = urls.DeepCopy();
-                }));
+        protected override void InitializeData()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<string>>(Messages.SetManageApplicationUrlsData, urls => this.Urls = urls.DeepCopy()));
+        }
 
+        protected override void RegisterGetData()
+        {
             Messenger.Default.Register<NotificationMessageAction<ManageApplicationUrlsViewModel>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.GetManageApplicationUrlsData))
                         message.Execute(this);
-                    Messenger.Default.Unregister(this);
+                    Cleanup();
                 });
         }
 
         public string SelectedUrl
         {
             get { return this.selectedUrl; }
-            set
-            {
-                this.selectedUrl = value;
-                RaisePropertyChanged("SelectedUrl");
-            }
+            set { this.selectedUrl = value; RaisePropertyChanged("SelectedUrl"); }
         }
 
         public ObservableCollection<string> Urls
         {
             get { return this.urls; }
-            set
-            {
-                this.urls = value;
-                RaisePropertyChanged("Urls");
-            }
-        }
-
-        private void Confirmed()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.ManageApplicationUrlsDialogResult));
-        }
-
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.ManageApplicationUrlsDialogResult));
-            Messenger.Default.Unregister(this);
+            set { this.urls = value; RaisePropertyChanged("Urls"); }
         }
 
         private void Add()
@@ -129,9 +109,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void Remove()
         {
             if (this.SelectedUrl != null)
-            {
                 this.Urls.Remove(this.SelectedUrl);
-            }
         }
 
     }

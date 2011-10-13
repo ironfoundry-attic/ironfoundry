@@ -12,33 +12,16 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class AddCloudUrlViewModel : ViewModelBase
+    public class AddCloudUrlViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
         private CloudUrl cloudUrl = new CloudUrl();
 
         public AddCloudUrlViewModel()
+            : base(Messages.AddCloudUrlDialogResult)
         {
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-
-            InitializeData();
-            RegisterGetData();
         }
 
-        private void RegisterGetData()
-        {
-            Messenger.Default.Register<NotificationMessageAction<AddCloudUrlViewModel>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.GetAddCloudUrlData))
-                        message.Execute(this);
-                    Messenger.Default.Unregister(this);
-                });
-        }
-
-        private void InitializeData()
+        protected override void InitializeData()
         {
             Messenger.Default.Send(new NotificationMessageAction<CloudUrl>(Messages.SetAddCloudUrlData,
                 (cloudUrl) =>
@@ -47,35 +30,27 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 }));
         }
 
-        private void Confirmed()
-        {           
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddCloudUrlDialogResult));
-        }
-
-        private void Cancelled()
+        protected override void RegisterGetData()
         {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddCloudUrlDialogResult));
-            Messenger.Default.Unregister(this);
+            Messenger.Default.Register<NotificationMessageAction<AddCloudUrlViewModel>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.GetAddCloudUrlData))
+                        message.Execute(this);
+                    Cleanup();
+                });
         }
 
         public string Name
         {
             get { return this.cloudUrl.ServerType; }
-            set
-            {
-                this.cloudUrl.ServerType = value;
-                RaisePropertyChanged("Name");
-            }
+            set { this.cloudUrl.ServerType = value; RaisePropertyChanged("Name"); }
         }
 
         public string Url
         {
             get { return this.cloudUrl.Url; }
-            set
-            {
-                this.cloudUrl.Url = value;
-                RaisePropertyChanged("Url");
-            }
+            set { this.cloudUrl.Url = value; RaisePropertyChanged("Url"); }
         }
     }
 }

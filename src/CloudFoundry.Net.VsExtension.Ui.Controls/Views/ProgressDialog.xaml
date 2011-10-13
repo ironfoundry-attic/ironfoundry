@@ -5,9 +5,9 @@
         xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
 	    x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.ProgressDialog"
         WindowStartupLocation="CenterOwner"	
-	    Title="Performing Action..."
+	    Title="{Binding Title}"
         Icon="../Images/CloudFoundrySmall.ico"
-	    Width="479" Height="265"
+	    Width="479" Height="190"
         ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
@@ -21,21 +21,19 @@
             <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="40" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
                 <DockPanel>
                     <Image DockPanel.Dock="Left" Source="../Images/cloud_add.png" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="None" Margin="10,0" />
-                    <Label DockPanel.Dock="Left" Name="TitleLabel" Content="Performing Action..." HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" FontWeight="Bold" FontSize="18" Padding="0" />
+                    <Label DockPanel.Dock="Left" Content="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" FontWeight="Bold" FontSize="18" Padding="0" />
                     <Image DockPanel.Dock="Right" Source="../Images/cloud_foundry_eclipse_icon.png" HorizontalAlignment="Right" />
                 </DockPanel>
             </Border>
             <Grid DockPanel.Dock="Bottom" Margin="5">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                        <Label Name="LogInfoTextBlock" Content="TextBlock" />
-                        <ProgressBar Height="20" Name="progressBar1"  />
-                        <Label Content="Response:"  />
-                        <TextBox Name="ResponseTextBox" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Height="65" />                                               
+                        <Label Content="{Binding ProgressText}" />
+                        <ProgressBar Height="20" Value="{Binding ProgressValue}"  />
                     </StackPanel>
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Button FontSize="10.667" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Ok" Name="OkButton" Click="OkButton_Click" />
-                        <Button FontSize="10.667" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Cancel" Name="CancelButton" />
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Ok" Command="{Binding ConfirmedCommand}" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Cancel" Command="{Binding CancelledCommand}" />
                     </StackPanel>
                 </DockPanel>
             </Grid>

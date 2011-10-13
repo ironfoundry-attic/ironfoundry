@@ -13,35 +13,28 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class CreateMicrocloudTargetViewModel : ViewModelBase
+    public class CreateMicrocloudTargetViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
-        private CloudUrl cloudUrl;
         private string replacementText;
         private string name;
+        private CloudUrl cloudUrl;
 
-        public CreateMicrocloudTargetViewModel()
+        public CreateMicrocloudTargetViewModel() : base(Messages.CreateMicrocloudTargetDialogResult)
         {
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-
-            InitializeData();            
-            RegisterGetData();
         }
 
-        private void Confirmed()
+        protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.CreateMicrocloudTargetDialogResult));
+            Messenger.Default.Send(new NotificationMessageAction<CloudUrl>(Messages.SetAddCloudUrlData,
+                (cloudUrl) =>
+                {
+                    this.cloudUrl = cloudUrl;
+                    this.replacementText = Regex.Match(this.cloudUrl.Url, @"\{(\w+)\}").Groups[1].Value;
+                    this.name = string.Format("Microcloud ({0})", this.replacementText);
+                }));
         }
 
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.CreateMicrocloudTargetDialogResult));
-            Messenger.Default.Unregister(this);
-        }
-
-        private void RegisterGetData()
+        protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<CreateMicrocloudTargetViewModel>>(this,
                 message =>
@@ -53,40 +46,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                         this.cloudUrl.Url = this.cloudUrl.Url.Replace(toReplace,this.replacementText);
                         message.Execute(this);
                     }
-                    Messenger.Default.Unregister(this);
+                    Cleanup();
                 });
-        }
-
-        private void InitializeData()
-        {
-            Messenger.Default.Send(new NotificationMessageAction<CloudUrl>(Messages.SetAddCloudUrlData,
-                (cloudUrl) =>
-                {
-                    this.cloudUrl = cloudUrl;
-                    this.replacementText = Regex.Match(this.cloudUrl.Url, @"\{(\w+)\}").Groups[1].Value;
-                    this.name = string.Format("Microcloud ({0})", this.replacementText);
-                }));
         }
 
         public string Name
         {
             get { return this.name; }
-            set
-            {
-                this.name = value;
-                RaisePropertyChanged("Name");
-            }
+            set { this.name = value; RaisePropertyChanged("Name"); }
         }
 
         public string ReplacementText
         {
             get { return this.replacementText; }
-            set
-            {
-                this.replacementText = value;
-                RaisePropertyChanged("ReplacementText");
-                this.Name = string.Format("Microcloud ({0})", this.replacementText);
-            }
+            set { this.replacementText = value; RaisePropertyChanged("ReplacementText"); this.Name = string.Format("Microcloud ({0})", this.replacementText); }
         }
 
         public CloudUrl CloudUrl

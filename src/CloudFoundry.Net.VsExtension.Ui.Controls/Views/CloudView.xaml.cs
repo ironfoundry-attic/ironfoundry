@@ -59,9 +59,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                 this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.ProvisionService))
+                    if (message.Notification.Equals(Messages.CreateService))
                     {
-                        var view = new Views.ProvisionService();
+                        var view = new Views.CreateService();
                         Window parentWindow = Window.GetWindow(this);
                         view.Owner = parentWindow;
                         var result = view.ShowDialog();

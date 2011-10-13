@@ -53,7 +53,8 @@
         public CloudViewModel(Cloud cloud)
         {
             this.Cloud = cloud;
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            
             ChangePasswordCommand = new RelayCommand(ChangePassword);
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanExecuteValidateAccount);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
@@ -66,12 +67,8 @@
             RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);
             ProvisionServiceCommand = new RelayCommand(ProvisionService);
             RefreshCommand = new RelayCommand(RefreshApplication, CanExecuteRefresh);
-        }
 
-        private void LoadProvider(CloudFoundryProvider provider)
-        {
-            this.provider = provider;
-            instanceTimer.Interval = TimeSpan.FromSeconds(5);
+            instanceTimer.Interval = TimeSpan.FromSeconds(10);
             instanceTimer.Tick += RefreshInstances;
             instanceTimer.Start();
         }
@@ -80,13 +77,15 @@
         {
             if (null != SelectedApplication)
             {
-                var stats = provider.GetStats(SelectedApplication, Cloud);
-                UpdateInstanceCollection(stats);
+                var worker = new BackgroundWorker();
+                worker.DoWork += BeginGetInstances;
+                worker.RunWorkerCompleted += EndGetInstances;
+                worker.RunWorkerAsync();
             }
         }
 
         private void BeginGetInstances(object sender, DoWorkEventArgs e)
-        {            
+        {
             e.Result = provider.GetStats(SelectedApplication, Cloud);
         }
 
@@ -94,7 +93,9 @@
         {
             if (e.Cancelled)
                 return;
-            UpdateInstanceCollection((IEnumerable<StatInfo>)e.Result);
+            var statsResponse = e.Result as ProviderResponse<IEnumerable<StatInfo>>;
+            if (statsResponse.Response != null)
+                UpdateInstanceCollection(statsResponse.Response);
         }
 
         private void BeginUpdateApplication(object sender, DoWorkEventArgs e)
@@ -217,13 +218,17 @@
 
         private void Connect()
         {
-            Cloud returnCloud = provider.Connect(this.Cloud);
-            if (returnCloud != null)
+            var local = this.provider.Connect(this.Cloud);
+            if (local.Response != null)
             {
-                this.Cloud.AccessToken = returnCloud.AccessToken;
-                this.Cloud.Applications.Synchronize(returnCloud.Applications, new ApplicationEqualityComparer());
-                this.Cloud.Services.Synchronize(returnCloud.Services, new ProvisionedServiceEqualityComparer());
-                this.Cloud.AvailableServices.Synchronize(returnCloud.AvailableServices, new SystemServiceEqualityComparer());
+                this.Cloud.AccessToken = local.Response.AccessToken;
+                this.Cloud.Services.Synchronize(local.Response.Services, new ProvisionedServiceEqualityComparer());
+                this.Cloud.Applications.Synchronize(local.Response.Applications, new ApplicationEqualityComparer());
+                this.Cloud.AvailableServices.Synchronize(local.Response.AvailableServices, new SystemServiceEqualityComparer());
+            }
+            else
+            {
+                this.OverviewErrorMessage = local.Message;
             }
         }
 
@@ -415,16 +420,16 @@
             Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.SetProvisionServiceData))
+                    if (message.Notification.Equals(Messages.SetCreateServiceData))
                         message.Execute(this.Cloud);
                 });
 
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ProvisionService,
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.CreateService,
                 (confirmed) =>
                 {
                     if (confirmed)
                     {
-                        Messenger.Default.Send(new NotificationMessageAction<ProvisionedServiceViewModel>(Messages.GetProvisionServiceData,
+                        Messenger.Default.Send(new NotificationMessageAction<CreateServiceViewModel>(Messages.GetCreateServiceData,
                         (viewModel) =>
                         {
                             var result = provider.CreateService(this.Cloud,viewModel.SelectedSystemService.Vendor, viewModel.Name);

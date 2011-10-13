@@ -43,7 +43,6 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
                                 <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Specify the host name and other common settings." Margin="-10,0,0,0" />
@@ -51,24 +50,22 @@
                                 <Label Grid.Row="1" Grid.Column="0" Content="Server Name:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
                                 <TextBox Grid.Row="1" Grid.Column="1" x:Name="ServerNameTextBox" Text="{Binding ServerName, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"/>
 
-                                <Label Grid.Row="2" Grid.Column="0" Content="Host Name:" Foreground="{StaticResource DarkBlueBrushKey}" />
-                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding HostName, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"/>
 
-                                <Label Grid.Row="3" Grid.Column="0" Content="Runtime Environment:" Foreground="{StaticResource DarkBlueBrushKey}" />
-                                <ComboBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,3">
+                                <Label Grid.Row="2" Grid.Column="0" Content="Runtime Environment:" Foreground="{StaticResource DarkBlueBrushKey}" />
+                                <ComboBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,3">
                                     <ComboBoxItem Content="Cloud Foundry (Runtime) v1.0" IsSelected="True" />
                                 </ComboBox>
 
-                                <Label Grid.Row="4" Grid.ColumnSpan="2" Content="Register or log in to Cloud Foundry account." Margin="-10,0,0,0" />
+                                <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Register or log in to Cloud Foundry account." Margin="-10,0,0,0" />
 
-                                <Label Grid.Row="5" Grid.Column="0" Content="Email:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-                                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding EMail, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" Margin="10,0,0,3" />
+                                <Label Grid.Row="4" Grid.Column="0" Content="Email:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding EMail, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" Margin="10,0,0,3" />
 
-                                <Label Grid.Row="6" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-                                <PasswordBox Grid.Row="6" Grid.Column="1" u:PasswordHelper.Attach="True" u:PasswordHelper.Password="{Binding Password, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"  />
+                                <Label Grid.Row="5" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                                <PasswordBox Grid.Row="5" Grid.Column="1" u:PasswordHelper.Attach="True" u:PasswordHelper.Password="{Binding Password, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"  />
 
-                                <Label Grid.Row="7" Grid.Column="0" Content="URL:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-                                <DockPanel Grid.Row="7" Grid.Column="1" HorizontalAlignment="Stretch">
+                                <Label Grid.Row="6" Grid.Column="0" Content="URL:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                                <DockPanel Grid.Row="6" Grid.Column="1" HorizontalAlignment="Stretch">
                                     <ComboBox DockPanel.Dock="Left" Margin="10,2,10,2" Width="315" ItemsSource="{Binding CloudUrls}" 
 							  SelectedItem="{Binding SelectedCloudUrl}">
                                         <ComboBox.ItemTemplate>
@@ -87,7 +84,7 @@
                                     <Button DockPanel.Dock="Right" Height="22" Margin="0" Command="{Binding ManageCloudUrlsCommand}">Manage Cloud...</Button>
                                 </DockPanel>
 
-                                <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="-10,10,0,0" >
+                                <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="-10,10,0,0" >
                                     <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Content="Validate Account" Command="{Binding ValidateAccountCommand}" Width="115" />
                                     <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Content="Register Account..." Command="{Binding RegisterAccountCommand}" Width="115" />
                                 </StackPanel>

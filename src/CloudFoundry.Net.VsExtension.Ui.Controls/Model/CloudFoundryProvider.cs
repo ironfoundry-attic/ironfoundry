@@ -8,6 +8,7 @@
     using CloudFoundry.Net.Vmc;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
+    using System;
 
     public class CloudFoundryProvider
     {
@@ -43,7 +44,6 @@
                 case "AccessToken":
                 case "Email":
                 case "ServerName":
-                case "HostName":
                 case "Url":
                 case "TimeoutStart":
                 case "TimeoutStop":
@@ -70,14 +70,17 @@
             preferencesProvider.SavePreferences(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
         }
 
-        public Cloud Connect(Cloud cloud)
-        {            
+        public ProviderResponse<Cloud> Connect(Cloud cloud)
+        {
+            ProviderResponse<Cloud> response = null;
             Cloud local = cloud.DeepCopy();
             IVcapClient client = new VcapClient(local);
 
-            VcapClientResult result = client.Login();
-            if (result.Success)
+            try
             {
+                VcapClientResult result = client.Login();
+                if (!result.Success)
+                    throw new Exception(result.Message);
                 local.AccessToken = client.CurrentToken;
                 var applications = client.GetApplications();
                 if (null != applications)
@@ -88,12 +91,15 @@
                     local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
                     local.AvailableServices.Synchronize(new ObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
                 }
-                return local;
+                response = new ProviderResponse<Cloud>(local, string.Empty);
             }
-            else
+            catch (Exception ex)
             {
-                return null;
+                response = new ProviderResponse<Cloud>(null, ex.Message);
             }
+
+            return response;
+           
         }
 
         public Cloud Disconnect(Cloud cloud)
@@ -105,10 +111,20 @@
             return cloud;
         }
 
-        public IEnumerable<StatInfo> GetStats(Application app, Cloud cloud)
+        public ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud)
         {
-            IVcapClient client = new VcapClient(cloud);
-            return client.GetStats(app);
+            ProviderResponse<IEnumerable<StatInfo>> response = null;
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                var stats = client.GetStats(app);
+                response = new ProviderResponse<IEnumerable<StatInfo>>(stats, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                response = new ProviderResponse<IEnumerable<StatInfo>>(null, ex.Message);
+            }
+            return response;
         }
 
         public VcapResponse UpdateApplication(Application app, Cloud cloud)
@@ -164,6 +180,18 @@
         {
             IVcapClient client = new VcapClient(argCloud);
             return client.ChangePassword(newPassword);
+        }
+    }
+
+    public class ProviderResponse<T>
+    {
+        public T Response { get; set; }
+        public string Message { get; set; }
+        
+        public ProviderResponse(T response, string message)
+        {
+            Response = response;
+            Message = message;
         }
     }
 }

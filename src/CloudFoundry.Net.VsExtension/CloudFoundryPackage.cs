@@ -17,6 +17,8 @@ using GalaSoft.MvvmLight.Messaging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+using System.Windows.Input;
 
 namespace CloudFoundry.Net.VsExtension
 {
@@ -28,20 +30,20 @@ namespace CloudFoundry.Net.VsExtension
     public sealed class CloudFoundryPackage : Package
     {
         private IVsMonitorSelection vsMonitorSelection;
-        private DTE dte;       
+        private DTE dte;
         private CloudFoundryProvider provider;
 
         public CloudFoundryPackage()
-        {            
+        {
         }
 
         protected override void Initialize()
-        {              
+        {
             base.Initialize();
 
             vsMonitorSelection = (IVsMonitorSelection)GetService(typeof(IVsMonitorSelection));
             dte = GetService(typeof(SDTE)) as DTE;
-            
+
             if (provider == null)
             {
                 PreferencesProvider preferences = new PreferencesProvider("VisualStudio2010");
@@ -49,7 +51,7 @@ namespace CloudFoundry.Net.VsExtension
             }
 
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if ( null != mcs )
+            if (null != mcs)
             {
                 mcs.AddCommand(new MenuCommand(CloudFoundryExplorer,
                                new CommandID(GuidList.guidCloudFoundryCmdSet,
@@ -77,7 +79,7 @@ namespace CloudFoundry.Net.VsExtension
         {
             Project project = vsMonitorSelection.GetActiveProject();
             if (project != null)
-            {                
+            {
                 Guid cloudGuid = GetCurrentCloudGuid(project);
 
                 Messenger.Default.Register<NotificationMessageAction<Guid>>(this,
@@ -101,7 +103,7 @@ namespace CloudFoundry.Net.VsExtension
                     List<string> services = new List<string>();
                     foreach (var provisionedService in modelData.ApplicationServices)
                         services.Add(provisionedService.Name);
-                    PerformAction("Push Application", project, modelData.SelectedCloud, (c, d) => 
+                    PerformAction("Push Application", project, modelData.SelectedCloud, (c, d) =>
                         c.Push(modelData.Name, modelData.Url, modelData.Instances, d, Convert.ToUInt32(modelData.SelectedMemory), services.ToArray()));
                 }
             }
@@ -119,7 +121,7 @@ namespace CloudFoundry.Net.VsExtension
                     {
                         if (message.Notification.Equals(Messages.SetUpdateAppData))
                             message.Execute(cloudGuid);
-                    });                
+                    });
 
                 var window = new Update();
                 WindowInteropHelper helper = new WindowInteropHelper(window);
@@ -132,26 +134,31 @@ namespace CloudFoundry.Net.VsExtension
                     Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData, model => modelData = model));
 
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                    PerformAction("Update Application",project, modelData.SelectedCloud, (c, d) => 
+                    PerformAction("Update Application", project, modelData.SelectedCloud, (c, d) =>
                         c.Update(modelData.SelectedApplication.Name, d));
                 }
             }
-        }        
+        }
 
-        private void PerformAction(string action, Project project, Cloud cloud, Func<VcapClient,DirectoryInfo,VcapClientResult> function)
-        {    
+        private void PerformAction(string action, Project project, Cloud cloud, Func<VcapClient, DirectoryInfo, VcapClientResult> function)
+        {
             var worker = new BackgroundWorker();
-            var progress = new ProgressDialog(action, "Saving project...");
-            var dispatcher = progress.Dispatcher;
-            var helper = new WindowInteropHelper(progress);
+
+            Messenger.Default.Register<NotificationMessageAction<string>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetProgressData))
+                        message.Execute(action);
+                });
+
+            var window = new ProgressDialog();
+            var helper = new WindowInteropHelper(window);
             helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
-            progress.Cancel += (s,e) => worker.CancelAsync();            
-           
             worker.WorkerSupportsCancellation = true;
-            worker.DoWork += (s,args) =>
+            worker.DoWork += (s, args) =>
             {
                 if (worker.CancellationPending) { args.Cancel = true; return; }
-
+                Messenger.Default.Send(new ProgressMessage(0, "Starting " + action));
                 var projectProperties = project.DTE.Properties["Environment", "ProjectsAndSolution"];
                 var defaultProjectLocation = projectProperties.Item("ProjectsLocation").Value as string;
                 var stagingPath = Path.Combine(defaultProjectLocation, "CloudFoundry_Staging");
@@ -161,66 +168,73 @@ namespace CloudFoundry.Net.VsExtension
                 var precompiledSitePath = Path.Combine(stagingPath, projectName);
                 var frameworkPath = project.GetFrameworkPath();
 
+                if (worker.CancellationPending) { args.Cancel = true; return; }
                 if (!Directory.Exists(stagingPath))
+                {
+                    Messenger.Default.Send(new ProgressMessage(10, "Creating Staging Path"));
                     Directory.CreateDirectory(stagingPath);
+                }
 
+                if (worker.CancellationPending) { args.Cancel = true; return; }
                 if (Directory.Exists(precompiledSitePath))
+                {
+                    Messenger.Default.Send(new ProgressMessage(10, "Creating Precompiled Site Path"));
                     Directory.Delete(precompiledSitePath, true);
+                }
 
-                Action<string,int> update = (logtext,percent) => { progress.LogInfo = logtext; progress.ProgressValue = percent; };
-                Action<string> updateResponse = (response) => progress.Response = response;
-                                                      
-                try
+                if (worker.CancellationPending) { args.Cancel = true; return; }
+                Messenger.Default.Send(new ProgressMessage(30, "Creating Precompiled Site Path"));
+                var process = new System.Diagnostics.Process()
                 {
-                    var process = new System.Diagnostics.Process()
+                    StartInfo = new ProcessStartInfo()
                     {
-                        StartInfo = new ProcessStartInfo()
-                        {
-                            FileName = frameworkPath + "\\aspnet_compiler.exe",
-                            Arguments = string.Format("-v / -nologo -p \"{0}\" -u -c \"{1}\"", projectDirectory, precompiledSitePath),
-                            CreateNoWindow = true,
-                            ErrorDialog = false,
-                            UseShellExecute = false,
-                            RedirectStandardOutput = true
-                        }
-                    };                    
-                    process.Start();
-                    var output = process.StandardOutput.ReadToEnd();                    
-                    process.WaitForExit();
-                    if (!string.IsNullOrEmpty(output))
-                        throw new Exception("Asp Compile Error: " + output);
+                        FileName = frameworkPath + "\\aspnet_compiler.exe",
+                        Arguments = string.Format("-v / -nologo -p \"{0}\" -u -c \"{1}\"", projectDirectory, precompiledSitePath),
+                        CreateNoWindow = true,
+                        ErrorDialog = false,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true
+                    }
+                };
 
-                    if (worker.CancellationPending) { args.Cancel = true; return; }
-                    var client = new VcapClient(cloud);
-                    var result = client.Login();
-                    if (result.Success == false)
-                        throw new Exception("Vcap Login Failure: " + result.Message);
-
-                    dispatcher.BeginInvoke(update, string.Format("Sending to {0}", cloud.Url), 65);
-                    if (worker.CancellationPending) { args.Cancel = true; return; }
-
-                    var response = function(client,new DirectoryInfo(precompiledSitePath));
-                    if (response.Success == false)
-                        throw new Exception("Vcap Action Failure: " + response.Message);
-                    
-                    dispatcher.BeginInvoke(update, "Complete.", 100);
-                    dispatcher.BeginInvoke(updateResponse, response.Message);
-                }
-                catch (Exception ex)
+                Messenger.Default.Send(new ProgressMessage(40, "Precompiling Site"));
+                process.Start();
+                var output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                if (!string.IsNullOrEmpty(output))
                 {
-                    dispatcher.BeginInvoke(updateResponse, ex.Message + ":" + ex.StackTrace);
+                    Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output));
+                    return;
                 }
-            };
+                Messenger.Default.Send(new ProgressMessage(50, "Logging in to Cloud Foundry"));
 
-            worker.RunWorkerCompleted += (s,args) =>
-            {
-                progress.OkButtonEnabled = true;
-                progress.CancelButtonEnabled = false;
+                if (worker.CancellationPending) { args.Cancel = true; return; }
+                
+
+                var client = new VcapClient(cloud);
+                var result = client.Login();
+
+                if (result.Success == false)
+                {
+                    Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message));
+                    return;
+                }
+                Messenger.Default.Send(new ProgressMessage(75, "Sending to " + cloud.Url));
+                if (worker.CancellationPending) { args.Cancel = true; return; }
+
+                var response = function(client, new DirectoryInfo(precompiledSitePath));
+                if (result.Success == false)
+                {
+                    Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message));
+                    return;
+                }
+                Messenger.Default.Send(new ProgressMessage(100, action + " complete."));
             };
 
             worker.RunWorkerAsync();
-            progress.ShowDialog();
-        }                    
+            if (!window.ShowDialog().GetValueOrDefault())
+                worker.CancelAsync();
+        }
 
         private static Guid GetCurrentCloudGuid(Project project)
         {
@@ -232,7 +246,7 @@ namespace CloudFoundry.Net.VsExtension
         }
 
         private static void SetCurrentCloudGuid(Project project, Guid guid)
-        {            
+        {
             project.SetGlobalVariable("CloudId", guid.ToString());
         }
     }

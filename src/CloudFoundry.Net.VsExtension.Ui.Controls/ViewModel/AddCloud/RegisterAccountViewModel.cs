@@ -12,32 +12,17 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class RegisterAccountViewModel : ViewModelBase
+    public class RegisterAccountViewModel : DialogViewModel
     {
         private string newPassword = string.Empty;
         private string verifyPassword = string.Empty;
         private string eMail = string.Empty;
 
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
-
-        public RegisterAccountViewModel()
-        {
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-
-            InitializeData();
-            RegisterGetData();
-            
-            if (IsInDesignMode)
-            {
-                this.NewPassword = "TestPassword";
-                this.VerifyPassword = "TestPassword";
-                this.EMail = "test.email@cloudfoundry.com";
-            }
+        public RegisterAccountViewModel() : base(Messages.RegisterAccountDialogResult)
+        {            
         }
 
-        private void InitializeData()
+        protected override void InitializeData()
         {
             Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetRegisterAccountData,
                 (cloud) =>
@@ -47,7 +32,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 }));
         }
 
-        private void RegisterGetData()
+        protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<RegisterAccountViewModel>>(this,
                 message =>
@@ -63,43 +48,19 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public string NewPassword
         {
             get { return newPassword; }
-            set
-            {
-                newPassword = value;
-                RaisePropertyChanged("NewPassword");
-            }
+            set { newPassword = value; RaisePropertyChanged("NewPassword"); }
         }
 
         public string EMail
         {
             get { return eMail; }
-            set
-            {
-                eMail = value;
-                RaisePropertyChanged("EMail");
-            }
+            set { eMail = value; RaisePropertyChanged("EMail"); }
         }
 
         public string VerifyPassword
         {
             get { return verifyPassword; }
-            set
-            {
-                verifyPassword = value;
-                RaisePropertyChanged("VerifyPassword");
-            }
-        }
-
-
-        private void Confirmed()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.RegisterAccountDialogResult));
-        }
-
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.RegisterAccountDialogResult));
-            Messenger.Default.Unregister(this);
+            set { verifyPassword = value; RaisePropertyChanged("VerifyPassword"); }
         }
     }
 }

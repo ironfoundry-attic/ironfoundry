@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:u="clr-namespace:CloudFoundry.Net.VsExtension.Ui.Controls.Utilities"
-	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.ProvisionService"
+	x:Class="CloudFoundry.Net.VsExtension.Ui.Controls.Views.CreateService"
     WindowStartupLocation="CenterOwner"	
 	Title="Create Service..."
         Icon="../Images/CloudFoundrySmall.ico"

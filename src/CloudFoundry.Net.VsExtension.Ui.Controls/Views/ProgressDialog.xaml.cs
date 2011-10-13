@@ -19,65 +19,22 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
     public partial class ProgressDialog : Window
     {
-        public ProgressDialog(string title, string initialActivity)
-        {
+        public ProgressDialog()
+        {            
             InitializeComponent();
-            this.Title = title;
-            this.TitleLabel.Content = title;
-            LogInfoTextBlock.Content = initialActivity;
-        }
+            this.DataContext = new ProgressViewModel();
+            this.Closed += (s, e) => Messenger.Default.Unregister(this);
 
-        public string LogInfo
-        {
-            set
-            {
-                LogInfoTextBlock.Content = value;
-            }
+            Messenger.Default.Register<NotificationMessage<bool>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.ProgressDialogResult))
+                    {
+                        this.DialogResult = message.Content;
+                        this.Close();
+                        Messenger.Default.Unregister(this);
+                    }
+                });
         }
-
-        public string Response
-        {
-            set
-            {
-                ResponseTextBox.Text = value;
-            }
-        }
-        
-        public int ProgressValue
-        {
-            set
-            {
-                this.progressBar1.Value = value;
-            }
-        }
-
-        public bool OkButtonEnabled
-        {
-            set
-            {
-                this.OkButton.IsEnabled = value;
-            }
-        }
-
-        public bool CancelButtonEnabled
-        {
-            set
-            {
-                this.CancelButton.IsEnabled = value;
-            }
-        }
-
-        public event EventHandler Cancel = delegate { };
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            Cancel(sender, e);
-        }
-
-        private void OkButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
     }
 }

@@ -13,52 +13,34 @@ using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class ProvisionedServiceViewModel : ViewModelBase
+    public class CreateServiceViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
-        string name;
+        private string name;
         private ObservableCollection<SystemService> systemServices = new ObservableCollection<SystemService>();
         private SystemService selectedSystemService;
 
-        public ProvisionedServiceViewModel()
+        public CreateServiceViewModel() : base(Messages.CreateServiceDialogResult)
         {
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-
-            InitializeData();
-            RegisterGetData();
         }
 
-        private void RegisterGetData()
+        protected override void RegisterGetData()
         {
-            Messenger.Default.Register<NotificationMessageAction<ProvisionedServiceViewModel>>(this,
+            Messenger.Default.Register<NotificationMessageAction<CreateServiceViewModel>>(this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.GetProvisionServiceData))
+                    if (message.Notification.Equals(Messages.GetCreateServiceData))
                         message.Execute(this);
-                    Messenger.Default.Unregister(this);
+                    Cleanup();
                 });
         }
 
-        private void InitializeData()
+        protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetProvisionServiceData,
+            Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetCreateServiceData,
                 (cloud) =>
                 {
                     this.SystemServices.Synchronize(cloud.AvailableServices, new SystemServiceEqualityComparer());
                 }));
-        }
-
-        private void Confirmed()
-        {           
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.ProvisionServiceDialogResult));
-        }
-
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.ProvisionServiceDialogResult));
-            Messenger.Default.Unregister(this);
         }
 
         public ObservableCollection<SystemService> SystemServices
@@ -69,21 +51,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public SystemService SelectedSystemService
         {
             get { return this.selectedSystemService; }
-            set
-            {
-                this.selectedSystemService = value;
-                RaisePropertyChanged("SelectedSystemService");
-            }
+            set { this.selectedSystemService = value; RaisePropertyChanged("SelectedSystemService"); }
         }
 
         public string Name
         {
             get { return this.name; }
-            set
-            {
-                this.name = value;
-                RaisePropertyChanged("Name");
-            }
+            set { this.name = value; RaisePropertyChanged("Name"); }
         }
     }
 }

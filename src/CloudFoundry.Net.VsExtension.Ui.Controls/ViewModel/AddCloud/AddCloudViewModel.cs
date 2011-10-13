@@ -11,49 +11,25 @@ using GalaSoft.MvvmLight.Messaging;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class AddCloudViewModel : ViewModelBase
+    public class AddCloudViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
         public RelayCommand ManageCloudUrlsCommand { get; private set; }
         public RelayCommand ValidateAccountCommand { get; private set; }
         public RelayCommand RegisterAccountCommand { get; private set; }
-        public Cloud Cloud { get; private set; }  
 
-        private CloudFoundryProvider provider;
+        public Cloud Cloud { get; private set; }  
         private ObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
 
-        public AddCloudViewModel()
+        public AddCloudViewModel() : base(Messages.AddCloudDialogResult)
         {
             Cloud = new Types.Cloud();
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
-
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanValidate);
             RegisterAccountCommand = new RelayCommand(RegisterAccount, CanRegister);
             ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);                        
-        }
-
-        private void LoadProvider(CloudFoundryProvider provider)
-        {
-            this.provider = provider;
             this.cloudUrls = provider.CloudUrls;
             this.SelectedCloudUrl = cloudUrls.SingleOrDefault((i) => i.IsDefault);
-        }       
-
-        private void Confirmed()
-        {
-            this.provider.Clouds.Add(this.Cloud.DeepCopy());
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddCloudDialogResult));
-            Messenger.Default.Unregister(this);
-        }
-
-        private void Cancelled()
-        {         
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddCloudDialogResult));
-            Messenger.Default.Unregister(this);
+            OnConfirmed += (s, e) => { this.provider.Clouds.Add(this.Cloud); Cleanup(); };
         }
 
         private void ValidateAccount() { }
@@ -114,51 +90,25 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public ObservableCollection<CloudUrl> CloudUrls
         {
             get { return this.cloudUrls; }
-            set
-            {
-                this.cloudUrls = value;
-                RaisePropertyChanged("CloudUrls");
-            }
+            set { this.cloudUrls = value; RaisePropertyChanged("CloudUrls"); }
         }
 
         public string ServerName
         {
             get { return this.Cloud.ServerName; }
-            set
-            {
-                this.Cloud.ServerName = value;
-                RaisePropertyChanged("ServerName");
-            }
-        }
-
-        public string HostName
-        {
-            get { return this.Cloud.HostName; }
-            set
-            {
-                this.Cloud.HostName = value;
-                RaisePropertyChanged("HostName");
-            }
+            set { this.Cloud.ServerName = value; RaisePropertyChanged("ServerName"); }
         }
 
         public string EMail
         {
             get { return this.Cloud.Email; }
-            set
-            {
-                this.Cloud.Email = value;
-                RaisePropertyChanged("EMail");
-            }
+            set { this.Cloud.Email = value; RaisePropertyChanged("EMail"); }
         }
 
         public string Password
         {
             get { return this.Cloud.Password; }
-            set
-            {
-                this.Cloud.Password = value;
-                RaisePropertyChanged("Password");
-            }
+            set { this.Cloud.Password = value; RaisePropertyChanged("Password"); }
         }
     }
 }

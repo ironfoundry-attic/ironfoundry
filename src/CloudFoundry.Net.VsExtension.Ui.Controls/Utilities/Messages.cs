@@ -43,10 +43,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string GetAddApplicationUrlData = "GetAddApplicationUrlData";
         public const string SetAddApplicationUrlData = "SetAddApplicationUrlData";
 
-        public const string ProvisionService = "ProvisionService";
-        public const string ProvisionServiceDialogResult = "ProvisionServiceDialogResult";
-        public const string GetProvisionServiceData = "GetProvisionServiceData";
-        public const string SetProvisionServiceData = "SetProvisionServiceData";
+        public const string CreateService = "CreateService";
+        public const string CreateServiceDialogResult = "CreateServiceDialogResult";
+        public const string GetCreateServiceData = "GetCreateServiceData";
+        public const string SetCreateServiceData = "SetCreateServiceData";
 
         public const string ChangePassword = "ChangePassword";
         public const string ChangePasswordDialogResult = "ChangePasswordDialogResult";
@@ -72,5 +72,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string UpdateDialogResult = "UpdateDialogResult";
         public const string GetUpdateAppData = "GetPushAppData";
         public const string SetUpdateAppData = "SetPushAppData";
+
+        public const string Progress = "Progress";
+        public const string ProgressDialogResult = "ProgressDialogResult";
+        public const string SetProgressData = "SetProgressData";
     }
 }

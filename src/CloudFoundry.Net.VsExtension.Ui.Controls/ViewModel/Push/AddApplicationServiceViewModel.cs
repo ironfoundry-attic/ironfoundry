@@ -13,34 +13,28 @@ using System.Collections.ObjectModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class AddApplicationServiceViewModel : ViewModelBase
+    public class AddApplicationServiceViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
-        private ObservableCollection<ProvisionedService> systemServices = new ObservableCollection<ProvisionedService>();
+        private ObservableCollection<ProvisionedService> systemServices;
         private ProvisionedService selectedService;
 
-        public AddApplicationServiceViewModel()
+        public AddApplicationServiceViewModel() : base(Messages.AddApplicationServiceDialogResult)
         {
-            ConfirmedCommand = new RelayCommand(Confirmed,CanExecuteConfirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-
-            InitializeData();
-            RegisterGetData();
+            this.systemServices = new ObservableCollection<ProvisionedService>();
         }
 
-        private void RegisterGetData()
+        protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<AddApplicationServiceViewModel>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.GetAddApplicationServiceData))
                         message.Execute(this);
-                    Messenger.Default.Unregister(this);
+                    Cleanup();
                 });
         }
 
-        private void InitializeData()
+        protected override void InitializeData()
         {
             Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetAddApplicationServiceData,
                 (cloud) =>
@@ -54,15 +48,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddApplicationServiceDialogResult));
         }
 
-        private bool CanExecuteConfirmed()
+        protected override bool CanExecuteConfirmed()
         {
             return this.SelectedService != null;
-        }
-
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddApplicationServiceDialogResult));
-            Messenger.Default.Unregister(this);
         }
 
         public ObservableCollection<ProvisionedService> Services
@@ -73,11 +61,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public ProvisionedService SelectedService
         {
             get { return this.selectedService; }
-            set
-            {
-                this.selectedService = value;
-                RaisePropertyChanged("SelectedService");
-            }
+            set { this.selectedService = value; RaisePropertyChanged("SelectedService"); }
         }
     }
 }

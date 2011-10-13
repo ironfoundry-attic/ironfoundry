@@ -13,66 +13,26 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class ManageCloudUrlsViewModel : ViewModelBase
+    public class ManageCloudUrlsViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
         public RelayCommand AddCommand { get; private set; }
         public RelayCommand EditCommand { get; private set; }
         public RelayCommand RemoveCommand { get; private set; }
         private ObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
-        private CloudFoundryProvider provider;
 
-        public ManageCloudUrlsViewModel()
+        public ManageCloudUrlsViewModel() : base(Messages.ManageCloudUrlsDialogResult)
         {
             AddCommand = new RelayCommand(Add);
             EditCommand = new RelayCommand(Edit, CanEdit);
             RemoveCommand = new RelayCommand(Remove, CanRemove);
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
-        }
-
-        private void LoadProvider(CloudFoundryProvider provider)
-        {
-            this.provider = provider;
-            this.CloudUrls = provider.CloudUrls.DeepCopy();            
-        }
-
-        public CloudUrl SelectedCloudUrl
-        {
-            get { return this.selectedCloudUrl; }
-            set
+            this.CloudUrls = provider.CloudUrls.DeepCopy();
+            OnConfirmed += (s, e) =>
             {
-                this.selectedCloudUrl = value;
-                RaisePropertyChanged("SelectedCloudUrl");
-            }
-        }
-
-        public ObservableCollection<CloudUrl> CloudUrls
-        {
-            get { return this.cloudUrls; }
-            set
-            {
-                this.cloudUrls = value;
-                RaisePropertyChanged("CloudUrls");
-            }
-        }
-
-        private void Confirmed()
-        {
-            provider.CloudUrls.Synchronize(this.CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
-            provider.SaveChanges();
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.ManageCloudUrlsDialogResult));
-            Messenger.Default.Unregister(this);
-        }
-
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.ManageCloudUrlsDialogResult));
-            Messenger.Default.Unregister(this);
-        }
+                provider.CloudUrls.Synchronize(this.CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
+                provider.SaveChanges();
+            };
+        }       
 
         private void Add()
         {
@@ -100,7 +60,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 PrepareMicroCloud();
             else
                 AddCloudUrl(isNew);
-            
         }
 
         private void AddCloudUrl(bool isNew)
@@ -169,9 +128,19 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void Remove()
         {
             if (this.SelectedCloudUrl != null)
-            {
                 this.CloudUrls.Remove(this.SelectedCloudUrl);
-            }
+        }
+
+        public CloudUrl SelectedCloudUrl
+        {
+            get { return this.selectedCloudUrl; }
+            set { this.selectedCloudUrl = value; RaisePropertyChanged("SelectedCloudUrl"); }
+        }
+
+        public ObservableCollection<CloudUrl> CloudUrls
+        {
+            get { return this.cloudUrls; }
+            set { this.cloudUrls = value; RaisePropertyChanged("CloudUrls"); }
         }
 
     }

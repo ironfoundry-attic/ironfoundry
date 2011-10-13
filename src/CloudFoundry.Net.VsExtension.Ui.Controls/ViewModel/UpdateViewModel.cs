@@ -14,40 +14,30 @@
     using GalaSoft.MvvmLight.Messaging;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
     
-    public class UpdateViewModel : ViewModelBase
+    public class UpdateViewModel : DialogViewModel
     {
         private Cloud selectedCloud;
-        private Application application;
-        private string errorMessage;
-        private CloudFoundryProvider provider;
+        private Application application;        
         private string name;
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
         public RelayCommand ManageCloudsCommand { get; private set; }
 
-        public UpdateViewModel()
+        public UpdateViewModel() : base(Messages.UpdateDialogResult)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
-            ConfirmedCommand = new RelayCommand(Confirmed, () => SelectedCloud != null && SelectedApplication != null);
-            CancelledCommand = new RelayCommand(Cancelled);
             ManageCloudsCommand = new RelayCommand(ManageClouds);
-
-            InitializeData();
-            RegisterGetData();
         }
 
-        private void RegisterGetData()
+        protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<UpdateViewModel>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.GetUpdateAppData))
                         message.Execute(this);
-                    Messenger.Default.Unregister(this);
+                    Cleanup();
                 });
         }
 
-        private void InitializeData()
+        protected override void InitializeData()
         {
             Messenger.Default.Send(new NotificationMessageAction<Guid>(Messages.SetUpdateAppData,
                 (id) =>
@@ -56,11 +46,10 @@
                 }));
         }
 
-        public string ErrorMessage
+        protected override bool CanExecuteConfirmed()
         {
-            get { return this.errorMessage; }
-            set { this.errorMessage = value; RaisePropertyChanged("ErrorMessage"); }
-        }
+            return SelectedCloud != null && SelectedApplication != null;
+        }        
 
         public string Name
         {
@@ -81,10 +70,17 @@
                 this.selectedCloud = value;
                 if (this.selectedCloud != null)
                 {
-                    Cloud local = this.provider.Connect(this.selectedCloud);
-                    this.selectedCloud.Services.Synchronize(local.Services, new ProvisionedServiceEqualityComparer());
-                    this.selectedCloud.Applications.Synchronize(local.Applications, new ApplicationEqualityComparer());
-                    this.selectedCloud.AvailableServices.Synchronize(local.AvailableServices, new SystemServiceEqualityComparer());
+                    var local = this.provider.Connect(this.selectedCloud);
+                    if (local.Response != null)
+                    {
+                        this.selectedCloud.Services.Synchronize(local.Response.Services, new ProvisionedServiceEqualityComparer());
+                        this.selectedCloud.Applications.Synchronize(local.Response.Applications, new ApplicationEqualityComparer());
+                        this.selectedCloud.AvailableServices.Synchronize(local.Response.AvailableServices, new SystemServiceEqualityComparer());
+                    }
+                    else
+                    {
+                        this.ErrorMessage = local.Message;
+                    }
                 }
                 RaisePropertyChanged("SelectedCloud");
                 RaisePropertyChanged("Applications");
@@ -106,22 +102,7 @@
         public Application SelectedApplication
         {
             get { return this.application; }
-            set
-            {
-                this.application = value;
-                RaisePropertyChanged("SelectedApplication");
-            }
-        }
-
-        private void Confirmed()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.UpdateDialogResult));
-        }
-
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.UpdateDialogResult));
-            Messenger.Default.Unregister(this);
+            set { this.application = value; RaisePropertyChanged("SelectedApplication"); }
         }
 
         private void ManageClouds()

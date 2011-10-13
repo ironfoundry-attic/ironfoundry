@@ -19,24 +19,19 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class ExplorerViewModel : ViewModelBase
     {
-        private CloudFoundryProvider provider;
         private CloudViewModel currentCloudView;
         private readonly ObservableCollection<CloudViewModel> clouds = new ObservableCollection<CloudViewModel>();
         private CloudViewModel selectedCloudView;
+        private CloudFoundryProvider provider;
         
         public RelayCommand<CloudViewModel> CloseCloudCommand { get; private set; }
 
         public ExplorerViewModel()
         {
             CloseCloudCommand = new RelayCommand<CloudViewModel>(CloseCloud);
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider,LoadProvider));
+            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
-        }
-
-        private void LoadProvider(CloudFoundryProvider provider)
-        {
-            this.provider = provider;
             this.provider.CloudsChanged += CloudsCollectionChanged;
         }
 
@@ -92,17 +87,17 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private void ProcessApplicationNotification(NotificationMessage<Application> message)
         {
             OpenApplication(message.Content);
-            if (message.Notification.Equals(Messages.StartApplication))
+            switch (message.Notification)
             {
-                this.SelectedCloudView.Start();
-            }
-            else if (message.Notification.Equals(Messages.StopApplication))
-            {
-                this.SelectedCloudView.Stop();
-            }
-            else if (message.Notification.Equals(Messages.RestartApplication))
-            {
-                this.SelectedCloudView.Restart();
+                case Messages.StartApplication:
+                    SelectedCloudView.Start();
+                    break;
+                case Messages.StopApplication:
+                    SelectedCloudView.Stop();
+                    break;
+                case Messages.RestartApplication:
+                    SelectedCloudView.Restart();
+                    break;
             }
         }
 

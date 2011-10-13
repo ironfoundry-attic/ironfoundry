@@ -11,22 +11,15 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    public class AddApplicationUrlViewModel : ViewModelBase
+    public class AddApplicationUrlViewModel : DialogViewModel
     {
-        public RelayCommand ConfirmedCommand { get; private set; }
-        public RelayCommand CancelledCommand { get; private set; }
-        string url;
+        private string url;
 
-        public AddApplicationUrlViewModel()
+        public AddApplicationUrlViewModel() : base(Messages.AddApplicationUrlDialogResult)
         {
-            ConfirmedCommand = new RelayCommand(Confirmed);
-            CancelledCommand = new RelayCommand(Cancelled);
-
-            InitializeData();
-            RegisterGetData();
         }
 
-        private void RegisterGetData()
+        protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<AddApplicationUrlViewModel>>(this,
                 message =>
@@ -37,34 +30,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 });
         }
 
-        private void InitializeData()
+        protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetAddApplicationUrlData,
-                (url) =>
-                {
-                    this.url = url;
-                }));
-        }
-
-        private void Confirmed()
-        {           
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddApplicationUrlDialogResult));
-        }
-
-        private void Cancelled()
-        {
-            Messenger.Default.Send(new NotificationMessage<bool>(this, false, Messages.AddApplicationUrlDialogResult));
-            Messenger.Default.Unregister(this);
+            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetAddApplicationUrlData, u => this.url = u));
         }
 
         public string Url
         {
             get { return this.url; }
-            set
-            {
-                this.url = value;
-                RaisePropertyChanged("Url");
-            }
+            set { this.url = value; RaisePropertyChanged("Url"); }
         }
     }
 }

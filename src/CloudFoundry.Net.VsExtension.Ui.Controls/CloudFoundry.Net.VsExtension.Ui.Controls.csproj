@@ -81,7 +81,10 @@
     <Compile Include="Model\Instance.cs" />
     <Compile Include="Model\Preferences.cs" />
     <Compile Include="Model\PreferencesProvider.cs" />
+    <Compile Include="Mvvm\DialogViewModel.cs" />
     <Compile Include="Mvvm\DragDropMvvm.cs" />
+    <Compile Include="Mvvm\ProgressError.cs" />
+    <Compile Include="Mvvm\ProgressMessage.cs" />
     <Compile Include="Utilities\Messages.cs" />
     <Compile Include="Utilities\PasswordHelper.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
@@ -89,6 +92,7 @@
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ProvisionedServiceViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
+    <Compile Include="ViewModel\ProgressViewModel.cs" />
     <Compile Include="ViewModel\Push\AddApplicationServiceViewModel.cs" />
     <Compile Include="ViewModel\UpdateViewModel.cs" />
     <Compile Include="ViewModel\Push\PushViewModel.cs" />
@@ -138,8 +142,8 @@
     <Compile Include="Views\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ProvisionService.xaml.cs">
-      <DependentUpon>ProvisionService.xaml</DependentUpon>
+    <Compile Include="Views\CreateService.xaml.cs">
+      <DependentUpon>CreateService.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Update.xaml.cs">
       <DependentUpon>Update.xaml</DependentUpon>
@@ -220,7 +224,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\ProvisionService.xaml">
+    <Page Include="Views\CreateService.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
