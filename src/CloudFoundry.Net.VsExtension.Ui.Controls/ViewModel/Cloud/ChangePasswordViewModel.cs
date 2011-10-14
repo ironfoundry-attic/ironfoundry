@@ -8,18 +8,21 @@ using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 using CloudFoundry.Net.Types;
+using System.ComponentModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class ChangePasswordViewModel : DialogViewModel
     {
+        private Cloud cloud;
         private string newPassword;
         private string verifyPassword;
         private string email;
 
         public ChangePasswordViewModel() : base(Messages.ChangePasswordDialogResult)
         {
-        }
+            OnConfirmed += ConfirmChange;
+        }        
 
         protected override void RegisterGetData()
         {
@@ -34,7 +37,34 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetChangePasswordData, c => this.EMail = c.Email));
+            Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetChangePasswordData, c => {
+                this.EMail = c.Email;
+                this.cloud = c;
+            }));
+        }
+
+        private void ConfirmChange(object sender, CancelEventArgs e)
+        {
+            if (String.IsNullOrEmpty(NewPassword) || 
+                String.IsNullOrEmpty(VerifyPassword))
+            {
+                e.Cancel = true;
+                ErrorMessage = "Passwords cannot be empty.";
+            }
+            else if (!NewPassword.Equals(VerifyPassword))
+            {
+                e.Cancel = true;
+                ErrorMessage = "Passwords must match.";
+            }
+            else
+            {
+                var result = provider.ChangePassword(this.cloud, NewPassword);
+                if (!result.Response)
+                {
+                    ErrorMessage = result.Message;
+                    e.Cancel = true;
+                }
+            }
         }
 
         public string NewPassword

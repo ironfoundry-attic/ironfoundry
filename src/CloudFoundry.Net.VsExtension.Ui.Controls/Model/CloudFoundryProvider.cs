@@ -72,7 +72,7 @@
 
         public ProviderResponse<Cloud> Connect(Cloud cloud)
         {
-            ProviderResponse<Cloud> response = null;
+            ProviderResponse<Cloud> response = new ProviderResponse<Cloud>();
             Cloud local = cloud.DeepCopy();
             IVcapClient client = new VcapClient(local);
 
@@ -91,15 +91,13 @@
                     local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
                     local.AvailableServices.Synchronize(new ObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
                 }
-                response = new ProviderResponse<Cloud>(local, string.Empty);
+                response.Response = local;
             }
             catch (Exception ex)
             {
-                response = new ProviderResponse<Cloud>(null, ex.Message);
+                response.Message = ex.Message;
             }
-
-            return response;
-           
+            return response;           
         }
 
         public Cloud Disconnect(Cloud cloud)
@@ -111,75 +109,189 @@
             return cloud;
         }
 
-        public ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud)
+        public ProviderResponse<bool> ValidateAccount(Cloud cloud)
         {
-            ProviderResponse<IEnumerable<StatInfo>> response = null;
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var stats = client.GetStats(app);
-                response = new ProviderResponse<IEnumerable<StatInfo>>(stats, string.Empty);
+                var vcapResponse = client.Login();
+                if (vcapResponse != null && 
+                    !vcapResponse.Success && 
+                    !String.IsNullOrEmpty(vcapResponse.Message))
+                    throw new Exception(vcapResponse.Message);
+                response.Response = true;
             }
             catch (Exception ex)
             {
-                response = new ProviderResponse<IEnumerable<StatInfo>>(null, ex.Message);
+                response.Message = ex.Message;
             }
             return response;
         }
 
-        public VcapResponse UpdateApplication(Application app, Cloud cloud)
+        public ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud)
         {
-            IVcapClient client = new VcapClient(cloud);
-            return client.UpdateApplication(app);
+            ProviderResponse<IEnumerable<StatInfo>> response = new ProviderResponse<IEnumerable<StatInfo>>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);                
+                response.Response = client.GetStats(app);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public void Start(Application app, Cloud cloud)
+        public ProviderResponse<bool> UpdateApplication(Application app, Cloud cloud)
         {
-            IVcapClient client = new VcapClient(cloud);
-            client.Start(app);
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                var vcapResponse = client.UpdateApplication(app);
+                if (vcapResponse != null && !String.IsNullOrEmpty(vcapResponse.Description))
+                    throw new Exception(vcapResponse.Description);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public void Stop(Application argApp, Cloud argCloud)
+        public ProviderResponse<bool> Start(Application app, Cloud cloud)
         {
-            IVcapClient client = new VcapClient(argCloud);
-            client.Stop(argApp);
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                client.Start(app);                
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public void Restart(Application argApp, Cloud argCloud)
+        public ProviderResponse<bool> Stop(Application app, Cloud cloud)
         {
-            IVcapClient client = new VcapClient(argCloud);
-            client.Restart(argApp);
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                client.Stop(app);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public void UpdateAndRestart(Application argApp, Cloud argCloud)
+        public ProviderResponse<bool> Restart(Application app, Cloud cloud)
         {
-            IVcapClient client = new VcapClient(argCloud);
-            client.UpdateApplication(argApp);
-            client.Restart(argApp);
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                client.Restart(app);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;            
         }
 
-        public Application GetApplication(Application argApp, Cloud argCloud)
+        public ProviderResponse<Application> GetApplication(Application app, Cloud cloud)
         {
-            IVcapClient client = new VcapClient(argCloud);
-            return client.GetApplication(argApp.Name);
+            ProviderResponse<Application> response = new ProviderResponse<Application>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                response.Response = client.GetApplication(app.Name);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public VcapClientResult CreateService(Cloud argCloud, string serviceName, string provisionedServiceName)
+        public ProviderResponse<bool> CreateService(Cloud cloud, string serviceName, string provisionedServiceName)
         {
-            IVcapClient client = new VcapClient(argCloud);
-            return client.CreateService(serviceName,provisionedServiceName);
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                var vcapResult = client.CreateService(serviceName, provisionedServiceName);
+                if (!vcapResult.Success)
+                    throw new Exception(vcapResult.Message);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;            
         }
 
-        public ObservableCollection<ProvisionedService> GetProvisionedServices(Cloud argCloud)
+        public ProviderResponse<ObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud)
         {
-            IVcapClient client = new VcapClient(argCloud);
-            return new ObservableCollection<ProvisionedService>(client.GetProvisionedServices());
+            ProviderResponse<ObservableCollection<ProvisionedService>> response = new ProviderResponse<ObservableCollection<ProvisionedService>>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                response.Response = new ObservableCollection<ProvisionedService>(client.GetProvisionedServices());
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public VcapClientResult ChangePassword(Cloud argCloud, string newPassword)
+        public ProviderResponse<bool> ChangePassword(Cloud cloud, string newPassword)
         {
-            IVcapClient client = new VcapClient(argCloud);
-            return client.ChangePassword(newPassword);
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                var vcapResult = client.ChangePassword(newPassword);
+                if (!vcapResult.Success)
+                    throw new Exception(vcapResult.Message);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;   
+        }
+
+        public ProviderResponse<bool> RegisterAccount(Cloud cloud,string email, string password)
+        {
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                var vcapResult = client.AddUser(email,password);
+                if (!vcapResult.Success)
+                    throw new Exception(vcapResult.Message);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response; 
         }
     }
 
@@ -188,6 +300,12 @@
         public T Response { get; set; }
         public string Message { get; set; }
         
+        public ProviderResponse()
+        {
+            Response = default(T);
+            Message = string.Empty;
+        }
+
         public ProviderResponse(T response, string message)
         {
             Response = response;

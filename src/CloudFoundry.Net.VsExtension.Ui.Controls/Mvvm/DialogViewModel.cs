@@ -7,6 +7,7 @@ using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using System.ComponentModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 {
@@ -14,7 +15,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
     {
         public RelayCommand ConfirmedCommand { get; private set; }
         public RelayCommand CancelledCommand { get; private set; }
-        protected event EventHandler OnConfirmed;
+        protected event CancelEventHandler OnConfirmed;
         protected event EventHandler OnCancelled;
         private string resultMessageId;
         protected CloudFoundryProvider provider;
@@ -36,9 +37,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 
         private void Confirmed()
         {
+            var args = new CancelEventArgs();    
             if (OnConfirmed != null)
-                OnConfirmed(this, null);
-            Messenger.Default.Send(new NotificationMessage<bool>(this, true, resultMessageId));            
+                OnConfirmed(this, args);
+            if (!args.Cancel)
+                Messenger.Default.Send(new NotificationMessage<bool>(this, true, resultMessageId));            
         }
 
         protected virtual bool CanExecuteConfirmed()
@@ -50,6 +53,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
         {
             if (OnCancelled != null)
                 OnCancelled(this, null);
+            
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, resultMessageId));
             Cleanup();
         }

@@ -10,17 +10,30 @@ using GalaSoft.MvvmLight.Messaging;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using CloudFoundry.Net.Types;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class CreateServiceViewModel : DialogViewModel
     {
+        private Cloud cloud;
         private string name;
         private ObservableCollection<SystemService> systemServices = new ObservableCollection<SystemService>();
         private SystemService selectedSystemService;
 
         public CreateServiceViewModel() : base(Messages.CreateServiceDialogResult)
         {
+            this.OnConfirmed += ConfirmCreate;
+        }
+
+        private void ConfirmCreate(object sender, CancelEventArgs e)
+        {
+            var result = provider.CreateService(cloud, SelectedSystemService.Vendor, Name);            
+            if (!result.Response)
+            {
+                ErrorMessage = result.Message;
+                e.Cancel = true;
+            }
         }
 
         protected override void RegisterGetData()
@@ -39,6 +52,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetCreateServiceData,
                 (cloud) =>
                 {
+                    this.cloud = cloud;
                     this.SystemServices.Synchronize(cloud.AvailableServices, new SystemServiceEqualityComparer());
                 }));
         }

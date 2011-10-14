@@ -29,8 +29,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     if (this.ProgressValue == 100)
                     {
                         this.canExecuteCancelled = false;
-                        this.canExecuteConfirmed = true;
-                        CommandManager.InvalidateRequerySuggested();
+                        this.canExecuteConfirmed = true;                        
                     }
                 });
 
@@ -40,7 +39,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     this.ErrorMessage = error.Text;
                     this.canExecuteCancelled = false;
                     this.canExecuteConfirmed = true;                    
-                    CommandManager.InvalidateRequerySuggested();
                 });
         }
 

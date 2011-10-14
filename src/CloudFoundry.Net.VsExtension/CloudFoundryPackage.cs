@@ -152,6 +152,7 @@ namespace CloudFoundry.Net.VsExtension
                 });
 
             var window = new ProgressDialog();
+            var dispatcher = window.Dispatcher;
             var helper = new WindowInteropHelper(window);
             helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
             worker.WorkerSupportsCancellation = true;
@@ -171,19 +172,19 @@ namespace CloudFoundry.Net.VsExtension
                 if (worker.CancellationPending) { args.Cancel = true; return; }
                 if (!Directory.Exists(stagingPath))
                 {
-                    Messenger.Default.Send(new ProgressMessage(10, "Creating Staging Path"));
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Creating Staging Path")))); 
                     Directory.CreateDirectory(stagingPath);
                 }
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
                 if (Directory.Exists(precompiledSitePath))
                 {
-                    Messenger.Default.Send(new ProgressMessage(10, "Creating Precompiled Site Path"));
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Creating Precompiled Site Path"))));
                     Directory.Delete(precompiledSitePath, true);
                 }
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
-                Messenger.Default.Send(new ProgressMessage(30, "Creating Precompiled Site Path"));
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(30, "Preparing Compiler"))));
                 var process = new System.Diagnostics.Process()
                 {
                     StartInfo = new ProcessStartInfo()
@@ -197,16 +198,16 @@ namespace CloudFoundry.Net.VsExtension
                     }
                 };
 
-                Messenger.Default.Send(new ProgressMessage(40, "Precompiling Site"));
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(40, "Precompiling Site"))));
                 process.Start();
                 var output = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
                 if (!string.IsNullOrEmpty(output))
                 {
-                    Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output));
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output))));
                     return;
                 }
-                Messenger.Default.Send(new ProgressMessage(50, "Logging in to Cloud Foundry"));
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(50, "Logging in to Cloud Foundry"))));
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
                 
@@ -216,19 +217,19 @@ namespace CloudFoundry.Net.VsExtension
 
                 if (result.Success == false)
                 {
-                    Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message));
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message))));
                     return;
                 }
-                Messenger.Default.Send(new ProgressMessage(75, "Sending to " + cloud.Url));
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Sending to " + cloud.Url))));
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
                 var response = function(client, new DirectoryInfo(precompiledSitePath));
                 if (result.Success == false)
                 {
-                    Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message));
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message))));
                     return;
                 }
-                Messenger.Default.Send(new ProgressMessage(100, action + " complete."));
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, action + " complete."))));
             };
 
             worker.RunWorkerAsync();

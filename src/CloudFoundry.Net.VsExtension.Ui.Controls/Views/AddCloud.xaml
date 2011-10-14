@@ -87,6 +87,7 @@
                                 <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="-10,10,0,0" >
                                     <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Content="Validate Account" Command="{Binding ValidateAccountCommand}" Width="115" />
                                     <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Content="Register Account..." Command="{Binding RegisterAccountCommand}" Width="115" />
+                                    <Label Margin="5,0,0,0" Content="Account Valid." Visibility="{Binding IsAccountValid, Converter={StaticResource booleanToVisibilityConverter}}" />
                                 </StackPanel>
 
                             </Grid>

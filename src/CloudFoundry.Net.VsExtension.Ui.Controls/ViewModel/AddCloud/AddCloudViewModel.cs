@@ -20,6 +20,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public Cloud Cloud { get; private set; }  
         private ObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
+        private bool isAccountValid;
+        
 
         public AddCloudViewModel() : base(Messages.AddCloudDialogResult)
         {
@@ -32,10 +34,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             OnConfirmed += (s, e) => { this.provider.Clouds.Add(this.Cloud); Cleanup(); };
         }
 
-        private void ValidateAccount() { }
+        private void ValidateAccount()
+        {
+            this.ErrorMessage = string.Empty;
+            this.IsAccountValid = false;
+            var result = this.provider.ValidateAccount(this.Cloud);
+            if (result.Response)
+                this.IsAccountValid = true;
+            else
+                this.ErrorMessage = result.Message;
+        }
 
         private void RegisterAccount()
         {
+            IsAccountValid = false;
             Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
                 message =>
                 {
@@ -48,6 +60,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 {
                     if (confirmed)
                     {
+
                         Messenger.Default.Send(new NotificationMessageAction<RegisterAccountViewModel>(Messages.GetRegisterAccountData,
                             (viewModel) =>
                             {
@@ -78,6 +91,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return this.selectedCloudUrl; }
             set
             {
+                IsAccountValid = false;
                 this.selectedCloudUrl = value;
                 if (this.selectedCloudUrl != null)
                     this.Cloud.Url = selectedCloudUrl.Url;
@@ -85,6 +99,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     this.Cloud.Url = string.Empty;
                 RaisePropertyChanged("SelectedCloudUrl");
             }
+        }
+
+        public bool IsAccountValid
+        {
+            get { return this.isAccountValid; }
+            set { this.isAccountValid = value; RaisePropertyChanged("IsAccountValid"); }
         }
 
         public ObservableCollection<CloudUrl> CloudUrls

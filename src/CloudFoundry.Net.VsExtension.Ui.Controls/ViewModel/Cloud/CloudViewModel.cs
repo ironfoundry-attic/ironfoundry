@@ -22,39 +22,36 @@
         public RelayCommand ValidateAccountCommand { get; private set; }
         public RelayCommand ConnectCommand { get; private set; }
         public RelayCommand DisconnectCommand { get; private set; }
-
         public RelayCommand StartCommand { get; private set; }
         public RelayCommand StopCommand { get; private set; }
         public RelayCommand RestartCommand { get; private set; }
-        public RelayCommand UpdateAndRestartCommand { get; private set; }
         public RelayCommand UpdateInstanceCountCommand { get; private set; }
-
         public RelayCommand ManageApplicationUrlsCommand { get; private set; }
         public RelayCommand RemoveApplicationServiceCommand { get; private set; }
         public RelayCommand ProvisionServiceCommand { get; private set; }
         public RelayCommand RefreshCommand { get; private set; }
 
         private Cloud cloud;
+        private CloudFoundryProvider provider;
         private Application selectedApplication;
         private ProvisionedService selectedApplicationService;
         private bool isApplicationViewSelected;
+        private bool applicationStarting;
+        private bool isAccountValid;
+        private Dispatcher dispatcher;
         private string overviewErrorMessage;
         private string applicationErrorMessage;
         private IDragSource provisionedServicesSource;
         private IDropTarget applicationServicesTarget;
-
         private ObservableCollection<ProvisionedService> applicationServices;
         private ObservableCollection<Model.Instance> instances;
-        private CloudFoundryProvider provider;
-        private bool applicationStarting;
-        
-        DispatcherTimer instanceTimer = new DispatcherTimer();
 
         public CloudViewModel(Cloud cloud)
         {
-            this.Cloud = cloud;
             Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
-            
+            this.dispatcher = Dispatcher.CurrentDispatcher;
+            this.Cloud = cloud;
+
             ChangePasswordCommand = new RelayCommand(ChangePassword);
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanExecuteValidateAccount);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
@@ -62,16 +59,18 @@
             StartCommand = new RelayCommand(Start, CanExecuteStart);
             StopCommand = new RelayCommand(Stop, CanExecuteStopActions);
             RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
-            UpdateAndRestartCommand = new RelayCommand(UpdateAndRestart, CanExecuteStopActions);
             ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);
             RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);
             ProvisionServiceCommand = new RelayCommand(ProvisionService);
-            RefreshCommand = new RelayCommand(RefreshApplication, CanExecuteRefresh);
+            RefreshCommand = new RelayCommand(Refresh, CanExecuteRefresh);
 
+            var instanceTimer = new DispatcherTimer();
             instanceTimer.Interval = TimeSpan.FromSeconds(10);
             instanceTimer.Tick += RefreshInstances;
             instanceTimer.Start();
         }
+
+        #region InstanceManagement
 
         private void RefreshInstances(object sender, EventArgs e)
         {
@@ -96,26 +95,6 @@
             var statsResponse = e.Result as ProviderResponse<IEnumerable<StatInfo>>;
             if (statsResponse.Response != null)
                 UpdateInstanceCollection(statsResponse.Response);
-        }
-
-        private void BeginUpdateApplication(object sender, DoWorkEventArgs e)
-        {
-            ApplicationErrorMessage = string.Empty;
-            e.Result = provider.UpdateApplication(SelectedApplication, Cloud);
-        }
-
-        private void EndUpdateApplication(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Result != null)
-            {
-                VcapResponse response = e.Result as VcapResponse;
-                ApplicationErrorMessage = string.Format("{0} - (Error: {1})", response.Description, response.Code);
-            }
-            else
-            {
-                ApplicationErrorMessage = string.Empty;
-            }
-            RefreshApplication();
         }
 
         private void UpdateInstanceCollection(IEnumerable<StatInfo> stats)
@@ -159,83 +138,21 @@
             this.Instances = instances;
         }
 
-        #region Overview
+        #endregion
+
+        #region Properties
 
         public string OverviewErrorMessage
         {
             get { return this.overviewErrorMessage; }
-            set { 
-                this.overviewErrorMessage = value;
-                RaisePropertyChanged("OverviewErrorMessage");
-            }
-        }        
-
-        private void ChangePassword()
-        {
-            Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.SetChangePasswordData))
-                        message.Execute(Cloud);
-                });
-
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ChangePassword,
-                (confirmed) =>
-                {
-                    if (confirmed)
-                    {
-                        Messenger.Default.Send(new NotificationMessageAction<ChangePasswordViewModel>(Messages.GetChangePasswordData,
-                        (viewModel) =>
-                        {
-                            var result = provider.ChangePassword(Cloud, viewModel.NewPassword);
-                            //this.Cloud.Password = viewModel.NewPassword;                               
-                        }));
-                    }
-                }));
+            set { this.overviewErrorMessage = value; RaisePropertyChanged("OverviewErrorMessage"); }
         }
 
-        private void ValidateAccount()
+        public bool IsAccountValid
         {
-
-        }
-
-        private bool CanExecuteValidateAccount()
-        {
-            return !String.IsNullOrEmpty(Cloud.Email) &&
-                   !String.IsNullOrEmpty(Cloud.Password) &&
-                   !String.IsNullOrEmpty(Cloud.Url);
-        }
-
-        private bool CanExecuteConnect()
-        {
-            return Cloud.IsDisconnected;
-        }
-
-        private bool CanExecuteDisconnect()
-        {
-            return Cloud.IsConnected;
-        }
-
-        private void Connect()
-        {
-            var local = this.provider.Connect(this.Cloud);
-            if (local.Response != null)
-            {
-                this.Cloud.AccessToken = local.Response.AccessToken;
-                this.Cloud.Services.Synchronize(local.Response.Services, new ProvisionedServiceEqualityComparer());
-                this.Cloud.Applications.Synchronize(local.Response.Applications, new ApplicationEqualityComparer());
-                this.Cloud.AvailableServices.Synchronize(local.Response.AvailableServices, new SystemServiceEqualityComparer());
-            }
-            else
-            {
-                this.OverviewErrorMessage = local.Message;
-            }
-        }
-
-        private void Disconnect()
-        {
-            this.Cloud = provider.Disconnect(this.Cloud);
-        }
+            get { return this.isAccountValid; }
+            set { this.isAccountValid = value; RaisePropertyChanged("IsAccountValid"); }
+        }                  
 
         public Cloud Cloud
         {
@@ -243,90 +160,22 @@
             set { this.cloud = value; RaisePropertyChanged("Cloud"); }
         }
 
-        #endregion
-
-        #region Application
-
         public string ApplicationErrorMessage
         {
             get { return this.applicationErrorMessage; }
-            set
-            {
-                this.applicationErrorMessage = value;
-                RaisePropertyChanged("ApplicationErrorMessage");
-            }
+            set { this.applicationErrorMessage = value; RaisePropertyChanged("ApplicationErrorMessage"); }
         }
 
         public ProvisionedService SelectedApplicationService
         {
             get { return this.selectedApplicationService; }
-            set
-            {
-                this.selectedApplicationService = value;
-                RaisePropertyChanged("SelectedApplicationService");
-            }
+            set { this.selectedApplicationService = value; RaisePropertyChanged("SelectedApplicationService"); }
         }
 
-        public bool CanExecuteStart()
+        public int[] MemoryLimits
         {
-            return IsApplicationSelected && !applicationStarting && !(
-                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
+            get { return Constants.MemoryLimits; }
         }
-
-        public bool CanExecuteStopActions()
-        {
-            return IsApplicationSelected && (
-                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
-        }
-
-        public void Start()
-        {
-            applicationStarting = true;
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, args) => provider.Start(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
-            worker.RunWorkerCompleted += (s, args) => { RefreshApplication(); applicationStarting = false; };
-            worker.RunWorkerAsync();
-        }
-
-        public void Stop()
-        {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, args) => provider.Stop(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
-            worker.RunWorkerCompleted += (s, args) => RefreshApplication();
-            worker.RunWorkerAsync();
-        }
-
-        public void Restart()
-        {
-            Start();
-            Stop();          
-        }
-
-        public void UpdateAndRestart()
-        {
-            Restart();
-        }
-
-        private bool CanExecuteRefresh()
-        {
-            return SelectedApplication != null;
-        }
-
-        private void RefreshApplication()
-        {
-            var application = provider.GetApplication(SelectedApplication, Cloud);
-            var applicationToReplace = Cloud.Applications.SingleOrDefault((i) => i.Name == application.Name);
-            if (applicationToReplace != null)
-                applicationToReplace = application;
-            SelectedApplication = application;
-            CommandManager.InvalidateRequerySuggested();
-        }
-
-        public int[] MemoryLimits { get { return Constants.MemoryLimits; } }
 
         public ObservableCollection<Application> Applications
         {
@@ -346,12 +195,66 @@
         public bool IsApplicationViewSelected
         {
             get { return this.isApplicationViewSelected; }
-            set
-            {
-                this.isApplicationViewSelected = value;
-                RaisePropertyChanged("IsApplicationViewSelected");
-            }
+            set { this.isApplicationViewSelected = value; RaisePropertyChanged("IsApplicationViewSelected"); }
         }
+
+        public ObservableCollection<Model.Instance> Instances
+        {
+            get { return this.instances; }
+            set { this.instances = value; RaisePropertyChanged("Instances"); }
+        }
+
+        public ObservableCollection<ProvisionedService> ApplicationServices
+        {
+            get { return this.applicationServices; }
+            set { this.applicationServices = value; RaisePropertyChanged("ApplicationServices"); }
+        }
+
+#endregion
+
+        #region CanExecutes
+
+        private bool CanExecuteValidateAccount()
+        {
+            return !String.IsNullOrEmpty(Cloud.Email) &&
+                   !String.IsNullOrEmpty(Cloud.Password) &&
+                   !String.IsNullOrEmpty(Cloud.Url);
+        }
+
+        private bool CanExecuteConnect()
+        {
+            return Cloud.IsDisconnected;
+        }
+
+        private bool CanExecuteDisconnect()
+        {
+            return Cloud.IsConnected;
+        }
+
+        public bool CanExecuteStart()
+        {
+            return IsApplicationSelected && !applicationStarting && !(
+                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
+        }
+
+        public bool CanExecuteStopActions()
+        {
+            return IsApplicationSelected && (
+                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
+                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
+        }
+
+        private bool CanExecuteRefresh()
+        {
+            return SelectedApplication != null;
+        }      
+
+        #endregion
+
+        #region Selected Application
 
         public Application SelectedApplication
         {
@@ -360,14 +263,14 @@
             {
                 if (this.SelectedApplication != null)
                 {
-                    this.SelectedApplication.PropertyChanged -= selectedApplication_PropertyChanged;
-                    this.SelectedApplication.Resources.PropertyChanged -= selectedApplication_PropertyChanged;
+                    this.SelectedApplication.PropertyChanged -= SelectedApplicationPropertyChanged;
+                    this.SelectedApplication.Resources.PropertyChanged -= SelectedApplicationPropertyChanged;
                 }
                 this.selectedApplication = value;
                 if (this.selectedApplication != null)
                 {
-                    this.selectedApplication.PropertyChanged += selectedApplication_PropertyChanged;
-                    this.selectedApplication.Resources.PropertyChanged += selectedApplication_PropertyChanged;
+                    this.selectedApplication.PropertyChanged += SelectedApplicationPropertyChanged;
+                    this.selectedApplication.Resources.PropertyChanged += SelectedApplicationPropertyChanged;
                     
 
                     this.ApplicationServices = new ObservableCollection<ProvisionedService>();
@@ -387,32 +290,44 @@
             }
         }
 
-        private void selectedApplication_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void SelectedApplicationPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            BackgroundWorker updateApplication = new BackgroundWorker();
-            updateApplication.DoWork += BeginUpdateApplication;
-            updateApplication.RunWorkerCompleted += EndUpdateApplication; 
-            updateApplication.RunWorkerAsync();
-        }       
-
-        public ObservableCollection<Model.Instance> Instances
-        {
-            get { return this.instances; }
-            set
+            var worker = new BackgroundWorker();
+            worker.DoWork += (s, args) =>
             {
-                this.instances = value;
-                RaisePropertyChanged("Instances");
-            }
-        }
-
-        public ObservableCollection<ProvisionedService> ApplicationServices
-        {
-            get { return this.applicationServices; }
-            set
+                ApplicationErrorMessage = string.Empty;
+                args.Result = provider.UpdateApplication(SelectedApplication, Cloud);
+            };
+            worker.RunWorkerCompleted += (s, args) =>
             {
-                this.applicationServices = value;
-                RaisePropertyChanged("ApplicationServices");
-            }
+                var result = args.Result as ProviderResponse<bool>;
+                if (!result.Response)
+                    ApplicationErrorMessage = result.Message;
+                RefreshApplication();
+            };
+            worker.RunWorkerAsync();
+        }        
+
+        #endregion
+
+        #region Commands
+
+        private void ChangePassword()
+        {
+            this.IsAccountValid = false;
+            Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetChangePasswordData))
+                        message.Execute(Cloud);
+                });
+
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ChangePassword,
+                (confirmed) =>
+                {
+                    if (confirmed)
+                        Messenger.Default.Send(new NotificationMessageAction<ChangePasswordViewModel>(Messages.GetChangePasswordData, v => this.Cloud.Password = v.NewPassword));
+                }));
         }
 
         private void ProvisionService()
@@ -432,9 +347,11 @@
                         Messenger.Default.Send(new NotificationMessageAction<CreateServiceViewModel>(Messages.GetCreateServiceData,
                         (viewModel) =>
                         {
-                            var result = provider.CreateService(this.Cloud,viewModel.SelectedSystemService.Vendor, viewModel.Name);
-                            var systemServices = provider.GetProvisionedServices(this.Cloud);
-                            this.Cloud.Services.Synchronize(systemServices, new ProvisionedServiceEqualityComparer());
+                            var result = provider.GetProvisionedServices(this.Cloud);
+                            if (result.Response == null)
+                                ApplicationErrorMessage = result.Message;
+                            else 
+                                this.Cloud.Services.Synchronize(result.Response, new ProvisionedServiceEqualityComparer());
                         }));
                     }
                 }));
@@ -472,14 +389,197 @@
                     SelectedApplication.Services.Remove(SelectedApplicationService.Name);
                     RaisePropertyChanged("ApplicationServices");
                 }
-                this.ApplicationServices.Remove(SelectedApplicationService);
-                
+                this.ApplicationServices.Remove(SelectedApplicationService);                
             }
+        }        
+
+        private void Connect()
+        {
+            this.OverviewErrorMessage = string.Empty;
+            var result = this.provider.Connect(this.Cloud);
+            if (result.Response != null)
+            {
+                this.Cloud.AccessToken = result.Response.AccessToken;
+                this.Cloud.Services.Synchronize(result.Response.Services, new ProvisionedServiceEqualityComparer());
+                this.Cloud.Applications.Synchronize(result.Response.Applications, new ApplicationEqualityComparer());
+                this.Cloud.AvailableServices.Synchronize(result.Response.AvailableServices, new SystemServiceEqualityComparer());
+            }
+            else
+            {
+                this.OverviewErrorMessage = result.Message;
+            }
+        }
+
+        private void Disconnect()
+        {
+            this.Cloud = provider.Disconnect(this.Cloud);
+            this.IsAccountValid = false;
+        }
+
+        private void ValidateAccount()
+        {
+            this.OverviewErrorMessage = string.Empty;
+            this.IsAccountValid = false;
+            var result = this.provider.ValidateAccount(this.Cloud);
+            if (result.Response)
+                this.IsAccountValid = true;
+            else
+                this.OverviewErrorMessage = result.Message;
+        }
+
+        private void Refresh()
+        {
+            var worker = new BackgroundWorker();
+            SetProgressTitle("Refresh Application");
+            worker.DoWork += (s, args) =>
+            {
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(50, "Refreshing Application: " + SelectedApplication.Name))));
+                var resultString = RefreshApplication();
+                if (!String.IsNullOrEmpty(resultString))
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(resultString))));
+                    return;
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Refreshed."))));
+            };
+            worker.RunWorkerAsync();
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
+        }
+
+        private string RefreshApplication()
+        {
+            var result = provider.GetApplication(SelectedApplication, Cloud);
+            if (result.Response == null)
+                return result.Message;
+            else
+            {
+                var application = result.Response;
+                var applicationToReplace = Cloud.Applications.SingleOrDefault((i) => i.Name == application.Name);
+                if (applicationToReplace != null)
+                    applicationToReplace = application;
+                SelectedApplication = application;
+                return string.Empty;
+            }
+        }
+
+        public void Start()
+        {
+            applicationStarting = true;
+            var worker = new BackgroundWorker();
+            SetProgressTitle("Starting Application");
+            worker.DoWork += (s, args) =>
+            {
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(25, "Starting Application: " + SelectedApplication.Name))));
+
+                var result = provider.Start(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
+                if (!result.Response)
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(result.Message))));
+                    return;
+                }
+
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Refreshing Application: " + SelectedApplication.Name))));
+                var resultString = RefreshApplication();
+                if (!String.IsNullOrEmpty(resultString))
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(resultString))));
+                    return;
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Started."))));
+
+            };
+            worker.RunWorkerCompleted += (s, args) => { applicationStarting = false; };
+            worker.RunWorkerAsync();
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
+        }
+
+        public void Stop()
+        {
+            var worker = new BackgroundWorker();
+            SetProgressTitle("Stopping Application");
+            worker.DoWork += (s, args) =>
+            {
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(25, "Stopping Application: " + SelectedApplication.Name))));
+
+                var result = provider.Stop(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
+                if (!result.Response)
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(result.Message))));
+                    return;
+                }
+
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Refreshing Application: " + SelectedApplication.Name))));
+                var resultString = RefreshApplication();
+                if (!String.IsNullOrEmpty(resultString))
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(resultString))));
+                    return;
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Stopped."))));
+
+            };
+            worker.RunWorkerAsync();
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
+        }
+
+        public void Restart()
+        {
+            var worker = new BackgroundWorker();
+            SetProgressTitle("Restarting Application");
+            worker.DoWork += (s, args) =>
+            {
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(20, "Stopping Application: " + SelectedApplication.Name))));
+                var result = provider.Stop(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
+                if (!result.Response)
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(result.Message))));
+                    return;
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(40, "Refreshing Application: " + SelectedApplication.Name))));
+                var resultString = RefreshApplication();
+                if (!String.IsNullOrEmpty(resultString))
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(resultString))));
+                    return;
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(60, "Restarting Application: " + SelectedApplication.Name))));
+                result = provider.Start(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
+                if (!result.Response)
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(result.Message))));
+                    return;
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(80, "Refreshing Application: " + SelectedApplication.Name))));
+                resultString = RefreshApplication();
+                if (!String.IsNullOrEmpty(resultString))
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(resultString))));
+                    return;
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Restarted."))));
+
+            };
+            worker.RunWorkerAsync();
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
+        }    
+
+        #endregion
+
+        #region Utility
+        
+        private void SetProgressTitle(string title)
+        {
+            Messenger.Default.Register<NotificationMessageAction<string>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetProgressData))
+                        message.Execute(title);
+                });
         }
 
         #endregion
 
-        #region DragDropProvisionedServices        
+        #region DragDropProvisionedServices
 
         public IDragSource SourceOfProvisionedServices
         {
