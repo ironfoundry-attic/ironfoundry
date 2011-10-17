@@ -9,6 +9,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string StartApplication = "StartApplication";
         public const string StopApplication = "StopApplication";
         public const string RestartApplication = "RestartApplication";
+        public const string DeleteApplication = "DeleteApplication";
         public const string ManageClouds = "ManageClouds";
         public const string GetCloudFoundryProvider = "GetCloudFoundryProvider";
 

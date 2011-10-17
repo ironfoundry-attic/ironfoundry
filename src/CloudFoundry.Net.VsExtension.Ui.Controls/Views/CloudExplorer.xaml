@@ -74,6 +74,7 @@
                                 <MenuItem Header="Start" Command="{Binding StartApplicationCommand, Mode=OneWay}" />
                                 <MenuItem Header="Stop" Command="{Binding StopApplicationCommand, Mode=OneWay}" />
                                 <MenuItem Header="Restart" Command="{Binding RestartApplicationCommand, Mode=OneWay}" />
+                                <MenuItem Header="Delete" Command="{Binding DeleteApplicationCommand, Mode=OneWay}" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
                         <i:Interaction.Triggers>
@@ -101,8 +102,20 @@
                     </StackPanel>
                 </HierarchicalDataTemplate>
                 
-                <DataTemplate DataType="{x:Type vm:FileTreeViewItemViewModel}">
+                <DataTemplate DataType="{x:Type vm:FileTreeViewItemViewModel}">                    
                     <StackPanel Orientation="Horizontal">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <cmd:EventToCommand Command="{Binding OpenFileCommand}"
+                                                    PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <StackPanel.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Open File..." 
+                                          Command="{Binding OpenFileFromContextCommand}" />
+                            </ContextMenu>
+                        </StackPanel.ContextMenu>
                         <Image Width="16" Height="16" Margin="3,0" Source="{Binding Icon}" />
                         <TextBlock Text="{Binding Name}" />
                     </StackPanel>

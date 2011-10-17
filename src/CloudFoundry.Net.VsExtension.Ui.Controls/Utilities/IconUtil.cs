@@ -47,6 +47,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
             if (CurrentVer != null)
                 ApplicationKey = CurrentVer;
 
+            if (ApplicationKey == null)
+                ApplicationKey = Root.OpenSubKey("Unknown");
+
             string IconLocation =
                 ApplicationKey.OpenSubKey("DefaultIcon").GetValue("").ToString();
             string[] IconPath = IconLocation.Split(',');

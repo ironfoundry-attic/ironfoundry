@@ -94,11 +94,10 @@
       <IDSymbol name="bmpDefault" value="1" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidVenusCmdId" value="{C7547851-4E3A-4E5B-9173-FA6E9C8BD82C}" >
-      <IDSymbol name="IDG_VENUS_CTX_REFERENCE" value="27" />
-      <IDSymbol name="IDG_CTX_REFERENCE" value="0x102" />
-      <IDSymbol name="IDG_CTX_BUILD" value="0x104"/>
-      <IDSymbol name="IDG_CTX_PUBLISH" value="0x103"/>
+    <GuidSymbol name="guidVenusCmdId" value="{C7547851-4E3A-4e5b-9173-FA6E9C8BD82C}" >
+      <IDSymbol name="IDG_CTX_REFERENCE" value="0x0102" />
+      <IDSymbol name="IDG_CTX_BUILD" value="0x0104"/>
+      <IDSymbol name="IDG_CTX_PUBLISH" value="0x0103"/>
     </GuidSymbol>
     <GuidSymbol name="UICONTEXT_SolutionExistsAndNotBuildingAndNotDebugging" value="{D0E4DEEC-1B53-4CDA-8559-D454583AD23B}" />
   </Symbols>

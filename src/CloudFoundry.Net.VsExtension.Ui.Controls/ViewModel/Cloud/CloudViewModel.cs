@@ -30,6 +30,7 @@
         public RelayCommand RemoveApplicationServiceCommand { get; private set; }
         public RelayCommand ProvisionServiceCommand { get; private set; }
         public RelayCommand RefreshCommand { get; private set; }
+        public RelayCommand DeleteApplicationCommand { get; private set; }
 
         private Cloud cloud;
         private CloudFoundryProvider provider;
@@ -63,6 +64,7 @@
             RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);
             ProvisionServiceCommand = new RelayCommand(ProvisionService);
             RefreshCommand = new RelayCommand(Refresh, CanExecuteRefresh);
+            DeleteApplicationCommand = new RelayCommand(DeleteApplication);
 
             var instanceTimer = new DispatcherTimer();
             instanceTimer.Interval = TimeSpan.FromSeconds(10);
@@ -465,6 +467,35 @@
                 }                
                 return string.Empty;
             }
+        }
+
+        public void DeleteApplication()
+        {
+            var worker = new BackgroundWorker();
+            SetProgressTitle("Delete Application");
+            worker.DoWork += (s, args) =>
+            {
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(50, "Deleting Application: " + SelectedApplication.Name))));
+                var result = provider.Delete(SelectedApplication.DeepCopy(), Cloud.DeepCopy());
+                if (!result.Response)
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(result.Message))));
+                    return;
+                }
+
+                var applicationToRemove = Cloud.Applications.SingleOrDefault((i) => i.Name == SelectedApplication.Name);
+                if (applicationToRemove != null)
+                {
+                    var index = Cloud.Applications.IndexOf(applicationToRemove);
+                    dispatcher.BeginInvoke((Action)(() =>
+                    {
+                        Cloud.Applications.RemoveAt(index);
+                        Messenger.Default.Send(new ProgressMessage(100, "Application Deleted."));
+                    }));
+                }      
+            };
+            worker.RunWorkerAsync();
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
         }
 
         public void Start()

@@ -210,6 +210,22 @@
             return response;            
         }
 
+        public ProviderResponse<bool> Delete(Application app, Cloud cloud)
+        {
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                client.Delete(app.Name);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
         public ProviderResponse<Application> GetApplication(Application app, Cloud cloud)
         {
             ProviderResponse<Application> response = new ProviderResponse<Application>();

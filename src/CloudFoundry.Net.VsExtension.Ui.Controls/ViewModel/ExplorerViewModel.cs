@@ -98,6 +98,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 case Messages.RestartApplication:
                     SelectedCloudView.Restart();
                     break;
+                case Messages.DeleteApplication:
+                    SelectedCloudView.DeleteApplication();
+                    break;
             }
         }
 

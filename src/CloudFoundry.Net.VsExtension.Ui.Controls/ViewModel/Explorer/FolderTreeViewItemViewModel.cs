@@ -44,7 +44,7 @@
             foreach (var dir in result.Response.Directories)
                 base.Children.Add(new FolderTreeViewItemViewModel(dir.Name, path + "/" + dir.Name, app, id));
             foreach (var file in result.Response.Files)
-                base.Children.Add(new FileTreeViewItemViewModel(file.Name));
+                base.Children.Add(new FileTreeViewItemViewModel(file.Name, path + "/" + file.Name, app, id));
         }
 
         public ImageSource Icon

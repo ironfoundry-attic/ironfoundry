@@ -165,9 +165,9 @@ namespace CloudFoundry.Net.VsExtension
                 var stagingPath = Path.Combine(defaultProjectLocation, "CloudFoundry_Staging");
                 var projectDirectory = Path.GetDirectoryName(project.FullName);
                 var projectName = Path.GetFileNameWithoutExtension(projectDirectory).ToLower();
-                //var site = project.Object as VsWebSite.VSWebSite;
+                var site = project.Object as VsWebSite.VSWebSite;
                 var precompiledSitePath = Path.Combine(stagingPath, projectName);
-                var frameworkPath = project.GetFrameworkPath();
+                var frameworkPath = (site == null) ? project.GetFrameworkPath() : string.Empty;
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
                 if (!Directory.Exists(stagingPath))
@@ -184,29 +184,38 @@ namespace CloudFoundry.Net.VsExtension
                 }
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
-                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(30, "Preparing Compiler"))));
-                var process = new System.Diagnostics.Process()
-                {
-                    StartInfo = new ProcessStartInfo()
-                    {
-                        FileName = frameworkPath + "\\aspnet_compiler.exe",
-                        Arguments = string.Format("-v / -nologo -p \"{0}\" -u -c \"{1}\"", projectDirectory, precompiledSitePath),
-                        CreateNoWindow = true,
-                        ErrorDialog = false,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true
-                    }
-                };
 
-                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(40, "Precompiling Site"))));
-                process.Start();
-                var output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
-                if (!string.IsNullOrEmpty(output))
+                
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(30, "Preparing Compiler"))));
+
+                if (site != null)
+                    site.PreCompileWeb(precompiledSitePath, true);
+                else
                 {
-                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output))));
-                    return;
+                    var process = new System.Diagnostics.Process()
+                    {
+                        StartInfo = new ProcessStartInfo()
+                        {
+                            FileName = frameworkPath + "\\aspnet_compiler.exe",
+                            Arguments = string.Format("-v / -nologo -p \"{0}\" -u -c \"{1}\"", projectDirectory, precompiledSitePath),
+                            CreateNoWindow = true,
+                            ErrorDialog = false,
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true
+                        }
+                    };
+
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(40, "Precompiling Site"))));
+                    process.Start();
+                    var output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+                    if (!string.IsNullOrEmpty(output))
+                    {
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output))));
+                        return;
+                    }
                 }
+
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(50, "Logging in to Cloud Foundry"))));
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }

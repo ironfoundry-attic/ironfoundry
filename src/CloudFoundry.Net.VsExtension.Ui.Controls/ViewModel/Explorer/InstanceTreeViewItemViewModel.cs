@@ -36,7 +36,7 @@
             foreach (var dir in clientResult.Directories)
                 base.Children.Add(new FolderTreeViewItemViewModel(dir.Name, dir.Name, app, (ushort)statInfo.ID));
             foreach (var file in clientResult.Files)
-                base.Children.Add(new FileTreeViewItemViewModel(file.Name));
+                base.Children.Add(new FileTreeViewItemViewModel(file.Name, file.Name, app, (ushort)statInfo.ID));
         }
     }
 }

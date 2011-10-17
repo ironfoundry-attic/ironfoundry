@@ -17,6 +17,7 @@
         public RelayCommand StartApplicationCommand { get; private set; }
         public RelayCommand StopApplicationCommand { get; private set; }
         public RelayCommand RestartApplicationCommand { get; private set; }
+        public RelayCommand DeleteApplicationCommand { get; private set; }
         
         public ApplicationTreeViewItemViewModel(Application application, CloudTreeViewItemViewModel parentCloud) : base(parentCloud, true)
         {
@@ -25,6 +26,7 @@
             StartApplicationCommand = new RelayCommand(StartApplication, CanStart);
             StopApplicationCommand = new RelayCommand(StopApplication, CanStop);
             RestartApplicationCommand = new RelayCommand(RestartApplication, CanStop);
+            DeleteApplicationCommand = new RelayCommand(DeleteApplication);
 
             this.application = application;
         }
@@ -50,6 +52,11 @@
         {
             return Application.CanStop;
         }
+        
+        private void DeleteApplication()
+        {
+            Messenger.Default.Send(new NotificationMessage<Application>(this, this.Application, Messages.DeleteApplication));
+        }
 
         private void StartApplication()
         {
@@ -60,6 +67,7 @@
         {
             Messenger.Default.Send(new NotificationMessage<Application>(this, this.Application, Messages.StopApplication));
         }
+
         private void RestartApplication()
         {
             Messenger.Default.Send(new NotificationMessage<Application>(this, this.Application, Messages.RestartApplication));
