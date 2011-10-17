@@ -209,9 +209,13 @@
 
             var hlpr = new AppsHelper(credMgr);
             byte[] content = hlpr.Files(appName, path, instance);
-            if (content.IsNullOrEmpty())
+            if (null == content)
             {
                 rv = new VcapFilesResult(false);
+            }
+            else if (content.Length == 0)
+            {
+                rv = new VcapFilesResult(content);
             }
             else
             {
