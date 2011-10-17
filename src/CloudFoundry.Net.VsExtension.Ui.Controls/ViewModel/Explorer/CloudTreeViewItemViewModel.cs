@@ -24,23 +24,24 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand DisconnectCommand { get; private set; }
         private BackgroundWorker connector = new BackgroundWorker();
 
-        public CloudTreeViewItemViewModel(Cloud cloud) : base(null,false)
+        public CloudTreeViewItemViewModel(Cloud cloud)
+            : base(null, false)
         {
             Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             OpenCloudCommand = new RelayCommand<MouseButtonEventArgs>(OpenCloud);
             RemoveCloudCommand = new RelayCommand(RemoveCloud);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
             DisconnectCommand = new RelayCommand(Disconnect, CanExecuteDisconnect);
-            
+
             this.Cloud = cloud;
             if (Cloud.IsConnected)
-                foreach(var application in Cloud.Applications)
+                foreach (var application in Cloud.Applications)
                     Children.Add(new ApplicationTreeViewItemViewModel(application, this));
 
             this.Cloud.Applications.CollectionChanged += Applications_CollectionChanged;
             connector.DoWork += BeginConnect;
             connector.RunWorkerCompleted += EndConnect;
-            connector.RunWorkerAsync(); 
+            connector.RunWorkerAsync();
         }
 
         public Cloud Cloud
@@ -48,7 +49,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return this.cloud; }
             set { this.cloud = value; RaisePropertyChanged("Cloud"); }
         }
-       
+
         private void OpenCloud(MouseButtonEventArgs e)
         {
             if (e == null || e.ClickCount >= 2)
@@ -83,7 +84,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void Connect()
         {
-            connector.RunWorkerAsync(); 
+            connector.RunWorkerAsync();
         }
 
         private bool CanExecuteConnect()
@@ -126,6 +127,23 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     }
                     foreach (var treeView in appsToRemove)
                         base.Children.Remove(treeView);
+                }
+            }
+            else if (e.Action.Equals(NotifyCollectionChangedAction.Replace))
+            {
+                foreach(var item in e.NewItems)
+                {
+                    var app = item as Application;
+                    foreach (var treeView in base.Children)
+                    {
+                        var appTreeView = treeView as ApplicationTreeViewItemViewModel;
+                        if (appTreeView.Application.Name == app.Name)
+                        {
+                            appTreeView.Application = app;
+                            if (!appTreeView.HasNotBeenPopulated)
+                                appTreeView.LoadChildren();
+                        }
+                    }
                 }
             }
             else if (e.Action.Equals(NotifyCollectionChangedAction.Reset))

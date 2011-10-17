@@ -27,7 +27,8 @@
                 <DockPanel>
                     <Image DockPanel.Dock="Left" Source="../Images/cloud_foundry_logo_400.png" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <Label DockPanel.Dock="Left" Content="EXPLORER" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" 
-                           FontWeight="Bold" FontSize="28" Margin="5,0,0,0" />                                       
+                           FontWeight="Bold" FontSize="28" Margin="5,0,0,0" />                        
+                    <Image DockPanel.Dock="Left" Name="IconTest" />
                 </DockPanel>
             </Border>
         </Grid>

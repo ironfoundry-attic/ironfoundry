@@ -1,6 +1,10 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using System.Windows.Interop;
+using System;
+using System.Windows.Media.Imaging;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
@@ -12,7 +16,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
         public Explorer()
         {
             InitializeComponent();
-            this.DataContext = new ExplorerViewModel();
+            this.DataContext = new ExplorerViewModel();            
         }
     }
 }

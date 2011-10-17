@@ -85,6 +85,7 @@
     <Compile Include="Mvvm\DragDropMvvm.cs" />
     <Compile Include="Mvvm\ProgressError.cs" />
     <Compile Include="Mvvm\ProgressMessage.cs" />
+    <Compile Include="Utilities\IconUtil.cs" />
     <Compile Include="Utilities\Messages.cs" />
     <Compile Include="Utilities\PasswordHelper.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
@@ -92,6 +93,8 @@
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ProvisionedServiceViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
+    <Compile Include="ViewModel\Explorer\FileTreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\Explorer\FolderTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\ProgressViewModel.cs" />
     <Compile Include="ViewModel\Push\AddApplicationServiceViewModel.cs" />
     <Compile Include="ViewModel\UpdateViewModel.cs" />

@@ -293,6 +293,37 @@
             }
             return response; 
         }
+
+        public ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application)
+        {
+            ProviderResponse<ObservableCollection<StatInfo>> response = new ProviderResponse<ObservableCollection<StatInfo>>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                response.Response = new ObservableCollection<StatInfo>(client.GetStats(application));
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;    
+        }
+
+        public ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId)
+        {
+            ProviderResponse<VcapFilesResult> response = new ProviderResponse<VcapFilesResult>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                var result = client.Files(application.Name, path, instanceId);
+                response.Response = result;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
+        }
     }
 
     public class ProviderResponse<T>

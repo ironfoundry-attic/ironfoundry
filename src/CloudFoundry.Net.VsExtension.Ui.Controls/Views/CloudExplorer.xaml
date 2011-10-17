@@ -83,16 +83,31 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\cloud_droplet.png" />
-                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text="{Binding Application.Name}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
 
-                <DataTemplate DataType="{x:Type vm:InstanceTreeViewItemViewModel}">
+                <HierarchicalDataTemplate DataType="{x:Type vm:InstanceTreeViewItemViewModel}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\server.png" />
                         <TextBlock Text="{Binding Host}" />
                     </StackPanel>
+                </HierarchicalDataTemplate>
+                
+                <HierarchicalDataTemplate DataType="{x:Type vm:FolderTreeViewItemViewModel}" ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Margin="3,0" Source="{Binding Icon}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                
+                <DataTemplate DataType="{x:Type vm:FileTreeViewItemViewModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Margin="3,0" Source="{Binding Icon}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
                 </DataTemplate>
+                
             </TreeView.Resources>
         </TreeView>
     </DockPanel>

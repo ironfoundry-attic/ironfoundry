@@ -270,8 +270,7 @@
                 if (this.selectedApplication != null)
                 {
                     this.selectedApplication.PropertyChanged += SelectedApplicationPropertyChanged;
-                    this.selectedApplication.Resources.PropertyChanged += SelectedApplicationPropertyChanged;
-                    
+                    this.selectedApplication.Resources.PropertyChanged += SelectedApplicationPropertyChanged;                    
 
                     this.ApplicationServices = new ObservableCollection<ProvisionedService>();
                     foreach (var svc in this.selectedApplication.Services)
@@ -454,10 +453,16 @@
             else
             {
                 var application = result.Response;
+                
                 var applicationToReplace = Cloud.Applications.SingleOrDefault((i) => i.Name == application.Name);
                 if (applicationToReplace != null)
-                    applicationToReplace = application;
-                SelectedApplication = application;
+                {
+                    var index = Cloud.Applications.IndexOf(applicationToReplace);
+                    dispatcher.BeginInvoke((Action)(() => {
+                        Cloud.Applications[index] = application;
+                        SelectedApplication = application;
+                    }));                
+                }                
                 return string.Empty;
             }
         }
