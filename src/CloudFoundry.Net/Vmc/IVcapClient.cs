@@ -40,9 +40,10 @@
         void Restart(Application app);
         void Delete(string appName);
 
-        Application GetApplication(string name);
+        Application GetApplication(string appName);
         IEnumerable<Application> GetApplications();
-        string Files(string name, string path, ushort instance);
+        string FilesSimple(string appName, string path, ushort instance);
+        VcapFilesResult Files(string appName, string path, ushort instance);
 
         string GetLogs(Application application, ushort instanceNumber);
 

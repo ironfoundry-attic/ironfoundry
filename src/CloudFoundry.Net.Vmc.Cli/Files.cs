@@ -19,7 +19,8 @@
             string path = unparsed[1];
 
             IVcapClient vc = new VcapClient();
-            Console.Write(vc.Files(appname, path, 0));
+            string output = vc.FilesSimple(appname, path, 0);
+            Console.Write(output);
             return true;
         }
     }

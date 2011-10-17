@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Text.RegularExpressions;
     using Properties;
     using Types;
 
@@ -11,6 +12,8 @@
         private readonly VcapCredentialManager credMgr;
         private readonly Cloud cloud;
         private Info info;
+        private static readonly Regex file_re = new Regex(@"^([\w\.]+)\s+([0-9]+(?:\.[0-9]+)?[KBMG]?)$", RegexOptions.Compiled);
+        private static readonly Regex dir_re = new Regex(@"^([\w.]+)/\s+-$", RegexOptions.Compiled);
 
         public VcapClient()
         {
@@ -190,11 +193,68 @@
             return apps;
         }
 
-        public string Files(string name, string path, ushort instance)
+        public string FilesSimple(string appName, string path, ushort instance)
         {
             checkLoginStatus();
             var hlpr = new AppsHelper(credMgr);
-            return hlpr.Files(name, path, instance);
+            return hlpr.Files(appName, path, instance);
+        }
+
+        public VcapFilesResult Files(string appName, string path, ushort instance)
+        {
+            checkLoginStatus();
+
+            VcapFilesResult rv;
+
+            var hlpr = new AppsHelper(credMgr);
+            string content = hlpr.Files(appName, path, instance);
+            if (content.IsNullOrWhiteSpace())
+            {
+                rv = new VcapFilesResult(false);
+            }
+            else
+            {
+                string[] contentAry = content.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                if (contentAry.IsNullOrEmpty())
+                {
+                    rv = new VcapFilesResult(content);
+                }
+                else
+                {
+                    string firstLine = contentAry[0];
+                    if (file_re.IsMatch(firstLine) || dir_re.IsMatch(firstLine))
+                    {
+                        rv = new VcapFilesResult();
+                        foreach (string item in contentAry)
+                        {
+                            Match fileMatch = file_re.Match(item);
+                            if (null != fileMatch && fileMatch.Success)
+                            {
+                                string fileName = fileMatch.Groups[1].Value; // NB: 0 is the entire matched string
+                                string fileSize = fileMatch.Groups[2].Value;
+                                rv.AddFile(fileName, fileSize);
+                                continue;
+                            }
+
+                            Match dirMatch = dir_re.Match(item);
+                            if (null != dirMatch && dirMatch.Success)
+                            {
+                                string dirName = dirMatch.Groups[1].Value;
+                                rv.AddDirectory(dirName);
+                                continue;
+                            }
+
+                            throw new InvalidOperationException("Match failed.");
+                        }
+                    }
+                    else
+                    {
+                        rv = new VcapFilesResult(content);
+                    }
+                }
+            }
+
+            return rv;
         }
 
         public VcapResponse UpdateApplication(Application app)
