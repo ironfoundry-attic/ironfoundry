@@ -1,6 +1,7 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     public class VcapFilesResult : VcapClientResult
     {
@@ -11,17 +12,21 @@
 
         public VcapFilesResult(bool success) : base(success) { }
 
-        public VcapFilesResult(string file)
+        public VcapFilesResult(byte[] file)
         {
-            File = file;
+            if (false == file.IsNullOrEmpty())
+            {
+                File = file;
+            }
         }
 
         public bool IsFile
         {
-            get { return false == File.IsNullOrWhiteSpace(); }
+            get { return null != File; }
         }
 
-        public string File
+        [JsonIgnore]
+        public byte[] File
         {
             get;
             private set;

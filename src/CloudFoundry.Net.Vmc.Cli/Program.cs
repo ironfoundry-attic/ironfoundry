@@ -39,6 +39,9 @@
                 { "passwd",         (arg) => Passwd(arg) },
                 { "add-user",       (arg) => AddUser(arg) },
                 { "files",          (arg) => Files(arg) },
+#if DEBUG
+                { "testfiles",      (arg) => TestFiles(arg) },
+#endif
             };
 
             var p = new OptionSet

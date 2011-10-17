@@ -42,7 +42,7 @@
 
         Application GetApplication(string appName);
         IEnumerable<Application> GetApplications();
-        string FilesSimple(string appName, string path, ushort instance);
+        byte[] FilesSimple(string appName, string path, ushort instance);
         VcapFilesResult Files(string appName, string path, ushort instance);
 
         string GetLogs(Application application, ushort instanceNumber);

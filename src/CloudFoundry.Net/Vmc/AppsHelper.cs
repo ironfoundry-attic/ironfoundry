@@ -74,11 +74,11 @@
             Start(app);
         }
 
-        public string Files(string name, string path, ushort instance)
+        public byte[] Files(string name, string path, ushort instance)
         {
             var r = new VcapRequest(credMgr, Constants.APPS_PATH, name, "instances", instance, "files", path);
             RestResponse response = r.Execute();
-            return response.Content;
+            return response.RawBytes;
         }
 
         public VcapClientResult Push(string name, string deployFQDN, ushort instances,
