@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Newtonsoft.Json;
 
     static partial class Program
     {
@@ -30,17 +29,5 @@
             }
             return true;
         }
-
-#if DEBUG
-        static bool TestFiles(IList<string> unparsed)
-        {
-            string appname = unparsed[0];
-            string path = unparsed[1];
-            IVcapClient vc = new VcapClient();
-            VcapFilesResult result = vc.Files(appname, path, 0);
-            Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
-            return true;
-        }
-#endif
     }
 }

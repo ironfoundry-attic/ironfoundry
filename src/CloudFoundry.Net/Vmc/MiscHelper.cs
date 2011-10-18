@@ -29,10 +29,15 @@
                 // without argument, displays current target
                 var r = new VcapRequest(credMgr, false, argUri, Constants.INFO_PATH);
                 Info info = r.Execute<Info>();
-                bool success = false == info.Name.IsNullOrWhiteSpace() &&
-                               false == info.Build.IsNullOrWhiteSpace() &&
-                               false == info.Version.IsNullOrWhiteSpace() &&
-                               false == info.Support.IsNullOrWhiteSpace();
+
+                bool success = false;
+                if (null != info)
+                {
+                    success = false == info.Name.IsNullOrWhiteSpace() &&
+                              false == info.Build.IsNullOrWhiteSpace() &&
+                              false == info.Version.IsNullOrWhiteSpace() &&
+                              false == info.Support.IsNullOrWhiteSpace();
+                }
 
                 if (success)
                 {

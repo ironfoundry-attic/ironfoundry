@@ -41,6 +41,7 @@
                 { "files",          (arg) => Files(arg) },
 #if DEBUG
                 { "testfiles",      (arg) => TestFiles(arg) },
+                { "teststats",      (arg) => TestStats(arg) },
 #endif
             };
 

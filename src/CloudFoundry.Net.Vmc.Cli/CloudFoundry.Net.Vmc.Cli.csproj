@@ -55,6 +55,7 @@
     <Compile Include="AddUser.cs" />
     <Compile Include="Files.cs" />
     <Compile Include="Passwd.cs" />
+    <Compile Include="Tests.cs" />
     <Compile Include="Update.cs" />
     <Compile Include="Delete.cs" />
     <Compile Include="Info.cs" />
