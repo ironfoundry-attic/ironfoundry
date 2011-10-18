@@ -41,6 +41,12 @@
         {
             Children.Clear();
             var result = provider.GetFiles(app.Parent, app, path, id);
+            if (result.Response == null)
+            {
+                Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
+                return;
+            }
+
             foreach (var dir in result.Response.Directories)
                 base.Children.Add(new FolderTreeViewItemViewModel(dir.Name, path + "/" + dir.Name, app, id));
             foreach (var file in result.Response.Files)

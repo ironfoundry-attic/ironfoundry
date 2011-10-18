@@ -69,6 +69,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                         message.Execute(result.GetValueOrDefault());
                     }
                 });
+
+            Messenger.Default.Register<NotificationMessageAction<bool>>(
+                this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.ExplorerProgress))
+                    {
+                        var view = new Views.ProgressDialog();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
+                        var result = view.ShowDialog();
+                        message.Execute(result.GetValueOrDefault());
+                    }
+                });
         }
     }
 }

@@ -31,6 +31,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                         this.canExecuteCancelled = false;
                         this.canExecuteConfirmed = true;                        
                     }
+                    CommandManager.InvalidateRequerySuggested();
                 });
 
             Messenger.Default.Register<ProgressError>(this,
@@ -38,7 +39,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 {
                     this.ErrorMessage = error.Text;
                     this.canExecuteCancelled = false;
-                    this.canExecuteConfirmed = true;                    
+                    this.canExecuteConfirmed = true;
+                    CommandManager.InvalidateRequerySuggested();
                 });
         }
 

@@ -8,6 +8,7 @@ using GalaSoft.MvvmLight;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using System.ComponentModel;
+using System.Threading;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 {
@@ -66,7 +67,17 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
         public string ErrorMessage
         {
             get { return this.errorMessage; }
-            set { this.errorMessage = value; RaisePropertyChanged("ErrorMessage"); }
+            set
+            {
+                this.errorMessage = value; RaisePropertyChanged("ErrorMessage");
+                if (!String.IsNullOrWhiteSpace(this.errorMessage))
+                {
+                    var worker = new BackgroundWorker();
+                    worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
+                    worker.RunWorkerCompleted += (s, e) => this.ErrorMessage = string.Empty;
+                    worker.RunWorkerAsync();
+                }
+            }
         }
     }
 }

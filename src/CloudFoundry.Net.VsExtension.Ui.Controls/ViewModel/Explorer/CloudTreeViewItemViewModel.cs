@@ -73,7 +73,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
             else
             {
-                // Set error info here.
+                Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
             }
         }
 

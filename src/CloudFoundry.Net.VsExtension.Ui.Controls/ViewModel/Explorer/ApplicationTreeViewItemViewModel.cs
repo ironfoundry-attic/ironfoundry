@@ -8,6 +8,7 @@
     using GalaSoft.MvvmLight.Messaging;
     using System;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using System.ComponentModel;
 
     public class ApplicationTreeViewItemViewModel : TreeViewItemViewModel
     {
@@ -76,7 +77,12 @@
         public override void LoadChildren()
         {
             Children.Clear();
-            var statsResponse = provider.GetStats(this.application.Parent, this.application);        
+            var statsResponse = provider.GetStats(this.application.Parent, this.application);
+            if (statsResponse.Response == null)
+            {
+                Messenger.Default.Send(new NotificationMessage<string>(statsResponse.Message, Messages.ErrorMessage));
+                return;
+            }
             foreach (StatInfo statInfo in statsResponse.Response)
                 base.Children.Add(new InstanceTreeViewItemViewModel(statInfo, this));
         }

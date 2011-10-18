@@ -14,6 +14,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Specialized;
 using System;
+using System.Threading;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -23,6 +24,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private readonly ObservableCollection<CloudViewModel> clouds = new ObservableCollection<CloudViewModel>();
         private CloudViewModel selectedCloudView;
         private CloudFoundryProvider provider;
+        private string errorMessage;
         
         public RelayCommand<CloudViewModel> CloseCloudCommand { get; private set; }
 
@@ -32,6 +34,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
+            Messenger.Default.Register<NotificationMessage<string>>(this, ProcessErrorMessage);
             this.provider.CloudsChanged += CloudsCollectionChanged;
         }
 
@@ -68,6 +71,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }                
             this.SelectedCloudView.SelectedApplication = application;
             this.SelectedCloudView.IsApplicationViewSelected = true;
+        }
+
+        private void ProcessErrorMessage(NotificationMessage<string> message)
+        {
+            if (message.Notification.Equals(Messages.ErrorMessage))
+                this.ErrorMessage = message.Content;
         }
 
         private void ProcessCloudNotification(NotificationMessage<Cloud> message)
@@ -119,6 +128,20 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         {
             get { return this.selectedCloudView; }
             set { this.selectedCloudView = value; RaisePropertyChanged("SelectedCloudView"); }
+        }
+
+        public string ErrorMessage
+        {
+            get { return this.errorMessage; }
+            set { this.errorMessage = value; RaisePropertyChanged("ErrorMessage");
+                if (!String.IsNullOrWhiteSpace(this.errorMessage))
+                {
+                    var worker = new BackgroundWorker();
+                    worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
+                    worker.RunWorkerCompleted += (s, e) => this.ErrorMessage = string.Empty;
+                    worker.RunWorkerAsync();
+                }
+            }
         }
     }
 }

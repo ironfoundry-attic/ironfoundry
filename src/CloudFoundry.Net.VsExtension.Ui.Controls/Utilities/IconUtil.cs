@@ -30,10 +30,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public static Icon IconFromExtension(string extension, SystemIconSize size)
         {            
             RegistryKey currentUser = Registry.CurrentUser;
-            var className = currentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\"+extension+@"\OpenWithProgids").GetValueNames().First();
+            var className = "Unknown";
+            var classKey = currentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\"+extension+@"\OpenWithProgids");
+            if (classKey != null)
+                className = classKey.GetValueNames().First();
             RegistryKey Root = Registry.ClassesRoot;
             if (className.EndsWith("Folder"))
                 className = "Folder";
+            if (className.Equals("icofile"))
+                className = "Unknown";
 
             RegistryKey ApplicationKey = Root.OpenSubKey(className);
 

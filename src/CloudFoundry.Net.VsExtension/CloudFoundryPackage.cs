@@ -81,13 +81,14 @@ namespace CloudFoundry.Net.VsExtension
             if (project != null)
             {
                 Guid cloudGuid = GetCurrentCloudGuid(project);
+                ProjectDirectories projectDirectories = GetProjectDirectories(project);
 
                 Messenger.Default.Register<NotificationMessageAction<Guid>>(this,
                     message =>
                     {
                         if (message.Notification.Equals(Messages.SetPushAppData))
                             message.Execute(cloudGuid);
-                    });
+                    });                
 
                 var window = new Push();
                 WindowInteropHelper helper = new WindowInteropHelper(window);
@@ -103,8 +104,8 @@ namespace CloudFoundry.Net.VsExtension
                     List<string> services = new List<string>();
                     foreach (var provisionedService in modelData.ApplicationServices)
                         services.Add(provisionedService.Name);
-                    PerformAction("Push Application", project, modelData.SelectedCloud, (c, d) =>
-                        c.Push(modelData.Name, modelData.Url, modelData.Instances, d, Convert.ToUInt32(modelData.SelectedMemory), services.ToArray()));
+                    PerformAction("Push Application", project, modelData.SelectedCloud, projectDirectories, (c, d) =>
+                        c.Push(modelData.Name, modelData.Url, Convert.ToUInt16(modelData.Instances), d, Convert.ToUInt32(modelData.SelectedMemory), services.ToArray()));
                 }
             }
         }
@@ -115,6 +116,7 @@ namespace CloudFoundry.Net.VsExtension
             if (project != null)
             {
                 Guid cloudGuid = GetCurrentCloudGuid(project);
+                ProjectDirectories projectDirectories = GetProjectDirectories(project);
 
                 Messenger.Default.Register<NotificationMessageAction<Guid>>(this,
                     message =>
@@ -134,13 +136,17 @@ namespace CloudFoundry.Net.VsExtension
                     Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData, model => modelData = model));
 
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
-                    PerformAction("Update Application", project, modelData.SelectedCloud, (c, d) =>
+                    PerformAction("Update Application", project, modelData.SelectedCloud, projectDirectories, (c, d) =>
                         c.Update(modelData.SelectedApplication.Name, d));
                 }
             }
         }
 
-        private void PerformAction(string action, Project project, Cloud cloud, Func<VcapClient, DirectoryInfo, VcapClientResult> function)
+        private void PerformAction(string action, 
+                                   Project project, 
+                                   Cloud cloud, 
+                                   ProjectDirectories dir,
+                                   Func<VcapClient, DirectoryInfo, VcapClientResult> function)
         {
             var worker = new BackgroundWorker();
 
@@ -160,27 +166,20 @@ namespace CloudFoundry.Net.VsExtension
             {
                 if (worker.CancellationPending) { args.Cancel = true; return; }
                 Messenger.Default.Send(new ProgressMessage(0, "Starting " + action));
-                var projectProperties = project.DTE.Properties["Environment", "ProjectsAndSolution"];
-                var defaultProjectLocation = projectProperties.Item("ProjectsLocation").Value as string;
-                var stagingPath = Path.Combine(defaultProjectLocation, "CloudFoundry_Staging");
-                var projectDirectory = Path.GetDirectoryName(project.FullName);
-                var projectName = Path.GetFileNameWithoutExtension(projectDirectory).ToLower();
                 var site = project.Object as VsWebSite.VSWebSite;
-                var precompiledSitePath = Path.Combine(stagingPath, projectName);
-                var frameworkPath = (site == null) ? project.GetFrameworkPath() : string.Empty;
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
-                if (!Directory.Exists(stagingPath))
+                if (!Directory.Exists(dir.StagingPath))
                 {
                     dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Creating Staging Path")))); 
-                    Directory.CreateDirectory(stagingPath);
+                    Directory.CreateDirectory(dir.StagingPath);
                 }
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
-                if (Directory.Exists(precompiledSitePath))
+                if (Directory.Exists(dir.DeployFromPath))
                 {
                     dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Creating Precompiled Site Path"))));
-                    Directory.Delete(precompiledSitePath, true);
+                    Directory.Delete(dir.DeployFromPath, true);
                 }
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
@@ -189,15 +188,17 @@ namespace CloudFoundry.Net.VsExtension
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(30, "Preparing Compiler"))));
 
                 if (site != null)
-                    site.PreCompileWeb(precompiledSitePath, true);
+                    site.PreCompileWeb(dir.DeployFromPath, true);
                 else
                 {
+                    var frameworkPath = (site == null) ? project.GetFrameworkPath() : string.Empty;
                     var process = new System.Diagnostics.Process()
                     {
                         StartInfo = new ProcessStartInfo()
                         {
+
                             FileName = frameworkPath + "\\aspnet_compiler.exe",
-                            Arguments = string.Format("-v / -nologo -p \"{0}\" -u -c \"{1}\"", projectDirectory, precompiledSitePath),
+                            Arguments = string.Format("-v / -nologo -p \"{0}\" -u -c \"{1}\"", dir.ProjectDirectory, dir.DeployFromPath),
                             CreateNoWindow = true,
                             ErrorDialog = false,
                             UseShellExecute = false,
@@ -232,7 +233,7 @@ namespace CloudFoundry.Net.VsExtension
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Sending to " + cloud.Url))));
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                var response = function(client, new DirectoryInfo(precompiledSitePath));
+                var response = function(client, new DirectoryInfo(dir.DeployFromPath));
                 if (result.Success == false)
                 {
                     dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message))));
@@ -244,6 +245,22 @@ namespace CloudFoundry.Net.VsExtension
             worker.RunWorkerAsync();
             if (!window.ShowDialog().GetValueOrDefault())
                 worker.CancelAsync();
+        }
+
+        private static ProjectDirectories GetProjectDirectories(Project project)
+        {
+            var projectProperties = project.DTE.Properties["Environment", "ProjectsAndSolution"];
+            var defaultProjectLocation = projectProperties.Item("ProjectsLocation").Value as string;
+            var stagingPath = Path.Combine(defaultProjectLocation, "CloudFoundry_Staging");
+            var projectDirectory = Path.GetDirectoryName(project.FullName);
+            var projectName = Path.GetFileNameWithoutExtension(projectDirectory).ToLower();
+            var precompiledSitePath = Path.Combine(stagingPath, projectName);
+            return new ProjectDirectories()
+            {
+                StagingPath = stagingPath,
+                ProjectDirectory = projectDirectory,
+                DeployFromPath = precompiledSitePath
+            };
         }
 
         private static Guid GetCurrentCloudGuid(Project project)
@@ -259,5 +276,12 @@ namespace CloudFoundry.Net.VsExtension
         {
             project.SetGlobalVariable("CloudId", guid.ToString());
         }
+    }
+
+    public class ProjectDirectories
+    {
+        public string StagingPath { get; set; }
+        public string DeployFromPath { get; set; }
+        public string ProjectDirectory { get; set; }
     }
 }

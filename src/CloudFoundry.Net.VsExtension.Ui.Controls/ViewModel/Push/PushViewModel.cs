@@ -20,17 +20,21 @@
         private ObservableCollection<ProvisionedService> applicationServices;
         private string name;
         private string url;
+        private string pushFromDirectory;
         private int selectedMemory;
-        private ushort instances;
+        private int instances = 1;
+        private bool canChangeDirectory = true;
 
         public RelayCommand ManageCloudsCommand { get; private set; }
         public RelayCommand AddAppServiceCommand { get; private set; }
+        public RelayCommand ChooseDirectoryCommand { get; private set; }
 
         public PushViewModel() : base(Messages.PushDialogResult)
         {
             this.applicationServices = new ObservableCollection<ProvisionedService>();
             ManageCloudsCommand = new RelayCommand(ManageClouds);
             AddAppServiceCommand = new RelayCommand(AddAppService, CanAddAppService);
+            ChooseDirectoryCommand = new RelayCommand(ChooseDirectory, CanChooseDirectory);
             SelectedMemory = MemoryLimits[0];
         }
 
@@ -52,11 +56,27 @@
                 {                    
                     this.SelectedCloud = Clouds.SingleOrDefault(i => i.ID == id);
                 }));
+
+            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetPushAppDirectory,
+                (directory) =>
+                {
+                    this.PushFromDirectory = directory;
+                    this.CanChangeDirectory = false;
+                }));
         }
 
         private void ManageClouds()
         {
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ManageClouds, (confirmed) => { }));
+        }
+
+        private void ChooseDirectory()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.ChooseDirectory, (directory) =>
+                {
+                    if (directory != null)
+                        this.PushFromDirectory = directory;
+                }));
         }
        
         private void AddAppService()
@@ -79,6 +99,11 @@
                     }));
             }));
             
+        }
+
+        private bool CanChooseDirectory()
+        {
+            return this.canChangeDirectory;
         }
 
         private bool CanAddAppService()
@@ -122,6 +147,12 @@
             set { this.url = value; RaisePropertyChanged("Url"); }
         }
 
+        public string PushFromDirectory
+        {
+            get { return this.pushFromDirectory; }
+            set { this.pushFromDirectory = value; RaisePropertyChanged("PushFromDirectory"); }
+        }
+
         public ObservableCollection<Cloud> Clouds
         {
             get { return provider.Clouds; }
@@ -138,7 +169,7 @@
             set { this.selectedMemory = value; RaisePropertyChanged("SelectedMemory"); }
         }
 
-        public ushort Instances
+        public int Instances
         {
             get { return this.instances; }
             set { this.instances = value; RaisePropertyChanged("Instances"); }
@@ -148,6 +179,12 @@
         {
             get { return this.applicationServices; }
             set { this.applicationServices = value; RaisePropertyChanged("ApplicationServices"); }
+        }
+
+        public bool CanChangeDirectory
+        {
+            get { return this.canChangeDirectory; }
+            set { this.canChangeDirectory = value; RaisePropertyChanged("CanChangeDirectory"); }
         }
     }
 }

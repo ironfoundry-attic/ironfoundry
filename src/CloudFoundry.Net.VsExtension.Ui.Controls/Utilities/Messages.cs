@@ -12,6 +12,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string DeleteApplication = "DeleteApplication";
         public const string ManageClouds = "ManageClouds";
         public const string GetCloudFoundryProvider = "GetCloudFoundryProvider";
+        public const string ErrorMessage = "ErrorMessage";
+        public const string ChooseDirectory = "ChooseDirectory";
 
         // Dialog Interactions
         public const string AddCloud = "AddCloud";
@@ -67,6 +69,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string PushApp = "PushApp";
         public const string GetPushAppData = "GetPushAppData";
         public const string SetPushAppData = "SetPushAppData";
+        public const string SetPushAppDirectory = "SetPushAppDirectory";
         public const string PushDialogResult = "PushDialogResult";
         
         public const string UpdateApp = "UpdateApp";
@@ -77,5 +80,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string Progress = "Progress";
         public const string ProgressDialogResult = "ProgressDialogResult";
         public const string SetProgressData = "SetProgressData";
+
+        public const string ExplorerProgress = "ExplorerProgress";        
     }
 }

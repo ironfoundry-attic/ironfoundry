@@ -73,6 +73,11 @@ using GalaSoft.MvvmLight.Command;
         private void OpenFile()
         {
             var result = provider.GetFiles(app.Parent, app, "/" + path, id);
+            if (result.Response == null)
+            {
+                Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
+                return;
+            }
             var pathToFile = System.IO.Path.GetTempPath() + name;
             using (var fs = File.Create(pathToFile))
                 using (var bw = new BinaryWriter(fs))

@@ -340,6 +340,38 @@
             }
             return response;
         }
+
+        public ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services)
+        {
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                client.Push(name, url, instances, new System.IO.DirectoryInfo(directoryToPushFrom), memory, services);
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom)
+        {
+            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                client.Update(app.Name, new System.IO.DirectoryInfo(directoryToPushFrom));
+                response.Response = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
+        }
     }
 
     public class ProviderResponse<T>

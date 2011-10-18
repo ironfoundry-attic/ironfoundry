@@ -147,7 +147,15 @@
         public string OverviewErrorMessage
         {
             get { return this.overviewErrorMessage; }
-            set { this.overviewErrorMessage = value; RaisePropertyChanged("OverviewErrorMessage"); }
+            set { this.overviewErrorMessage = value; RaisePropertyChanged("OverviewErrorMessage");
+            if (!String.IsNullOrWhiteSpace(this.overviewErrorMessage))
+                {
+                    var worker = new BackgroundWorker();
+                    worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
+                    worker.RunWorkerCompleted += (s, e) => this.OverviewErrorMessage = string.Empty;
+                    worker.RunWorkerAsync();
+                }            
+            }
         }
 
         public bool IsAccountValid
@@ -165,7 +173,15 @@
         public string ApplicationErrorMessage
         {
             get { return this.applicationErrorMessage; }
-            set { this.applicationErrorMessage = value; RaisePropertyChanged("ApplicationErrorMessage"); }
+            set { this.applicationErrorMessage = value; RaisePropertyChanged("ApplicationErrorMessage");
+                if (!String.IsNullOrWhiteSpace(this.applicationErrorMessage))
+                {
+                    var worker = new BackgroundWorker();
+                    worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
+                    worker.RunWorkerCompleted += (s, e) => this.ApplicationErrorMessage = string.Empty;
+                    worker.RunWorkerAsync();
+                }
+            }
         }
 
         public ProvisionedService SelectedApplicationService
