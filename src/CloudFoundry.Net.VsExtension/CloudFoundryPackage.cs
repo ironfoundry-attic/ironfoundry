@@ -146,7 +146,7 @@ namespace CloudFoundry.Net.VsExtension
                                    Project project, 
                                    Cloud cloud, 
                                    ProjectDirectories dir,
-                                   Func<VcapClient, DirectoryInfo, VcapClientResult> function)
+                                   Func<IVcapClient, DirectoryInfo, VcapClientResult> function)
         {
             var worker = new BackgroundWorker();
 
