@@ -41,26 +41,4 @@
             return c.Vendor.GetHashCode();
         }
     }
-
-    /*
-    [Serializable]
-    public class Tiers : EntityBase
-    {
-        [JsonProperty(PropertyName = "free")]
-        public Type Type { get; set; } //Currently on showing Free but potentially other options in the future
-
-        [JsonProperty(PropertyName = "order")]
-        public int Order { get; set; }
-    }
-
-    [Serializable]
-    public class Type : EntityBase
-    {
-        [JsonProperty(PropertyName = "options")]
-        public Options Options { get; set; }
-    }
-    
-    [Serializable]
-    public class Options : EntityBase { }
-     */
 }

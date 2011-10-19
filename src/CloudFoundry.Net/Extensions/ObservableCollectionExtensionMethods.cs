@@ -1,11 +1,8 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
-using System.Threading;
+using System.Linq;
 
-namespace CloudFoundry.Net
+namespace CloudFoundry.Net.Extensions
 {
     public static class ObservableCollectionExtensionMethods
     {

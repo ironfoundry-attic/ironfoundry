@@ -1,8 +1,8 @@
-﻿namespace CloudFoundry.Net
-{
-    using System.Collections.Generic;
-    using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace CloudFoundry.Net.Extensions
+{
     public static class IEnumerableExtensionMethods
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> argThis)

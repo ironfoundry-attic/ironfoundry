@@ -4,23 +4,7 @@
     using Newtonsoft.Json;
 
     public class Stats : Message
-    {
-        public Stats() { }
-
-        public Stats(Instance argInstance, TimeSpan argUptime)
-        {
-            Name      = argInstance.Name;
-            Host      = argInstance.Host;
-            Port      = argInstance.Port;
-            Uptime    = argUptime.TotalSeconds;
-            Uris      = argInstance.Uris;
-            MemQuota  = argInstance.MemQuota;
-            DiskQuota = argInstance.DiskQuota;
-            FdsQuota  = argInstance.FdsQuota;
-            Cores     = 1; // TODO
-            Usage     = new Usage();
-            // TODO Usage = 20
-        }
+    {        
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

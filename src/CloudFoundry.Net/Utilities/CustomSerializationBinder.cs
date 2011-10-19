@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.Serialization;
+using System;
 using System.Reflection;
+using System.Runtime.Serialization;
 
-namespace CloudFoundry.Net
+namespace CloudFoundry.Net.Utilities
 {
-    public class Binder : SerializationBinder
+    public class CustomSerializationBinder : SerializationBinder
     {
         public override Type BindToType(string assemblyName, string typeName)
         {

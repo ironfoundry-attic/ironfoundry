@@ -1,7 +1,7 @@
-﻿namespace CloudFoundry.Net
-{
-    using System;
+using System;
 
+namespace CloudFoundry.Net.Extensions
+{
     public static class UriExtensionMethods
     {
         private static readonly char[] trimChars = new char[] { '/' };

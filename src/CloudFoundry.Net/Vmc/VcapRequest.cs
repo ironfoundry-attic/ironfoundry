@@ -1,4 +1,6 @@
-﻿namespace CloudFoundry.Net.Vmc
+﻿using CloudFoundry.Net.Extensions;
+
+namespace CloudFoundry.Net.Vmc
 {
     using System;
     using System.Linq;

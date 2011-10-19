@@ -1,4 +1,6 @@
-﻿namespace CloudFoundry.Net.Types
+﻿using CloudFoundry.Net.Extensions;
+
+namespace CloudFoundry.Net.Types
 {
     using System;
 
