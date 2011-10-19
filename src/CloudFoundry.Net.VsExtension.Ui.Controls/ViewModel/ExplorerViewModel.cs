@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
 using GalaSoft.MvvmLight;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 using System.Collections.ObjectModel;

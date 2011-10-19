@@ -1,21 +1,22 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Windows.Threading;
-    using CloudFoundry.Net.Types;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-    using GalaSoft.MvvmLight;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Messaging;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-    using System.Threading;
-    using System.Windows.Input;
+﻿using CloudFoundry.Net.Extensions;
+using CloudFoundry.Net.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Threading;
+using CloudFoundry.Net.Types;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+using System.Threading;
 
+namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+{
     public class CloudViewModel : ViewModelBase
     {
         public RelayCommand ChangePasswordCommand { get; private set; }
@@ -32,7 +33,7 @@
         public RelayCommand RefreshCommand { get; private set; }
         public RelayCommand DeleteApplicationCommand { get; private set; }
 
-        private Cloud cloud;
+        private Types.Cloud cloud;
         private CloudFoundryProvider provider;
         private Application selectedApplication;
         private ProvisionedService selectedApplicationService;
@@ -45,9 +46,9 @@
         private IDragSource provisionedServicesSource;
         private IDropTarget applicationServicesTarget;
         private ObservableCollection<ProvisionedService> applicationServices;
-        private ObservableCollection<Model.Instance> instances;
+        private ObservableCollection<Instance> instances;
 
-        public CloudViewModel(Cloud cloud)
+        public CloudViewModel(Types.Cloud cloud)
         {
             Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             this.dispatcher = Dispatcher.CurrentDispatcher;
@@ -66,8 +67,7 @@
             RefreshCommand = new RelayCommand(Refresh, CanExecuteRefresh);
             DeleteApplicationCommand = new RelayCommand(DeleteApplication);
 
-            var instanceTimer = new DispatcherTimer();
-            instanceTimer.Interval = TimeSpan.FromSeconds(10);
+            var instanceTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(10)};
             instanceTimer.Tick += RefreshInstances;
             instanceTimer.Start();
         }
@@ -79,66 +79,46 @@
             if (null != SelectedApplication)
             {
                 var worker = new BackgroundWorker();
-                worker.DoWork += BeginGetInstances;
-                worker.RunWorkerCompleted += EndGetInstances;
+                worker.DoWork += (s, ea) => ea.Result = provider.GetStats(SelectedApplication, Cloud);                
+                worker.RunWorkerCompleted += (s, ea) =>
+                {
+                    var statsResponse = ea.Result as ProviderResponse<IEnumerable<StatInfo>>;
+                    if (statsResponse.Response != null)
+                    {
+                        var instances = new ObservableCollection<Instance>();
+
+                        foreach (var stat in statsResponse.Response)
+                        {
+                            if (stat.State.Equals(Types.VcapStates.RUNNING) ||
+                                stat.State.Equals(Types.VcapStates.STARTED) ||
+                                stat.State.Equals(Types.VcapStates.STARTING))
+                            {
+                                var actualstats = stat.Stats;
+                                var instance = new Instance()
+                                {
+                                    ID = stat.ID,
+                                    Cores = actualstats.Cores,
+                                    MemoryQuota = actualstats.MemQuota / 1048576,
+                                    DiskQuota = actualstats.DiskQuota / 1048576,
+                                    Host = actualstats.Host,
+                                    Parent = this.selectedApplication,
+                                    Uptime = TimeSpan.FromSeconds(Convert.ToInt32(actualstats.Uptime))
+                                };
+                                if (actualstats.Usage != null)
+                                {
+                                    instance.Cpu = actualstats.Usage.CpuTime / 100;
+                                    instance.Memory = Convert.ToInt32(actualstats.Usage.MemoryUsage) / 1024;
+                                    instance.Disk = Convert.ToInt32(actualstats.Usage.DiskUsage) / 1048576;
+                                }
+                                instances.Add(instance);
+                            }
+                        }
+                        this.Instances = instances;
+                    } 
+                }; 
                 worker.RunWorkerAsync();
             }
-        }
-
-        private void BeginGetInstances(object sender, DoWorkEventArgs e)
-        {
-            e.Result = provider.GetStats(SelectedApplication, Cloud);
-        }
-
-        private void EndGetInstances(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled)
-                return;
-            var statsResponse = e.Result as ProviderResponse<IEnumerable<StatInfo>>;
-            if (statsResponse.Response != null)
-                UpdateInstanceCollection(statsResponse.Response);
-        }
-
-        private void UpdateInstanceCollection(IEnumerable<StatInfo> stats)
-        {
-            UpdateInstanceCollection(stats, null);
-        }
-
-        private void UpdateInstanceCollection(IEnumerable<StatInfo> stats, RunWorkerCompletedEventArgs e)
-        {
-            var instances = new ObservableCollection<Model.Instance>();
-
-            foreach (var stat in stats)
-            {
-                if (e != null && e.Cancelled == true)
-                    return;
-
-                if (stat.State.Equals(Types.VcapStates.RUNNING) ||
-                    stat.State.Equals(Types.VcapStates.STARTED) ||
-                    stat.State.Equals(Types.VcapStates.STARTING))
-                {
-                    var actualstats = stat.Stats;
-                    var instance = new Model.Instance()
-                    {
-                        ID = stat.ID,
-                        Cores = actualstats.Cores,
-                        MemoryQuota = actualstats.MemQuota / 1048576,
-                        DiskQuota = actualstats.DiskQuota / 1048576,
-                        Host = actualstats.Host,
-                        Parent = this.selectedApplication,
-                        Uptime = TimeSpan.FromSeconds(Convert.ToInt32(actualstats.Uptime))
-                    };
-                    if (actualstats.Usage != null)
-                    {
-                        instance.Cpu = actualstats.Usage.CpuTime / 100;
-                        instance.Memory = Convert.ToInt32(actualstats.Usage.MemoryUsage) / 1024;
-                        instance.Disk = Convert.ToInt32(actualstats.Usage.DiskUsage) / 1048576;
-                    }
-                    instances.Add(instance);
-                }
-            }
-            this.Instances = instances;
-        }
+        }      
 
         #endregion
 
@@ -164,7 +144,7 @@
             set { this.isAccountValid = value; RaisePropertyChanged("IsAccountValid"); }
         }                  
 
-        public Cloud Cloud
+        public Types.Cloud Cloud
         {
             get { return this.cloud; }
             set { this.cloud = value; RaisePropertyChanged("Cloud"); }
@@ -216,7 +196,7 @@
             set { this.isApplicationViewSelected = value; RaisePropertyChanged("IsApplicationViewSelected"); }
         }
 
-        public ObservableCollection<Model.Instance> Instances
+        public ObservableCollection<Instance> Instances
         {
             get { return this.instances; }
             set { this.instances = value; RaisePropertyChanged("Instances"); }
@@ -296,11 +276,7 @@
                             if (appService.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase))
                                 this.ApplicationServices.Add(appService);
 
-                    BackgroundWorker instanceWorker = new BackgroundWorker();
-                    instanceWorker.DoWork += BeginGetInstances;
-                    instanceWorker.RunWorkerCompleted += EndGetInstances;
-                    instanceWorker.WorkerSupportsCancellation = true;
-                    instanceWorker.RunWorkerAsync();
+                    RefreshInstances(this,null);                    
                 }
                 RaisePropertyChanged("SelectedApplication");
                 RaisePropertyChanged("IsApplicationSelected");
@@ -332,7 +308,7 @@
         private void ChangePassword()
         {
             this.IsAccountValid = false;
-            Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
+            Messenger.Default.Register<NotificationMessageAction<Types.Cloud>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.SetChangePasswordData))
@@ -349,7 +325,7 @@
 
         private void ProvisionService()
         {
-            Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
+            Messenger.Default.Register<NotificationMessageAction<Types.Cloud>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.SetCreateServiceData))

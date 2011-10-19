@@ -40,19 +40,19 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Enter a cloud URL name." Margin="0,0,0,0" FontSize="10.667" />
+                                <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Enter a cloud URL name." Margin="0,0,0,0" />
 
-                                <Label Grid.Row="1" Grid.Column="0" FontSize="10.667" Content="Name:" VerticalAlignment="Center" />
-                                <TextBox Grid.Row="1" Grid.Column="1" FontSize="10.667" x:Name="NameTextBox" Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,0,3"/>
+                                <Label Grid.Row="1" Grid.Column="0" Content="Name:" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="NameTextBox" Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,0,3"/>
 
-                                <Label Grid.Row="2" Grid.Column="0" FontSize="10.667" Content="URL:" />
-                                <TextBox Grid.Row="2" Grid.Column="1" FontSize="10.667" Text="{Binding Url}" VerticalAlignment="Center" Margin="0,0,0,3"/>
+                                <Label Grid.Row="2" Grid.Column="0" Content="URL:" />
+                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Url}" VerticalAlignment="Center" Margin="0,0,0,3"/>
                             </Grid>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Ok" Command="{Binding ConfirmedCommand}" />
-                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Cancel" Command="{Binding CancelledCommand}" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Ok" Command="{Binding ConfirmedCommand}" IsDefault="True" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Cancel" Command="{Binding CancelledCommand}" IsCancel="True" />
                     </StackPanel>
                 </DockPanel>
             </Grid>

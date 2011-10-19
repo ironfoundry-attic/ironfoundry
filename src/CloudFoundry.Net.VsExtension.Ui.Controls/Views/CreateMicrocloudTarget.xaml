@@ -31,15 +31,15 @@
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Margin="10,10,10,0" Orientation="Vertical">
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Enter the value to replace {mycloud}:" FontSize="10.667" Margin="0,0,0,5"/>
-                            <TextBox FontSize="10.667" x:Name="ReplaceTextBox" Text="{Binding ReplacementText}" VerticalAlignment="Center" Margin="0,0,0,10" />
-                            <TextBlock Text="Enter the name for this Cloud URL:" FontSize="10.667" Margin="0,0,0,5"/>
-                            <TextBox  FontSize="10.667" x:Name="CloudUrlName" Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,0,0" />
+                            <TextBlock Text="Enter the value to replace {mycloud}:" Margin="0,0,0,5"/>
+                            <TextBox x:Name="ReplaceTextBox" Text="{Binding ReplacementText}" VerticalAlignment="Center" Margin="0,0,0,10" />
+                            <TextBlock Text="Enter the name for this Cloud URL:" Margin="0,0,0,5"/>
+                            <TextBox  x:Name="CloudUrlName" Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,0,0" />
                         </StackPanel>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Ok" Command="{Binding ConfirmedCommand}" />
-                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" FontSize="10.667" Content="Cancel" Command="{Binding CancelledCommand}" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Ok" Command="{Binding ConfirmedCommand}" IsDefault="True" />
+                        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Width="90" Content="Cancel" Command="{Binding CancelledCommand}" IsCancel="True" />
                     </StackPanel>
                 </DockPanel>
             </Grid>

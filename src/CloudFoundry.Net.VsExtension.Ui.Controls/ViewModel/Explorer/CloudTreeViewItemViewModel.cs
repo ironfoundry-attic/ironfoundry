@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CloudFoundry.Net.Extensions;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using GalaSoft.MvvmLight.Command;
 using System.Windows.Input;

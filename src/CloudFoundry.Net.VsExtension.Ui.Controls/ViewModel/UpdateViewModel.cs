@@ -1,4 +1,6 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿using CloudFoundry.Net.Extensions;
+
+namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     using System;
     using System.Collections.Generic;
