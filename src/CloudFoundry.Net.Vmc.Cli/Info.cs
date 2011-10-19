@@ -6,6 +6,7 @@
     using Newtonsoft.Json;
     using Properties;
     using Types;
+    using CloudFoundry.Net.Extensions;
 
     static partial class Program
     {

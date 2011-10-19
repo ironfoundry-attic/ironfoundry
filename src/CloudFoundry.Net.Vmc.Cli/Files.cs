@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using CloudFoundry.Net.Extensions;
 
     static partial class Program
     {

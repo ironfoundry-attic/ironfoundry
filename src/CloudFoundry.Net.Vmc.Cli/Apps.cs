@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Types;
+    using CloudFoundry.Net.Extensions;
 
     static partial class Program
     {
