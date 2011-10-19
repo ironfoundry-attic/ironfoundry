@@ -37,8 +37,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AccessTokenManagerTests.cs" />
-    <Compile Include="ConversionTests.cs" />
-    <Compile Include="JsonSerializationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
