@@ -1,10 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.Dea", "src\CloudFoundry.Net.Dea\CloudFoundry.Net.Dea.csproj", "{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.Dea.Service", "src\CloudFoundry.Net.Dea.Service\CloudFoundry.Net.Dea.Service.csproj", "{8704AF02-615E-4679-B183-FB7164408FA0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.Vmc.Cli", "src\CloudFoundry.Net.Vmc.Cli\CloudFoundry.Net.Vmc.Cli.csproj", "{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{612435DA-4BBF-49B5-B0AA-36E6529C1D8B}"
@@ -12,11 +8,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9E04D2BE-86B8-47B9-809D-84506CFDF42D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{097A69C8-07B2-435F-896F-D81AA9C58284}"
-	ProjectSection(SolutionItems) = preProject
-		docs\CloudFoundry.Net.Dea.README.txt = docs\CloudFoundry.Net.Dea.README.txt
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.Dea.Test", "test\CloudFoundry.Net.Dea.Test\CloudFoundry.Net.Dea.Test.csproj", "{5FDC7FB1-A8F5-4CBE-B4C4-8E07365BC37A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.VsExtension", "src\CloudFoundry.Net.VsExtension\CloudFoundry.Net.VsExtension.csproj", "{8393BB9D-7606-46AA-A399-8008F686CB7D}"
 EndProject
@@ -24,10 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{698503
 	ProjectSection(SolutionItems) = preProject
 		common\CloudFoundry.snk = common\CloudFoundry.snk
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.VS2k10_IntegrationTests", "test\CloudFoundry.Net.VsExtension.IntegrationTests\CloudFoundry.VS2k10_IntegrationTests.csproj", "{A8CFDA2B-D3B9-4DA7-A1E6-B12EE338DC12}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.VS2k10_UnitTests", "test\CloudFoundry.Net.VsExtension.UnitTests\CloudFoundry.VS2k10_UnitTests.csproj", "{053EA5DD-4BBB-417A-8314-589A9C48413A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net", "src\CloudFoundry.Net\CloudFoundry.Net.csproj", "{506CCDF4-11FE-4138-8061-25495EEBF8E0}"
 EndProject
@@ -52,42 +39,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.VsExtensio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.VsExtension.Ui.Application", "src\CloudFoundry.Net.VsExtension.Ui.Application\CloudFoundry.Net.VsExtension.Ui.Application.csproj", "{8FA37E43-3BAD-4287-B873-253A2A1AF227}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.Vmc", "test\CloudFoundry.Net.Vmc\CloudFoundry.Net.Vmc.csproj", "{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8704AF02-615E-4679-B183-FB7164408FA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8704AF02-615E-4679-B183-FB7164408FA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8704AF02-615E-4679-B183-FB7164408FA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8704AF02-615E-4679-B183-FB7164408FA0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FDC7FB1-A8F5-4CBE-B4C4-8E07365BC37A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FDC7FB1-A8F5-4CBE-B4C4-8E07365BC37A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FDC7FB1-A8F5-4CBE-B4C4-8E07365BC37A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FDC7FB1-A8F5-4CBE-B4C4-8E07365BC37A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8393BB9D-7606-46AA-A399-8008F686CB7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8393BB9D-7606-46AA-A399-8008F686CB7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8393BB9D-7606-46AA-A399-8008F686CB7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8393BB9D-7606-46AA-A399-8008F686CB7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A8CFDA2B-D3B9-4DA7-A1E6-B12EE338DC12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8CFDA2B-D3B9-4DA7-A1E6-B12EE338DC12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8CFDA2B-D3B9-4DA7-A1E6-B12EE338DC12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8CFDA2B-D3B9-4DA7-A1E6-B12EE338DC12}.Release|Any CPU.Build.0 = Release|Any CPU
-		{053EA5DD-4BBB-417A-8314-589A9C48413A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{053EA5DD-4BBB-417A-8314-589A9C48413A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{053EA5DD-4BBB-417A-8314-589A9C48413A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{053EA5DD-4BBB-417A-8314-589A9C48413A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{506CCDF4-11FE-4138-8061-25495EEBF8E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{506CCDF4-11FE-4138-8061-25495EEBF8E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{506CCDF4-11FE-4138-8061-25495EEBF8E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -104,26 +69,16 @@ Global
 		{8FA37E43-3BAD-4287-B873-253A2A1AF227}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FA37E43-3BAD-4287-B873-253A2A1AF227}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FA37E43-3BAD-4287-B873-253A2A1AF227}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{8704AF02-615E-4679-B183-FB7164408FA0} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
-		{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{8393BB9D-7606-46AA-A399-8008F686CB7D} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{506CCDF4-11FE-4138-8061-25495EEBF8E0} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{C6E076BF-108A-4379-AE35-8F47059F4331} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{8FA37E43-3BAD-4287-B873-253A2A1AF227} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
-		{5FDC7FB1-A8F5-4CBE-B4C4-8E07365BC37A} = {9E04D2BE-86B8-47B9-809D-84506CFDF42D}
-		{A8CFDA2B-D3B9-4DA7-A1E6-B12EE338DC12} = {9E04D2BE-86B8-47B9-809D-84506CFDF42D}
-		{053EA5DD-4BBB-417A-8314-589A9C48413A} = {9E04D2BE-86B8-47B9-809D-84506CFDF42D}
 		{196F323E-74FE-4EA6-9344-D4BFB98BEA7C} = {9E04D2BE-86B8-47B9-809D-84506CFDF42D}
-		{F869D5EC-6C4A-43A2-A848-9CD4B4FBCE32} = {9E04D2BE-86B8-47B9-809D-84506CFDF42D}
 	EndGlobalSection
 EndGlobal
