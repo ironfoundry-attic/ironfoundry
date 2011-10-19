@@ -24,12 +24,12 @@ using GalaSoft.MvvmLight.Command;
         private string fileExtension;
         public RelayCommand<MouseButtonEventArgs> OpenFileCommand { get; private set; }
         public RelayCommand OpenFileFromContextCommand { get; private set; } 
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
 
         public FileTreeViewItemViewModel(string name, string path, CloudFoundry.Net.Types.Application app, ushort id)
             : base(null, true)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             this.name = name;
             this.app = app;
             this.path = path;

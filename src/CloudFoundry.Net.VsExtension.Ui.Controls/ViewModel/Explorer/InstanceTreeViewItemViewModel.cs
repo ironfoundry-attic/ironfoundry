@@ -15,12 +15,12 @@
         private const string Host_Default = "Loading...";
         private StatInfo statInfo;
         private Application app;
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
         private string host = Host_Default;
 
         public InstanceTreeViewItemViewModel(StatInfo statInfo, ApplicationTreeViewItemViewModel parentApplication) : base(parentApplication, true)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             this.app = parentApplication.Application;
             this.statInfo = statInfo;
 

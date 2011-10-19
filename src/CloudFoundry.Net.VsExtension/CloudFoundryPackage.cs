@@ -31,7 +31,7 @@ namespace CloudFoundry.Net.VsExtension
     {
         private IVsMonitorSelection vsMonitorSelection;
         private DTE dte;
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
 
         public CloudFoundryPackage()
         {

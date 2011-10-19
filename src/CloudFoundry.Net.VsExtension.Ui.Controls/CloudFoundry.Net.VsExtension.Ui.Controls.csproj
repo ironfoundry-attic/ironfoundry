@@ -79,7 +79,10 @@
     <Compile Include="Converters\CsvConverter.cs" />
     <Compile Include="Converters\TitleCaseConverter.cs" />
     <Compile Include="Model\CloudFoundryProvider.cs" />
+    <Compile Include="Model\ICloudFoundryProvider.cs" />
+    <Compile Include="Model\IPreferencesProvider.cs" />
     <Compile Include="Model\PreferencesProvider.cs" />
+    <Compile Include="Model\ProviderResponse.cs" />
     <Compile Include="Mvvm\DialogViewModel.cs" />
     <Compile Include="Mvvm\DragDropMvvm.cs" />
     <Compile Include="Mvvm\ProgressError.cs" />

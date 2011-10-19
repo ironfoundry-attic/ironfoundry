@@ -19,12 +19,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
         protected event CancelEventHandler OnConfirmed;
         protected event EventHandler OnCancelled;
         private string resultMessageId;
-        protected CloudFoundryProvider provider;
+        protected ICloudFoundryProvider provider;
         private string errorMessage;
 
         public DialogViewModel(string resultMessageId)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             this.resultMessageId = resultMessageId;
             this.ConfirmedCommand = new RelayCommand(Confirmed, CanExecuteConfirmed);
             this.CancelledCommand = new RelayCommand(Cancelled, CanExecuteCancelled);

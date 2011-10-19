@@ -18,7 +18,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     public class CloudTreeViewItemViewModel : TreeViewItemViewModel
     {
         private Cloud cloud;
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
         public RelayCommand<MouseButtonEventArgs> OpenCloudCommand { get; private set; }
         public RelayCommand RemoveCloudCommand { get; private set; }
         public RelayCommand ConnectCommand { get; private set; }
@@ -28,7 +28,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public CloudTreeViewItemViewModel(Cloud cloud)
             : base(null, false)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             OpenCloudCommand = new RelayCommand<MouseButtonEventArgs>(OpenCloud);
             RemoveCloudCommand = new RelayCommand(RemoveCloud);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);

@@ -12,7 +12,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
     using GalaSoft.MvvmLight.Messaging;
     using System;
 
-    public class CloudFoundryProvider
+    public class CloudFoundryProvider : ICloudFoundryProvider
     {
         private PreferencesProvider preferencesProvider;
         public ObservableCollection<Cloud> Clouds { get; private set;}
@@ -22,7 +22,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         public CloudFoundryProvider(PreferencesProvider preferencesProvider)
         {
             this.preferencesProvider = preferencesProvider;
-            var preferences          = preferencesProvider.LoadPreferences();
+            var preferences          = preferencesProvider.Load();
             this.Clouds              = preferences.Clouds.DeepCopy();            
             this.CloudUrls           = preferences.CloudUrls.DeepCopy();
 
@@ -30,10 +30,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             foreach (var cloud in Clouds)
                 cloud.PropertyChanged += CloudChanged;
 
-            Messenger.Default.Register<NotificationMessageAction<CloudFoundryProvider>>(this, ProcessCloudFoundryProviderMessage);
+            Messenger.Default.Register<NotificationMessageAction<ICloudFoundryProvider>>(this, ProcessCloudFoundryProviderMessage);
         }
         
-        private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<CloudFoundryProvider> message)
+        private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<ICloudFoundryProvider> message)
         {
             if (message.Notification.Equals(Messages.GetCloudFoundryProvider))
                 message.Execute(this);
@@ -53,7 +53,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                 case "Password":
                 case "IsConnected":
                 case "IsDisconnected":
-                    preferencesProvider.SavePreferences(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
+                    preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
                     break;
                 default:
                     break;
@@ -64,12 +64,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         {
             if (this.CloudsChanged != null)
                 this.CloudsChanged(sender, e);
-            preferencesProvider.SavePreferences(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
+            preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
         }
 
         public void SaveChanges()
         {
-            preferencesProvider.SavePreferences(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
+            preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
         }
 
         public ProviderResponse<Cloud> Connect(Cloud cloud)
@@ -373,24 +373,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                 response.Message = ex.Message;
             }
             return response;
-        }
-    }
-
-    public class ProviderResponse<T>
-    {
-        public T Response { get; set; }
-        public string Message { get; set; }
-        
-        public ProviderResponse()
-        {
-            Response = default(T);
-            Message = string.Empty;
-        }
-
-        public ProviderResponse(T response, string message)
-        {
-            Response = response;
-            Message = message;
         }
     }
 }

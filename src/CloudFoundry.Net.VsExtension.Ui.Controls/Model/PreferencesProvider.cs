@@ -12,17 +12,17 @@ using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
-    public class PreferencesProvider
+    public class PreferencesProvider : IPreferencesProvider
     {
-        private string preferencesPath;
-        private const string preferencesFileName = "preferences.bin";
+        private readonly string preferencesPath;
+        private const string PreferencesFileName = "preferences.bin";
 
         public PreferencesProvider(string preferencesPath)
         {
             this.preferencesPath = preferencesPath;            
         }
         
-        public Preferences LoadPreferences()
+        public Preferences Load()
         {
             var preferences = new Preferences()
             {
@@ -32,7 +32,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 
             try
             {
-                var fullPath = this.preferencesPath + "/" + preferencesFileName;
+                var fullPath = this.preferencesPath + "/" + PreferencesFileName;
                 IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);                
                 if (isoStore.DirectoryExists(this.preferencesPath) && isoStore.FileExists(fullPath))
                 {
@@ -50,15 +50,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             return preferences;
         }        
 
-        public void SavePreferences(Preferences preferences)
+        public void Save(Preferences preferences)
         {           
-            IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
+            var isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
             IsolatedStorageFileStream configStream;
             
             if (!isoStore.DirectoryExists(this.preferencesPath))
                 isoStore.CreateDirectory(this.preferencesPath);
 
-            var fullPath = this.preferencesPath + "/" + preferencesFileName;
+            var fullPath = this.preferencesPath + "/" + PreferencesFileName;
             if (!isoStore.FileExists(fullPath))
                 configStream = isoStore.CreateFile(fullPath);
             else

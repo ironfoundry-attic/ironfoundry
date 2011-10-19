@@ -12,7 +12,7 @@
 
     public class ApplicationTreeViewItemViewModel : TreeViewItemViewModel
     {
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
         private Application application;
         public RelayCommand<MouseButtonEventArgs> OpenApplicationCommand { get; private set; }
         public RelayCommand StartApplicationCommand { get; private set; }
@@ -22,7 +22,7 @@
         
         public ApplicationTreeViewItemViewModel(Application application, CloudTreeViewItemViewModel parentCloud) : base(parentCloud, true)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             OpenApplicationCommand = new RelayCommand<MouseButtonEventArgs>(OpenApplication);
             StartApplicationCommand = new RelayCommand(StartApplication, CanStart);
             StopApplicationCommand = new RelayCommand(StopApplication, CanStop);

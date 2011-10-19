@@ -24,7 +24,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private CloudViewModel currentCloudView;
         private readonly ObservableCollection<CloudViewModel> clouds = new ObservableCollection<CloudViewModel>();
         private CloudViewModel selectedCloudView;
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
         private string errorMessage;
         
         public RelayCommand<CloudViewModel> CloseCloudCommand { get; private set; }
@@ -32,7 +32,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public ExplorerViewModel()
         {
             CloseCloudCommand = new RelayCommand<CloudViewModel>(CloseCloud);
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             Messenger.Default.Register<NotificationMessage<string>>(this, ProcessErrorMessage);

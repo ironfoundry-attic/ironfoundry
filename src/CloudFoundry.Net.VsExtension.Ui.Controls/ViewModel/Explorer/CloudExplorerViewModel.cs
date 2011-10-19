@@ -20,7 +20,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class CloudExplorerViewModel : ViewModelBase
     {
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
         private Dispatcher dispatcher;
         private ObservableCollection<CloudTreeViewItemViewModel> clouds = new ObservableCollection<CloudTreeViewItemViewModel>();        
         public RelayCommand AddCloudCommand { get; private set; }
@@ -31,14 +31,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public CloudExplorerViewModel()
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
             this.dispatcher = Dispatcher.CurrentDispatcher;
             AddCloudCommand = new RelayCommand(AddCloud);
             PushAppCommand = new RelayCommand(PushApp);
             UpdateAppCommand = new RelayCommand(UpdateApp);
         }
 
-        private void LoadProvider(CloudFoundryProvider provider)
+        private void LoadProvider(ICloudFoundryProvider provider)
         {
             this.provider = provider;
             foreach (var cloud in provider.Clouds)

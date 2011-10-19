@@ -13,7 +13,7 @@
 
     public class FolderTreeViewItemViewModel : TreeViewItemViewModel
     {
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
         private string name;
         private CloudFoundry.Net.Types.Application app;
         private string path;
@@ -22,7 +22,7 @@
         public FolderTreeViewItemViewModel(string name, string path, CloudFoundry.Net.Types.Application app, ushort id)
             : base(null, true)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             this.name = name;
             this.app = app;
             this.path = path;

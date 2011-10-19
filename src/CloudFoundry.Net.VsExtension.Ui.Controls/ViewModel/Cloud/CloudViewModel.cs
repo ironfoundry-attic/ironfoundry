@@ -34,7 +34,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand DeleteApplicationCommand { get; private set; }
 
         private Types.Cloud cloud;
-        private CloudFoundryProvider provider;
+        private ICloudFoundryProvider provider;
         private Application selectedApplication;
         private ProvisionedService selectedApplicationService;
         private bool isApplicationViewSelected;
@@ -50,7 +50,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public CloudViewModel(Types.Cloud cloud)
         {
-            Messenger.Default.Send<NotificationMessageAction<CloudFoundryProvider>>(new NotificationMessageAction<CloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             this.dispatcher = Dispatcher.CurrentDispatcher;
             this.Cloud = cloud;
 

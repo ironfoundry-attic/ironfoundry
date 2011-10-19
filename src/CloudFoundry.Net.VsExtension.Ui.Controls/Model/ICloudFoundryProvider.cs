@@ -1,0 +1,34 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using CloudFoundry.Net.Types;
+using CloudFoundry.Net.Vmc;
+
+namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
+{
+    public interface ICloudFoundryProvider
+    {
+        ObservableCollection<Cloud> Clouds { get; }
+        ObservableCollection<CloudUrl> CloudUrls { get; }
+        event NotifyCollectionChangedEventHandler CloudsChanged;
+        void SaveChanges();
+        ProviderResponse<Cloud> Connect(Cloud cloud);
+        Cloud Disconnect(Cloud cloud);
+        ProviderResponse<bool> ValidateAccount(Cloud cloud);
+        ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud);
+        ProviderResponse<bool> UpdateApplication(Application app, Cloud cloud);
+        ProviderResponse<bool> Start(Application app, Cloud cloud);
+        ProviderResponse<bool> Stop(Application app, Cloud cloud);
+        ProviderResponse<bool> Restart(Application app, Cloud cloud);
+        ProviderResponse<bool> Delete(Application app, Cloud cloud);
+        ProviderResponse<Application> GetApplication(Application app, Cloud cloud);
+        ProviderResponse<bool> CreateService(Cloud cloud, string serviceName, string provisionedServiceName);
+        ProviderResponse<ObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud);
+        ProviderResponse<bool> ChangePassword(Cloud cloud, string newPassword);
+        ProviderResponse<bool> RegisterAccount(Cloud cloud,string email, string password);
+        ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application);
+        ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId);
+        ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services);
+        ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);
+    }
+}
