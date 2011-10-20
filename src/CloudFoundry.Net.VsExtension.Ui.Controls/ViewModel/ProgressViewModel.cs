@@ -36,12 +36,17 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
             Messenger.Default.Register<ProgressError>(this,
                 error =>
-                {
-                    this.ErrorMessage = error.Text;
-                    this.canExecuteCancelled = false;
-                    this.canExecuteConfirmed = true;
-                    CommandManager.InvalidateRequerySuggested();
+                    {
+                        this.ProgressText = error.Text;
+                        this.ProgressValue = 100;
+                        this.ErrorMessage = error.Text;
+                        this.canExecuteCancelled = false;
+                        this.canExecuteConfirmed = true;
+                        CommandManager.InvalidateRequerySuggested();
                 });
+
+            OnConfirmed += (s, e) => Cleanup();
+            OnCancelled += (s, e) => Cleanup();
         }
 
         protected override void InitializeData()

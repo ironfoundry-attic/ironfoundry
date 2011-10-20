@@ -51,7 +51,23 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                         this.Close();
                         Messenger.Default.Unregister(this);
                     }
-                });            
+                });
+
+            Messenger.Default.Register<NotificationMessageAction<string>>(
+                this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.ChooseDirectory))
+                    {
+                        var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                        dialog.Description = "Choose a directory with a pre-compiled ASP.NET application.";
+                        var result = dialog.ShowDialog();
+                        if (result == System.Windows.Forms.DialogResult.OK)
+                            message.Execute(dialog.SelectedPath);
+                        else
+                            message.Execute(null);
+                    }
+                });
         }
     }
 }

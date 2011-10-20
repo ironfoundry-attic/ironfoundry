@@ -305,6 +305,9 @@
   <ItemGroup>
     <Resource Include="Images\cloud_foundry_logo_400.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\update.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>

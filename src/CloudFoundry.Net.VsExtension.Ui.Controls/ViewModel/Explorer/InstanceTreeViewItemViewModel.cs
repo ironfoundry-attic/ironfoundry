@@ -9,6 +9,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.ComponentModel;
 
     public class InstanceTreeViewItemViewModel : TreeViewItemViewModel
     {
@@ -38,16 +39,22 @@
 
         private void SetHostName()
         {
-            if (host.Equals(Host_Default))
+            var worker = new BackgroundWorker();
+            worker.DoWork += (s, e) =>
             {
-                var result = provider.GetStats(app, app.Parent);
-                if (result.Response != null)
+                if (host.Equals(Host_Default))
                 {
-                    var newStatInfo = result.Response.SingleOrDefault((st) => st.ID == this.statInfo.ID);
-                    if (newStatInfo != null && newStatInfo.Stats != null)
-                        this.Host = newStatInfo.Stats.Host;
+                    var result = provider.GetStats(app, app.Parent);
+                    if (result.Response != null)
+                    {
+                        var newStatInfo =
+                            result.Response.SingleOrDefault((st) => st.ID == this.statInfo.ID);
+                        if (newStatInfo != null && newStatInfo.Stats != null)
+                            this.Host = newStatInfo.Stats.Host;
+                    }
                 }
-            }
+            };
+            worker.RunWorkerAsync();
         }
 
         public string Host

@@ -349,7 +349,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                client.Push(name, url, instances, new System.IO.DirectoryInfo(directoryToPushFrom), memory, services);
+                var result = client.Push(name, url, instances, new System.IO.DirectoryInfo(directoryToPushFrom), memory, services);
+                if (!result.Success)
+                    throw new Exception(result.Message);
                 response.Response = true;
             }
             catch (Exception ex)
@@ -365,7 +367,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                client.Update(app.Name, new System.IO.DirectoryInfo(directoryToPushFrom));
+                var result = client.Update(app.Name, new System.IO.DirectoryInfo(directoryToPushFrom));
+                if (!result.Success)
+                    throw new Exception(result.Message);
                 response.Response = true;
             }
             catch (Exception ex)

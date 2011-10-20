@@ -22,25 +22,19 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     {
         private ICloudFoundryProvider provider;
         private Dispatcher dispatcher;
-        private ObservableCollection<CloudTreeViewItemViewModel> clouds = new ObservableCollection<CloudTreeViewItemViewModel>();        
+        private ObservableCollection<CloudTreeViewItemViewModel> clouds = new ObservableCollection<CloudTreeViewItemViewModel>();
         public RelayCommand AddCloudCommand { get; private set; }
         public RelayCommand PushAppCommand { get; private set; }
-        public RelayCommand UpdateAppCommand { get; private set; }  
-
-        private BackgroundWorker connector = new BackgroundWorker();
+        public RelayCommand UpdateAppCommand { get; private set; }
+        public RelayCommand RefreshCloudsCommand { get; private set; }
 
         public CloudExplorerViewModel()
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, LoadProvider));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, (p) => this.provider = p));
             this.dispatcher = Dispatcher.CurrentDispatcher;
             AddCloudCommand = new RelayCommand(AddCloud);
             PushAppCommand = new RelayCommand(PushApp);
             UpdateAppCommand = new RelayCommand(UpdateApp);
-        }
-
-        private void LoadProvider(ICloudFoundryProvider provider)
-        {
-            this.provider = provider;
             foreach (var cloud in provider.Clouds)
                 clouds.Add(new CloudTreeViewItemViewModel(cloud));
             this.provider.CloudsChanged += CloudsCollectionChanged;
@@ -65,7 +59,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     clouds.Remove(cloudTreeViewItem);
                 }
             }
-        }  
+        }
 
         public ObservableCollection<CloudTreeViewItemViewModel> Clouds
         {
@@ -74,13 +68,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void AddCloud()
         {
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloud,(confirmed) => {}));                
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloud, (confirmed) => { }));
         }
 
         private void PushApp()
         {
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.PushApp, 
-            (confirmed) => 
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.PushApp,
+            (confirmed) =>
             {
                 if (confirmed)
                 {
@@ -91,52 +85,97 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     SetProgressTitle("Push Application");
                     worker.DoWork += (s, args) =>
                     {
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Pushing Application...")))); 
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Pushing Application..."))));
                         List<string> services = new List<string>();
                         foreach (var provisionedService in pushViewModel.ApplicationServices)
                             services.Add(provisionedService.Name);
 
-                        var result = provider.Push(pushViewModel.SelectedCloud, 
-                                                   pushViewModel.Name, 
-                                                   pushViewModel.Url, 
-                                                   Convert.ToUInt16(pushViewModel.Instances), 
-                                                   pushViewModel.PushFromDirectory, 
-                                                   Convert.ToUInt32(pushViewModel.SelectedMemory), 
-                                                   services.ToArray());                        
+                        var result = provider.Push(pushViewModel.SelectedCloud,
+                                                   pushViewModel.Name,
+                                                   pushViewModel.Url,
+                                                   Convert.ToUInt16(pushViewModel.Instances),
+                                                   pushViewModel.PushFromDirectory,
+                                                   Convert.ToUInt32(pushViewModel.SelectedMemory),
+                                                   services.ToArray());
 
                         if (!result.Response)
                         {
                             dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Push Error: " + result.Message))));
                             return;
                         }
-                        
-                        var refreshResult = provider.GetApplication(new Application() { Name = pushViewModel.Name },pushViewModel.SelectedCloud);
+
+                        var refreshResult = provider.GetApplication(new Application() { Name = pushViewModel.Name }, pushViewModel.SelectedCloud);
                         if (refreshResult.Response == null)
                         {
                             dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Push Error: " + result.Message))));
                             return;
                         }
 
-                        dispatcher.BeginInvoke((Action)(() => 
+                        dispatcher.BeginInvoke((Action)(() =>
                         {
                             Messenger.Default.Send(new ProgressMessage(100, "Application Pushed."));
                             var cloud = provider.Clouds.SingleOrDefault((c) => c.ID == pushViewModel.SelectedCloud.ID);
                             cloud.Applications.Add(refreshResult.Response);
-                        })); 
+                        }));
 
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Pushed.")))); 
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Pushed."))));
                     };
                     worker.RunWorkerAsync();
                     Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ExplorerProgress, c => { }));
                 }
-               
+
             }));
         }
 
         private void UpdateApp()
         {
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.UpdateApp, (confirmed) => { 
-            
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.UpdateApp,
+            (confirmed) =>
+            {
+                if (confirmed)
+                {
+                    UpdateViewModel updateViewModel = null;
+                    Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData, vm => updateViewModel = vm));
+
+                    var worker = new BackgroundWorker();
+                    SetProgressTitle("Update Application");
+                    worker.DoWork += (s, args) =>
+                    {
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Updating Application..."))));
+
+                        var result = provider.Update(updateViewModel.SelectedCloud, updateViewModel.SelectedApplication,
+                                                    updateViewModel.PushFromDirectory);
+                        if (!result.Response)
+                        {
+                            dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Update Error: " + result.Message))));
+                            return;
+                        }
+
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Refreshing Application..."))));
+                        var refreshResult = provider.GetApplication(new Application() { Name = updateViewModel.SelectedApplication.Name }, updateViewModel.SelectedCloud);
+                        if (refreshResult.Response == null)
+                        {
+                            dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Update Error: " + result.Message))));
+                            return;
+                        }
+
+                        var cloud = provider.Clouds.SingleOrDefault((c) => c.ID == updateViewModel.SelectedCloud.ID);
+                        var applicationToReplace = cloud.Applications.SingleOrDefault((i) => i.Name == refreshResult.Response.Name);
+                        dispatcher.BeginInvoke((Action)(() =>
+                        {                            
+                            if (applicationToReplace != null)
+                            {
+                                var index = cloud.Applications.IndexOf(applicationToReplace);
+                                cloud.Applications[index] = refreshResult.Response;
+                            }
+                        }));
+
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Updated."))));
+                    };
+                    worker.RunWorkerAsync();
+                    Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ExplorerProgress, c => { }));
+                }
+
             }));
         }
 
@@ -153,6 +192,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         }
 
         #endregion
-          
+
     }
 }
