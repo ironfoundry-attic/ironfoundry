@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Windows.Threading;
 using CloudFoundry.Net.Types;
 using CloudFoundry.Net.Vmc;
 
@@ -12,8 +13,9 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         ObservableCollection<CloudUrl> CloudUrls { get; }
         event NotifyCollectionChangedEventHandler CloudsChanged;
         void SaveChanges();
-        ProviderResponse<Cloud> Connect(Cloud cloud);
+        ProviderResponse<Cloud> Connect(Cloud cloud);        
         Cloud Disconnect(Cloud cloud);
+        ProviderResponse<IEnumerable<Instance>> GetInstances(Cloud cloud, Application app);
         ProviderResponse<bool> ValidateAccount(Cloud cloud);
         ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud);
         ProviderResponse<bool> UpdateApplication(Application app, Cloud cloud);
@@ -29,6 +31,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application);
         ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId);
         ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services);
-        ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);
+        ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);        
     }
 }

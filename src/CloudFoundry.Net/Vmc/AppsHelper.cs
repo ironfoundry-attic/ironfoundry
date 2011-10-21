@@ -197,20 +197,19 @@ namespace CloudFoundry.Net.Vmc
                 JObject parsed = JObject.Parse(appJson);
 
                 // Ruby detects health a little differently
-                string appState          = (string)parsed["state"];
-                ushort instances         = (ushort)parsed["instances"];
+                string appState          = (string)parsed["state"];                
                 ushort? runningInstances = (ushort?)parsed["runningInstances"];
 
                 if ((appState == VcapStates.STARTED) &&
                     (runningInstances.HasValue) &&
-                    (instances == runningInstances.Value))
+                    (runningInstances.Value > 0))
                 {
                     started = true;
                     break;
                 }
                 else
                 {
-                    Thread.Sleep(TimeSpan.FromSeconds(6));
+                    Thread.Sleep(TimeSpan.FromSeconds(3));
                 }
             }
 

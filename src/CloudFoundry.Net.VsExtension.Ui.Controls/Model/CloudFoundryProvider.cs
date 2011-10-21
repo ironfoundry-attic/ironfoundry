@@ -2,6 +2,7 @@
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
+    using System.Linq;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
@@ -11,6 +12,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
     using System;
+using System.Windows.Threading;
 
     public class CloudFoundryProvider : ICloudFoundryProvider
     {
@@ -85,13 +87,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                     throw new Exception(result.Message);
                 local.AccessToken = client.CurrentToken;
                 var applications = client.GetApplications();
-                if (null != applications)
+                var provisionedServices = client.GetProvisionedServices();
+                var availableServices = client.GetSystemServices();                
+                local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());
+                local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
+                local.AvailableServices.Synchronize(new ObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
+                foreach (Application app in local.Applications)
                 {
-                    local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());
-                    var provisionedServices = client.GetProvisionedServices();
-                    var availableServices = client.GetSystemServices();
-                    local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
-                    local.AvailableServices.Synchronize(new ObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
+                    var instances = GetInstances(local, app);
+                    if (instances.Response != null)
+                        app.InstanceCollection.Synchronize(new ObservableCollection<Instance>(instances.Response), new InstanceEqualityComparer());
                 }
                 response.Response = local;
             }
@@ -100,14 +105,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                 response.Message = ex.Message;
             }
             return response;           
-        }
+        }        
 
         public Cloud Disconnect(Cloud cloud)
         {
             cloud.AccessToken = string.Empty;
-            cloud.ClearApplications();
-            cloud.ClearServices();
-            cloud.ClearAvailableServices();
+            cloud.Services.Clear();
+            cloud.Applications.Clear();
+            cloud.AvailableServices.Clear();
             return cloud;
         }
 
@@ -129,15 +134,109 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
                 response.Message = ex.Message;
             }
             return response;
+        }      
+
+        public ProviderResponse<IEnumerable<Instance>> GetInstances(Cloud cloud, Application app)
+        {
+            var response = new ProviderResponse<IEnumerable<Instance>>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                var stats = client.GetStats(app);
+                var instances = new ObservableCollection<Instance>();
+                if (stats != null)
+                {
+
+                    foreach (var stat in stats)
+                    {
+                        var instance = new Instance()
+                                       {
+                                           ID = stat.ID,
+                                           State = stat.State
+                                       };
+                        if (stat.Stats != null)
+                        {
+                            instance.Cores = stat.Stats.Cores;
+                            instance.MemoryQuota = stat.Stats.MemQuota/1048576;
+                            instance.DiskQuota = stat.Stats.DiskQuota/1048576;
+                            instance.Host = stat.Stats.Host;
+                            instance.Parent = app;
+                            instance.Uptime = TimeSpan.FromSeconds(Convert.ToInt32(stat.Stats.Uptime));
+
+                            if (stat.Stats.Usage != null)
+                            {
+                                instance.Cpu = stat.Stats.Usage.CpuTime/100;
+                                instance.Memory = Convert.ToInt32(stat.Stats.Usage.MemoryUsage)/1024;
+                                instance.Disk = Convert.ToInt32(stat.Stats.Usage.DiskUsage)/1048576;
+                            }
+                        }
+                        instances.Add(instance);
+                    }
+                }
+                response.Response = instances;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;            
         }
 
         public ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud)
         {
-            ProviderResponse<IEnumerable<StatInfo>> response = new ProviderResponse<IEnumerable<StatInfo>>();
+            var response = new ProviderResponse<IEnumerable<StatInfo>>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);                
-                response.Response = client.GetStats(app);
+                response.Response = client.GetStats(app);                
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public ProviderResponse<Application> GetApplication(Application app, Cloud cloud)
+        {
+            var response = new ProviderResponse<Application>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                response.Response = client.GetApplication(app.Name);
+                var instancesResponse = this.GetInstances(cloud, app);
+                if (instancesResponse.Response != null)
+                    response.Response.InstanceCollection.Synchronize(new ObservableCollection<Instance>(instancesResponse.Response),new InstanceEqualityComparer());
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public ProviderResponse<ObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud)
+        {
+            ProviderResponse<ObservableCollection<ProvisionedService>> response = new ProviderResponse<ObservableCollection<ProvisionedService>>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                response.Response = new ObservableCollection<ProvisionedService>(client.GetProvisionedServices());
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application)
+        {
+            ProviderResponse<ObservableCollection<StatInfo>> response = new ProviderResponse<ObservableCollection<StatInfo>>();
+            try
+            {
+                IVcapClient client = new VcapClient(cloud);
+                response.Response = new ObservableCollection<StatInfo>(client.GetStats(application));
             }
             catch (Exception ex)
             {
@@ -228,20 +327,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             return response;
         }
 
-        public ProviderResponse<Application> GetApplication(Application app, Cloud cloud)
-        {
-            ProviderResponse<Application> response = new ProviderResponse<Application>();
-            try
-            {
-                IVcapClient client = new VcapClient(cloud);
-                response.Response = client.GetApplication(app.Name);
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-            }
-            return response;
-        }
+        
 
         public ProviderResponse<bool> CreateService(Cloud cloud, string serviceName, string provisionedServiceName)
         {
@@ -261,20 +347,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             return response;            
         }
 
-        public ProviderResponse<ObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud)
-        {
-            ProviderResponse<ObservableCollection<ProvisionedService>> response = new ProviderResponse<ObservableCollection<ProvisionedService>>();
-            try
-            {
-                IVcapClient client = new VcapClient(cloud);
-                response.Response = new ObservableCollection<ProvisionedService>(client.GetProvisionedServices());
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-            }
-            return response;
-        }
+        
 
         public ProviderResponse<bool> ChangePassword(Cloud cloud, string newPassword)
         {
@@ -312,20 +385,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
             return response; 
         }
 
-        public ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application)
-        {
-            ProviderResponse<ObservableCollection<StatInfo>> response = new ProviderResponse<ObservableCollection<StatInfo>>();
-            try
-            {
-                IVcapClient client = new VcapClient(cloud);
-                response.Response = new ObservableCollection<StatInfo>(client.GetStats(application));
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-            }
-            return response;    
-        }
+       
 
         public ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId)
         {

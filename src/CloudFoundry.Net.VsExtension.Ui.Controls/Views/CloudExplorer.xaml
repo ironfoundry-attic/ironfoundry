@@ -54,6 +54,7 @@
                                 <MenuItem Header="Remove" Command="{Binding RemoveCloudCommand, Mode=OneWay}" />
                                 <MenuItem Header="Connect" Command="{Binding ConnectCommand, Mode=OneWay}" />
                                 <MenuItem Header="Disconnect" Command="{Binding DisconnectCommand, Mode=OneWay}" />
+                                <MenuItem Header="Refresh" Command="{Binding RefreshCommand, Mode=OneWay}" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
                         <i:Interaction.Triggers>
@@ -87,14 +88,17 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\cloud_droplet.png" />
-                        <TextBlock Text="{Binding Application.Name}" />
+                        <TextBlock>
+                            <Run Text="{Binding Application.Name,Mode=OneWay}"/>
+                            <Run Text="["/><Run Text="{Binding Application.State,Mode=OneWay, Converter={StaticResource titleCaseConverter}}"/><Run Text="]"/>
+                        </TextBlock>                        
                     </StackPanel>
                 </HierarchicalDataTemplate>
 
                 <HierarchicalDataTemplate DataType="{x:Type vm:InstanceTreeViewItemViewModel}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Margin="3,0" Source="..\Images\server.png" />
-                        <TextBlock Text="{Binding Host}" />
+                        <TextBlock><Run Text="#"/><Run Text="{Binding Instance.ID,Mode=OneWay}"/><Run Text=" ["/><Run Text="{Binding Instance.State,Mode=OneWay, Converter={StaticResource titleCaseConverter}}"/><Run Text="]"/></TextBlock>
                     </StackPanel>
                 </HierarchicalDataTemplate>
                 

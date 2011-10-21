@@ -9,6 +9,9 @@
     using System;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
     using System.ComponentModel;
+    using System.Windows.Threading;
+    using System.Collections.Specialized;
+using System.Collections.Generic;
 
     public class ApplicationTreeViewItemViewModel : TreeViewItemViewModel
     {
@@ -19,9 +22,10 @@
         public RelayCommand StopApplicationCommand { get; private set; }
         public RelayCommand RestartApplicationCommand { get; private set; }
         public RelayCommand DeleteApplicationCommand { get; private set; }
+        public Dispatcher dispatcher;
         
         public ApplicationTreeViewItemViewModel(Application application, CloudTreeViewItemViewModel parentCloud) : base(parentCloud, true)
-        {
+        {            
             Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             OpenApplicationCommand = new RelayCommand<MouseButtonEventArgs>(OpenApplication);
             StartApplicationCommand = new RelayCommand(StartApplication, CanStart);
@@ -29,8 +33,10 @@
             RestartApplicationCommand = new RelayCommand(RestartApplication, CanStop);
             DeleteApplicationCommand = new RelayCommand(DeleteApplication);
 
-            this.application = application;
-        }
+            this.Application = application;
+            this.Application.InstanceCollection.CollectionChanged += InstanceCollection_CollectionChanged;
+            this.dispatcher = Dispatcher.CurrentDispatcher;
+        }        
         
         public Application Application
         {
@@ -72,19 +78,66 @@
         private void RestartApplication()
         {
             Messenger.Default.Send(new NotificationMessage<Application>(this, this.Application, Messages.RestartApplication));
-        }
+        }        
 
         public override void LoadChildren()
         {
-            Children.Clear();
-            var statsResponse = provider.GetStats(this.application.Parent, this.application);
-            if (statsResponse.Response == null)
+            foreach (var instance in Application.InstanceCollection)
+                base.Children.Add(new InstanceTreeViewItemViewModel(instance, this));
+        }
+
+        private void InstanceCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var comparer = new InstanceEqualityComparer();
+            if (e.Action.Equals(NotifyCollectionChangedAction.Add))
             {
-                Messenger.Default.Send(new NotificationMessage<string>(statsResponse.Message, Messages.ErrorMessage));
-                return;
+                foreach (var item in e.NewItems)
+                {
+                    var instance = item as Instance;
+                    base.Children.Add(new InstanceTreeViewItemViewModel(instance, this));
+                }
             }
-            foreach (StatInfo statInfo in statsResponse.Response)
-                base.Children.Add(new InstanceTreeViewItemViewModel(statInfo, this));
+            else if (e.Action.Equals(NotifyCollectionChangedAction.Remove))
+            {                
+                foreach (var item in e.OldItems)
+                {
+                    var toRemove = new List<TreeViewItemViewModel>();
+                    var instance = item as Instance;
+                    foreach (var treeView in base.Children)
+                    {
+                        var instanceTreeView = treeView as InstanceTreeViewItemViewModel;
+                        if (instanceTreeView != null)
+                        {
+                            if (comparer.Equals(instanceTreeView.Instance, instance))
+                                toRemove.Add(treeView);
+                        }
+                    }
+                    foreach (var treeView in toRemove)
+                        base.Children.Remove(treeView);
+                }
+            }
+            else if (e.Action.Equals(NotifyCollectionChangedAction.Replace))
+            {
+                foreach(var item in e.NewItems)
+                {
+                    var instance = item as Instance;
+                    foreach (var treeView in base.Children)
+                    {
+                        var instanceTreeView = treeView as InstanceTreeViewItemViewModel;
+                        if (instanceTreeView != null)
+                        {
+                            if (comparer.Equals(instanceTreeView.Instance, instance))
+                            {
+                                instanceTreeView.Instance = instance;
+                                if (!instanceTreeView.HasNotBeenPopulated)
+                                    instanceTreeView.LoadChildren();
+                            }
+                        }
+                    }
+                }
+            }
+            else if (e.Action.Equals(NotifyCollectionChangedAction.Reset))
+                base.Children.Clear();        
         }
     }
 }

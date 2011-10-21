@@ -62,6 +62,7 @@
     <Compile Include="Types\ExternalInstance.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Types\IMergeable.cs" />
     <Compile Include="Types\Info.cs">
       <SubType>Code</SubType>
     </Compile>

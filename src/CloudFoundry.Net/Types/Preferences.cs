@@ -18,9 +18,9 @@ namespace CloudFoundry.Net.Types
                 this.clouds = value.DeepCopy();
                 foreach (var cloud in this.clouds)
                 {
-                    cloud.ClearServices();
-                    cloud.ClearApplications();
-                    cloud.ClearAvailableServices();
+                    cloud.Services.Clear();
+                    cloud.Applications.Clear();
+                    cloud.AvailableServices.Clear();
                     cloud.IsConnected = false;
                     cloud.IsDisconnected = true;
                 }

@@ -4,10 +4,11 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using CloudFoundry.Net.Extensions;
     using Newtonsoft.Json;
 
     [Serializable]
-    public class Application : EntityBase
+    public class Application : EntityBase, IMergeable<Application> 
     {
         private string name;
         private Staging staging;
@@ -16,35 +17,20 @@
         private int? runningInstances;
         private AppResources resources;
         private string state;
-        // private AppMeta metadata;
         private readonly ObservableCollection<string> uris = new ObservableCollection<string>();
         private readonly ObservableCollection<string> services = new ObservableCollection<string>();        
         private readonly ObservableCollection<string> environment = new ObservableCollection<string>();
+        private readonly ObservableCollection<Instance> instanceCollection = new ObservableCollection<Instance>();
 
         public Application()
         {
-            uris.CollectionChanged += UrisChanged;
-            services.CollectionChanged += ServicesChanged;
-            environment.CollectionChanged += EnvironmentChanged;
+            uris.CollectionChanged += (s,e) => RaisePropertyChanged("Uris");
+            services.CollectionChanged += (s,e) => RaisePropertyChanged("Services");
+            environment.CollectionChanged += (s,e) => RaisePropertyChanged("Environment");
+            instanceCollection.CollectionChanged += (s,e) => RaisePropertyChanged("InstanceCollection");
 
             Staging = new Staging();
             Resources = new AppResources();
-            // MetaData = new AppMeta();
-        }
-
-        void EnvironmentChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Environment");
-        }
-
-        void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Services");
-        }
-
-        void UrisChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Uris");
         }
 
         [JsonProperty(PropertyName = "name")]
@@ -96,7 +82,7 @@
         }
 
         [JsonProperty(PropertyName = "services")]
-        public ObservableCollection<string> Services // TODO should be string[], not observable collection. This should not do dual-duty as message object and view model.
+        public ObservableCollection<string> Services 
         {
             get { return this.services; }
         }
@@ -114,16 +100,12 @@
             get { return this.environment; }
         }
 
-        /*
-         * Unused in ruby vmc
-        [JsonProperty(PropertyName = "meta")]
-        public AppMeta MetaData
+        [JsonIgnore]
+        public ObservableCollection<Instance> InstanceCollection
         {
-            get { return this.metadata; }
-            set { this.metadata = value; RaisePropertyChanged("MetaData"); }
+            get { return this.instanceCollection; }
         }
-         */
-
+        
         [JsonIgnore]
         public Cloud Parent { get; set; }
 
@@ -155,6 +137,18 @@
             {
                 return State == VcapStates.RUNNING || State == VcapStates.STARTED || State == VcapStates.STARTING;
             }
+        }
+
+        public void Merge(Application obj)
+        {
+            this.Staging = obj.Staging;
+            this.Resources = obj.Resources;
+            this.Version = obj.Version;
+            this.Instances = obj.Instances;
+            this.RunningInstances = obj.RunningInstances;
+            this.State = obj.State;
+            this.Uris.Synchronize(obj.Uris,StringComparer.InvariantCulture);
+            this.InstanceCollection.Synchronize(obj.InstanceCollection,new InstanceEqualityComparer());
         }
     }
 
@@ -206,31 +200,7 @@
             get { return this.fds; }
             set { this.fds = value; RaisePropertyChanged("Fds"); }
         }
-    }
-
-    /*
-     * Unused in ruby vmc
-    [Serializable]
-    public class AppMeta : EntityBase
-    {
-        private uint version;
-        private long created;
-
-        [JsonProperty(PropertyName = "version")]
-        public uint Version 
-        {
-            get { return this.version; }
-            set { this.version = value; RaisePropertyChanged("Version"); }
-        }
-
-        [JsonProperty(PropertyName = "created")]
-        public long Created
-        {
-            get { return this.created; }
-            set { this.created = value; RaisePropertyChanged("Created"); }
-        }
-    }
-     */
+    }   
 
     public class ApplicationEqualityComparer : IEqualityComparer<Application>
     {

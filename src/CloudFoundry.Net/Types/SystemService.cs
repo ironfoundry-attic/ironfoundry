@@ -5,10 +5,10 @@
     using System.Collections.Generic;
 
     [Serializable]
-    public class SystemService : EntityBase
+    public class SystemService : EntityBase, IMergeable<SystemService>
     {
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; } //Types supported are key/value, generic, database... could potentially be a static class or enum
+        public string Type { get; set; } 
 
         [JsonProperty(PropertyName = "version")]
         public string Version { get; set; }
@@ -19,14 +19,16 @@
         [JsonProperty(PropertyName = "vendor")]
         public string Vendor { get; set; }
 
-        /*
-         * TODO
-        [JsonProperty(PropertyName = "tiers")]
-        public Tiers Tiers { get; set; }
-         */
-
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
+
+        public void Merge(SystemService obj)
+        {
+            this.Type = obj.Type;
+            this.Version = obj.Version;
+            this.Id = obj.Id;
+            this.Description = obj.Description;
+        }
     }
 
     public class SystemServiceEqualityComparer : IEqualityComparer<SystemService>

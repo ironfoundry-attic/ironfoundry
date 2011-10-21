@@ -5,7 +5,7 @@
     using Newtonsoft.Json;
 
     [Serializable]
-    public class ProvisionedService : EntityBase
+    public class ProvisionedService : EntityBase, IMergeable<ProvisionedService>
     {        
         [JsonProperty(PropertyName = "name")]
         public string Name { get; private set; }
@@ -24,6 +24,15 @@
 
         [JsonProperty(PropertyName = "version")]
         public string Version { get; private set; }
+
+        public void Merge(ProvisionedService obj)
+        {            
+            this.Type = obj.Type;
+            this.Tier = obj.Tier;
+            this.Vendor = obj.Vendor;
+            this.MetaData = obj.MetaData;
+            this.Version = obj.Version;
+        }
     }
 
     [Serializable]

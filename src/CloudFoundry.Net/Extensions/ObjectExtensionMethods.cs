@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using CloudFoundry.Net.Utilities;
@@ -22,6 +23,6 @@ namespace CloudFoundry.Net.Extensions
             }
 
             return (T)result;
-        }
+        }        
     }
 }

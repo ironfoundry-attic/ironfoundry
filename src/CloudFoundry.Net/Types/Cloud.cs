@@ -3,10 +3,11 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
-    using System.Windows;    
+    using System.Windows;
+    using CloudFoundry.Net.Extensions;
 
     [Serializable]
-    public class Cloud : EntityBase, IEquatable<Cloud>
+    public class Cloud : EntityBase, IEquatable<Cloud>, IMergeable<Cloud>
     {
         private readonly Guid id;
         private string serverName;
@@ -25,32 +26,17 @@
         private ObservableCollection<ProvisionedService> services = new ObservableCollection<ProvisionedService>();
 
         public Cloud()
-        {            
-            applications.CollectionChanged += ApplicationsChanged;
-            services.CollectionChanged += ServicesChanged;
-            availableServices.CollectionChanged += AvailableServicesChanged;
+        {
+            applications.CollectionChanged += (s, e) => RaisePropertyChanged("Applications");
+            services.CollectionChanged += (s, e) => RaisePropertyChanged("Services");
+            availableServices.CollectionChanged += (s, e) => RaisePropertyChanged("AvailableServices");
 
             id = Guid.NewGuid();
             TimeoutStart = 600;
             TimeoutStop = 60;
             IsConnected = false;
             IsDisconnected = true;
-        }
-
-        private void AvailableServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("AvailableServices");
-        }
-
-        private void ServicesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Services");
-        }
-
-        private void ApplicationsChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RaisePropertyChanged("Applications");
-        }
+        }        
 
         public Guid ID
         {
@@ -156,21 +142,23 @@
                     this.availableServices = new ObservableCollection<SystemService>();
                 return this.availableServices; 
             }
-        }
+        }        
 
-        public void ClearServices()
+        public void Merge(Cloud c)
         {
-            Services.Clear();
-        }
+            this.ServerName = c.ServerName;
+            this.HostName = c.HostName;
+            this.Email = c.Email;
+            this.Password = c.Password;
+            this.TimeoutStart = c.TimeoutStart;
+            this.TimeoutStop = c.TimeoutStop;
+            this.AccessToken = c.AccessToken;
+            this.IsConnected = c.IsConnected;
+            this.IsDisconnected = c.IsDisconnected;
 
-        public void ClearApplications()
-        {
-            Applications.Clear();
-        }
-
-        public void ClearAvailableServices()
-        {
-            AvailableServices.Clear();
+            this.Applications.Synchronize(c.Applications,new ApplicationEqualityComparer());
+            this.Services.Synchronize(c.Services,new ProvisionedServiceEqualityComparer());
+            this.AvailableServices.Synchronize(c.AvailableServices, new SystemServiceEqualityComparer());            
         }
 
         public bool Equals(Cloud other)
