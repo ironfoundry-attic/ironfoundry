@@ -32,7 +32,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public ExplorerViewModel()
         {
             CloseCloudCommand = new RelayCommand<CloudViewModel>(CloseCloud);
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             Messenger.Default.Register<NotificationMessage<Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             Messenger.Default.Register<NotificationMessage<string>>(this, ProcessErrorMessage);
@@ -65,7 +65,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 var selectedCloudViewModel = this.Clouds.SingleOrDefault((i) => i.Cloud.Equals(application.Parent));
                 if (selectedCloudViewModel == null)
                 {
-                    selectedCloudViewModel = new CloudViewModel(application.Parent);
+                    var currentCloud = provider.Clouds.SingleOrDefault((c) => c.Equals(application.Parent));
+                    selectedCloudViewModel = new CloudViewModel(currentCloud);
                     this.Clouds.Add(selectedCloudViewModel);
                 }
                 this.SelectedCloudView = selectedCloudViewModel;

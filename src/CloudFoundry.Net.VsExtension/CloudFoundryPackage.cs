@@ -218,7 +218,6 @@ namespace CloudFoundry.Net.VsExtension
                 }
 
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(50, "Logging in to Cloud Foundry"))));
-
                 if (worker.CancellationPending) { args.Cancel = true; return; }
                 
 

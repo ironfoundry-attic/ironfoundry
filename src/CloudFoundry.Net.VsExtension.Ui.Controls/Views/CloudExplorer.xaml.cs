@@ -74,7 +74,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls
                 this,
                 message =>
                 {
-                    if (message.Notification.Equals(Messages.ExplorerProgress))
+                    if (message.Notification.Equals(Messages.Progress))
                     {
                         var view = new Views.ProgressDialog();
                         Window parentWindow = Window.GetWindow(this);

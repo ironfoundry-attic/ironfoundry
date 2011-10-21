@@ -19,7 +19,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     {
         private Cloud cloud;
         private string name;
-        private ObservableCollection<SystemService> systemServices = new ObservableCollection<SystemService>();
+        private readonly ObservableCollection<SystemService> systemServices = new ObservableCollection<SystemService>();
         private SystemService selectedSystemService;
 
         public CreateServiceViewModel() : base(Messages.CreateServiceDialogResult)

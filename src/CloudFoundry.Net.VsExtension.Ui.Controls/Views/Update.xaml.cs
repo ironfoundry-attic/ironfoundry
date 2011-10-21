@@ -59,8 +59,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
                 {
                     if (message.Notification.Equals(Messages.ChooseDirectory))
                     {
-                        var dialog = new System.Windows.Forms.FolderBrowserDialog();
-                        dialog.Description = "Choose a directory with a pre-compiled ASP.NET application.";
+                        var dialog = new System.Windows.Forms.FolderBrowserDialog
+                                         {Description = "Choose a directory with a pre-compiled ASP.NET application."};
                         var result = dialog.ShowDialog();
                         if (result == System.Windows.Forms.DialogResult.OK)
                             message.Execute(dialog.SelectedPath);

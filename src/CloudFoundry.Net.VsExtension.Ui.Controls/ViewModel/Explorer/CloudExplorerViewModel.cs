@@ -23,14 +23,14 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private ICloudFoundryProvider provider;
         private Dispatcher dispatcher;
         private ObservableCollection<CloudTreeViewItemViewModel> clouds = new ObservableCollection<CloudTreeViewItemViewModel>();
-        public RelayCommand AddCloudCommand { get; private set; }
-        public RelayCommand PushAppCommand { get; private set; }
-        public RelayCommand UpdateAppCommand { get; private set; }
-        public RelayCommand RefreshCloudsCommand { get; private set; }
+        public RelayCommand AddCloudCommand { get; set; }
+        public RelayCommand PushAppCommand { get; set; }
+        public RelayCommand UpdateAppCommand { get; set; }
+        public RelayCommand RefreshCloudsCommand { get; set; }
 
         public CloudExplorerViewModel()
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, (p) => this.provider = p));
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, (p) => this.provider = p));
             this.dispatcher = Dispatcher.CurrentDispatcher;
             AddCloudCommand = new RelayCommand(AddCloud);
             PushAppCommand = new RelayCommand(PushApp);
@@ -78,50 +78,49 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             {
                 if (confirmed)
                 {
-                    PushViewModel pushViewModel = null;
-                    Messenger.Default.Send(new NotificationMessageAction<PushViewModel>(Messages.GetPushAppData, vm => pushViewModel = vm));
+                    PushViewModel viewModel = null;
+                    Messenger.Default.Send(new NotificationMessageAction<PushViewModel>(Messages.GetPushAppData, vm => viewModel = vm));
 
-                    var worker = new BackgroundWorker();
+
+                    var worker = new BackgroundWorker {WorkerReportsProgress = true};
                     SetProgressTitle("Push Application");
-                    worker.DoWork += (s, args) =>
+                    worker.ProgressChanged += WorkerProgressChanged;
+                    worker.DoWork += (s, e) =>
                     {
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Pushing Application..."))));
-                        List<string> services = new List<string>();
-                        foreach (var provisionedService in pushViewModel.ApplicationServices)
-                            services.Add(provisionedService.Name);
+                        worker.ReportProgress(10, "Pushing Application: " + viewModel.Name);
 
-                        var result = provider.Push(pushViewModel.SelectedCloud,
-                                                   pushViewModel.Name,
-                                                   pushViewModel.Url,
-                                                   Convert.ToUInt16(pushViewModel.Instances),
-                                                   pushViewModel.PushFromDirectory,
-                                                   Convert.ToUInt32(pushViewModel.SelectedMemory),
-                                                   services.ToArray());
+                        var result = provider.Push(viewModel.SelectedCloud,
+                                                   viewModel.Name,
+                                                   viewModel.Url,
+                                                   Convert.ToUInt16(viewModel.Instances),
+                                                   viewModel.PushFromDirectory,
+                                                   Convert.ToUInt32(viewModel.SelectedMemory),
+                                                   viewModel.ApplicationServices.Select(provisionedService => provisionedService.Name).ToArray());
 
                         if (!result.Response)
                         {
-                            dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Push Error: " + result.Message))));
+                            worker.ReportProgress(-1, result.Message);
                             return;
                         }
 
-                        var refreshResult = provider.GetApplication(new Application() { Name = pushViewModel.Name }, pushViewModel.SelectedCloud);
-                        if (refreshResult.Response == null)
+                        var appResult = provider.GetApplication(new Application() { Name = viewModel.Name }, viewModel.SelectedCloud);
+                        if (appResult.Response == null)
                         {
-                            dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Push Error: " + result.Message))));
+                            worker.ReportProgress(-1, appResult.Message);
                             return;
                         }
-
-                        dispatcher.BeginInvoke((Action)(() =>
-                        {
-                            Messenger.Default.Send(new ProgressMessage(100, "Application Pushed."));
-                            var cloud = provider.Clouds.SingleOrDefault((c) => c.ID == pushViewModel.SelectedCloud.ID);
-                            cloud.Applications.Add(refreshResult.Response);
-                        }));
-
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Pushed."))));
+                        e.Result = appResult.Response;                                               
+                    };
+                    worker.RunWorkerCompleted += (s, e) =>
+                    {
+                        var result = e.Result as Application;
+                        var cloud = provider.Clouds.SingleOrDefault((c) => c.ID == viewModel.SelectedCloud.ID);
+                        if (result != null) 
+                            cloud.Applications.Add(result);
+                        Messenger.Default.Send(new ProgressMessage(100, "Application Pushed."));
                     };
                     worker.RunWorkerAsync();
-                    Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ExplorerProgress, c => { }));
+                    Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
                 }
 
             }));
@@ -134,48 +133,48 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             {
                 if (confirmed)
                 {
-                    UpdateViewModel updateViewModel = null;
-                    Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData, vm => updateViewModel = vm));
+                    UpdateViewModel viewModel = null;
+                    Messenger.Default.Send(new NotificationMessageAction<UpdateViewModel>(Messages.GetUpdateAppData, vm => viewModel = vm));
 
-                    var worker = new BackgroundWorker();
+                    var worker = new BackgroundWorker { WorkerReportsProgress = true };
                     SetProgressTitle("Update Application");
-                    worker.DoWork += (s, args) =>
+                    worker.ProgressChanged += WorkerProgressChanged;
+                    worker.DoWork += (s, e) =>
                     {
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Updating Application..."))));
-
-                        var result = provider.Update(updateViewModel.SelectedCloud, updateViewModel.SelectedApplication,
-                                                    updateViewModel.PushFromDirectory);
+                        worker.ReportProgress(10, "Updating Application: " + viewModel.SelectedApplication.Name);                        
+                        var result = provider.Update(viewModel.SelectedCloud, 
+                                                     viewModel.SelectedApplication,
+                                                     viewModel.PushFromDirectory);
                         if (!result.Response)
                         {
-                            dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Update Error: " + result.Message))));
+                            worker.ReportProgress(-1, result.Message);
                             return;
                         }
 
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Refreshing Application..."))));
-                        var refreshResult = provider.GetApplication(new Application() { Name = updateViewModel.SelectedApplication.Name }, updateViewModel.SelectedCloud);
-                        if (refreshResult.Response == null)
+                        worker.ReportProgress(75, "Refreshing Application: " + viewModel.SelectedApplication.Name);
+                        var appResult = provider.GetApplication(viewModel.SelectedApplication, viewModel.SelectedCloud);
+                        if (appResult.Response == null)
                         {
-                            dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Update Error: " + result.Message))));
+                            worker.ReportProgress(-1, appResult.Message);
                             return;
                         }
-
-                        var cloud = provider.Clouds.SingleOrDefault((c) => c.ID == updateViewModel.SelectedCloud.ID);
-                        var applicationToReplace = cloud.Applications.SingleOrDefault((i) => i.Name == refreshResult.Response.Name);
-                        dispatcher.BeginInvoke((Action)(() =>
-                        {                            
-                            if (applicationToReplace != null)
-                            {
-                                var index = cloud.Applications.IndexOf(applicationToReplace);
-                                cloud.Applications[index] = refreshResult.Response;
-                            }
-                        }));
-
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, "Application Updated."))));
+                        e.Result = appResult.Response;
+                    };
+                    worker.RunWorkerCompleted += (s, e) =>
+                    {
+                        var result = e.Result as Application;
+                        var cloud = provider.Clouds.SingleOrDefault((c) => c.ID == viewModel.SelectedCloud.ID);
+                        if (cloud != null)
+                        {
+                            var application = cloud.Applications.SingleOrDefault((i) => i.Name == result.Name);
+                            if (application != null)
+                                application.Merge(result);
+                        }
+                        Messenger.Default.Send(new ProgressMessage(100, "Application Updated."));
                     };
                     worker.RunWorkerAsync();
-                    Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.ExplorerProgress, c => { }));
+                    Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
                 }
-
             }));
         }
 
@@ -189,6 +188,15 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     if (message.Notification.Equals(Messages.SetProgressData))
                         message.Execute(title);
                 });
+        }
+
+        private void WorkerProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            var message = e.UserState as string;
+            if (e.ProgressPercentage < 0)
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(message))));
+            else
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(e.ProgressPercentage, message))));
         }
 
         #endregion

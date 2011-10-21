@@ -25,31 +25,30 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand DisconnectCommand { get; private set; }
         public RelayCommand StartCommand { get; private set; }
         public RelayCommand StopCommand { get; private set; }
-        public RelayCommand RestartCommand { get; private set; }
-        public RelayCommand UpdateInstanceCountCommand { get; private set; }
+        public RelayCommand RestartCommand { get; private set; }        
         public RelayCommand ManageApplicationUrlsCommand { get; private set; }
         public RelayCommand RemoveApplicationServiceCommand { get; private set; }
         public RelayCommand ProvisionServiceCommand { get; private set; }
         public RelayCommand RefreshCommand { get; private set; }
         public RelayCommand DeleteApplicationCommand { get; private set; }
 
-        private Types.Cloud cloud;
+        private Cloud cloud;
         private ICloudFoundryProvider provider;
         private Application selectedApplication;
         private ProvisionedService selectedApplicationService;
         private bool isApplicationViewSelected;
         private bool applicationStarting;
         private bool isAccountValid;
-        private Dispatcher dispatcher;
+        private readonly Dispatcher dispatcher;
         private string overviewErrorMessage;
         private string applicationErrorMessage;
         private IDragSource provisionedServicesSource;
         private IDropTarget applicationServicesTarget;
         private ObservableCollection<ProvisionedService> applicationServices;
 
-        public CloudViewModel(Types.Cloud cloud)
+        public CloudViewModel(Cloud cloud)
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
             this.dispatcher = Dispatcher.CurrentDispatcher;
             this.Cloud = cloud;
 
@@ -62,12 +61,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
             ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);
             RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);
-            ProvisionServiceCommand = new RelayCommand(ProvisionService);
+            ProvisionServiceCommand = new RelayCommand(CreateService);
             RefreshCommand = new RelayCommand(Refresh, CanExecuteRefresh);
             DeleteApplicationCommand = new RelayCommand(DeleteApplication);
 
-            var instanceTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(10)};
-            instanceTimer.Tick += RefreshInstances;
+            var instanceTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(3)};
+            instanceTimer.Tick += RefreshApplication;
             instanceTimer.Start();
         }        
 
@@ -257,31 +256,21 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             worker.RunWorkerAsync();
         }
 
-        #region InstanceManagement
-
-        private void RefreshInstances(object sender, EventArgs e)
+        private void RefreshApplication(object sender, EventArgs e)
         {
             if (null != SelectedApplication)
             {
                 var worker = new BackgroundWorker();
-                worker.DoWork += (s, ea) => ea.Result = provider.GetInstances(Cloud, SelectedApplication);
+                worker.DoWork += (s, ea) => ea.Result = provider.GetApplication(SelectedApplication, Cloud);
                 worker.RunWorkerCompleted += (s, ea) =>
                 {                    
-                    var response = ea.Result as ProviderResponse<IEnumerable<Instance>>;
-                    if (response != null && response.Response != null)
-                    {
-                        SelectedApplication.PropertyChanged -= SelectedApplicationPropertyChanged;
-                        SelectedApplication.Resources.PropertyChanged -= SelectedApplicationPropertyChanged;            
-                        this.SelectedApplication.InstanceCollection.Synchronize(new ObservableCollection<Instance>(response.Response), new InstanceEqualityComparer());
-                        SelectedApplication.PropertyChanged += SelectedApplicationPropertyChanged;
-                        SelectedApplication.Resources.PropertyChanged += SelectedApplicationPropertyChanged;
-                    }
+                    var result = ea.Result as ProviderResponse<Application>;
+                    if (result != null && result.Response != null)
+                        RefreshSelectedApplication(result.Response);
                 };
                 worker.RunWorkerAsync();
             }
-        }
-
-        #endregion
+        }        
 
         private void RefreshSelectedApplication(Application application)
         {
@@ -314,7 +303,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 }));
         }
 
-        private void ProvisionService()
+        private void CreateService()
         {
             Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
                 message =>
@@ -415,13 +404,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void Refresh()
         {
-            var worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
+            var worker = new BackgroundWorker { WorkerReportsProgress = true };
             SetProgressTitle("Refresh Application");
             worker.ProgressChanged += WorkerProgressChanged;
             worker.DoWork += (s, e) =>
             {
-                worker.ReportProgress(30,"Refreshing Application: " + SelectedApplication.Name);
+                worker.ReportProgress(30, "Refreshing Application: " + SelectedApplication.Name);
                 var appResult = provider.GetApplication(SelectedApplication, Cloud);
                 if (appResult.Response == null)
                 {
@@ -440,12 +428,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             };
             worker.RunWorkerAsync();
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));
+            
         }        
 
         public void DeleteApplication()
         {
-            var worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
+            var worker = new BackgroundWorker {WorkerReportsProgress = true};
             SetProgressTitle("Delete Application");
             worker.ProgressChanged += WorkerProgressChanged;
             worker.DoWork += (s, e) =>
@@ -476,8 +464,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public void Start()
         {
             applicationStarting = true;
-            var worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
+            var worker = new BackgroundWorker {WorkerReportsProgress = true};
             SetProgressTitle("Starting Application");
             worker.ProgressChanged += WorkerProgressChanged;
             worker.DoWork += (s, e) =>
@@ -512,8 +499,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         
         public void Stop()
         {
-            var worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
+            var worker = new BackgroundWorker {WorkerReportsProgress = true};
             SetProgressTitle("Stopping Application");
             worker.ProgressChanged += WorkerProgressChanged;
             worker.DoWork += (s, e) => 
@@ -547,8 +533,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public void Restart()
         {
-            var worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
+            var worker = new BackgroundWorker { WorkerReportsProgress = true };
             SetProgressTitle("Restarting Application");
             worker.ProgressChanged += WorkerProgressChanged;
             worker.DoWork += (s, e) =>
@@ -592,7 +577,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 var result = e.Result as Application;
                 if (result != null)
                     RefreshSelectedApplication(result);
-                Messenger.Default.Send(new ProgressMessage(100, "Application Stopped."));
+                Messenger.Default.Send(new ProgressMessage(100, "Application Restarted."));
             };
             worker.RunWorkerAsync();
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Progress, c => { }));            
