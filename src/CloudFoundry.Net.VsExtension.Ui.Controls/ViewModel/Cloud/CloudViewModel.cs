@@ -595,6 +595,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     if (message.Notification.Equals(Messages.SetProgressData))
                         message.Execute(title);
                 });
+
+            Messenger.Default.Register<NotificationMessageAction<bool>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetProgressCancelButtonVisible))
+                        message.Execute(false);
+                });
         }
 
         private void WorkerProgressChanged(object sender, ProgressChangedEventArgs e)

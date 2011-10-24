@@ -46,11 +46,11 @@ namespace CloudFoundry.Net.VsExtension
 
             if (provider == null)
             {
-                PreferencesProvider preferences = new PreferencesProvider("VisualStudio2010");
+                var preferences = new PreferencesProvider("VisualStudio2010");
                 provider = new CloudFoundryProvider(preferences);
             }
 
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
             {
                 mcs.AddCommand(new MenuCommand(CloudFoundryExplorer,
@@ -70,7 +70,7 @@ namespace CloudFoundry.Net.VsExtension
         private void CloudFoundryExplorer(object sender, EventArgs e)
         {
             var window = new Explorer();
-            WindowInteropHelper helper = new WindowInteropHelper(window);
+            var helper = new WindowInteropHelper(window);
             helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
             window.ShowDialog();
         }
@@ -80,18 +80,25 @@ namespace CloudFoundry.Net.VsExtension
             Project project = vsMonitorSelection.GetActiveProject();
             if (project != null)
             {
-                Guid cloudGuid = GetCurrentCloudGuid(project);
-                ProjectDirectories projectDirectories = GetProjectDirectories(project);
+                var cloudGuid = GetCurrentCloudGuid(project);
+                var projectDirectories = GetProjectDirectories(project);
 
                 Messenger.Default.Register<NotificationMessageAction<Guid>>(this,
                     message =>
                     {
                         if (message.Notification.Equals(Messages.SetPushAppData))
                             message.Execute(cloudGuid);
-                    });                
+                    });    
+            
+                Messenger.Default.Register<NotificationMessageAction<string>>(this,
+                    message =>
+                    {
+                        if (message.Notification.Equals(Messages.SetPushAppDirectory))
+                            message.Execute(projectDirectories.DeployFromPath);
+                    });
 
                 var window = new Push();
-                WindowInteropHelper helper = new WindowInteropHelper(window);
+                var helper = new WindowInteropHelper(window);
                 helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
                 var result = window.ShowDialog();
 
@@ -125,8 +132,15 @@ namespace CloudFoundry.Net.VsExtension
                             message.Execute(cloudGuid);
                     });
 
+                Messenger.Default.Register<NotificationMessageAction<string>>(this,
+                    message =>
+                    {
+                        if (message.Notification.Equals(Messages.SetPushAppDirectory))
+                            message.Execute(projectDirectories.DeployFromPath);
+                    });
+
                 var window = new Update();
-                WindowInteropHelper helper = new WindowInteropHelper(window);
+                var helper = new WindowInteropHelper(window);
                 helper.Owner = (IntPtr)(dte.MainWindow.HWnd);
                 var result = window.ShowDialog();
 
@@ -264,7 +278,7 @@ namespace CloudFoundry.Net.VsExtension
 
         private static Guid GetCurrentCloudGuid(Project project)
         {
-            Guid cloudGuid = Guid.Empty;
+            var cloudGuid = Guid.Empty;
             var cloudId = project.GetGlobalVariable("CloudId");
             if (!Guid.TryParse(cloudId, out cloudGuid))
                 cloudGuid = Guid.Empty;

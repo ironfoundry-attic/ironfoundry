@@ -80,5 +80,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
         public const string Progress = "Progress";
         public const string ProgressDialogResult = "ProgressDialogResult";
         public const string SetProgressData = "SetProgressData";
+        public const string SetProgressCancelButtonVisible = "SetProgressCancelButtonVisible";
     }
 }

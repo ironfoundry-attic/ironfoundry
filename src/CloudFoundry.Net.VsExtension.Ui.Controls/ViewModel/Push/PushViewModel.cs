@@ -92,16 +92,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                         message.Execute(this.SelectedCloud);
                 });
 
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddApplicationService, (confirmed) =>
-            {
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddApplicationService, (confirmed) => 
                 Messenger.Default.Send(new NotificationMessageAction<AddApplicationServiceViewModel>(Messages.GetAddApplicationServiceData,
-                    (viewModel) =>
-                    {
-                        if (!this.ApplicationServices.Contains(viewModel.SelectedService,new ProvisionedServiceEqualityComparer()))
-                            this.ApplicationServices.Add(viewModel.SelectedService);
-                    }));
-            }));
-            
+                (viewModel) =>
+                {
+                    if (!this.ApplicationServices.Contains(viewModel.SelectedService,new ProvisionedServiceEqualityComparer()))
+                        this.ApplicationServices.Add(viewModel.SelectedService);    
+                }))));            
         }
 
         private bool CanChooseDirectory()

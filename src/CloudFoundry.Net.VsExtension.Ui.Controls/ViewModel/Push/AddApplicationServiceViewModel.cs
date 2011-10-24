@@ -16,12 +16,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class AddApplicationServiceViewModel : DialogViewModel
     {
-        private ObservableCollection<ProvisionedService> systemServices;
+        private ObservableCollection<ProvisionedService> systemServices = new ObservableCollection<ProvisionedService>();
         private ProvisionedService selectedService;
 
         public AddApplicationServiceViewModel() : base(Messages.AddApplicationServiceDialogResult)
-        {
-            this.systemServices = new ObservableCollection<ProvisionedService>();
+        {            
         }
 
         protected override void RegisterGetData()
@@ -38,10 +37,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         protected override void InitializeData()
         {
             Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetAddApplicationServiceData,
-                (cloud) =>
-                {
-                    this.Services.Synchronize(cloud.Services, new ProvisionedServiceEqualityComparer());
-                }));
+                (cloud) => this.Services.Synchronize(cloud.Services, new ProvisionedServiceEqualityComparer())));
         }
 
         private void Confirmed()

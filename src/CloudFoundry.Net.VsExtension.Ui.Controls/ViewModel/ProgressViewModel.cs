@@ -16,6 +16,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private string title;
         private bool canExecuteConfirmed;
         private bool canExecuteCancelled;
+        private bool isCancelVisible = true;
 
         public ProgressViewModel() : base(Messages.ProgressDialogResult)
         {
@@ -52,6 +53,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         protected override void InitializeData()
         {
             Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetProgressData, (s) => this.Title = s));
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.SetProgressCancelButtonVisible, (b) => this.IsCancelVisible = b));
         }
 
         protected override bool CanExecuteConfirmed()
@@ -81,5 +83,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return this.progressText; }
             set { this.progressText = value; RaisePropertyChanged("ProgressText"); }
         }
+
+        public bool IsCancelVisible
+        {
+            get { return this.isCancelVisible; }
+            set { this.isCancelVisible = value; RaisePropertyChanged("IsCancelVisible"); }
+        }
+
     }
 }

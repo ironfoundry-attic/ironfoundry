@@ -26,9 +26,9 @@
             <Button ToolTip="Update..." Command="{Binding UpdateAppCommand}">
                 <Image Source="../Images/update.png"/>
             </Button>
-            <Button ToolTip="Refresh..." HorizontalAlignment="Right" Command="{Binding RefreshCloudsCommand}">
+            <!--<Button ToolTip="Refresh..." HorizontalAlignment="Right" Command="{Binding RefreshCloudsCommand}">
                 <Image Source="../Images/refresh.png"/>
-            </Button>                        
+            </Button>-->                        
         </ToolBar>
         <TreeView DockPanel.Dock="Bottom" ItemsSource="{Binding Clouds}" VerticalAlignment="Stretch">
             <TreeView.ItemContainerStyle>                
