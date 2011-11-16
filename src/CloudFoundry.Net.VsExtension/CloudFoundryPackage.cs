@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 using System.Windows.Input;
+using Application = CloudFoundry.Net.Types.Application;
 
 namespace CloudFoundry.Net.VsExtension
 {
@@ -151,7 +152,12 @@ namespace CloudFoundry.Net.VsExtension
 
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
                     PerformAction("Update Application", project, modelData.SelectedCloud, projectDirectories, (c, d) =>
-                        c.Update(modelData.SelectedApplication.Name, d));
+                    {
+                        var updateResult = c.Update(modelData.SelectedApplication.Name, d);
+                        if (updateResult.Success)
+                            c.Restart(new Application() {Name = modelData.SelectedApplication.Name});
+                        return updateResult;
+                    });
                 }
             }
         }
@@ -246,12 +252,12 @@ namespace CloudFoundry.Net.VsExtension
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Sending to " + cloud.Url))));
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                var response = function(client, new DirectoryInfo(dir.DeployFromPath));
+                var response = function(client, new DirectoryInfo(dir.DeployFromPath));                
                 if (result.Success == false)
                 {
                     dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message))));
                     return;
-                }
+                }               
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, action + " complete."))));
             };
 
