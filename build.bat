@@ -22,6 +22,8 @@ if "%DevEnvDir%"=="" (
 
 rem msbuild /v:n /t:build /p:Configuration=Debug /p:Platform="Any CPU" %SLN%
 
+powershell -nologo -file clean.ps1
+
 msbuild /v:n /t:rebuild /p:Configuration=Release /p:Platform="Any CPU" %SLN%
 
 exit /b %ERRORLEVEL%
