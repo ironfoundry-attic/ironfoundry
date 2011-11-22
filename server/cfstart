@@ -1,0 +1,13 @@
+#!/bin/bash
+export HOME=/home/cfadmin
+source $HOME/.rvm/scripts/rvm
+$HOME/.rvm/bin/rvm use ruby-1.9.2-p180
+# $HOME/cloudfoundry/vcap/bin/vcap start router
+# $HOME/cloudfoundry/vcap/bin/vcap start cloud_controller
+# $HOME/cloudfoundry/vcap/bin/vcap start health_manager
+# $HOME/cloudfoundry/vcap/bin/vcap start redis
+# $HOME/cloudfoundry/vcap/bin/vcap start node
+# $HOME/cloudfoundry/vcap/bin/vcap start mysql
+# $HOME/cloudfoundry/vcap/bin/vcap start mongodb
+# $HOME/cloudfoundry/vcap/bin/vcap start neo4j
+$HOME/cloudfoundry/vcap/bin/vcap start dea
