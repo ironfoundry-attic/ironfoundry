@@ -1,1 +1,0 @@
-sc create mssql_gateway_svc binPath= "C:\Ruby192\bin\rubyw.exe -C C:\Projects\T3\CF\cf_src\vcap-read-only\services\mssql\bin mssql_gateway_svc.rb"
