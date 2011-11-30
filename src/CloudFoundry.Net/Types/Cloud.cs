@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.Windows;
     using CloudFoundry.Net.Extensions;
 
@@ -163,14 +162,21 @@
 
         public bool Equals(Cloud other)
         {
-            return other.ID == this.ID;
+            if (null == other)
+                return false;
+
+            return this.GetHashCode() == other.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null || obj == DependencyProperty.UnsetValue)
+            if (null == obj)
                 return false;
-            return ((Cloud)obj).ID == this.ID;
+
+            if (DependencyProperty.UnsetValue == obj)
+                return false;
+
+            return Equals(obj as Cloud);
         }
 
         public override int GetHashCode()
