@@ -98,6 +98,12 @@ namespace CloudFoundry.Net.Vmc
             return hlpr.AddUser(email, password);
         }
 
+        public VcapClientResult DeleteUser(string email)
+        {
+            var hlpr = new UserHelper(credMgr);
+            return hlpr.DeleteUser(email);
+        }
+
         public VcapClientResult Push(
             string name, string deployFQDN, ushort instances,
             DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames)

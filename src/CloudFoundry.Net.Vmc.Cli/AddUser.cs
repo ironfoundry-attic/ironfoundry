@@ -27,6 +27,7 @@
             if (password == verifyPassword)
             {
                 IVcapClient vc = new VcapClient();
+                Console.WriteLine();
                 Console.Write("Creating New User: ");
                 vc.AddUser(email, password);
                 Console.WriteLine("OK");

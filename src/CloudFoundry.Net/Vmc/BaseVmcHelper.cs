@@ -1,6 +1,7 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
     using System.Collections.Generic;
+    using CloudFoundry.Net.Extensions;
     using Newtonsoft.Json;
     using Types;
 
@@ -25,9 +26,13 @@
             return JsonConvert.DeserializeObject<Application>(json);
         }
 
-        public IEnumerable<Application> GetApplications()
+        public IEnumerable<Application> GetApplications(string proxy_user = null)
         {
             var r = new VcapRequest(credMgr, Constants.APPS_PATH);
+            if (false == proxy_user.IsNullOrWhiteSpace())
+            {
+                r.ProxyUser = proxy_user;
+            }
             return r.Execute<Application[]>();
         }
 

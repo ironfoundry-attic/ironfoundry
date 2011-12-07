@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using NDesk.Options;
     using CloudFoundry.Net.Extensions;
+    using NDesk.Options;
 
     static partial class Program
     {
@@ -39,6 +39,7 @@
                 { "help",           (arg) => Usage() },
                 { "passwd",         (arg) => Passwd(arg) },
                 { "add-user",       (arg) => AddUser(arg) },
+                { "delete-user",    (arg) => DeleteUser(arg) },
                 { "files",          (arg) => Files(arg) },
 #if DEBUG
                 { "testfiles",      (arg) => TestFiles(arg) },

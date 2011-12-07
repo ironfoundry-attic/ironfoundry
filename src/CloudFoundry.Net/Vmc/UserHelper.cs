@@ -2,6 +2,7 @@
 
 namespace CloudFoundry.Net.Vmc
 {
+    using CloudFoundry.Net.Types;
     using Newtonsoft.Json.Linq;
     using Properties;
     using RestSharp;
@@ -51,6 +52,25 @@ namespace CloudFoundry.Net.Vmc
         {
             var r = new VcapJsonRequest(credMgr, Method.POST, Constants.USERS_PATH);
             r.AddBody(new { email = email, password = password });
+            RestResponse response = r.Execute();
+            return new VcapClientResult();
+        }
+
+        public VcapClientResult DeleteUser(string email)
+        {
+            var appsHelper = new AppsHelper(credMgr);
+            foreach (Application a in appsHelper.GetApplications(email))
+            {
+                appsHelper.Delete(a.Name);
+            }
+
+            var servicesHelper = new ServicesHelper(credMgr);
+            foreach (ProvisionedService ps in servicesHelper.GetProvisionedServices(email))
+            {
+                servicesHelper.DeleteService(ps.Name);
+            }
+
+            var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.USERS_PATH, email);
             RestResponse response = r.Execute();
             return new VcapClientResult();
         }
