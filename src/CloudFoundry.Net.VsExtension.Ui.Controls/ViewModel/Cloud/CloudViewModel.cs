@@ -1,19 +1,18 @@
-﻿using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.Utilities;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Windows.Threading;
+using CloudFoundry.Net.Extensions;
 using CloudFoundry.Net.Types;
+using CloudFoundry.Net.Utilities;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using System.Threading;
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
@@ -175,18 +174,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public bool CanExecuteStart()
         {
-            return IsApplicationSelected && !applicationStarting && !(
-                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
+            return IsApplicationSelected && false == applicationStarting && SelectedApplication.CanStart;
         }
 
         public bool CanExecuteStopActions()
         {
-            return IsApplicationSelected && (
-                   SelectedApplication.State.Equals(Types.VcapStates.RUNNING) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTED) ||
-                   SelectedApplication.State.Equals(Types.VcapStates.STARTING));
+            return IsApplicationSelected && SelectedApplication.CanStop;
         }
 
         private bool CanExecuteRefresh()

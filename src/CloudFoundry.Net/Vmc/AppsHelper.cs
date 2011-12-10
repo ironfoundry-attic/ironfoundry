@@ -11,7 +11,6 @@ namespace CloudFoundry.Net.Vmc
     using CloudFoundry.Net.Types;
     using ICSharpCode.SharpZipLib.Zip;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
     using RestSharp;
 
     internal class AppsHelper : BaseVmcHelper
@@ -23,7 +22,7 @@ namespace CloudFoundry.Net.Vmc
             Application app = GetApplication(applicationName);
             if (false == app.IsStarted)
             {
-                app.State = VcapStates.STARTED;
+                app.Start();
                 UpdateApplication(app);
                 // NB: Ruby vmc does a LOT more steps here
                 // TODO wait for start?
@@ -41,7 +40,7 @@ namespace CloudFoundry.Net.Vmc
             Application app = GetApplication(applicationName);
             if (false == app.IsStopped)
             {
-                app.State = VcapStates.STOPPED;
+                app.Stop();
                 UpdateApplication(app);
             }
         }
@@ -130,7 +129,7 @@ namespace CloudFoundry.Net.Vmc
                     uploadAppBits(name, path);
 
                     Application app = GetApplication(name);
-                    app.State = VcapStates.STARTED;
+                    app.Start();
                     r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name);
                     r.AddBody(app);
                     response = r.Execute();
@@ -165,10 +164,7 @@ namespace CloudFoundry.Net.Vmc
             {
                 uploadAppBits(name, path);
                 Application app = GetApplication(name);
-                if (app.IsStarted)
-                {
-                    Restart(app);
-                }
+                Restart(app);
                 rv = new VcapClientResult();
             }
 
@@ -193,16 +189,10 @@ namespace CloudFoundry.Net.Vmc
 
             for (int i = 0; i < 20; ++i)
             {
-                string appJson = GetApplicationJson(name);
-                JObject parsed = JObject.Parse(appJson);
+                Application app = GetApplication(name);
 
-                // Ruby detects health a little differently
-                string appState          = (string)parsed["state"];                
-                ushort? runningInstances = (ushort?)parsed["runningInstances"];
-
-                if ((appState == VcapStates.STARTED) &&
-                    (runningInstances.HasValue) &&
-                    (runningInstances.Value > 0))
+                if (app.IsStarted &&
+                    (app.RunningInstances.HasValue && app.RunningInstances.Value > 0))
                 {
                     started = true;
                     break;
