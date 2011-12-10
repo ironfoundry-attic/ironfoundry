@@ -6,9 +6,6 @@
 
     public interface IVcapClient
     {
-        /*
-         * TODO: better way to indicate success for methods that don't return VcapClientResult? hm.
-         */
         string CurrentToken { get; }
         string CurrentUri { get; }
 
@@ -24,7 +21,7 @@
 
         VcapClientResult Push(
             string name, string deployFQDN, ushort instances, DirectoryInfo path,
-            uint memoryKB, string[] provisionedServiceNames);
+            uint memoryMB, string[] provisionedServiceNames);
 
         VcapClientResult Update(string appname, DirectoryInfo di);
 

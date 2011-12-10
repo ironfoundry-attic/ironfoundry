@@ -17,6 +17,7 @@
         static string command_password = null;
         static bool prompt_ok          = true;
         static ushort instances        = 1;
+        static ushort memoryMB         = 64;
 
         static void Main(string[] args)
         {
@@ -67,6 +68,8 @@
                 { "noprompts", "set prompting", v => { prompt_ok = v.IsNullOrWhiteSpace(); } },
 
                 { "instances=", "set instances", v => { instances = Convert.ToUInt16(v); } },
+
+                { "mem=", "set memory in MB", v => { memoryMB = Convert.ToUInt16(v); } },
             };
 
             IList<string> unparsed = null;

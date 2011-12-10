@@ -21,7 +21,6 @@
         {
             T rv = JsonConvert.DeserializeObject<T>(argJson);
 
-            // TODO hmm...
             var message = rv as Message;
             if (null != message)
             {

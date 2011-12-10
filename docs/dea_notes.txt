@@ -46,7 +46,7 @@ dea/db/applications.json -
   }
 }
 
-lbakken@QA1LRBCC2301:~/cloudfoundry/vcap$ tree /var/vcap.local/
+~/cloudfoundry/vcap$ tree /var/vcap.local/
 /var/vcap.local/
 +-- dea
 ¦   +-- apps

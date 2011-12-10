@@ -11,7 +11,7 @@
             // TODO match ruby argument parsing
             if (unparsed.Count < 3 || unparsed.Count > 4)
             {
-                Console.Error.WriteLine("Usage: vmc push <appname> <path> <url> [service] --instances N"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc push <appname> <path> <url> [service] --instances N --mem MB"); // TODO usage statement standardization
                 return false;
             }
 
@@ -37,7 +37,7 @@
             }
 
             IVcapClient vc = new VcapClient();
-            VcapClientResult rv = vc.Push(appname, fqdn, instances, di, 128, serviceNames); // TODO MEM
+            VcapClientResult rv = vc.Push(appname, fqdn, instances, di, memoryMB, serviceNames);
             if (false == rv.Success)
             {
                 Console.Error.WriteLine(rv.Message);
