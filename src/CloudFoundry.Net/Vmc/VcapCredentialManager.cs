@@ -158,8 +158,14 @@ namespace CloudFoundry.Net.Vmc
             if (shouldWrite)
             {
                 // NB: ruby vmc writes target uris without trailing slash
-                Dictionary<string, string> tmp = tokenDict.ToDictionary(e => e.Key.AbsoluteUriTrimmed(), e => e.Value.Token);
-                File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tmp));
+                try
+                {
+                    Dictionary<string, string> tmp = tokenDict.ToDictionary(e => e.Key.AbsoluteUriTrimmed(), e => e.Value.Token);
+                    File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tmp));
+                }
+                catch (IOException)
+                {
+                }
             }
         }
 

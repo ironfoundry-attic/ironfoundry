@@ -211,7 +211,6 @@ namespace CloudFoundry.Net.Vmc
             /*
              * Before creating the app, ensure we can build resource list
              */
-
             string uploadFile = Path.GetTempFileName();
             DirectoryInfo explodeDir = Utility.GetTempDirectory();
             Utility.CopyDirectory(path, explodeDir);
@@ -237,16 +236,21 @@ namespace CloudFoundry.Net.Vmc
                             resources.Remove(r);
                         }
                     }
-
-                    if (false == resources.IsNullOrEmpty())
+                    if (resources.IsNullOrEmpty())
                     {
-                        var zipper = new FastZip();
-                        zipper.CreateZip(uploadFile, explodeDir.FullName, true, String.Empty);
-                        var request = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name, "application");
-                        request.AddFile("application", uploadFile);
-                        request.AddParameter("resources", JsonConvert.SerializeObject(appcloudResources.ToArrayOrNull()));
-                        RestResponse response = request.Execute();
+                        /*
+                            If no resource needs to be sent, add an empty file to ensure we have
+                            a multi-part request that is expected by nginx fronting the CC.
+                         */
+                        File.WriteAllText(Path.Combine(explodeDir.FullName, ".__empty__"), String.Empty);
                     }
+
+                    var zipper = new FastZip();
+                    zipper.CreateZip(uploadFile, explodeDir.FullName, true, String.Empty);
+                    var request = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name, "application");
+                    request.AddFile("application", uploadFile);
+                    request.AddParameter("resources", JsonConvert.SerializeObject(appcloudResources.ToArrayOrNull()));
+                    RestResponse response = request.Execute();
                 }
             }
             finally
