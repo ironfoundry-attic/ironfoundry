@@ -1,21 +1,15 @@
-﻿using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.Utilities;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.ComponentModel;
     using System.Linq;
-    using System.Windows.Threading;
+    using CloudFoundry.Net.Extensions;
     using CloudFoundry.Net.Types;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.Utilities;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-    using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
 
     public class PushViewModel : DialogViewModel
     {

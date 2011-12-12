@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Converters
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Converters
 {
+    using System;
+    using System.Globalization;
+    using System.Windows.Data;
+
     public class TitleCaseConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

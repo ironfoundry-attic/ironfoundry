@@ -1,17 +1,14 @@
 ﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Windows.Input;
+    using System.Windows.Threading;
     using CloudFoundry.Net.Types;
-    using CloudFoundry.Net.Vmc;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
-    using System;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-    using System.ComponentModel;
-    using System.Windows.Threading;
-    using System.Collections.Specialized;
-using System.Collections.Generic;
 
     public class ApplicationTreeViewItemViewModel : TreeViewItemViewModel
     {

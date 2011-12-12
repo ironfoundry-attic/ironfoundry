@@ -1,5 +1,4 @@
-﻿
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
 {
     public static class Messages
     {

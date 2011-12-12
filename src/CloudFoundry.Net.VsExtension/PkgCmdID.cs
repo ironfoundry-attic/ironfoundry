@@ -1,6 +1,6 @@
 ﻿namespace CloudFoundry.Net.VsExtension
 {
-    static class PkgCmdIDList
+    public static class PkgCmdIDList
     {
         public const uint cmdidCloudFoundryExplorer = 0x100;
         public const uint cmdidPushCloudFoundryApplication = 0x200;

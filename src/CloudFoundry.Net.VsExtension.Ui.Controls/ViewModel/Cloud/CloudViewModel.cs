@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Windows.Threading;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.Types;
-using CloudFoundry.Net.Utilities;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Threading;
+    using System.Windows.Threading;
+    using CloudFoundry.Net.Extensions;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.Utilities;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+
     public class CloudViewModel : ViewModelBase
     {
         public RelayCommand ChangePasswordCommand { get; private set; }

@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using System.ComponentModel;
-using System.Threading;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 {
+    using System;
+    using System.ComponentModel;
+    using System.Threading;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+
     public abstract class DialogViewModel : ViewModelBase
     {
         public RelayCommand ConfirmedCommand { get; private set; }

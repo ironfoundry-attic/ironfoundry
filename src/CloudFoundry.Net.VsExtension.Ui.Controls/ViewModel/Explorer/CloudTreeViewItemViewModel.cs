@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Threading;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using GalaSoft.MvvmLight.Command;
-using System.Windows.Input;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.Types;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
+    using System.Windows.Input;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+
     public class CloudTreeViewItemViewModel : TreeViewItemViewModel
     {
         private Cloud cloud;

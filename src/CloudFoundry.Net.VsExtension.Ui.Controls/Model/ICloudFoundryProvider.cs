@@ -1,12 +1,11 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Windows.Threading;
-using CloudFoundry.Net.Types;
-using CloudFoundry.Net.Vmc;
-
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.Vmc;
+
     public interface ICloudFoundryProvider
     {
         ObservableCollection<Cloud> Clouds { get; }

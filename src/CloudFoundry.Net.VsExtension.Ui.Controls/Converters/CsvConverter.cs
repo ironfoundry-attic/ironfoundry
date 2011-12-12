@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-using System.Windows;
-using System.Windows.Controls;
-using System.Globalization;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Converters
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Converters
 {
+    using System;
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Data;
+
     public class CsvConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

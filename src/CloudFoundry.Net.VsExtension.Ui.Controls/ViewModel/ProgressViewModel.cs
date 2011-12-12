@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using System.Windows.Input;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System.Windows.Input;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Messaging;
+
     public class ProgressViewModel : DialogViewModel
     {
         private int progressValue;
