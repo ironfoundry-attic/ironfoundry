@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Linq;
     using CloudFoundry.Net.Types;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
@@ -29,7 +30,12 @@
             ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);
             this.cloudUrls = provider.CloudUrls;
             this.SelectedCloudUrl = cloudUrls.SingleOrDefault((i) => i.IsDefault);
-            OnConfirmed += (s, e) => { this.provider.Clouds.Add(this.Cloud); Cleanup(); };
+        }
+
+        protected override void OnConfirmed(CancelEventArgs e)
+        {
+            this.provider.Clouds.Add(this.Cloud);
+            Cleanup();
         }
 
         private void ValidateAccount()

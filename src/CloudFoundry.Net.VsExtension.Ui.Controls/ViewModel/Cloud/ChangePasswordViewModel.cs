@@ -14,10 +14,7 @@
         private string verifyPassword;
         private string email;
 
-        public ChangePasswordViewModel() : base(Messages.ChangePasswordDialogResult)
-        {
-            OnConfirmed += ConfirmChange;
-        }        
+        public ChangePasswordViewModel() : base(Messages.ChangePasswordDialogResult) { }        
 
         protected override void RegisterGetData()
         {
@@ -38,7 +35,7 @@
             }));
         }
 
-        private void ConfirmChange(object sender, CancelEventArgs e)
+        protected override void OnConfirmed(CancelEventArgs e)
         {
             if (String.IsNullOrEmpty(NewPassword) || 
                 String.IsNullOrEmpty(VerifyPassword))

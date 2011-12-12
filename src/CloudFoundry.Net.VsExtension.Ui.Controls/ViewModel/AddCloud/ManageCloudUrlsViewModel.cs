@@ -1,6 +1,7 @@
 ﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using CloudFoundry.Net.Extensions;
     using CloudFoundry.Net.Types;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
@@ -22,12 +23,13 @@
             EditCommand = new RelayCommand(Edit, CanEdit);
             RemoveCommand = new RelayCommand(Remove, CanRemove);
             this.CloudUrls = provider.CloudUrls.DeepCopy();
-            OnConfirmed += (s, e) =>
-            {
-                provider.CloudUrls.Synchronize(this.CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
-                provider.SaveChanges();
-            };
-        }       
+        }
+
+        protected override void OnConfirmed(CancelEventArgs args)
+        {
+            provider.CloudUrls.Synchronize(this.CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
+            provider.SaveChanges();
+        }
 
         private void Add()
         {

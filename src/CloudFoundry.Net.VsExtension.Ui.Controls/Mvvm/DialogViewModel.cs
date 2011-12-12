@@ -13,11 +13,12 @@
     {
         public RelayCommand ConfirmedCommand { get; private set; }
         public RelayCommand CancelledCommand { get; private set; }
-        protected event CancelEventHandler OnConfirmed;
-        protected event EventHandler OnCancelled;
         private string resultMessageId;
         protected ICloudFoundryProvider provider;
         private string errorMessage;
+
+        protected virtual void OnConfirmed(CancelEventArgs args) { }
+        protected virtual void OnCancelled() { }
 
         public DialogViewModel(string resultMessageId)
         {
@@ -36,10 +37,11 @@
         private void Confirmed()
         {
             var args = new CancelEventArgs();    
-            if (OnConfirmed != null)
-                OnConfirmed(this, args);
-            if (!args.Cancel)
-                Messenger.Default.Send(new NotificationMessage<bool>(this, true, resultMessageId));            
+            OnConfirmed(args);
+            if (false == args.Cancel)
+            {
+                Messenger.Default.Send(new NotificationMessage<bool>(this, true, resultMessageId));
+            }
         }
 
         protected virtual bool CanExecuteConfirmed()
@@ -49,9 +51,7 @@
 
         private void Cancelled()
         {
-            if (OnCancelled != null)
-                OnCancelled(this, null);
-            
+            OnCancelled();
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, resultMessageId));
             Cleanup();
         }

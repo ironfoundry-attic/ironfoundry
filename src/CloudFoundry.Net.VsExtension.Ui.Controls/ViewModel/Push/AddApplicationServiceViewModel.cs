@@ -6,6 +6,7 @@
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
+using System.ComponentModel;
 
     public class AddApplicationServiceViewModel : DialogViewModel
     {
@@ -33,7 +34,7 @@
                 (cloud) => this.Services.Synchronize(cloud.Services, new ProvisionedServiceEqualityComparer())));
         }
 
-        private void Confirmed()
+        protected override void OnConfirmed(CancelEventArgs e)
         {           
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddApplicationServiceDialogResult));
         }

@@ -10,6 +10,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
     {
         ObservableCollection<Cloud> Clouds { get; }
         ObservableCollection<CloudUrl> CloudUrls { get; }
+
         event NotifyCollectionChangedEventHandler CloudsChanged;
         void SaveChanges();
         ProviderResponse<Cloud> Connect(Cloud cloud);        
@@ -30,6 +31,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application);
         ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId);
         ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services);
-        ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);        
+        ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);
     }
 }

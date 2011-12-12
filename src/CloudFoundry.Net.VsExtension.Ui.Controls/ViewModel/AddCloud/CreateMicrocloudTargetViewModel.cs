@@ -59,6 +59,5 @@
         {
             get { return this.cloudUrl; }
         }
-
     }
 }

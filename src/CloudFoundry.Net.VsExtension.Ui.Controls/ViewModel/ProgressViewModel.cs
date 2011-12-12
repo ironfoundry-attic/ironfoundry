@@ -4,6 +4,7 @@
     using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
+    using System.ComponentModel;
 
     public class ProgressViewModel : DialogViewModel
     {
@@ -41,9 +42,16 @@
                         this.canExecuteConfirmed = true;
                         CommandManager.InvalidateRequerySuggested();
                 });
+        }
 
-            OnConfirmed += (s, e) => Cleanup();
-            OnCancelled += (s, e) => Cleanup();
+        protected override void OnConfirmed(CancelEventArgs args)
+        {
+            Cleanup();
+        }
+
+        protected override void OnCancelled()
+        {
+            Cleanup();
         }
 
         protected override void InitializeData()

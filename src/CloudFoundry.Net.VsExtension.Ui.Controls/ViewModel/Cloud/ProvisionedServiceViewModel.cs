@@ -17,10 +17,9 @@
 
         public CreateServiceViewModel() : base(Messages.CreateServiceDialogResult)
         {
-            this.OnConfirmed += ConfirmCreate;
         }
 
-        private void ConfirmCreate(object sender, CancelEventArgs e)
+        protected override void OnConfirmed(CancelEventArgs e)
         {
             var result = provider.CreateService(cloud, SelectedSystemService.Vendor, Name);            
             if (!result.Response)

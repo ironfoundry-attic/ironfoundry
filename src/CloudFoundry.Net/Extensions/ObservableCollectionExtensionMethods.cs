@@ -1,10 +1,10 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using CloudFoundry.Net.Types;
-
 namespace CloudFoundry.Net.Extensions
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using CloudFoundry.Net.Types;
+
     public static class ObservableCollectionExtensionMethods
     {
         public static void Synchronize<T>(this ObservableCollection<T> argThis, ObservableCollection<T> toSynchronizeWith, IEqualityComparer<T> comparer)

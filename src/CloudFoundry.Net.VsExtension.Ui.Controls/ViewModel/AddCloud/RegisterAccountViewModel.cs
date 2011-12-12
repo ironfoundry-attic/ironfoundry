@@ -16,10 +16,9 @@
 
         public RegisterAccountViewModel() : base(Messages.RegisterAccountDialogResult)
         {
-            OnConfirmed += ConfirmRegister;
         }
 
-        void ConfirmRegister(object sender, CancelEventArgs e)
+        protected override void OnConfirmed(CancelEventArgs e)
         {
             if (String.IsNullOrEmpty(EMail))
             {
