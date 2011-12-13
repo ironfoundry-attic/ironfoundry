@@ -207,13 +207,19 @@
                 else
                 {
                     var frameworkPath = (site == null) ? project.GetFrameworkPath() : string.Empty;
+
+                    string objDir = Path.Combine(dir.ProjectDirectory, "obj");
+                    if (Directory.Exists(objDir))
+                    {
+                        Directory.Delete(objDir, true); // NB: this can cause precompile errors
+                    }
                     var process = new System.Diagnostics.Process()
                     {
                         StartInfo = new ProcessStartInfo()
                         {
 
                             FileName = frameworkPath + "\\aspnet_compiler.exe",
-                            Arguments = string.Format("-v / -nologo -p \"{0}\" -u -c \"{1}\"", dir.ProjectDirectory, dir.DeployFromPath),
+                            Arguments = String.Format("-nologo -v / -p \"{0}\" -f -u -c \"{1}\"", dir.ProjectDirectory, dir.DeployFromPath),
                             CreateNoWindow = true,
                             ErrorDialog = false,
                             UseShellExecute = false,
