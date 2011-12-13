@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Extensions;
-using GalaSoft.MvvmLight;
-using System.Collections.ObjectModel;
-using GalaSoft.MvvmLight.Command;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System.Linq;
+    using CloudFoundry.Net.Extensions;
+    using GalaSoft.MvvmLight;
+
     public class TreeViewItemViewModel : ViewModelBase
     {
         private static readonly TreeViewItemViewModel placeholderChild = new TreeViewItemViewModel();

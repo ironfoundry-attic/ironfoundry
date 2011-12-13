@@ -57,6 +57,7 @@ Currently available vmc commands are:
   Administration
     passwd                                       Change the password for the current user
     add-user                                     Register a new user (requires admin privileges)
+    delete-user <user>                           Delete a user and all apps and services (requires admin privileges)
 
   Help
     help                                         Get general help

@@ -8,6 +8,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9E04D2BE-86B8-47B9-809D-84506CFDF42D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{097A69C8-07B2-435F-896F-D81AA9C58284}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Net.VsExtension", "src\CloudFoundry.Net.VsExtension\CloudFoundry.Net.VsExtension.csproj", "{8393BB9D-7606-46AA-A399-8008F686CB7D}"
 EndProject

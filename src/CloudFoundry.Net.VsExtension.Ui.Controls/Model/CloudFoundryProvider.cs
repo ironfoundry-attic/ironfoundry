@@ -1,18 +1,15 @@
-﻿using CloudFoundry.Net.Extensions;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
-    using System.Linq;
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
+    using CloudFoundry.Net.Extensions;
     using CloudFoundry.Net.Types;
     using CloudFoundry.Net.Vmc;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
-    using System;
-using System.Windows.Threading;
 
     public class CloudFoundryProvider : ICloudFoundryProvider
     {

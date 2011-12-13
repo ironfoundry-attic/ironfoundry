@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Drawing;
-using Microsoft.Win32;
-using System.Reflection;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
 {
+    using System;
+    using System.Drawing;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using Microsoft.Win32;
+
     public static class IconUtil
     {               
-
         [DllImport("Shell32", CharSet = CharSet.Auto)]
         extern static int ExtractIconEx(
             [MarshalAs(UnmanagedType.LPTStr)] 

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Utilities
 {
+    using System.Windows;
+    using System.Windows.Controls;
+
     public static class PasswordHelper
     {
         public static readonly DependencyProperty PasswordProperty = DependencyProperty.RegisterAttached("Password",

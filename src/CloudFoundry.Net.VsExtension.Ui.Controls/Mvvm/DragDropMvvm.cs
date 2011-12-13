@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Input;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 {
+    using System;
+    using System.Windows;
+    using System.Windows.Input;
+
     public interface IDragSource
     {
         DragDropEffects GetDragEffects(object dataContext);
@@ -207,6 +204,4 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
             e.Handled = true;
         }
     }
-
-
 }

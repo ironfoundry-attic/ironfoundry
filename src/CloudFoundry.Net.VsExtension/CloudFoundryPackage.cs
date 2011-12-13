@@ -1,28 +1,26 @@
-﻿using System;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Interop;
-using CloudFoundry.Net.Types;
-using CloudFoundry.Net.Vmc;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Views;
-using EnvDTE;
-using GalaSoft.MvvmLight.Messaging;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using System.Collections.Generic;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using System.Windows.Input;
-using Application = CloudFoundry.Net.Types.Application;
-
-namespace CloudFoundry.Net.VsExtension
+﻿namespace CloudFoundry.Net.VsExtension
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.ComponentModel.Design;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Runtime.InteropServices;
+    using System.Windows.Interop;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.Vmc;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Views;
+    using EnvDTE;
+    using GalaSoft.MvvmLight.Messaging;
+    using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Shell.Interop;
+    using Application = CloudFoundry.Net.Types.Application;
+
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -162,10 +160,7 @@ namespace CloudFoundry.Net.VsExtension
             }
         }
 
-        private void PerformAction(string action, 
-                                   Project project, 
-                                   Cloud cloud, 
-                                   ProjectDirectories dir,
+        private void PerformAction(string action, Project project, Cloud cloud, ProjectDirectories dir,
                                    Func<IVcapClient, DirectoryInfo, VcapClientResult> function)
         {
             var worker = new BackgroundWorker();
@@ -230,7 +225,7 @@ namespace CloudFoundry.Net.VsExtension
                     process.Start();
                     var output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
-                    if (!string.IsNullOrEmpty(output))
+                    if (false == String.IsNullOrEmpty(output))
                     {
                         dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output))));
                         return;

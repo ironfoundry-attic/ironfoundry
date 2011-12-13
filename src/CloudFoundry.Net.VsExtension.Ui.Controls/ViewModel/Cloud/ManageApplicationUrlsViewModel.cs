@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using System.Collections.ObjectModel;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System;
+    using System.Collections.ObjectModel;
+    using CloudFoundry.Net.Extensions;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+
     public class ManageApplicationUrlsViewModel : DialogViewModel
     {
         public RelayCommand AddCommand { get; private set; }
@@ -115,5 +110,3 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
     }
 }
-
-

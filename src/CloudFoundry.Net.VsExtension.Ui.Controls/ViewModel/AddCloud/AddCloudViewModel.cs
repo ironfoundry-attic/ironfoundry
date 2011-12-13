@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Threading;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.Types;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System;
+    using System.Linq;
+    using System.Windows.Threading;
+    using CloudFoundry.Net.Extensions;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+    using System.ComponentModel;
+
     public class AddCloudViewModel : DialogViewModel
     {
         public RelayCommand ManageCloudUrlsCommand { get; private set; }
@@ -23,8 +21,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private SafeObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
         private bool isAccountValid;
-        private Dispatcher dispatcher;
-        
+        private Dispatcher dispatcher;        
 
         public AddCloudViewModel() : base(Messages.AddCloudDialogResult)
         {
@@ -35,14 +32,12 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);
             this.cloudUrls = provider.CloudUrls;
             this.SelectedCloudUrl = cloudUrls.SingleOrDefault((i) => i.IsDefault);
-            OnConfirmed += (s, e) =>
-            {
-                dispatcher.BeginInvoke(new Action(() =>
-                {
-                    this.provider.Clouds.SafeAdd(this.Cloud);
-                }));
-                Cleanup();
-            };
+        }
+
+        protected override void OnConfirmed(CancelEventArgs e)
+        {
+            dispatcher.BeginInvoke(new Action(() => { this.provider.Clouds.SafeAdd(this.Cloud); }));
+            Cleanup();
         }
 
         private void ValidateAccount()

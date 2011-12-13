@@ -1,11 +1,15 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.Extensions
-{
-    public static class SafeObservableCollectionExtensionMethods
+{    
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using CloudFoundry.Net.Types;
+
+    public static class ObservableCollectionExtensionMethods
     {
         public static void Synchronize<T>(this SafeObservableCollection<T> argThis, SafeObservableCollection<T> toSynchronizeWith, IEqualityComparer<T> comparer)
         {

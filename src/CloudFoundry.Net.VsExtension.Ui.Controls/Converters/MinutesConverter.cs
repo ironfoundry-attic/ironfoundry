@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Converters
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Converters
 {
+    using System;
+    using System.Windows.Data;
+
     public class MinutesConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

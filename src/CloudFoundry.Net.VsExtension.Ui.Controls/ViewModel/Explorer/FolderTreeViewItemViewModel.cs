@@ -1,15 +1,13 @@
 ﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
-    using Types;
-    using System.Windows.Media;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-    using System.Windows.Interop;
     using System;
     using System.Windows;
+    using System.Windows.Interop;
+    using System.Windows.Media;
     using System.Windows.Media.Imaging;
-    using CloudFoundry.Net.Vmc;
-    using GalaSoft.MvvmLight.Messaging;
     using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Messaging;
 
     public class FolderTreeViewItemViewModel : TreeViewItemViewModel
     {

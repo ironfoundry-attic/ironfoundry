@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using System.Collections.ObjectModel;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.Types;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using CloudFoundry.Net.Extensions;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+
     public class ManageCloudUrlsViewModel : DialogViewModel
     {
         public RelayCommand AddCommand { get; private set; }
@@ -28,12 +23,13 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             EditCommand = new RelayCommand(Edit, CanEdit);
             RemoveCommand = new RelayCommand(Remove, CanRemove);
             this.CloudUrls = provider.CloudUrls.DeepCopy();
-            OnConfirmed += (s, e) =>
-            {
-                provider.CloudUrls.Synchronize(this.CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
-                provider.SaveChanges();
-            };
-        }       
+        }
+
+        protected override void OnConfirmed(CancelEventArgs args)
+        {
+            provider.CloudUrls.Synchronize(this.CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
+            provider.SaveChanges();
+        }
 
         private void Add()
         {
@@ -146,5 +142,3 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
     }
 }
-
-

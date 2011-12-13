@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using System.Windows.Input;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System.Windows.Input;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Messaging;
+    using System.ComponentModel;
+
     public class ProgressViewModel : DialogViewModel
     {
         private int progressValue;
@@ -45,9 +42,16 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                         this.canExecuteConfirmed = true;
                         CommandManager.InvalidateRequerySuggested();
                 });
+        }
 
-            OnConfirmed += (s, e) => Cleanup();
-            OnCancelled += (s, e) => Cleanup();
+        protected override void OnConfirmed(CancelEventArgs args)
+        {
+            Cleanup();
+        }
+
+        protected override void OnCancelled()
+        {
+            Cleanup();
         }
 
         protected override void InitializeData()

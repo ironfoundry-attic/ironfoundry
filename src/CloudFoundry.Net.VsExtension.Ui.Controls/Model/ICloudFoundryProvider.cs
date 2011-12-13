@@ -1,13 +1,13 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Windows.Threading;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.Types;
-using CloudFoundry.Net.Vmc;
+
 
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.Vmc;
+    using CloudFoundry.Net.Extensions;
+
     public interface ICloudFoundryProvider
     {
         SafeObservableCollection<Cloud> Clouds { get; }
@@ -32,6 +32,6 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         ProviderResponse<SafeObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application);
         ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId);
         ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services);
-        ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);        
+        ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);
     }
 }

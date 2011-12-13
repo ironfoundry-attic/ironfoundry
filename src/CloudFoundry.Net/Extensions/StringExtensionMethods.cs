@@ -1,7 +1,7 @@
-using System;
-
 namespace CloudFoundry.Net.Extensions
 {
+    using System;
+
     public static class StringExtensionMethods
     {
         public static bool IsNullOrWhiteSpace(this string argThis)

@@ -1,21 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
 {
+    using System.Windows;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
+    using GalaSoft.MvvmLight.Messaging;
+
     /// <summary>
     /// Interaction logic for AddCloud.xaml
     /// </summary>

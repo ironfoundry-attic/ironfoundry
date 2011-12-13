@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.Types;
-using System.Collections.ObjectModel;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
+    using System.Collections.ObjectModel;
+    using CloudFoundry.Net.Extensions;
+    using CloudFoundry.Net.Types;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight.Messaging;
+using System.ComponentModel;
+
     public class AddApplicationServiceViewModel : DialogViewModel
     {
         private SafeObservableCollection<ProvisionedService> systemServices = new SafeObservableCollection<ProvisionedService>();
@@ -40,7 +34,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                 (cloud) => this.Services.Synchronize(cloud.Services, new ProvisionedServiceEqualityComparer())));
         }
 
-        private void Confirmed()
+        protected override void OnConfirmed(CancelEventArgs e)
         {           
             Messenger.Default.Send(new NotificationMessage<bool>(this, true, Messages.AddApplicationServiceDialogResult));
         }

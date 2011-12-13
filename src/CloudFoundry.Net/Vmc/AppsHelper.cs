@@ -11,7 +11,6 @@ namespace CloudFoundry.Net.Vmc
     using CloudFoundry.Net.Types;
     using ICSharpCode.SharpZipLib.Zip;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
     using RestSharp;
 
     internal class AppsHelper : BaseVmcHelper
@@ -23,7 +22,7 @@ namespace CloudFoundry.Net.Vmc
             Application app = GetApplication(applicationName);
             if (false == app.IsStarted)
             {
-                app.State = VcapStates.STARTED;
+                app.Start();
                 UpdateApplication(app);
                 // NB: Ruby vmc does a LOT more steps here
                 // TODO wait for start?
@@ -41,7 +40,7 @@ namespace CloudFoundry.Net.Vmc
             Application app = GetApplication(applicationName);
             if (false == app.IsStopped)
             {
-                app.State = VcapStates.STOPPED;
+                app.Stop();
                 UpdateApplication(app);
             }
         }
@@ -112,7 +111,7 @@ namespace CloudFoundry.Net.Vmc
                      * Before creating the app, ensure we can build resource list
                      */
                     var resources = new List<Resource>();
-                    addDirectoryToResources(resources, path, path.FullName);
+                    ulong totalSize = addDirectoryToResources(resources, path, path.FullName);
 
                     var manifest = new AppManifest
                     {
@@ -130,7 +129,7 @@ namespace CloudFoundry.Net.Vmc
                     uploadAppBits(name, path);
 
                     Application app = GetApplication(name);
-                    app.State = VcapStates.STARTED;
+                    app.Start();
                     r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name);
                     r.AddBody(app);
                     response = r.Execute();
@@ -165,10 +164,7 @@ namespace CloudFoundry.Net.Vmc
             {
                 uploadAppBits(name, path);
                 Application app = GetApplication(name);
-                if (app.IsStarted)
-                {
-                    Restart(app);
-                }
+                Restart(app);
                 rv = new VcapClientResult();
             }
 
@@ -193,16 +189,10 @@ namespace CloudFoundry.Net.Vmc
 
             for (int i = 0; i < 20; ++i)
             {
-                string appJson = GetApplicationJson(name);
-                JObject parsed = JObject.Parse(appJson);
+                Application app = GetApplication(name);
 
-                // Ruby detects health a little differently
-                string appState          = (string)parsed["state"];                
-                ushort? runningInstances = (ushort?)parsed["runningInstances"];
-
-                if ((appState == VcapStates.STARTED) &&
-                    (runningInstances.HasValue) &&
-                    (runningInstances.Value > 0))
+                if (app.IsStarted &&
+                    (app.RunningInstances.HasValue && app.RunningInstances.Value > 0))
                 {
                     started = true;
                     break;
@@ -221,43 +211,85 @@ namespace CloudFoundry.Net.Vmc
             /*
              * Before creating the app, ensure we can build resource list
              */
-            var resources = new List<Resource>();
-            addDirectoryToResources(resources, path, path.FullName);
-            Resource[] resourceAry = resources.ToArrayOrNull();
-
-            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.RESOURCES_PATH);
-            r.AddBody(resourceAry);
-            RestResponse response = r.Execute();
-            // TODO only upload files that have changed
-
-            string tempFile = Path.GetTempFileName();
+            string uploadFile = Path.GetTempFileName();
+            DirectoryInfo explodeDir = Utility.GetTempDirectory();
+            Utility.CopyDirectory(path, explodeDir);
             try
             {
-                var zipper = new FastZip();
-                zipper.CreateZip(tempFile, path.FullName, true, String.Empty);
+                var resources = new List<Resource>();
+                ulong totalSize = addDirectoryToResources(resources, explodeDir, explodeDir.FullName);
 
-                r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name, "application");
-                r.AddFile("application", tempFile);
-                r.AddParameter("resources", JsonConvert.SerializeObject(resourceAry));
-                response = r.Execute();
+                if (false == resources.IsNullOrEmpty())
+                {
+                    Resource[] appcloudResources = null;
+                    if (totalSize > (64 * 1024))
+                    {
+                        appcloudResources = checkResources(resources.ToArray());
+                    }
+                    if (false == appcloudResources.IsNullOrEmpty())
+                    {
+                        foreach (Resource r in appcloudResources)
+                        {
+                            string localPath = Path.Combine(explodeDir.FullName, r.FN);
+                            var localFileInfo = new FileInfo(localPath);
+                            localFileInfo.Delete();
+                            resources.Remove(r);
+                        }
+                    }
+                    if (resources.IsNullOrEmpty())
+                    {
+                        /*
+                            If no resource needs to be sent, add an empty file to ensure we have
+                            a multi-part request that is expected by nginx fronting the CC.
+                         */
+                        File.WriteAllText(Path.Combine(explodeDir.FullName, ".__empty__"), String.Empty);
+                    }
+
+                    var zipper = new FastZip();
+                    zipper.CreateZip(uploadFile, explodeDir.FullName, true, String.Empty);
+                    var request = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name, "application");
+                    request.AddFile("application", uploadFile);
+                    request.AddParameter("resources", JsonConvert.SerializeObject(appcloudResources.ToArrayOrNull()));
+                    RestResponse response = request.Execute();
+                }
             }
             finally
             {
-                File.Delete(tempFile);
+                Directory.Delete(explodeDir.FullName, true);
+                File.Delete(uploadFile);
             }
         }
 
-        private static void addDirectoryToResources(ICollection<Resource> resources, DirectoryInfo directory, string rootFullName)
+        private Resource[] checkResources(Resource[] resourceAry)
         {
+            /*
+                Send in a resources manifest array to the system to have
+                it check what is needed to actually send. Returns array
+                indicating what is needed. This returned manifest should be
+                sent in with the upload if resources were removed.
+                E.g. [{:sha1 => xxx, :size => xxx, :fn => filename}]
+             */
+            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.RESOURCES_PATH);
+            r.AddBody(resourceAry);
+            RestResponse response = r.Execute();
+            return JsonConvert.DeserializeObject<Resource[]>(response.Content);
+        }
+
+        private static ulong addDirectoryToResources(
+            ICollection<Resource> resources, DirectoryInfo directory, string rootFullName)
+        {
+            ulong totalSize = 0;
+
             var fileTrimStartChars = new[] { '\\', '/' };
 
             foreach (FileInfo file in directory.GetFiles())
             {
+                totalSize += (ulong)file.Length;
+
                 string hash     = generateHash(file.FullName);
-                long size       = file.Length;
                 string filename = file.FullName;
                 // The root path should be stripped. This is used
-                // by the server to TAR up the file that gets pushed
+                // by the server to tar up the file that gets pushed
                 // to the DEA.
                 filename = filename.Replace(rootFullName, String.Empty);
                 filename = filename.TrimStart(fileTrimStartChars);
@@ -267,8 +299,10 @@ namespace CloudFoundry.Net.Vmc
 
             foreach (DirectoryInfo subdirectory in directory.GetDirectories())
             {
-                addDirectoryToResources(resources, subdirectory, rootFullName);
+                totalSize += addDirectoryToResources(resources, subdirectory, rootFullName);
             }
+
+            return totalSize;
         }
 
         private static string generateHash(string fileName)

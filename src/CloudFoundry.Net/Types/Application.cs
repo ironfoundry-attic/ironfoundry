@@ -3,13 +3,33 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using CloudFoundry.Net.Extensions;
     using Newtonsoft.Json;
 
     [Serializable]
     public class Application : EntityBase, IMergeable<Application> 
     {
+        private static class VcapStates
+        {
+            public const string STARTING      = "STARTING";
+            public const string STOPPED       = "STOPPED";
+            public const string RUNNING       = "RUNNING";
+            public const string STARTED       = "STARTED";
+            public const string SHUTTING_DOWN = "SHUTTING_DOWN";
+            public const string CRASHED       = "CRASHED";
+            public const string DELETED       = "DELETED";
+
+            public static bool IsValid(string argState)
+            {
+                return STARTING == argState ||
+                       STOPPED == argState ||
+                       RUNNING == argState ||
+                       SHUTTING_DOWN == argState ||
+                       CRASHED == argState ||
+                       DELETED == argState;
+            }
+        }
+
         private string name;
         private Staging staging;
         private string version;
@@ -141,14 +161,24 @@
 
         public void Merge(Application obj)
         {
-            this.Staging = obj.Staging;
-            this.Resources = obj.Resources;
-            this.Version = obj.Version;
-            this.Instances = obj.Instances;
+            this.Staging          = obj.Staging;
+            this.Resources        = obj.Resources;
+            this.Version          = obj.Version;
+            this.Instances        = obj.Instances;
             this.RunningInstances = obj.RunningInstances;
-            this.State = obj.State;
+            this.State            = obj.State;
             this.Uris.Synchronize(obj.Uris,StringComparer.InvariantCulture);
             this.InstanceCollection.Synchronize(obj.InstanceCollection,new InstanceEqualityComparer());
+        }
+
+        public void Start()
+        {
+            this.State = VcapStates.STARTED;
+        }
+
+        public void Stop()
+        {
+            this.State = VcapStates.STOPPED;
         }
     }
 

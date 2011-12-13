@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using Properties;
     using CloudFoundry.Net.Extensions;
+    using Properties;
 
     static partial class Program
     {
@@ -65,7 +65,6 @@
                     Console.Error.WriteLine(String.Format(Resources.Vmc_LoginError_Fmt, vc.CurrentUri, e.Message));
                 }
 
-                // TODO retry if (tries += 1) < 3 && prompt_ok && !@options[:password]
                 ++tries;
             }
 

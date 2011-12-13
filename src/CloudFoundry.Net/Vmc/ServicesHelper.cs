@@ -34,9 +34,13 @@ namespace CloudFoundry.Net.Vmc
             return datastores.ToArrayOrNull(); 
         }
 
-        public IEnumerable<ProvisionedService> GetProvisionedServices()
+        public IEnumerable<ProvisionedService> GetProvisionedServices(string proxy_user = null)
         {            
             var r = new VcapRequest(credMgr,  Constants.SERVICES_PATH);
+            if (false == proxy_user.IsNullOrWhiteSpace())
+            {
+                r.ProxyUser = proxy_user;
+            }
             return r.Execute<ProvisionedService[]>();
         }
 

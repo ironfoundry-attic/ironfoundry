@@ -1,12 +1,12 @@
-﻿using System;
-using EnvDTE;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio;
-using System.Runtime.InteropServices;
-using Microsoft.Build.Utilities;
-
-namespace CloudFoundry.Net.VsExtension
+﻿namespace CloudFoundry.Net.VsExtension
 {
+    using System;
+    using System.Runtime.InteropServices;
+    using EnvDTE;
+    using Microsoft.Build.Utilities;
+    using Microsoft.VisualStudio;
+    using Microsoft.VisualStudio.Shell.Interop;
+
     public static class VisualStudioExtensions
     {
         private const int Fx40 = 262144;

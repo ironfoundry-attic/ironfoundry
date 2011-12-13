@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using System.ComponentModel;
-using System.Threading;
-
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
+﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 {
+    using System;
+    using System.ComponentModel;
+    using System.Threading;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
+    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using GalaSoft.MvvmLight;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
+
     public abstract class DialogViewModel : ViewModelBase
     {
         public RelayCommand ConfirmedCommand { get; private set; }
         public RelayCommand CancelledCommand { get; private set; }
-        protected event CancelEventHandler OnConfirmed;
-        protected event EventHandler OnCancelled;
         private string resultMessageId;
         protected ICloudFoundryProvider provider;
         private string errorMessage;
+
+        protected virtual void OnConfirmed(CancelEventArgs args) { }
+        protected virtual void OnCancelled() { }
 
         public DialogViewModel(string resultMessageId)
         {
@@ -39,10 +37,11 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
         private void Confirmed()
         {
             var args = new CancelEventArgs();    
-            if (OnConfirmed != null)
-                OnConfirmed(this, args);
-            if (!args.Cancel)
-                Messenger.Default.Send(new NotificationMessage<bool>(this, true, resultMessageId));            
+            OnConfirmed(args);
+            if (false == args.Cancel)
+            {
+                Messenger.Default.Send(new NotificationMessage<bool>(this, true, resultMessageId));
+            }
         }
 
         protected virtual bool CanExecuteConfirmed()
@@ -52,9 +51,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
 
         private void Cancelled()
         {
-            if (OnCancelled != null)
-                OnCancelled(this, null);
-            
+            OnCancelled();
             Messenger.Default.Send(new NotificationMessage<bool>(this, false, resultMessageId));
             Cleanup();
         }

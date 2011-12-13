@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using CloudFoundry.Net.Extensions;
-using CloudFoundry.Net.Types;
-using System.IO.IsolatedStorage;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-
+﻿
 namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
+    using System;
+    using CloudFoundry.Net.Extensions;
+    using CloudFoundry.Net.Types;
+    using System.IO.IsolatedStorage;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using System.IO;
+
     public class PreferencesProvider : IPreferencesProvider
     {
         private readonly string preferencesPath;

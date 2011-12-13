@@ -1,5 +1,6 @@
 ﻿namespace CloudFoundry.Net.Vmc
 {
+    using System;
     using Newtonsoft.Json;
 
     public class AppManifest
@@ -35,7 +36,7 @@
         public uint Memory { get; set; }
     }
 
-    public class Resource
+    public class Resource : IEquatable<Resource>
     {
         [JsonProperty(PropertyName="size")]
         public ulong Size { get; private set; }
@@ -51,6 +52,24 @@
             Size = argSize;
             SHA1 = argSha1;
             FN   = argFN;
+        }
+
+        public bool Equals(Resource other)
+        {
+            if (null == other)
+                return false;
+
+            return this.GetHashCode() == other.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Resource);
+        }
+
+        public override int GetHashCode()
+        {
+            return SHA1.GetHashCode();
         }
     }
 }

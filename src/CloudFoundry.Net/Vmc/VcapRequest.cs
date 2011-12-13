@@ -28,6 +28,7 @@ namespace CloudFoundry.Net.Vmc
         protected readonly VcapCredentialManager credentialManager;
         protected readonly RestClient client;
         protected RestRequest request;
+        protected string proxy_user;
 
         protected VcapRequestBase(VcapCredentialManager credentialManager)
         {
@@ -39,6 +40,19 @@ namespace CloudFoundry.Net.Vmc
         {
             this.credentialManager = credentialManager;
             client = BuildClient(useAuthentication, uri);
+        }
+
+        public string ProxyUser
+        {
+            get { return proxy_user; }
+            set
+            {
+                proxy_user = value;
+                if (false == proxy_user.IsNullOrWhiteSpace())
+                {
+                    client.AddDefaultHeader("PROXY-USER", proxy_user);
+                }
+            }
         }
 
         public RestResponse Execute()

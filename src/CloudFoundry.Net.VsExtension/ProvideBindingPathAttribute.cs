@@ -9,12 +9,11 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
-using System;
-using System.Text;
-using System.IO;
-
 namespace Microsoft.VisualStudio.Shell
 {
+    using System;
+    using System.Text;
+
     /// <summary>
     /// This attribute registers a path that should be probed for candidate assemblies at assembly load time.
     /// 
