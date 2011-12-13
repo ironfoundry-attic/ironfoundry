@@ -44,7 +44,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         private string applicationErrorMessage;
         private IDragSource provisionedServicesSource;
         private IDropTarget applicationServicesTarget;
-        private ObservableCollection<ProvisionedService> applicationServices;
+        private SafeObservableCollection<ProvisionedService> applicationServices;
 
         public CloudViewModel(Cloud cloud)
         {
@@ -125,7 +125,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return Constants.MemoryLimits; }
         }
 
-        public ObservableCollection<Application> Applications
+        public SafeObservableCollection<Application> Applications
         {
             get { return this.Cloud.Applications; }
         }
@@ -146,7 +146,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set { this.isApplicationViewSelected = value; RaisePropertyChanged("IsApplicationViewSelected"); }
         }
 
-        public ObservableCollection<ProvisionedService> ApplicationServices
+        public SafeObservableCollection<ProvisionedService> ApplicationServices
         {
             get { return this.applicationServices; }
             set { this.applicationServices = value; RaisePropertyChanged("ApplicationServices"); }
@@ -214,7 +214,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
                     this.selectedApplication.PropertyChanged += SelectedApplicationPropertyChanged;
                     this.selectedApplication.Resources.PropertyChanged += SelectedApplicationPropertyChanged;                    
 
-                    this.ApplicationServices = new ObservableCollection<ProvisionedService>();
+                    this.ApplicationServices = new SafeObservableCollection<ProvisionedService>();
                     foreach (var appService in 
                         from svc in this.selectedApplication.Services 
                         from appService in Cloud.Services 
@@ -332,7 +332,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         private void ManageApplicationUrls()
         {
-            Messenger.Default.Register<NotificationMessageAction<ObservableCollection<string>>>(this,
+            Messenger.Default.Register<NotificationMessageAction<SafeObservableCollection<string>>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.SetManageApplicationUrlsData))

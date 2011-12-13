@@ -7,10 +7,10 @@ namespace CloudFoundry.Net.Types
     [Serializable]
     public class Preferences
     {             
-        private ObservableCollection<Cloud> clouds;
-        private ObservableCollection<CloudUrl> cloudUrls;
+        private SafeObservableCollection<Cloud> clouds;
+        private SafeObservableCollection<CloudUrl> cloudUrls;
 
-        public ObservableCollection<Cloud> Clouds 
+        public SafeObservableCollection<Cloud> Clouds 
         {
             get { return this.clouds; }
             set
@@ -26,7 +26,7 @@ namespace CloudFoundry.Net.Types
                 }
             }
         }
-        public ObservableCollection<CloudUrl> CloudUrls
+        public SafeObservableCollection<CloudUrl> CloudUrls
         {
             get { return this.cloudUrls; }
             set

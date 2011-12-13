@@ -5,9 +5,9 @@ using CloudFoundry.Net.Types;
 
 namespace CloudFoundry.Net.Extensions
 {
-    public static class ObservableCollectionExtensionMethods
+    public static class SafeObservableCollectionExtensionMethods
     {
-        public static void Synchronize<T>(this ObservableCollection<T> argThis, ObservableCollection<T> toSynchronizeWith, IEqualityComparer<T> comparer)
+        public static void Synchronize<T>(this SafeObservableCollection<T> argThis, SafeObservableCollection<T> toSynchronizeWith, IEqualityComparer<T> comparer)
         {
             if (toSynchronizeWith != null)
             {

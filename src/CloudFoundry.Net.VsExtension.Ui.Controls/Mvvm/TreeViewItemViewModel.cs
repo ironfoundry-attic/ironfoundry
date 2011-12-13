@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CloudFoundry.Net.Extensions;
 using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight.Command;
@@ -11,7 +12,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     public class TreeViewItemViewModel : ViewModelBase
     {
         private static readonly TreeViewItemViewModel placeholderChild = new TreeViewItemViewModel();
-        private readonly ObservableCollection<TreeViewItemViewModel> children;
+        private readonly SafeObservableCollection<TreeViewItemViewModel> children;
         private readonly TreeViewItemViewModel parent;
         private bool isExpanded;
         private bool isSelected;
@@ -19,7 +20,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         protected TreeViewItemViewModel(TreeViewItemViewModel parent, bool lazyLoadChildren)
         {
             this.parent = parent;
-            this.children = new ObservableCollection<TreeViewItemViewModel>();
+            this.children = new SafeObservableCollection<TreeViewItemViewModel>();
             if (lazyLoadChildren)
                 this.children.Add(placeholderChild);
         }
@@ -73,7 +74,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             get { return this.parent; }
         }
 
-        public ObservableCollection<TreeViewItemViewModel> Children
+        public SafeObservableCollection<TreeViewItemViewModel> Children
         {
             get { return this.children; }
         }

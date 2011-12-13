@@ -75,7 +75,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set { this.name = value; RaisePropertyChanged("Name"); }
         }
 
-        public ObservableCollection<Cloud> Clouds
+        public SafeObservableCollection<Cloud> Clouds
         {
             get { return provider.Clouds; }
         }
@@ -105,7 +105,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             }
         }
 
-        public ObservableCollection<Application> Applications
+        public SafeObservableCollection<Application> Applications
         {
             get
             {

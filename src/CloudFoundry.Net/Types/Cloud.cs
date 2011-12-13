@@ -21,9 +21,9 @@
         private int timeoutStop;
         private string accessToken;
 
-        private ObservableCollection<Application> applications = new ObservableCollection<Application>();
-        private ObservableCollection<SystemService> availableServices = new ObservableCollection<SystemService>();
-        private ObservableCollection<ProvisionedService> services = new ObservableCollection<ProvisionedService>();
+        private SafeObservableCollection<Application> applications = new SafeObservableCollection<Application>();
+        private SafeObservableCollection<SystemService> availableServices = new SafeObservableCollection<SystemService>();
+        private SafeObservableCollection<ProvisionedService> services = new SafeObservableCollection<ProvisionedService>();
 
         public Cloud()
         {
@@ -116,30 +116,30 @@
             set { this.isDisconnected = value; RaisePropertyChanged("IsDisconnected"); }
         }
 
-        public ObservableCollection<Application> Applications 
+        public SafeObservableCollection<Application> Applications 
         {
             get
             {
                 if (this.applications == null)
-                    this.applications = new ObservableCollection<Application>();
+                    this.applications = new SafeObservableCollection<Application>();
                 return this.applications; 
             }            
         }
 
-        public ObservableCollection<ProvisionedService> Services
+        public SafeObservableCollection<ProvisionedService> Services
         {
             get {
                 if (this.services == null)
-                    this.services = new ObservableCollection<ProvisionedService>();
+                    this.services = new SafeObservableCollection<ProvisionedService>();
                 return this.services; 
             }
         }
 
-        public ObservableCollection<SystemService> AvailableServices
+        public SafeObservableCollection<SystemService> AvailableServices
         {
             get {
                 if (this.availableServices == null)
-                    this.availableServices = new ObservableCollection<SystemService>();
+                    this.availableServices = new SafeObservableCollection<SystemService>();
                 return this.availableServices; 
             }
         }        

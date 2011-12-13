@@ -19,7 +19,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand AddCommand { get; private set; }
         public RelayCommand EditCommand { get; private set; }
         public RelayCommand RemoveCommand { get; private set; }
-        private ObservableCollection<CloudUrl> cloudUrls;
+        private SafeObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
 
         public ManageCloudUrlsViewModel() : base(Messages.ManageCloudUrlsDialogResult)
@@ -138,7 +138,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set { this.selectedCloudUrl = value; RaisePropertyChanged("SelectedCloudUrl"); }
         }
 
-        public ObservableCollection<CloudUrl> CloudUrls
+        public SafeObservableCollection<CloudUrl> CloudUrls
         {
             get { return this.cloudUrls; }
             set { this.cloudUrls = value; RaisePropertyChanged("CloudUrls"); }

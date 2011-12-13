@@ -17,8 +17,8 @@ using System.Windows.Threading;
     public class CloudFoundryProvider : ICloudFoundryProvider
     {
         private PreferencesProvider preferencesProvider;
-        public ObservableCollection<Cloud> Clouds { get; private set;}
-        public ObservableCollection<CloudUrl> CloudUrls { get; private set; }
+        public SafeObservableCollection<Cloud> Clouds { get; private set;}
+        public SafeObservableCollection<CloudUrl> CloudUrls { get; private set; }
         public event NotifyCollectionChangedEventHandler CloudsChanged;
 
         public CloudFoundryProvider(PreferencesProvider preferencesProvider)
@@ -66,7 +66,7 @@ using System.Windows.Threading;
         {
             if (this.CloudsChanged != null)
                 this.CloudsChanged(sender, e);
-            preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
+            SaveChanges();
         }
 
         public void SaveChanges()
@@ -89,14 +89,14 @@ using System.Windows.Threading;
                 var applications = client.GetApplications();
                 var provisionedServices = client.GetProvisionedServices();
                 var availableServices = client.GetSystemServices();                
-                local.Applications.Synchronize(new ObservableCollection<Application>(applications), new ApplicationEqualityComparer());
-                local.Services.Synchronize(new ObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
-                local.AvailableServices.Synchronize(new ObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
+                local.Applications.Synchronize(new SafeObservableCollection<Application>(applications), new ApplicationEqualityComparer());
+                local.Services.Synchronize(new SafeObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
+                local.AvailableServices.Synchronize(new SafeObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
                 foreach (Application app in local.Applications)
                 {
                     var instances = GetInstances(local, app);
                     if (instances.Response != null)
-                        app.InstanceCollection.Synchronize(new ObservableCollection<Instance>(instances.Response), new InstanceEqualityComparer());
+                        app.InstanceCollection.Synchronize(new SafeObservableCollection<Instance>(instances.Response), new InstanceEqualityComparer());
                 }
                 response.Response = local;
             }
@@ -143,7 +143,7 @@ using System.Windows.Threading;
             {
                 IVcapClient client = new VcapClient(cloud);
                 var stats = client.GetStats(app);
-                var instances = new ObservableCollection<Instance>();
+                var instances = new SafeObservableCollection<Instance>();
                 if (stats != null)
                 {
 
@@ -206,7 +206,7 @@ using System.Windows.Threading;
                 response.Response = client.GetApplication(app.Name);
                 var instancesResponse = this.GetInstances(cloud, app);
                 if (instancesResponse.Response != null)
-                    response.Response.InstanceCollection.Synchronize(new ObservableCollection<Instance>(instancesResponse.Response),new InstanceEqualityComparer());
+                    response.Response.InstanceCollection.Synchronize(new SafeObservableCollection<Instance>(instancesResponse.Response),new InstanceEqualityComparer());
             }
             catch (Exception ex)
             {
@@ -215,13 +215,13 @@ using System.Windows.Threading;
             return response;
         }
 
-        public ProviderResponse<ObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud)
+        public ProviderResponse<SafeObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud)
         {
-            ProviderResponse<ObservableCollection<ProvisionedService>> response = new ProviderResponse<ObservableCollection<ProvisionedService>>();
+            ProviderResponse<SafeObservableCollection<ProvisionedService>> response = new ProviderResponse<SafeObservableCollection<ProvisionedService>>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                response.Response = new ObservableCollection<ProvisionedService>(client.GetProvisionedServices());
+                response.Response = new SafeObservableCollection<ProvisionedService>(client.GetProvisionedServices());
             }
             catch (Exception ex)
             {
@@ -230,13 +230,13 @@ using System.Windows.Threading;
             return response;
         }
 
-        public ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application)
+        public ProviderResponse<SafeObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application)
         {
-            ProviderResponse<ObservableCollection<StatInfo>> response = new ProviderResponse<ObservableCollection<StatInfo>>();
+            ProviderResponse<SafeObservableCollection<StatInfo>> response = new ProviderResponse<SafeObservableCollection<StatInfo>>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                response.Response = new ObservableCollection<StatInfo>(client.GetStats(application));
+                response.Response = new SafeObservableCollection<StatInfo>(client.GetStats(application));
             }
             catch (Exception ex)
             {

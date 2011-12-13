@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Threading;
+using CloudFoundry.Net.Extensions;
 using CloudFoundry.Net.Types;
 using CloudFoundry.Net.Vmc;
 
@@ -9,8 +10,8 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
 {
     public interface ICloudFoundryProvider
     {
-        ObservableCollection<Cloud> Clouds { get; }
-        ObservableCollection<CloudUrl> CloudUrls { get; }
+        SafeObservableCollection<Cloud> Clouds { get; }
+        SafeObservableCollection<CloudUrl> CloudUrls { get; }
         event NotifyCollectionChangedEventHandler CloudsChanged;
         void SaveChanges();
         ProviderResponse<Cloud> Connect(Cloud cloud);        
@@ -25,10 +26,10 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         ProviderResponse<bool> Delete(Application app, Cloud cloud);
         ProviderResponse<Application> GetApplication(Application app, Cloud cloud);
         ProviderResponse<bool> CreateService(Cloud cloud, string serviceName, string provisionedServiceName);
-        ProviderResponse<ObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud);
+        ProviderResponse<SafeObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud);
         ProviderResponse<bool> ChangePassword(Cloud cloud, string newPassword);
         ProviderResponse<bool> RegisterAccount(Cloud cloud,string email, string password);
-        ProviderResponse<ObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application);
+        ProviderResponse<SafeObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application);
         ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId);
         ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services);
         ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom);        

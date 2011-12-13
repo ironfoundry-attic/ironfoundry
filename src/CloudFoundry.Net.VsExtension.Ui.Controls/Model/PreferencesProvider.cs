@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using CloudFoundry.Net.Extensions;
 using CloudFoundry.Net.Types;
 using System.IO.IsolatedStorage;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -26,7 +27,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
         {
             var preferences = new Preferences()
             {
-                Clouds = new ObservableCollection<Cloud>(),
+                Clouds = new SafeObservableCollection<Cloud>(),
                 CloudUrls = CloudUrl.DefaultCloudUrls,
             };
 

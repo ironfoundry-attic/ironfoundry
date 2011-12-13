@@ -17,10 +17,10 @@
         private int? runningInstances;
         private AppResources resources;
         private string state;
-        private readonly ObservableCollection<string> uris = new ObservableCollection<string>();
-        private readonly ObservableCollection<string> services = new ObservableCollection<string>();        
-        private readonly ObservableCollection<string> environment = new ObservableCollection<string>();
-        private readonly ObservableCollection<Instance> instanceCollection = new ObservableCollection<Instance>();
+        private readonly SafeObservableCollection<string> uris = new SafeObservableCollection<string>();
+        private readonly SafeObservableCollection<string> services = new SafeObservableCollection<string>();        
+        private readonly SafeObservableCollection<string> environment = new SafeObservableCollection<string>();
+        private readonly SafeObservableCollection<Instance> instanceCollection = new SafeObservableCollection<Instance>();
 
         public Application()
         {
@@ -48,7 +48,7 @@
         }
 
         [JsonProperty(PropertyName = "uris")]
-        public ObservableCollection<string> Uris
+        public SafeObservableCollection<string> Uris
         {
             get { return this.uris; }
         }
@@ -82,7 +82,7 @@
         }
 
         [JsonProperty(PropertyName = "services")]
-        public ObservableCollection<string> Services 
+        public SafeObservableCollection<string> Services 
         {
             get { return this.services; }
         }
@@ -95,13 +95,13 @@
         }
 
         [JsonProperty(PropertyName = "env")]
-        public ObservableCollection<string> Environment
+        public SafeObservableCollection<string> Environment
         {
             get { return this.environment; }
         }
 
         [JsonIgnore]
-        public ObservableCollection<Instance> InstanceCollection
+        public SafeObservableCollection<Instance> InstanceCollection
         {
             get { return this.instanceCollection; }
         }

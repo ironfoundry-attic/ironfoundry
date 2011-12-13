@@ -1,4 +1,6 @@
-﻿namespace CloudFoundry.Net.Types
+﻿using CloudFoundry.Net.Extensions;
+
+namespace CloudFoundry.Net.Types
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +16,7 @@
         private bool isDefault;
         private bool isMicroCloud;
         
-        private static ObservableCollection<CloudUrl> defaultCloudUrls = new ObservableCollection<CloudUrl>
+        private static SafeObservableCollection<CloudUrl> defaultCloudUrls = new SafeObservableCollection<CloudUrl>
         {
             new CloudUrl { ServerType = "Local cloud", Url = "http://api.vcap.me", IsConfigurable = false},
             new CloudUrl { ServerType = "Microcloud", Url = "http://api.{mycloud}.cloudfoundry.me", IsConfigurable = true, IsMicroCloud = true },
@@ -53,7 +55,7 @@
             set { this.isMicroCloud = value; RaisePropertyChanged("IsMicroCloud"); }
         }
 
-        public static ObservableCollection<CloudUrl> DefaultCloudUrls
+        public static SafeObservableCollection<CloudUrl> DefaultCloudUrls
         {
             get { return defaultCloudUrls; }
         }

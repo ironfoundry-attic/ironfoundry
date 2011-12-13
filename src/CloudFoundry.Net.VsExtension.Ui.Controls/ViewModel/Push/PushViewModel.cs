@@ -20,7 +20,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
     public class PushViewModel : DialogViewModel
     {
         private Cloud selectedCloud;
-        private ObservableCollection<ProvisionedService> applicationServices;
+        private SafeObservableCollection<ProvisionedService> applicationServices;
         private string name;
         private string url;
         private string pushFromDirectory;
@@ -34,7 +34,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         public PushViewModel() : base(Messages.PushDialogResult)
         {
-            this.applicationServices = new ObservableCollection<ProvisionedService>();
+            this.applicationServices = new SafeObservableCollection<ProvisionedService>();
             ManageCloudsCommand = new RelayCommand(ManageClouds);
             AddAppServiceCommand = new RelayCommand(AddAppService, CanAddAppService);
             ChooseDirectoryCommand = new RelayCommand(ChooseDirectory, CanChooseDirectory);
@@ -153,7 +153,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set { this.pushFromDirectory = value; RaisePropertyChanged("PushFromDirectory"); }
         }
 
-        public ObservableCollection<Cloud> Clouds
+        public SafeObservableCollection<Cloud> Clouds
         {
             get { return provider.Clouds; }
         }
@@ -175,7 +175,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set { this.instances = value; RaisePropertyChanged("Instances"); }
         }
 
-        public ObservableCollection<ProvisionedService> ApplicationServices
+        public SafeObservableCollection<ProvisionedService> ApplicationServices
         {
             get { return this.applicationServices; }
             set { this.applicationServices = value; RaisePropertyChanged("ApplicationServices"); }

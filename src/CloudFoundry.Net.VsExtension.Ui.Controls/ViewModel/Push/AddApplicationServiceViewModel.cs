@@ -16,7 +16,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 {
     public class AddApplicationServiceViewModel : DialogViewModel
     {
-        private ObservableCollection<ProvisionedService> systemServices = new ObservableCollection<ProvisionedService>();
+        private SafeObservableCollection<ProvisionedService> systemServices = new SafeObservableCollection<ProvisionedService>();
         private ProvisionedService selectedService;
 
         public AddApplicationServiceViewModel() : base(Messages.AddApplicationServiceDialogResult)
@@ -50,7 +50,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             return this.SelectedService != null;
         }
 
-        public ObservableCollection<ProvisionedService> Services
+        public SafeObservableCollection<ProvisionedService> Services
         {
             get { return this.systemServices; }
         }

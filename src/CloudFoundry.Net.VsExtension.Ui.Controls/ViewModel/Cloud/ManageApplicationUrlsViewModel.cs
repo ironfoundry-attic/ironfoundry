@@ -19,7 +19,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand EditCommand { get; private set; }
         public RelayCommand RemoveCommand { get; private set; }
 
-        private ObservableCollection<string> urls;
+        private SafeObservableCollection<string> urls;
         private string selectedUrl;
 
         public ManageApplicationUrlsViewModel() : base(Messages.ManageApplicationUrlsDialogResult)
@@ -31,7 +31,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
 
         protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<ObservableCollection<string>>(Messages.SetManageApplicationUrlsData, urls => this.Urls = urls.DeepCopy()));
+            Messenger.Default.Send(new NotificationMessageAction<SafeObservableCollection<string>>(Messages.SetManageApplicationUrlsData, urls => this.Urls = urls.DeepCopy()));
         }
 
         protected override void RegisterGetData()
@@ -51,7 +51,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set { this.selectedUrl = value; RaisePropertyChanged("SelectedUrl"); }
         }
 
-        public ObservableCollection<string> Urls
+        public SafeObservableCollection<string> Urls
         {
             get { return this.urls; }
             set { this.urls = value; RaisePropertyChanged("Urls"); }

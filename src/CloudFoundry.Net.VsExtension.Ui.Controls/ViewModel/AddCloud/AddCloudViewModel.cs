@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Threading;
+using CloudFoundry.Net.Extensions;
 using CloudFoundry.Net.Types;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
 using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
@@ -18,20 +20,29 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
         public RelayCommand RegisterAccountCommand { get; private set; }
 
         public Cloud Cloud { get; private set; }  
-        private ObservableCollection<CloudUrl> cloudUrls;
+        private SafeObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
         private bool isAccountValid;
+        private Dispatcher dispatcher;
         
 
         public AddCloudViewModel() : base(Messages.AddCloudDialogResult)
         {
             Cloud = new Types.Cloud();
+            this.dispatcher = Dispatcher.CurrentDispatcher;
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanValidate);
             RegisterAccountCommand = new RelayCommand(RegisterAccount, CanRegister);
             ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);
             this.cloudUrls = provider.CloudUrls;
             this.SelectedCloudUrl = cloudUrls.SingleOrDefault((i) => i.IsDefault);
-            OnConfirmed += (s, e) => { this.provider.Clouds.Add(this.Cloud); Cleanup(); };
+            OnConfirmed += (s, e) =>
+            {
+                dispatcher.BeginInvoke(new Action(() =>
+                {
+                    this.provider.Clouds.SafeAdd(this.Cloud);
+                }));
+                Cleanup();
+            };
         }
 
         private void ValidateAccount()
@@ -107,7 +118,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
             set { this.isAccountValid = value; RaisePropertyChanged("IsAccountValid"); }
         }
 
-        public ObservableCollection<CloudUrl> CloudUrls
+        public SafeObservableCollection<CloudUrl> CloudUrls
         {
             get { return this.cloudUrls; }
             set { this.cloudUrls = value; RaisePropertyChanged("CloudUrls"); }
