@@ -97,6 +97,7 @@
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\CustomSerializationBinder.cs" />
     <Compile Include="Extensions\SafeObservableCollection.cs" />
+    <Compile Include="Utilities\Utilities.cs" />
     <Compile Include="Vmc\BaseVmcHelper.cs" />
     <Compile Include="Vmc\Constants.cs" />
     <Compile Include="Vmc\MiscHelper.cs" />
