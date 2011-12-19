@@ -1,4 +1,4 @@
-Iron Foundry is an implementation of Cloud Foundryª that is tightly integrated with the .NET Framework. It can support multiple frameworks, cloud providers, and application services all on a cloud scale platform.
+Iron Foundry is an implementation of Cloud Foundry that is tightly integrated with the .NET Framework. It can support multiple frameworks, cloud providers, and application services all on a cloud scale platform.
 
 h1. What is Iron Foundry? 
 
