@@ -1,8 +1,7 @@
-﻿using IronFoundry.Extensions;
-
-namespace IronFoundry.Vcap
+﻿namespace IronFoundry.Vcap
 {
     using System;
+    using System.Collections;
     using System.Linq;
     using System.Net;
     using Newtonsoft.Json;

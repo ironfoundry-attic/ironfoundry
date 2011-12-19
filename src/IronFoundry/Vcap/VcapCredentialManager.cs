@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using IronFoundry.Extensions;
     using IronFoundry.Types;
     using Newtonsoft.Json;
 

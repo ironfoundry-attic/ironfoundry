@@ -5,11 +5,10 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
-    using IronFoundry.Extensions;
+    using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
     using IronFoundry.Vcap;
     using IronFoundry.VsExtension.Ui.Controls.Utilities;
-    using GalaSoft.MvvmLight.Messaging;
 
     public class CloudFoundryProvider : ICloudFoundryProvider
     {

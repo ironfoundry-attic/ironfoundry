@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using IronFoundry.Extensions;
     using IronFoundry.Properties;
     using IronFoundry.Types;
     using IronFoundry.Vcap;

@@ -1,7 +1,5 @@
-namespace IronFoundry.Extensions
+namespace System
 {
-    using System;
-
     public static class StringExtensionMethods
     {
         public static bool IsNullOrWhiteSpace(this string argThis)

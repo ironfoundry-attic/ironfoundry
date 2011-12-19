@@ -1,12 +1,10 @@
-
-
 namespace IronFoundry.VsExtension.Ui.Controls.Model
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using IronFoundry.Types;
     using IronFoundry.Vcap;
-    using IronFoundry.Extensions;
 
     public interface ICloudFoundryProvider
     {

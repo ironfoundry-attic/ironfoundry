@@ -6,7 +6,6 @@
     using System.Security.Cryptography;
     using System.Threading;
     using IronFoundry;
-    using IronFoundry.Extensions;
     using IronFoundry.Properties;
     using IronFoundry.Types;
     using ICSharpCode.SharpZipLib.Zip;

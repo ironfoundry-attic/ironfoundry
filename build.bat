@@ -23,6 +23,6 @@ if "%DevEnvDir%"=="" (
 powershell -nologo -file clean.ps1
 
 msbuild /v:n /t:build /p:Configuration=Debug /p:Platform="Any CPU" %SLN%
-msbuild /v:n /t:build /p:Configuration=Release /p:Platform="Any CPU" %SLN%
+rem msbuild /v:n /t:build /p:Configuration=Release /p:Platform="Any CPU" %SLN%
 
 exit /b %ERRORLEVEL%

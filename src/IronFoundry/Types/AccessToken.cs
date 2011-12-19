@@ -1,6 +1,4 @@
-﻿using IronFoundry.Extensions;
-
-namespace IronFoundry.Types
+﻿namespace IronFoundry.Types
 {
     using System;
 

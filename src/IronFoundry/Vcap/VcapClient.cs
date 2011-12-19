@@ -7,7 +7,6 @@
     using System.Text.RegularExpressions;
     using IronFoundry.Properties;
     using IronFoundry.Types;
-    using IronFoundry.Extensions;
 
     public class VcapClient : IVcapClient
     {

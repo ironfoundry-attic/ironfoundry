@@ -1,12 +1,11 @@
-﻿
-namespace IronFoundry.VsExtension.Ui.Controls.Model
+﻿namespace IronFoundry.VsExtension.Ui.Controls.Model
 {
     using System;
-    using IronFoundry.Extensions;
-    using IronFoundry.Types;
+    using System.Collections.ObjectModel;
+    using System.IO;
     using System.IO.IsolatedStorage;
     using System.Runtime.Serialization.Formatters.Binary;
-    using System.IO;
+    using IronFoundry.Types;
 
     public class PreferencesProvider : IPreferencesProvider
     {

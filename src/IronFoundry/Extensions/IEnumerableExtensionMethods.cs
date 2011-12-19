@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
-
-namespace IronFoundry.Extensions
+namespace System.Collections.Generic
 {
+    using System.Linq;
+
     public static class IEnumerableExtensionMethods
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> argThis)
@@ -24,6 +23,19 @@ namespace IronFoundry.Extensions
                 return null;
 
             return argThis.ToArray();
+        }
+    }
+}
+
+namespace System.Collections
+{
+    using System.Linq;
+
+    public static class IEnumerableExtensionMethods
+    {
+        public static bool IsNullOrEmpty(this IEnumerable argThis)
+        {
+            return null == argThis || false == argThis.GetEnumerator().MoveNext();
         }
     }
 }

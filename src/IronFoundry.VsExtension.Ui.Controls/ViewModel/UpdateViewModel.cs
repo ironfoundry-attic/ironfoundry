@@ -3,12 +3,11 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using IronFoundry.Extensions;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
     using IronFoundry.VsExtension.Ui.Controls.Mvvm;
     using IronFoundry.VsExtension.Ui.Controls.Utilities;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Messaging;
     
     public class UpdateViewModel : DialogViewModel
     {

@@ -2,11 +2,10 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using IronFoundry.Extensions;
-    using IronFoundry.VsExtension.Ui.Controls.Mvvm;
-    using IronFoundry.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
+    using IronFoundry.VsExtension.Ui.Controls.Mvvm;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
 
     public class ManageApplicationUrlsViewModel : DialogViewModel
     {

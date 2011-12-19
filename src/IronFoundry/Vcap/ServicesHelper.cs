@@ -1,7 +1,6 @@
-﻿using IronFoundry.Extensions;
-
-namespace IronFoundry.Vcap
+﻿namespace IronFoundry.Vcap
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using IronFoundry.Types;

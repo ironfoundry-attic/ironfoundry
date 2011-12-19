@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Windows;
-    using IronFoundry.Extensions;
 
     [Serializable]
     public class Cloud : EntityBase, IEquatable<Cloud>, IMergeable<Cloud>

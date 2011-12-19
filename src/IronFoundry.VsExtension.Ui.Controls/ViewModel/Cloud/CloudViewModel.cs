@@ -6,15 +6,14 @@
     using System.Linq;
     using System.Threading;
     using System.Windows.Threading;
-    using IronFoundry.Extensions;
+    using GalaSoft.MvvmLight;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
     using IronFoundry.Utilities;
     using IronFoundry.VsExtension.Ui.Controls.Model;
     using IronFoundry.VsExtension.Ui.Controls.Mvvm;
     using IronFoundry.VsExtension.Ui.Controls.Utilities;
-    using GalaSoft.MvvmLight;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Messaging;
 
     public class CloudViewModel : ViewModelBase
     {

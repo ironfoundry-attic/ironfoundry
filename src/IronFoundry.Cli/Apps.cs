@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using IronFoundry.Extensions;
     using IronFoundry.Types;
     using IronFoundry.Vcap;
 

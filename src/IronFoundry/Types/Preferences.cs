@@ -1,9 +1,8 @@
-using System;
-using System.Collections.ObjectModel;
-using IronFoundry.Extensions;
-
 namespace IronFoundry.Types
 {
+    using System;
+    using System.Collections.ObjectModel;
+
     [Serializable]
     public class Preferences
     {             

@@ -1,13 +1,13 @@
 ﻿namespace IronFoundry.VsExtension.Ui.Controls.ViewModel
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
-    using IronFoundry.Extensions;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
     using IronFoundry.VsExtension.Ui.Controls.Mvvm;
     using IronFoundry.VsExtension.Ui.Controls.Utilities;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Messaging;
 
     public class ManageCloudUrlsViewModel : DialogViewModel
     {

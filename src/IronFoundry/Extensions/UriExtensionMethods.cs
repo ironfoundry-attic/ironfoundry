@@ -1,6 +1,4 @@
-using System;
-
-namespace IronFoundry.Extensions
+namespace System
 {
     public static class UriExtensionMethods
     {

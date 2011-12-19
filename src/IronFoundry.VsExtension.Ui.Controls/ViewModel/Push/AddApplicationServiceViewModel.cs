@@ -1,12 +1,11 @@
 ﻿namespace IronFoundry.VsExtension.Ui.Controls.ViewModel
 {
     using System.Collections.ObjectModel;
-    using IronFoundry.Extensions;
+    using System.ComponentModel;
+    using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
     using IronFoundry.VsExtension.Ui.Controls.Mvvm;
     using IronFoundry.VsExtension.Ui.Controls.Utilities;
-    using GalaSoft.MvvmLight.Messaging;
-using System.ComponentModel;
 
     public class AddApplicationServiceViewModel : DialogViewModel
     {

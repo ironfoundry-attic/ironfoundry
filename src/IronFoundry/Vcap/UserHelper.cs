@@ -1,6 +1,6 @@
 ﻿namespace IronFoundry.Vcap
 {
-    using IronFoundry.Extensions;
+    using System;
     using IronFoundry.Properties;
     using IronFoundry.Types;
     using Newtonsoft.Json.Linq;
