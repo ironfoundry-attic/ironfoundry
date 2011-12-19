@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{698503
 	ProjectSection(SolutionItems) = preProject
 		src\CommonAssemblyInfo.cs = src\CommonAssemblyInfo.cs
 		common\IronFoundry.snk = common\IronFoundry.snk
+		LICENSE.txt = LICENSE.txt
+		README = README
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry", "src\IronFoundry\IronFoundry.csproj", "{506CCDF4-11FE-4138-8061-25495EEBF8E0}"
