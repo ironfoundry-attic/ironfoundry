@@ -3,7 +3,7 @@
 setlocal
 
 set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
-set SLN="%~dp0\CloudFoundry.Net.sln"
+set SLN="%~dp0\IronFoundry.sln"
 
 if not exist %VCVARSALL% (
     echo Required file %VCVARSALL% not found.
