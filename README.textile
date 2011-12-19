@@ -6,6 +6,6 @@ Iron Foundry is an implementation of the Cloud Foundry Open Platform as a Servic
 
 h1. How can I use Iron Foundry?
 
-Developers can run their own instances of Iron Foundry in-house or with any service provider who supports it, finally giving them a truly open, interoperable .NET PaaS solution that can be run inside and outside the firewall. And because you can run your own instances of Iron Foundry, it’s easy to leverage it for a full dev, test/ QA, and staging environment before pushing to production. Operations teams now have the freedom to choose among a variety of service providers providing the same PaaS used in their development environments, enabling them to pick the one that meets their specific needs in areas such as security, compliance, availability, location, etc.
+Developers can run their own instances of Iron Foundry in-house or with any service provider who supports it, finally giving them a truly open, interoperable .NET PaaS solution that can be run inside and outside the firewall. And because you can run your own instances of Iron Foundry, it's easy to leverage it for a full dev, test/ QA, and staging environment before pushing to production. Operations teams now have the freedom to choose among a variety of service providers providing the same PaaS used in their development environments, enabling them to pick the one that meets their specific needs in areas such as security, compliance, availability, location, etc.
 
 Find out more at http://www.ironfoundry.org/
