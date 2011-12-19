@@ -1,7 +1,7 @@
 ﻿/*
 namespace IronFoundry.Vcap
 {
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Types;
     using Newtonsoft.Json.Linq;
     using RestSharp;
 

@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace IronFoundry.VsExtension.Ui.Controls.ViewModel
 {
     using System;
     using System.Diagnostics;
@@ -8,15 +8,15 @@
     using System.Windows.Interop;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using IronFoundry.VsExtension.Ui.Controls.Model;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
 
     public class FileTreeViewItemViewModel : TreeViewItemViewModel
     {
         private string name;
-        private CloudFoundry.Net.Types.Application app;
+        private IronFoundry.Types.Application app;
         private string path;
         private ushort id;
         private string fileExtension;
@@ -24,7 +24,7 @@
         public RelayCommand OpenFileFromContextCommand { get; private set; } 
         private ICloudFoundryProvider provider;
 
-        public FileTreeViewItemViewModel(string name, string path, CloudFoundry.Net.Types.Application app, ushort id)
+        public FileTreeViewItemViewModel(string name, string path, IronFoundry.Types.Application app, ushort id)
             : base(null, true)
         {
             Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));

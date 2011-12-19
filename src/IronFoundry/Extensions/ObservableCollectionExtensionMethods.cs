@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
-using CloudFoundry.Net.Types;
+using IronFoundry.Types;
 
-namespace CloudFoundry.Net.Extensions
+namespace IronFoundry.Extensions
 {    
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Types;
 
     public static class ObservableCollectionExtensionMethods
     {

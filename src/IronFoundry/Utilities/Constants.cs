@@ -1,4 +1,4 @@
-namespace CloudFoundry.Net.Utilities
+namespace IronFoundry.Utilities
 {
     public static class Constants
     {

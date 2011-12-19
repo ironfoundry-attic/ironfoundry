@@ -1,4 +1,4 @@
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
+namespace IronFoundry.VsExtension.Ui.Controls.Model
 {
     public class ProviderResponse<T>
     {

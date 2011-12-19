@@ -1,10 +1,10 @@
 ﻿using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
 using System.Collections.ObjectModel;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.Types;
+using IronFoundry.VsExtension.Ui.Controls.Utilities;
+using IronFoundry.Types;
 
-namespace CloudFoundry.Net.VsExtension.Ui.Application
+namespace IronFoundry.VsExtension.Ui.Application
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

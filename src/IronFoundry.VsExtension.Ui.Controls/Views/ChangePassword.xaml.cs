@@ -11,10 +11,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
+using IronFoundry.VsExtension.Ui.Controls.Utilities;
+using IronFoundry.VsExtension.Ui.Controls.ViewModel;
 
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
+namespace IronFoundry.VsExtension.Ui.Controls.Views
 {
     /// <summary>
     /// Interaction logic for ChangePassword.xaml

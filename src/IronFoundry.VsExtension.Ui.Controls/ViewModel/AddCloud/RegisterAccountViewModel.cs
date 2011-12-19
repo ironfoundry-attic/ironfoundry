@@ -1,10 +1,10 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace IronFoundry.VsExtension.Ui.Controls.ViewModel
 {
     using System;
     using System.ComponentModel;
-    using CloudFoundry.Net.Types;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using IronFoundry.Types;
+    using IronFoundry.VsExtension.Ui.Controls.Mvvm;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
 
     public class RegisterAccountViewModel : DialogViewModel

@@ -1,3 +1,3 @@
-﻿namespace CloudFoundry.Net.Types
+﻿namespace IronFoundry.Types
 {
 }

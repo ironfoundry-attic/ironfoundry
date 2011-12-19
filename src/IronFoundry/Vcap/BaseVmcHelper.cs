@@ -1,8 +1,8 @@
 ﻿namespace IronFoundry.Vcap
 {
     using System.Collections.Generic;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Extensions;
+    using IronFoundry.Types;
     using Newtonsoft.Json;
 
     internal abstract class BaseVmcHelper

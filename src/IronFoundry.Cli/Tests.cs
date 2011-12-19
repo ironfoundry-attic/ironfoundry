@@ -3,7 +3,7 @@ namespace IronFoundry.Cli
 {
     using System;
     using System.Collections.Generic;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Types;
     using IronFoundry.Vcap;
     using Newtonsoft.Json;
 

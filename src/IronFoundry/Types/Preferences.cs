@@ -1,8 +1,8 @@
 using System;
 using System.Collections.ObjectModel;
-using CloudFoundry.Net.Extensions;
+using IronFoundry.Extensions;
 
-namespace CloudFoundry.Net.Types
+namespace IronFoundry.Types
 {
     [Serializable]
     public class Preferences

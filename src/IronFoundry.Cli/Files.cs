@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using CloudFoundry.Net.Extensions;
+    using IronFoundry.Extensions;
     using IronFoundry.Vcap;
 
     static partial class Program

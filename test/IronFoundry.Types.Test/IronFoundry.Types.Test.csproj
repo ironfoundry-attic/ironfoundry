@@ -8,8 +8,8 @@
     <ProjectGuid>{196F323E-74FE-4EA6-9344-D4BFB98BEA7C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CloudFoundry.Net.Types.Test</RootNamespace>
-    <AssemblyName>CloudFoundry.Net.Types.Test</AssemblyName>
+    <RootNamespace>IronFoundry.Types.Test</RootNamespace>
+    <AssemblyName>IronFoundry.Types.Test</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -55,7 +55,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\IronFoundry\IronFoundry.csproj">
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
-      <Name>CloudFoundry.Net</Name>
+      <Name>IronFoundry</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

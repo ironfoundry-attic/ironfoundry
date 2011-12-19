@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CloudFoundry.Net.Extensions
+namespace IronFoundry.Extensions
 {
     public static class IEnumerableExtensionMethods
     {

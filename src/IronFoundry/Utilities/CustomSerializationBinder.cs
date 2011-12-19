@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace CloudFoundry.Net.Utilities
+namespace IronFoundry.Utilities
 {
     public class CustomSerializationBinder : SerializationBinder
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CloudFoundry.Net.VsExtension.Ui.Application.Properties
+namespace IronFoundry.VsExtension.Ui.Application.Properties
 {
 
 

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CloudFoundry.Net.VsExtension.Ui.Application.Properties
+namespace IronFoundry.VsExtension.Ui.Application.Properties
 {
 
 
@@ -44,7 +44,7 @@ namespace CloudFoundry.Net.VsExtension.Ui.Application.Properties
             {
                 if ((resourceMan == null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CloudFoundry.Net.VsExtension.Ui.Application.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IronFoundry.VsExtension.Ui.Application.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

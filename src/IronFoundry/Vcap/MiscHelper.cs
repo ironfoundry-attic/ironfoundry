@@ -1,8 +1,8 @@
 ﻿namespace IronFoundry.Vcap
 {
     using System;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Extensions;
+    using IronFoundry.Types;
 
     internal class MiscHelper : BaseVmcHelper
     {

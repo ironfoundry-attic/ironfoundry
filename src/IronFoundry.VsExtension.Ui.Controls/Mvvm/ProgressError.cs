@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
+﻿namespace IronFoundry.VsExtension.Ui.Controls.Mvvm
 {
     public class ProgressError
     {

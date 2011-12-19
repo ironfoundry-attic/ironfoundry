@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.Types
+﻿namespace IronFoundry.Types
 {
     using Newtonsoft.Json;
 

@@ -1,8 +1,8 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
+﻿namespace IronFoundry.VsExtension.Ui.Controls.Views
 {
     using System.Windows;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
+    using IronFoundry.VsExtension.Ui.Controls.ViewModel;
     using GalaSoft.MvvmLight.Messaging;
 
     /// <summary>

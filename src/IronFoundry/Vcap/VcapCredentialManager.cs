@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Extensions;
+    using IronFoundry.Types;
     using Newtonsoft.Json;
 
     /*

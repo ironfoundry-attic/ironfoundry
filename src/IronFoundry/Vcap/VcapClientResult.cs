@@ -1,6 +1,6 @@
 ﻿namespace IronFoundry.Vcap
 {
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Types;
 
     public class VcapClientResult
     {

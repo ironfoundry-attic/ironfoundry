@@ -1,6 +1,6 @@
 using System;
 
-namespace CloudFoundry.Net.Extensions
+namespace IronFoundry.Extensions
 {
     public static class UriExtensionMethods
     {

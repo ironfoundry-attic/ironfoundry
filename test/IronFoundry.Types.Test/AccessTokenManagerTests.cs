@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.Types.Test
+﻿namespace IronFoundry.Types.Test
 {
     using System;
     using IronFoundry.Vcap;

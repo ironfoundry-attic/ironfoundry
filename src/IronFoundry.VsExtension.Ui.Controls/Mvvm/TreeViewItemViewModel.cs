@@ -1,8 +1,8 @@
 ﻿
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace IronFoundry.VsExtension.Ui.Controls.ViewModel
 {
     using System.Linq;
-    using CloudFoundry.Net.Extensions;
+    using IronFoundry.Extensions;
     using GalaSoft.MvvmLight;
 
     public class TreeViewItemViewModel : ViewModelBase

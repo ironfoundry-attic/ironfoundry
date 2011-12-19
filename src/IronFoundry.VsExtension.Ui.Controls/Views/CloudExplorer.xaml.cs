@@ -12,10 +12,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GalaSoft.MvvmLight.Messaging;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
+using IronFoundry.VsExtension.Ui.Controls.Utilities;
+using IronFoundry.VsExtension.Ui.Controls.ViewModel;
 
-namespace CloudFoundry.Net.VsExtension.Ui.Controls
+namespace IronFoundry.VsExtension.Ui.Controls
 {
     /// <summary>
     /// Interaction logic for CloudExplorer.xaml

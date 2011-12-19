@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net
+﻿namespace IronFoundry
 {
     using System.IO;
     using Microsoft.VisualBasic.Devices;

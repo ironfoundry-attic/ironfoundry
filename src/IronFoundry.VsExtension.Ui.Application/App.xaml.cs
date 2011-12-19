@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Application
+﻿namespace IronFoundry.VsExtension.Ui.Application
 {
     using Controls.Model;
 

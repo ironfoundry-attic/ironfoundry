@@ -1,6 +1,6 @@
-﻿using CloudFoundry.Net.Extensions;
+﻿using IronFoundry.Extensions;
 
-namespace CloudFoundry.Net.Types
+namespace IronFoundry.Types
 {
     using System;
     using System.Collections.Generic;

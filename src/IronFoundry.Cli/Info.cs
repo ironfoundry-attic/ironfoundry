@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Properties;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Extensions;
+    using IronFoundry.Properties;
+    using IronFoundry.Types;
     using IronFoundry.Vcap;
     using Newtonsoft.Json;
 

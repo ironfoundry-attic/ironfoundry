@@ -6,7 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
-namespace CloudFoundry.Net.Extensions
+namespace IronFoundry.Extensions
 {
     [Serializable]
     public class SafeObservableCollection<T> : ObservableCollection<T>

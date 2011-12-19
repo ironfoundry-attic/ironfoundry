@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Extensions;
+    using IronFoundry.Types;
     using IronFoundry.Vcap;
 
     static partial class Program

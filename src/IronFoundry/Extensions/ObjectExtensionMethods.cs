@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using CloudFoundry.Net.Utilities;
+using IronFoundry.Utilities;
 
-namespace CloudFoundry.Net.Extensions
+namespace IronFoundry.Extensions
 {
     public static class ObjectExtensionMethods
     {

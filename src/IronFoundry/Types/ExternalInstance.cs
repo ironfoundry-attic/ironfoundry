@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
-using CloudFoundry.Net;
+using IronFoundry;
 
-namespace CloudFoundry.Net.Types
+namespace IronFoundry.Types
 {
     public class ExternalInstance : EntityBase
     {

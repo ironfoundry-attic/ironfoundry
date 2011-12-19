@@ -1,12 +1,12 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
-using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+using IronFoundry.VsExtension.Ui.Controls.ViewModel;
+using IronFoundry.VsExtension.Ui.Controls.Utilities;
 using System.Windows.Interop;
 using System;
 using System.Windows.Media.Imaging;
 
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Views
+namespace IronFoundry.VsExtension.Ui.Controls.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

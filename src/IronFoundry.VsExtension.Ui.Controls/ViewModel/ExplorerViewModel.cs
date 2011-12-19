@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace IronFoundry.VsExtension.Ui.Controls.ViewModel
 {
     using System;
     using System.Collections.ObjectModel;
@@ -6,9 +6,9 @@
     using System.ComponentModel;
     using System.Linq;
     using System.Threading;
-    using CloudFoundry.Net.Types;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using IronFoundry.Types;
+    using IronFoundry.VsExtension.Ui.Controls.Model;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;

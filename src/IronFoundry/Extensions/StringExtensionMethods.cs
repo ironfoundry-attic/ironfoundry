@@ -1,4 +1,4 @@
-namespace CloudFoundry.Net.Extensions
+namespace IronFoundry.Extensions
 {
     using System;
 

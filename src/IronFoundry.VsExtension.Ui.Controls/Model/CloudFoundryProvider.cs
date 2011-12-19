@@ -1,14 +1,14 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
+﻿namespace IronFoundry.VsExtension.Ui.Controls.Model
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Extensions;
+    using IronFoundry.Types;
     using IronFoundry.Vcap;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
 
     public class CloudFoundryProvider : ICloudFoundryProvider

@@ -5,10 +5,10 @@
     using System.IO;
     using System.Security.Cryptography;
     using System.Threading;
-    using CloudFoundry.Net;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Properties;
-    using CloudFoundry.Net.Types;
+    using IronFoundry;
+    using IronFoundry.Extensions;
+    using IronFoundry.Properties;
+    using IronFoundry.Types;
     using ICSharpCode.SharpZipLib.Zip;
     using Newtonsoft.Json;
     using RestSharp;

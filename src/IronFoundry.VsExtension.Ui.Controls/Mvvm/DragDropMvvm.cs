@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm
+﻿namespace IronFoundry.VsExtension.Ui.Controls.Mvvm
 {
     using System;
     using System.Windows;

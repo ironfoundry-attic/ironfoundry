@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.IO;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Types;
 
     public interface IVcapClient
     {

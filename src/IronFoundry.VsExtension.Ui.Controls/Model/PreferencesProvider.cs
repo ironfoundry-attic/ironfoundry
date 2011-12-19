@@ -1,9 +1,9 @@
 ﻿
-namespace CloudFoundry.Net.VsExtension.Ui.Controls.Model
+namespace IronFoundry.VsExtension.Ui.Controls.Model
 {
     using System;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Extensions;
+    using IronFoundry.Types;
     using System.IO.IsolatedStorage;
     using System.Runtime.Serialization.Formatters.Binary;
     using System.IO;

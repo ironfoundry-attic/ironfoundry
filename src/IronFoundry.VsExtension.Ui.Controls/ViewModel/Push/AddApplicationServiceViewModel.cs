@@ -1,10 +1,10 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel
+﻿namespace IronFoundry.VsExtension.Ui.Controls.ViewModel
 {
     using System.Collections.ObjectModel;
-    using CloudFoundry.Net.Extensions;
-    using CloudFoundry.Net.Types;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
+    using IronFoundry.Extensions;
+    using IronFoundry.Types;
+    using IronFoundry.VsExtension.Ui.Controls.Mvvm;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
     using GalaSoft.MvvmLight.Messaging;
 using System.ComponentModel;
 

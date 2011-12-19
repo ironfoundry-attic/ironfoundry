@@ -1,10 +1,10 @@
-﻿using CloudFoundry.Net.Extensions;
+﻿using IronFoundry.Extensions;
 
 namespace IronFoundry.Vcap
 {
     using System;
     using System.Collections.Generic;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Types;
     using Newtonsoft.Json;
     using RestSharp;
 

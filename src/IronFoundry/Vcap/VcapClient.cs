@@ -5,9 +5,9 @@
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
-    using CloudFoundry.Net.Properties;
-    using CloudFoundry.Net.Types;
-    using CloudFoundry.Net.Extensions;
+    using IronFoundry.Properties;
+    using IronFoundry.Types;
+    using IronFoundry.Extensions;
 
     public class VcapClient : IVcapClient
     {

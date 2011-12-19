@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.VsExtension
+﻿namespace IronFoundry.VsExtension
 {
     using System;
     using System.Collections.Generic;
@@ -8,18 +8,18 @@
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Windows.Interop;
-    using CloudFoundry.Net.Types;
+    using IronFoundry.Types;
     using IronFoundry.Vcap;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Model;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Mvvm;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Utilities;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.ViewModel;
-    using CloudFoundry.Net.VsExtension.Ui.Controls.Views;
+    using IronFoundry.VsExtension.Ui.Controls.Model;
+    using IronFoundry.VsExtension.Ui.Controls.Mvvm;
+    using IronFoundry.VsExtension.Ui.Controls.Utilities;
+    using IronFoundry.VsExtension.Ui.Controls.ViewModel;
+    using IronFoundry.VsExtension.Ui.Controls.Views;
     using EnvDTE;
     using GalaSoft.MvvmLight.Messaging;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
-    using Application = CloudFoundry.Net.Types.Application;
+    using Application = IronFoundry.Types.Application;
 
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]

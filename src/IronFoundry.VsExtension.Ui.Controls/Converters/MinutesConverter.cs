@@ -1,4 +1,4 @@
-﻿namespace CloudFoundry.Net.VsExtension.Ui.Controls.Converters
+﻿namespace IronFoundry.VsExtension.Ui.Controls.Converters
 {
     using System;
     using System.Windows.Data;
