@@ -1,0 +1,11 @@
+Iron Foundry is an implementation of Cloud Foundryª that is tightly integrated with the .NET Framework. It can support multiple frameworks, cloud providers, and application services all on a cloud scale platform.
+
+h1. What is Iron Foundry? 
+
+Iron Foundry is an implementation of the Cloud Foundry Open Platform as a Service that is tightly integrated with the .NET Framework. Iron Foundry can support multiple frameworks, multiple cloud providers, and multiple application services all on a cloud scale platform.
+
+h1. How can I use Iron Foundry?
+
+Developers can run their own instances of Iron Foundry in-house or with any service provider who supports it, finally giving them a truly open, interoperable .NET PaaS solution that can be run inside and outside the firewall. And because you can run your own instances of Iron Foundry, itÕs easy to leverage it for a full dev, test/ QA, and staging environment before pushing to production. Operations teams now have the freedom to choose among a variety of service providers providing the same PaaS used in their development environments, enabling them to pick the one that meets their specific needs in areas such as security, compliance, availability, location, etc.
+
+Find out more at http://www.ironfoundry.org/
