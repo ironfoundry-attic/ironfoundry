@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix 
+  xmlns="http://schemas.microsoft.com/wix/2006/wi"
+  xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" 
+  xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+  
+  <?ifndef var.VERSION ?>
+    <?error VERSION must be defined on candle command line: candle -dVERSION=VERSION ?>
+  <?endif?>
+
+  <?define var.SVCBUILDDIR = $(var.IronFoundry.Dea.Service.TargetDir)?>
+
+  <?if $(sys.BUILDARCH) = x64?>
+    <?define SEARCH.WIN64.REG = 'yes' ?>
+    <?define WIN64.COMPONENTS = 'yes' ?>
+    <?define ProgramFilesDirectoryId = 'ProgramFiles64Folder' ?>
+  <?else?>
+    <?define SEARCH.WIN64.REG = 'no' ?>
+    <?define WIN64.COMPONENTS = 'no' ?>
+    <?define ProgramFilesDirectoryId = 'ProgramFilesFolder' ?>
+  <?endif?>
+
+  <!-- Do Not Change These Values (They have dependencies outside of the MSI) -->
+  <?define ProductName = 'Iron Foundry DEA Service' ?>
+  <?define UpgradeCode = '{748a94e6-f23b-4ff9-b1de-92851ee357d2}' ?> <!-- NEVER CHANGE THIS -->
+  <?define RootRegistryPath = "SOFTWARE\IronFoundry\[ProductName]" ?>
+
+  <Product 
+    Id="*"
+    Name="$(var.ProductName)"
+    Language="1033"
+    Version="$(var.VERSION)"
+    Manufacturer="Tier3"
+    UpgradeCode="$(var.UpgradeCode)">
+    
+    <!-- InstallerVersion="200" -->
+    <Package 
+      Comments="$(var.ProductName) $(var.VERSION)"
+      Keywords="$(var.ProductName) $(var.VERSION)"
+      Description="$(var.ProductName) $(var.VERSION)"
+      InstallerVersion="200"
+      InstallPrivileges="elevated"
+      InstallScope="perMachine"
+      Languages="1033"
+      Compressed="yes"
+      Platform="$(var.PLATFORM)"
+      Manufacturer="Iron Foundry"
+      />
+    
+    <!-- Add Remove Programs Properties -->
+    <Property Id="ARPHELPLINK" Value="http://www.ironfoundry.org" />
+    <Property Id="ARPURLINFOABOUT" Value="http://www.ironfoundry.org" />
+    <!--Property Id="ARPHELPTELEPHONE" Value="" /-->
+    <Property Id="ARPCONTACT" Value="support@ironfoundry.org" />
+
+    <!-- Major Upgrade -->
+    <Upgrade Id="$(var.UpgradeCode)">
+      <UpgradeVersion Minimum="$(var.VERSION)" IncludeMinimum="no" OnlyDetect="yes" Property="NEWERVERSIONDETECTED" Language="1033" />
+      <UpgradeVersion Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="$(var.VERSION)" IncludeMaximum="no"
+        Property="OLDERVERSIONBEINGUPGRADED" OnlyDetect="no" IgnoreRemoveFailure="yes" MigrateFeatures="yes" Language="1033"/>
+    </Upgrade>
+
+    <PropertyRef Id="NETFRAMEWORK40FULL"/>
+    <PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR"/>
+    <PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR64"/>
+
+    <Property Id="INSTALLDIR">
+      <RegistrySearch
+        Id="RegINSTALLDIR"
+        Root="HKLM"
+        Win64="$(var.SEARCH.WIN64.REG)"
+        Type="raw"
+        Name="INSTALLDIR"
+        Key="SOFTWARE\IronFoundry\[ProductName]"
+        />
+    </Property>
+
+    <Property Id="SERVICENAME" Value="$(var.ProductName) Service" />
+    
+    <!-- START (Install Conditions) -->
+    <Condition Message="[ProductName] setup requires Administrator priveledges. Setup will now exit."><![CDATA[Privileged]]></Condition>
+    <Condition Message="[ProductName] requires .NET Framework 4.0 Full. Setup will now exit."><![CDATA[Installed OR NETFRAMEWORK40FULL]]></Condition>
+    <Condition Message="ALLUSERS must be 1. Setup will now exit."><![CDATA[ALLUSERS = 1]]></Condition>
+    <!-- END (Install Conditions) -->
+    
+    <Media Id="1" Cabinet="IronFoundry.DEA.Service.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="$(var.ProgramFilesDirectoryId)">
+        <Directory Id="IronFoundryDirectory" Name="IronFoundry">
+          <Directory Id="WindowsServiceDirectory" Name="DEAService">
+            <Directory Id="INSTALLDIR" Name=".">
+
+              <!-- START (Install Registry) -->
+              <Component Id="InstallDirRegKey" Guid="{E654A926-26E0-493C-966E-52C09381DB8C}" Win64="$(var.WIN64.COMPONENTS)">
+                <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
+                  <RegistryValue Name="INSTALLDIR" Value="[INSTALLDIR]" Type="string" KeyPath="yes"/>
+                </RegistryKey>
+              </Component>
+
+              <Component Id="IronFoundryRegKey" Guid="{BB5917B4-6CDF-4B35-B58B-DE3C472C5C31}" Win64="$(var.WIN64.COMPONENTS)">
+                <Condition><![CDATA[ALLUSERS = 1]]></Condition>
+                <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
+                  <RegistryKey Action="createAndRemoveOnUninstall" Key="Tier3">
+                    <RegistryValue Value="IronFoundry" Type="string" KeyPath="yes"/>
+                  </RegistryKey>
+                </RegistryKey>
+              </Component>
+
+              <Component Id="PerProductRegistryKey" Guid="{112F503E-8AF1-4532-96F9-DECC8A58A34C}" Win64="$(var.WIN64.COMPONENTS)">
+                <Condition><![CDATA[ALLUSERS = 1]]></Condition>
+                <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
+                  <RegistryKey Action="create" Key="IronFoundry">
+                    <Permission User="Administrators" GenericRead="yes" Read="yes" GenericWrite="yes" Write="yes" TakeOwnership="yes" />
+                    <RegistryKey Action="createAndRemoveOnUninstall" Key="[ProductName]">
+                      <RegistryValue Value="[ProductVersion]" Type="string" KeyPath="yes"/>
+                    </RegistryKey>
+                  </RegistryKey>
+                </RegistryKey>
+              </Component>
+              <!-- END (Install Registry)-->
+
+              <!-- START (StartMenu Shortcuts) -->
+              <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="$(var.ProductName)">
+
+                  <Component Id="UninstallShortcut" Guid="{8487965D-8106-4951-8D81-EE42E98EBC9C}">
+                    <Shortcut Id="UninstallProduct"
+                              Name="Uninstall $(var.ProductName)"
+                              Description="Uninstalls $(var.ProductName)"
+                              Target="[System64Folder]msiexec.exe"
+                              Arguments="/x [ProductCode]"/>
+                    <RemoveFolder Id="ApplicationProgramsFolderUninstall" On="uninstall" />
+                    <RemoveFolder Id="ProgramMenuFolderUninstall" On="uninstall" />
+                    <RegistryKey Root="HKCU" Action="none" Key="$(var.RootRegistryPath)">
+                      <RegistryValue Type="integer" Name="UninstallShortcut" Value="1" KeyPath="yes" />
+                    </RegistryKey>                    
+                  </Component>
+                </Directory>
+              </Directory>
+              <!-- END (StartMenu Shortcuts) -->
+
+              <!-- START (IronFoundry DEA Windows Service) -->
+              <Component Id="IronFoundry.Dea.Service" Guid="{12CF1125-8E7A-4FE2-8BD0-DF3889222B61}" Win64="$(var.WIN64.COMPONENTS)">
+                <File Id="IronFoundry.Dea.Service.exe"
+                      Name="IronFoundry.Dea.Service.exe"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Dea.Service.exe" />
+                <File Id="IronFoundry.Dea.Service.exe.config"
+                      Name="IronFoundry.Dea.Service.exe.config"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Dea.Service.exe.config" />                
+                <File Id="NLog.dll" 
+                      Name="NLog.dll" 
+                      Source="$(var.SVCBUILDDIR)NLog.dll" />                
+                <File Id="nlog.config"
+                      Name="nlog.config"
+                      Source="$(var.SVCBUILDDIR)nlog.config" />
+                <File Id="ICSharpCode.SharpZipLib.dll"
+                      Name="ICSharpCode.SharpZipLib.dll"
+                      Source="$(var.SVCBUILDDIR)ICSharpCode.SharpZipLib.dll" />
+                <File Id="IronFoundry.Dea.dll"
+                      Name="IronFoundry.Dea.dll"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Dea.dll" />
+                <File Id="IronFoundry.dll"
+                      Name="IronFoundry.dll"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.dll" />
+                <File Id="Newtonsoft.Json.dll"
+                      Name="Newtonsoft.Json.dll"
+                      Source="$(var.SVCBUILDDIR)Newtonsoft.Json.dll" />
+                <File Id="RestSharp.dll"
+                      Name="RestSharp.dll"
+                      Source="$(var.SVCBUILDDIR)RestSharp.dll" />
+                
+
+                <?if $(var.Configuration) = Debug ?>
+                  <File Id="IronFoundry.Dea.Service.pdb"
+                        Name="IronFoundry.Dea.Service.pdb"
+                        Source="$(var.SVCBUILDDIR)IronFoundry.Dea.Service.pdb" />
+                  <File Id="IronFoundry.Dea.pdb"
+                        Name="IronFoundry.Dea.pdb"
+                        Source="$(var.SVCBUILDDIR)IronFoundry.Dea.pdb" />
+                  <File Id="IronFoundry.pdb"
+                        Name="IronFoundry.pdb"
+                        Source="$(var.SVCBUILDDIR)IronFoundry.pdb" />
+                  <File Id="Newtonsoft.Json.pdb"
+                        Name="Newtonsoft.Json.pdb"
+                        Source="$(var.SVCBUILDDIR)Newtonsoft.Json.pdb" />
+                <?endif?>
+                
+                <ServiceInstall Id="IronFoundry.DEA.Service.ServiceInstaller"
+                                Type="ownProcess"
+                                Vital="yes"
+                                Name="[SERVICENAME]"
+                                DisplayName="[SERVICENAME]"
+                                Description="Iron Foundry DEA Service."
+                                Start="auto"
+                                Account="LocalSystem"
+                                ErrorControl="ignore"
+                                Interactive="no" />
+                <ServiceControl Id="IronFoundry.DEA.Service.StartService"
+                                Start="install"
+                                Name="[SERVICENAME]"
+                                Wait="yes" />
+                <ServiceControl Id="IronFoundry.DEA.Service.StopService"
+                                Stop="uninstall"
+                                Remove="uninstall"
+                                Name="[SERVICENAME]"
+                                Wait="yes" />
+                <RegistryKey Id="ServiceNameKey" Action="createAndRemoveOnUninstall" Key="$(var.RootRegistryPath)" Root="HKLM">
+                  <RegistryValue Id="SERVICENAME" Name="ServiceName" Value="[SERVICENAME]" Type="string" />
+                </RegistryKey>
+              </Component>
+              <!-- END (ClientBackup Windows Service) -->
+
+            </Directory>
+	  </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- START (User Interface) Reference: http://wix.sourceforge.net/manual-wix3/WixUI_dialog_library.htm -->    
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <WixVariable Id="WixUISupportPerUser" Value="0" />
+    <UIRef Id="WixUI_Common" />
+    
+    <UI>
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" />
+      
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode"    Value="FeatureTree" />
+      
+      <DialogRef Id="ErrorDlg"        />
+      <DialogRef Id="FatalError"      />
+      <DialogRef Id="FilesInUse"      />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg"      />
+      <DialogRef Id="ProgressDlg"     />
+      <DialogRef Id="ResumeDlg"       />
+      <DialogRef Id="UserExit"        />
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[LicenseAccepted = "1"]]></Publish>
+      
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Order="1" Value="WelcomeDlg" Event="NewDialog"><![CDATA[WixUI_InstallMode = "Remove"]]></Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Order="2" Value="LicenseAgreementDlg" Event="NewDialog"><![CDATA[NOT WixUI_InstallMode = "Remove"]]></Publish>
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="1">1</Publish>
+    </UI>
+    <!-- END (User Interface) -->
+    
+    <ComponentGroup Id="RegistryKeyComponents">
+      <ComponentRef Id="InstallDirRegKey" Primary="yes"/>
+      <ComponentRef Id="PerProductRegistryKey" Primary="yes"/>
+      <ComponentRef Id="IronFoundryRegKey" Primary="yes"/>
+    </ComponentGroup>
+
+    <ComponentGroup Id="DeaServiceComponents">      
+      <ComponentRef Id="IronFoundry.Dea.Service" Primary="yes" />
+      <ComponentRef Id="UninstallShortcut" Primary="yes"/>
+    </ComponentGroup>
+
+    <InstallUISequence>
+      <FindRelatedProducts Before="LaunchConditions" />
+      <Custom Action="NewerVersion" After="FindRelatedProducts"><![CDATA[NEWERVERSIONDETECTED]]></Custom>
+    </InstallUISequence>
+    
+    <CustomAction Id="NewerVersion" Error="This version or a newer version of [ProductName] is already installed." />
+    
+    <InstallExecuteSequence>
+      <Custom Action="NewerVersion" Before="FindRelatedProducts"><![CDATA[NEWERVERSIONDETECTED]]></Custom>
+      <RemoveExistingProducts After="InstallFinalize"/>
+    </InstallExecuteSequence>
+
+    <Feature Id="Product" Title="Iron Foundry DEA Service" Description="[ProductName] $(var.VERSION)" Display="expand" Level="1" AllowAdvertise="no" InstallDefault="local">
+      <Feature Id="WindowsService" Title="Windows Service" Level="1" Description="The Iron Foundry DEA Service." Display="expand" ConfigurableDirectory="INSTALLDIR" AllowAdvertise="no" InstallDefault="local" Absent="disallow" TypicalDefault="install">
+        <ComponentGroupRef Id="DeaServiceComponents" Primary="yes" />
+        <ComponentGroupRef Id="RegistryKeyComponents" />
+      </Feature>
+    </Feature>
+  </Product>
+</Wix>
