@@ -5,7 +5,7 @@
   xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   
   <?ifndef var.VERSION ?>
-    <?error VERSION must be defined on candle command line: candle -dVERSION=VERSION ?>
+    <?define VERSION = '1.0.0.0' ?>
   <?endif?>
 
   <?define var.SVCBUILDDIR = $(var.IronFoundry.Dea.Service.TargetDir)?>
