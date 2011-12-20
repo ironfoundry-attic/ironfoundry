@@ -8,5 +8,7 @@
         string NatsHost { get; }
         ushort NatsPort { get; }
         ushort FilesServicePort { get; }
+
+        FilesServiceCredentials FilesCredentials { get; }
     }
 }

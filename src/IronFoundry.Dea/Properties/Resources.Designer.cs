@@ -88,6 +88,24 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid password &apos;{0}&apos; sent to files service..
+        /// </summary>
+        internal static string FilesServiceValidator_InvalidPassword_Fmt {
+            get {
+                return ResourceManager.GetString("FilesServiceValidator_InvalidPassword_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid username &apos;{0}&apos; sent to files service..
+        /// </summary>
+        internal static string FilesServiceValidator_InvalidUser_Fmt {
+            get {
+                return ResourceManager.GetString("FilesServiceValidator_InvalidUser_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error setting up Event Log logger!.
         /// </summary>
         internal static string InternalLog_ErrorInSettingUpEventLogger_Message {

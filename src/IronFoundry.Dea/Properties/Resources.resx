@@ -126,6 +126,12 @@
   <data name="Agent_WaitingForTasksInStop_Message" xml:space="preserve">
     <value>Agent.Stop(): Waiting for tasks.</value>
   </data>
+  <data name="FilesServiceValidator_InvalidPassword_Fmt" xml:space="preserve">
+    <value>Invalid password '{0}' sent to files service.</value>
+  </data>
+  <data name="FilesServiceValidator_InvalidUser_Fmt" xml:space="preserve">
+    <value>Invalid username '{0}' sent to files service.</value>
+  </data>
   <data name="InternalLog_ErrorInSettingUpEventLogger_Message" xml:space="preserve">
     <value>Error setting up Event Log logger!</value>
   </data>

@@ -5,6 +5,7 @@
     public class Config : IConfig
     {
         private readonly DeaSection deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
+        private readonly FilesServiceCredentials filesCredentials = new FilesServiceCredentials();
 
         public bool DisableDirCleanup
         {
@@ -34,6 +35,11 @@
         public ushort FilesServicePort
         {
             get { return deaSection.FilesServicePort; }
+        }
+
+        public FilesServiceCredentials FilesCredentials
+        {
+            get { return filesCredentials; }
         }
     }
 }
