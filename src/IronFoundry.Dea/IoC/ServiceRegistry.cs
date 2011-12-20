@@ -2,6 +2,7 @@
 {
     using System;
     using System.Reflection;
+    using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
     using StructureMap.Configuration.DSL;
     using WinService;
@@ -23,6 +24,8 @@
                 s.LookForRegistries();
                 s.AddAllTypesOf<IService>();
             });
+
+            For<IConfig>().Singleton().Use<Config>();
 
             For<ILog>().Use(f =>
                 {

@@ -11,7 +11,7 @@
     using NLog;
     using Providers;
 
-    public sealed class Agent
+    public sealed class Agent : IAgent
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static readonly TimeSpan HEARTBEAT_INTERVAL = TimeSpan.FromSeconds(10);
@@ -19,15 +19,17 @@
         private readonly IMessagingProvider NATS;
         private readonly IWebServerAdministrationProvider IIS = new WebServerAdministrationProvider();
         private readonly DropletManager dropletManager = new DropletManager();
-        private readonly FilesManager filesManager = new FilesManager();
+        private readonly IFilesManager filesManager;
         private readonly Hello helloMessage;
         private readonly Task monitorTask;
 
         private bool shutting_down = false;
 
-        public Agent()
+        public Agent(IConfig config, IFilesManager filesManager)
         {
-            NATS = new NatsMessagingProvider(DeaConfig.NatsHost, DeaConfig.NatsPort);
+            this.filesManager = filesManager;
+
+            NATS = new NatsMessagingProvider(config.NatsHost, config.NatsPort);
             helloMessage = new Hello(NATS.UniqueIdentifier, Utility.LocalIPAddress, 12345, 0.99M);
             monitorTask = new Task(monitorLoop);
         }
@@ -148,7 +150,7 @@
                 return;
             }
 
-            Instance instance = new Instance(droplet);
+            var instance = new Instance(droplet);
 
             if (filesManager.Stage(droplet, instance))
             {

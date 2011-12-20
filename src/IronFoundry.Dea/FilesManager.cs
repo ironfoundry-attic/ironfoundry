@@ -15,18 +15,18 @@
     using IronFoundry.Dea.Types;
     using NLog;
 
-    public class FilesManager
+    public class FilesManager : IFilesManager
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly bool disableDirCleanup = false;
         private readonly string dropletsPath;
 
-        public FilesManager()
+        public FilesManager(IConfig config)
         {
-            disableDirCleanup = DeaConfig.DisableDirCleanup;
-            dropletsPath = DeaConfig.DropletDir;
-            ApplicationPath = DeaConfig.AppDir;
+            disableDirCleanup = config.DisableDirCleanup;
+            dropletsPath = config.DropletDir;
+            ApplicationPath = config.AppDir;
 
             Directory.CreateDirectory(dropletsPath);
             Directory.CreateDirectory(ApplicationPath);

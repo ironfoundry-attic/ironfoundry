@@ -84,5 +84,18 @@
                 this["disableDirCleanup"] = value;
             }
         }
+
+        [ConfigurationProperty("filesServicePort", DefaultValue = "12345", IsRequired = false)]
+        public ushort FilesServicePort
+        {
+            get
+            {
+                return Convert.ToUInt16(this["filesServicePort"]);
+            }
+            set
+            {
+                this["filesServicePort"] = value;
+            }
+        }
     }
 }

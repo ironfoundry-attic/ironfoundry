@@ -6,20 +6,21 @@
     using IronFoundry.Dea.Logging;
 
     [System.ComponentModel.DesignerCategory(@"Code")]
-    public class DeaWindowsService : IService
+    public class DeaWinService : IService
     {
         private static readonly TimeSpan INITIAL_INTERVAL = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromSeconds(5);
 
         private readonly ILog log;
-        private readonly Agent agent;
+        private readonly IAgent agent;
         private readonly Task agentTask;
         private readonly Timer agentMonitorTimer;
 
-        public DeaWindowsService(ILog log)
+        public DeaWinService(ILog log, IAgent agent)
         {
             this.log = log;
-            agent = new Agent();
+            this.agent = agent;
+
             agentTask = new Task(() => agent.Start());
             agentMonitorTimer = new Timer(agentMonitor);
         }

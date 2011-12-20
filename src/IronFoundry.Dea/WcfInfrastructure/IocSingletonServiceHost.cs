@@ -2,9 +2,9 @@
 {
     using System;
 
-    public class IocServiceHost : PerCallServiceHost
+    public class IocSingletonServiceHost : SingletonServiceHost
     {
-        public IocServiceHost(Type serviceType) : base(serviceType) { }
+        public IocSingletonServiceHost(Type serviceType) : base(serviceType) { }
 
         protected override void OnOpening()
         {

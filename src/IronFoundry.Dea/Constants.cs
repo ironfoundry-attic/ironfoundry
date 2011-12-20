@@ -4,6 +4,8 @@
 
     public static class Constants
     {
+        public const string FilesServiceNamespace = @"http://ironfoundry.org/dea/filesservice"; // NB: should match app.config
+
         public const string SupportedFramework = "aspdotnet";
 
         public const string JsonDateFormat = "yyyy-MM-dd HH:mm:ss zz00";

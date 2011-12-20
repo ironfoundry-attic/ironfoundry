@@ -10,7 +10,11 @@
     {
         private readonly ILog log;
         private readonly bool shouldRun = false;
-        private readonly ServiceHost serviceHost;
+
+        protected ServiceHost serviceHost;
+
+        public WcfWinService(ILog log, bool shouldRun)
+            : this(log, shouldRun, null) { }
 
         public WcfWinService(ILog log, bool shouldRun, ServiceHost serviceHost)
         {

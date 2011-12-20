@@ -55,6 +55,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web" />
   </ItemGroup>
@@ -63,13 +64,16 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Agent.cs" />
-    <Compile Include="Config\DeaConfig.cs" />
+    <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\IConfig.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
     <Compile Include="DropletManager.cs" />
     <Compile Include="Extensions\TimerExtensionMethods.cs" />
     <Compile Include="FileData.cs" />
     <Compile Include="FilesManager.cs" />
+    <Compile Include="IAgent.cs" />
+    <Compile Include="IFilesManager.cs" />
     <Compile Include="IoC\Bootstrapper.cs" />
     <Compile Include="IoC\ServiceRegistry.cs" />
     <Compile Include="JsonConverters\IPAddressConverter.cs" />
@@ -91,6 +95,8 @@
     <Compile Include="Providers\NatsSubscription.cs" />
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />
     <Compile Include="Extensions\SocketExtensionMethods.cs" />
+    <Compile Include="Services\FilesService.cs" />
+    <Compile Include="Services\IFilesService.cs" />
     <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\Discover.cs" />
     <Compile Include="Types\Droplet.cs" />
@@ -122,13 +128,17 @@
     <Compile Include="Types\VcapResponse.cs" />
     <Compile Include="Types\VcapStates.cs" />
     <Compile Include="Utilities.cs" />
+    <Compile Include="WcfInfrastructure\IocSingletonWebServiceHost.cs" />
+    <Compile Include="WcfInfrastructure\SingletonServiceHost.cs" />
+    <Compile Include="WcfInfrastructure\IocSingletonServiceHost.cs" />
     <Compile Include="WcfInfrastructure\IocInstanceProvider.cs" />
     <Compile Include="WcfInfrastructure\IocServiceBehavior.cs" />
     <Compile Include="WcfInfrastructure\IocServiceBehaviorUtil.cs" />
     <Compile Include="WcfInfrastructure\IocServiceHost.cs" />
     <Compile Include="WcfInfrastructure\PerCallServiceHost.cs" />
     <Compile Include="WcfInfrastructure\WcfWinService.cs" />
-    <Compile Include="WinService\DeaWindowsService.cs" />
+    <Compile Include="WinService\DeaWinService.cs" />
+    <Compile Include="WinService\FilesWinService.cs" />
     <Compile Include="WinService\IService.cs" />
     <Compile Include="WinService\MultipleServiceManager.cs" />
     <Compile Include="WinService\ServiceStatusUtil.cs" />
@@ -151,6 +161,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>

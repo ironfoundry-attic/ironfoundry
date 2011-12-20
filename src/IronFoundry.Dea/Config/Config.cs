@@ -2,33 +2,38 @@
 {
     using System.Configuration;
 
-    public static class DeaConfig
+    public class Config : IConfig
     {
-        private static readonly DeaSection deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
+        private readonly DeaSection deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
 
-        public static bool DisableDirCleanup
+        public bool DisableDirCleanup
         {
             get { return deaSection.DisableDirCleanup; }
         }
 
-        public static string DropletDir
+        public string DropletDir
         {
             get { return deaSection.DropletDir; }
         }
 
-        public static string AppDir
+        public string AppDir
         {
             get { return deaSection.AppDir; }
         }
 
-        public static string NatsHost
+        public string NatsHost
         {
             get { return deaSection.NatsHost; }
         }
 
-        public static ushort NatsPort
+        public ushort NatsPort
         {
             get { return deaSection.NatsPort; }
+        }
+
+        public ushort FilesServicePort
+        {
+            get { return deaSection.FilesServicePort; }
         }
     }
 }

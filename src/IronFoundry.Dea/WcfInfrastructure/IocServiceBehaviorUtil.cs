@@ -5,17 +5,17 @@
 
     public static class IocServiceBehaviorUtil
     {
-        public static void AddNinjectServiceBehaviorTo(ServiceHost argServiceHost)
+        public static void AddIoCServiceBehaviorTo(ServiceHost argServiceHost)
         {
             var behaviors = argServiceHost.Description.Behaviors;
 
             if (false == behaviors.IsNullOrEmpty())
             {
-                var ninjectServiceBehavior = behaviors.Find<IocServiceBehavior>();
-                if (null == ninjectServiceBehavior)
+                var iocServiceBehavior = behaviors.Find<IocServiceBehavior>();
+                if (null == iocServiceBehavior)
                 {
-                    ninjectServiceBehavior = new IocServiceBehavior();
-                    behaviors.Add(ninjectServiceBehavior);
+                    iocServiceBehavior = new IocServiceBehavior();
+                    behaviors.Add(iocServiceBehavior);
                 }
             }
         }
