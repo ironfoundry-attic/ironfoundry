@@ -24,7 +24,7 @@ if "%DevEnvDir%"=="" (
 
 powershell -nologo -file clean.ps1
 
-msbuild /v:n /t:build /p:Configuration=Debug /p:Platform="Any CPU" %SLN%
+msbuild /v:n /t:build /p:Configuration=Debug /p:Platform=x64 %SLN%
 
 msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x86 /p:WixValues="PLATFORM=x86;VERSION=%VERSION%" %SLN%
 msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x64 /p:WixValues="PLATFORM=x64;VERSION=%VERSION%" %SLN%
