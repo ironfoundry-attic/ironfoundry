@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea
+﻿namespace IronFoundry.Dea.Agent
 {
     public interface IAgent
     {

@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea
+﻿namespace IronFoundry.Dea.Agent
 {
     using System;
     using System.Collections;
@@ -12,21 +12,22 @@
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using IronFoundry.Dea.Config;
+    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Types;
-    using NLog;
 
     public class FilesManager : IFilesManager
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
+        private readonly ILog log;
         private readonly bool disableDirCleanup = false;
         private readonly string dropletsPath;
 
-        public FilesManager(IConfig config)
+        public FilesManager(ILog log, IConfig config)
         {
+            this.log = log;
+
             disableDirCleanup = config.DisableDirCleanup;
-            dropletsPath = config.DropletDir;
-            ApplicationPath = config.AppDir;
+            dropletsPath      = config.DropletDir;
+            ApplicationPath   = config.AppDir;
 
             Directory.CreateDirectory(dropletsPath);
             Directory.CreateDirectory(ApplicationPath);
@@ -174,7 +175,7 @@
             outInstanceApplicationPath = Path.Combine(ApplicationPath, argInstance.Dir);
         }
 
-        private static FileData getStagedApplicationFile(string executableUri)
+        private FileData getStagedApplicationFile(string executableUri)
         {
             FileData rv = null;
 
@@ -191,7 +192,7 @@
                     client.DownloadFile(executableUri, tempFile);
                 }
                 sw.Stop();
-                Logger.Debug("Took {0} time to dowload from {1} to {2}", sw.Elapsed, executableUri, tempFile);
+                log.Debug("Took {0} time to dowload from {1} to {2}", sw.Elapsed, executableUri, tempFile);
 
                 rv = new FileData(new FileStream(tempFile, FileMode.Open), tempFile);
             }

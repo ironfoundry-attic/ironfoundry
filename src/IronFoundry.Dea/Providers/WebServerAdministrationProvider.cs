@@ -2,17 +2,18 @@
 {
     using System.Linq;
     using System.Net;
+    using IronFoundry.Dea.Config;
     using Microsoft.Web.Administration;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
-        /*
-         * TODO 
-         * DEA connects to root DNS server via UDP and picks the last address.
-         * Probably should figure out a way to specify the IP.
-         */
-        private readonly IPAddress localIPAddress = Utility.LocalIPAddress;
+        private readonly IPAddress localIPAddress;
         private const ushort STARTING_PORT = 9000;
+
+        public WebServerAdministrationProvider(IConfig config)
+        {
+            this.localIPAddress = config.LocalIPAddress;
+        }
 
         public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
         {

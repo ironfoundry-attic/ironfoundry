@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea
+﻿namespace IronFoundry.Dea.Agent
 {
     using System;
     using System.Collections.Generic;
@@ -7,30 +7,40 @@
     using System.Threading;
     using System.Threading.Tasks;
     using IronFoundry.Dea.Config;
+    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Types;
-    using NLog;
     using Providers;
 
     public sealed class Agent : IAgent
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static readonly TimeSpan HEARTBEAT_INTERVAL = TimeSpan.FromSeconds(10);
 
-        private readonly IMessagingProvider NATS;
-        private readonly IWebServerAdministrationProvider IIS = new WebServerAdministrationProvider();
-        private readonly DropletManager dropletManager = new DropletManager();
+        private readonly ILog log;
+        private readonly IConfig config;
+        private readonly IMessagingProvider messagingProvider;
+        private readonly IWebServerAdministrationProvider webServerProvider;
+        private readonly IDropletManager dropletManager;
         private readonly IFilesManager filesManager;
+
         private readonly Hello helloMessage;
         private readonly Task monitorTask;
 
         private bool shutting_down = false;
 
-        public Agent(IConfig config, IFilesManager filesManager)
+        public Agent(ILog log, IConfig config,
+            IMessagingProvider messagingProvider,
+            IFilesManager filesManager,
+            IDropletManager dropletManager,
+            IWebServerAdministrationProvider webServerAdministrationProvider)
         {
-            this.filesManager = filesManager;
+            this.log               = log;
+            this.config            = config;
+            this.messagingProvider = messagingProvider;
+            this.filesManager      = filesManager;
+            this.dropletManager    = dropletManager;
+            this.webServerProvider = webServerAdministrationProvider;
 
-            NATS = new NatsMessagingProvider(config.NatsHost, config.NatsPort);
-            helloMessage = new Hello(NATS.UniqueIdentifier, Utility.LocalIPAddress, 12345, 0.99M);
+            helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort, 0.99M);
             monitorTask = new Task(monitorLoop);
         }
 
@@ -40,38 +50,38 @@
         {
             bool rv = false;
 
-            if (NATS.Connect())
+            if (messagingProvider.Connect())
             {
-                NATS.Start();
+                messagingProvider.Start();
 
                 var vcapComponentDiscoverMessage = new VcapComponentDiscover(
                     argType: "DEA",
                     argIndex: 1,
-                    argUuid: NATS.UniqueIdentifier, 
-                    argHost: Utility.LocalIPAddress.ToString(),
-                    argCredentials: NATS.UniqueIdentifier,
+                    argUuid: messagingProvider.UniqueIdentifier, 
+                    argHost: config.LocalIPAddress.ToString(),
+                    argCredentials: messagingProvider.UniqueIdentifier,
                     argStart: DateTime.Now);
 
-                NATS.Subscribe(NatsSubscription.VcapComponentDiscover,
+                messagingProvider.Subscribe(NatsSubscription.VcapComponentDiscover,
                     (msg, reply) =>
                     {
                         // TODO update_discover_uptime
-                        NATS.Publish(reply, vcapComponentDiscoverMessage);
+                        messagingProvider.Publish(reply, vcapComponentDiscoverMessage);
                     });
 
-                NATS.Publish(new VcapComponentAnnounce(vcapComponentDiscoverMessage));
+                messagingProvider.Publish(new VcapComponentAnnounce(vcapComponentDiscoverMessage));
 
-                NATS.Subscribe(NatsSubscription.DeaStatus, processDeaStatus);
-                NATS.Subscribe(NatsSubscription.DropletStatus, processDropletStatus);
-                NATS.Subscribe(NatsSubscription.DeaDiscover, processDeaDiscover);
-                NATS.Subscribe(NatsSubscription.DeaFindDroplet, processDeaFindDroplet);
-                NATS.Subscribe(NatsSubscription.DeaUpdate, processDeaUpdate);
-                NATS.Subscribe(NatsSubscription.DeaStop, processDeaStop);
-                NATS.Subscribe(NatsSubscription.GetDeaInstanceStartFor(NATS.UniqueIdentifier), processDeaStart);
-                NATS.Subscribe(NatsSubscription.RouterStart, processRouterStart);
-                NATS.Subscribe(NatsSubscription.HealthManagerStart, processHealthManagerStart);
+                messagingProvider.Subscribe(NatsSubscription.DeaStatus, processDeaStatus);
+                messagingProvider.Subscribe(NatsSubscription.DropletStatus, processDropletStatus);
+                messagingProvider.Subscribe(NatsSubscription.DeaDiscover, processDeaDiscover);
+                messagingProvider.Subscribe(NatsSubscription.DeaFindDroplet, processDeaFindDroplet);
+                messagingProvider.Subscribe(NatsSubscription.DeaUpdate, processDeaUpdate);
+                messagingProvider.Subscribe(NatsSubscription.DeaStop, processDeaStop);
+                messagingProvider.Subscribe(NatsSubscription.GetDeaInstanceStartFor(messagingProvider.UniqueIdentifier), processDeaStart);
+                messagingProvider.Subscribe(NatsSubscription.RouterStart, processRouterStart);
+                messagingProvider.Subscribe(NatsSubscription.HealthManagerStart, processHealthManagerStart);
 
-                NATS.Publish(helloMessage);
+                messagingProvider.Publish(helloMessage);
 
                 recoverExistingDroplets();
 
@@ -90,12 +100,12 @@
 
             shutting_down = true;
 
-            Logger.Info("Evacuating applications..");
+            log.Info("Evacuating applications..");
 
             dropletManager.ForAllInstances(
                 (dropletID) =>
                 {
-                    Logger.Debug("Evacuating app {0}", dropletID);
+                    log.Debug("Evacuating app {0}", dropletID);
                 },
                 (instance) =>
                 {
@@ -109,22 +119,22 @@
 
             takeSnapshot();
 
-            NATS.Dispose();
+            messagingProvider.Dispose();
 
-            Logger.Debug(IronFoundry.Dea.Properties.Resources.Agent_WaitingForTasksInStop_Message);
+            log.Debug(IronFoundry.Dea.Properties.Resources.Agent_WaitingForTasksInStop_Message);
 
             monitorTask.Wait(TimeSpan.FromSeconds(30));
 
-            Logger.Debug(IronFoundry.Dea.Properties.Resources.Agent_TasksCompletedInStop_Message);
+            log.Debug(IronFoundry.Dea.Properties.Resources.Agent_TasksCompletedInStop_Message);
         }
 
         private void monitorLoop()
         {
             while (false == shutting_down)
             {
-                if (NatsMessagingStatus.RUNNING != NATS.Status)
+                if (NatsMessagingStatus.RUNNING != messagingProvider.Status)
                 {
-                    Logger.Error(IronFoundry.Dea.Properties.Resources.Agent_ErrorDetectedInNats_Message);
+                    log.Error(IronFoundry.Dea.Properties.Resources.Agent_ErrorDetectedInNats_Message);
                     Error = true;
                     return;
                 }
@@ -141,12 +151,12 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processDeaStart: {0}", message);
+            log.Debug("Starting processDeaStart: {0}", message);
 
             Droplet droplet = Message.FromJson<Droplet>(message);
             if (false == droplet.FrameworkSupported)
             {
-                Logger.Debug("This DEA does not support non-aspdotnet frameworks");
+                log.Debug("This DEA does not support non-aspdotnet frameworks");
                 return;
             }
 
@@ -154,7 +164,7 @@
 
             if (filesManager.Stage(droplet, instance))
             {
-                WebServerAdministrationBinding binding = IIS.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.IIsName);
+                WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.IIsName);
                 instance.Host = binding.Host;
                 instance.Port = binding.Port;
 
@@ -182,7 +192,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processDeaUpdate: {0}", message);
+            log.Debug("Starting processDeaUpdate: {0}", message);
 
             Droplet droplet = Message.FromJson<Droplet>(message);
 
@@ -209,9 +219,9 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processDeaDiscover: {0}", message);
+            log.Debug("Starting processDeaDiscover: {0}", message);
             Discover discover = Message.FromJson<Discover>(message);
-            NATS.Publish(reply, helloMessage);
+            messagingProvider.Publish(reply, helloMessage);
         }
 
         private void processDeaStop(string message, string reply)
@@ -219,7 +229,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processDeaStop: {0}", message);
+            log.Debug("Starting processDeaStop: {0}", message);
 
             StopDroplet stopDropletMsg = Message.FromJson<StopDroplet>(message);
 
@@ -238,7 +248,7 @@
 
                             if (argInstance.IsStartingOrRunning)
                             {
-                                IIS.UninstallWebApp(argInstance.IIsName);
+                                webServerProvider.UninstallWebApp(argInstance.IIsName);
                             }
 
                             argInstance.DeaStopComplete();
@@ -249,7 +259,7 @@
 
                             dropletManager.InstanceStopped(dropletID, argInstance);
 
-                            Logger.Info("Stopped instance {0}", argInstance.LogID);
+                            log.Info("Stopped instance {0}", argInstance.LogID);
 
                             takeSnapshot();
                         }
@@ -279,7 +289,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processDeaStatus: {0}", message);
+            log.Debug("Starting processDeaStatus: {0}", message);
             var statusMessage = new Status(helloMessage)
             {
                 MaxMemory      = 4096,
@@ -287,7 +297,7 @@
                 ReservedMemory = 0,
                 NumClients     = 20
             };
-            NATS.Publish(reply, statusMessage);
+            messagingProvider.Publish(reply, statusMessage);
         }
 
         private void processDeaFindDroplet(string message, string reply)
@@ -295,7 +305,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processDeaFindDroplet: {0}", message);
+            log.Debug("Starting processDeaFindDroplet: {0}", message);
 
             FindDroplet findDroplet = Message.FromJson<FindDroplet>(message);
 
@@ -309,14 +319,14 @@
                         {
                             var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
                             var span = DateTime.Now - startDate;
-                            var response = new FindDropletResponse(NATS.UniqueIdentifier, instance, span);
+                            var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance, span);
 
                             if (response.State != VcapStates.RUNNING)
                             {
                                 response.Stats = null;
                             }
 
-                            NATS.Publish(reply, response);
+                            messagingProvider.Publish(reply, response);
                         }
                     }
                 }
@@ -328,7 +338,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processDropletStatus: {0}", message);
+            log.Debug("Starting processDropletStatus: {0}", message);
 
             dropletManager.ForAllInstances((instance) =>
             {
@@ -340,7 +350,7 @@
                     {
                         //Usage = 20
                     };
-                    NATS.Publish(reply, response);
+                    messagingProvider.Publish(reply, response);
                 }
             });
         }
@@ -350,7 +360,7 @@
             if (shutting_down)
                 return;
 
-            Logger.Debug("Starting processRouterStart: {0}", message);
+            log.Debug("Starting processRouterStart: {0}", message);
 
             dropletManager.ForAllInstances((instance) =>
                 {
@@ -363,7 +373,7 @@
 
         private void processHealthManagerStart(string message, string reply)
         {
-            Logger.Debug("Starting processHealthManagerStart: {0}", message);
+            log.Debug("Starting processHealthManagerStart: {0}", message);
             sendHeartbeat();
         }
 
@@ -374,14 +384,14 @@
 
             var routerRegister = new RouterRegister
             {
-                Dea  = NATS.UniqueIdentifier,
+                Dea  = messagingProvider.UniqueIdentifier,
                 Host = argInstance.Host,
                 Port = argInstance.Port,
                 Uris = argUris ?? argInstance.Uris,
                 Tag  = new Tag { Framework = argInstance.Framework, Runtime = argInstance.Runtime }
             };
 
-            NATS.Publish(routerRegister);
+            messagingProvider.Publish(routerRegister);
         }
 
         private void unregisterWithRouter(Instance argInstance)
@@ -396,13 +406,13 @@
 
             var routerUnregister = new RouterUnregister
             {
-                Dea  = NATS.UniqueIdentifier,
+                Dea  = messagingProvider.UniqueIdentifier,
                 Host = argInstance.Host,
                 Port = argInstance.Port,
                 Uris = argUris ?? argInstance.Uris,
             };
 
-            NATS.Publish(routerUnregister);
+            messagingProvider.Publish(routerUnregister);
         }
 
         private void sendExitedNotification(Instance argInstance)
@@ -410,9 +420,9 @@
             if (argInstance.IsEvacuated)
                 return;
 
-            NATS.Publish(new InstanceExited(argInstance));
+            messagingProvider.Publish(new InstanceExited(argInstance));
 
-            Logger.Debug("Sent droplet.exited.");
+            log.Debug("Sent droplet.exited.");
         }
 
         private void sendHeartbeat()
@@ -434,15 +444,15 @@
                 Droplets = heartbeats.ToArray()
             };
 
-            NATS.Publish( message);
+            messagingProvider.Publish( message);
         }
 
         private string getApplicationState(string name)
         {
-            if (false == IIS.DoesApplicationExist(name))
+            if (false == webServerProvider.DoesApplicationExist(name))
                 return VcapStates.DELETED;
 
-            ApplicationInstanceStatus status = IIS.GetStatus(name);
+            ApplicationInstanceStatus status = webServerProvider.GetStatus(name);
 
             string rv;
 
@@ -494,7 +504,7 @@
             {
                 Droplets = new[] { argHeartbeat }
             };
-            NATS.Publish(message);
+            messagingProvider.Publish(message);
         }
     }
 }

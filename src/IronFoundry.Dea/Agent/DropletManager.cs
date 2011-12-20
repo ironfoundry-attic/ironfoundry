@@ -1,10 +1,10 @@
-﻿namespace IronFoundry.Dea
+﻿namespace IronFoundry.Dea.Agent
 {
     using System;
     using System.Collections.Generic;
     using IronFoundry.Dea.Types;
 
-    public class DropletManager
+    public class DropletManager : IDropletManager
     {
         // TODO check this out: http://geekswithblogs.net/BlackRabbitCoder/archive/2011/02/17/c.net-little-wonders-the-concurrentdictionary.aspx
         private readonly IDictionary<uint, IDictionary<Guid, Instance>> droplets = new Dictionary<uint, IDictionary<Guid, Instance>>();

@@ -1,5 +1,7 @@
 ﻿namespace IronFoundry.Dea.Config
 {
+    using System.Net;
+
     public interface IConfig
     {
         bool DisableDirCleanup { get; }
@@ -8,7 +10,7 @@
         string NatsHost { get; }
         ushort NatsPort { get; }
         ushort FilesServicePort { get; }
-
         FilesServiceCredentials FilesCredentials { get; }
+        IPAddress LocalIPAddress { get; }
     }
 }

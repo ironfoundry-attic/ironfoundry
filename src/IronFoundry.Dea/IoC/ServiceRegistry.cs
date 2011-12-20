@@ -4,6 +4,7 @@
     using System.Reflection;
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
+    using IronFoundry.Dea.Providers;
     using StructureMap.Configuration.DSL;
     using WinService;
 
@@ -26,6 +27,8 @@
             });
 
             For<IConfig>().Singleton().Use<Config>();
+
+            For<IMessagingProvider>().Use<NatsMessagingProvider>();
 
             For<ILog>().Use(f =>
                 {

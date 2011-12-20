@@ -27,12 +27,11 @@
         [JsonProperty(PropertyName="version")]
         public decimal Version { get; private set; }
 
-        public Hello(Guid argID, IPAddress argAddress,
-            ushort argPort, decimal argVersion)
+        public Hello(Guid argID, IPAddress argAddress, ushort filesServicePort, decimal argVersion)
         {
             ID        = argID;
             IPAddress = argAddress;
-            Port      = argPort;
+            Port      = filesServicePort;
             Version   = argVersion;
         }
     }

@@ -1,11 +1,16 @@
 ﻿namespace IronFoundry.Dea.Config
 {
+    using System.Collections.Generic;
     using System.Configuration;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
 
     public class Config : IConfig
     {
         private readonly DeaSection deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
         private readonly FilesServiceCredentials filesCredentials = new FilesServiceCredentials();
+        private readonly IPAddress localIPAddress = GetLocalIPAddresses().Last();
 
         public bool DisableDirCleanup
         {
@@ -40,6 +45,17 @@
         public FilesServiceCredentials FilesCredentials
         {
             get { return filesCredentials; }
+        }
+
+        public IPAddress LocalIPAddress
+        {
+            get { return localIPAddress; }
+        }
+
+        private static IEnumerable<IPAddress> GetLocalIPAddresses()
+        {
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToListOrNull();
         }
     }
 }
