@@ -319,7 +319,12 @@
                         {
                             var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
                             var span = DateTime.Now - startDate;
-                            var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance, span);
+
+                            var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance, span)
+                            {
+                                FileUri = config.FilesServiceUri.AbsoluteUri,
+                                Credentials = config.FilesCredentials.ToArray(),
+                            };
 
                             if (response.State != VcapStates.RUNNING)
                             {

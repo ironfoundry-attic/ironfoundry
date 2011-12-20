@@ -21,5 +21,10 @@
         {
             return Guid.NewGuid().ToString().ToLowerInvariant().Replace("-", String.Empty);
         }
+
+        public string[] ToArray()
+        {
+            return new[] { username, password };
+        }
     }
 }

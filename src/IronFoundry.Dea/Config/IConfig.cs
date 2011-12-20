@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Dea.Config
 {
+    using System;
     using System.Net;
 
     public interface IConfig
@@ -12,5 +13,8 @@
         ushort FilesServicePort { get; }
         FilesServiceCredentials FilesCredentials { get; }
         IPAddress LocalIPAddress { get; }
+
+        Uri FilesServiceUri { get; }
+        Uri WCFFilesServiceUri { get; }
     }
 }

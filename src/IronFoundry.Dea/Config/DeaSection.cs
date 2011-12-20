@@ -33,6 +33,20 @@
             }
         }
 
+        [ConfigurationProperty("localRoute", DefaultValue = "127.0.0.1", IsRequired = false)]
+        public string LocalRoute
+        {
+            get
+            {
+                return (string)this["localRoute"];
+            }
+            set
+            {
+                this["localRoute"] = value;
+            }
+        }
+
+
         [ConfigurationProperty("appDir", DefaultValue = @"C:\IronFoundry\apps", IsRequired = false)]
         public string AppDir
         {

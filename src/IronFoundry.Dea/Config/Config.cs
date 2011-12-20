@@ -1,16 +1,26 @@
 ﻿namespace IronFoundry.Dea.Config
 {
-    using System.Collections.Generic;
+    using System;
     using System.Configuration;
-    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
 
     public class Config : IConfig
     {
-        private readonly DeaSection deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
-        private readonly FilesServiceCredentials filesCredentials = new FilesServiceCredentials();
-        private readonly IPAddress localIPAddress = GetLocalIPAddresses().Last();
+        private readonly DeaSection deaSection;
+        private readonly FilesServiceCredentials filesCredentials;
+        private readonly IPAddress localIPAddress;
+        private readonly Uri filesServiceUri;
+        private readonly Uri wcfFilesServiceUri;
+
+        public Config()
+        {
+            this.deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
+            this.filesCredentials = new FilesServiceCredentials();
+            this.localIPAddress = GetLocalIPAddress();
+            this.filesServiceUri = new Uri(String.Format("http://{0}:{1}", localIPAddress, FilesServicePort));
+            this.wcfFilesServiceUri = new Uri(String.Format("http://localhost:{0}", FilesServicePort));
+        }
 
         public bool DisableDirCleanup
         {
@@ -52,10 +62,24 @@
             get { return localIPAddress; }
         }
 
-        private static IEnumerable<IPAddress> GetLocalIPAddresses()
+        public Uri FilesServiceUri
         {
-            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-            return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToListOrNull();
+            get { return filesServiceUri; }
+        }
+
+        public Uri WCFFilesServiceUri
+        {
+            get { return wcfFilesServiceUri; }
+        }
+
+        private IPAddress GetLocalIPAddress()
+        {
+            using (UdpClient udpClient = new UdpClient())
+            {
+                udpClient.Connect(deaSection.LocalRoute, 1);
+                IPEndPoint ep = (IPEndPoint)udpClient.Client.LocalEndPoint;
+                return ep.Address;
+            }
         }
     }
 }

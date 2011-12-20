@@ -12,7 +12,7 @@
     {
         public FilesWinService(ILog log, IConfig config) : base(log, true)
         {
-            var baseAddress = new Uri("http://localhost:" + config.FilesServicePort);
+            Uri baseAddress = config.WCFFilesServiceUri;
 
             var httpBinding = new WebHttpBinding(); // TODO: message sizes
             httpBinding.Security.Mode = WebHttpSecurityMode.TransportCredentialOnly;
