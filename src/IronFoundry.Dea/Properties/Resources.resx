@@ -126,6 +126,9 @@
   <data name="Agent_WaitingForTasksInStop_Message" xml:space="preserve">
     <value>Agent.Stop(): Waiting for tasks.</value>
   </data>
+  <data name="InternalLog_ErrorInSettingUpEventLogger_Message" xml:space="preserve">
+    <value>Error setting up Event Log logger!</value>
+  </data>
   <data name="NatsMessagingProvider_AttemptingReconnectTwice_Message" xml:space="preserve">
     <value>Invalid attempt to reconnect twice.</value>
   </data>
@@ -146,5 +149,17 @@
   </data>
   <data name="NatsMessagingProvider_ReconnectSuccess_Message" xml:space="preserve">
     <value>Successfully reconnected to server.</value>
+  </data>
+  <data name="WcfService_ErrorClosingHost_Fmt" xml:space="preserve">
+    <value>Error closing WCF host! Message: {0}</value>
+  </data>
+  <data name="WcfService_NotConfiguredToRun_Fmt" xml:space="preserve">
+    <value>WCF ServiceHost '{0}' NOT configured to run.</value>
+  </data>
+  <data name="WcfService_StartingHost_Fmt" xml:space="preserve">
+    <value>Starting WCF ServiceHost '{0}'</value>
+  </data>
+  <data name="WcfService_StoppingHost_Fmt" xml:space="preserve">
+    <value>Stopping WCF ServiceHost '{0}'</value>
   </data>
 </root>

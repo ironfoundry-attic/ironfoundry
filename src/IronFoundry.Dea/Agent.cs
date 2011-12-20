@@ -2,11 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.Globalization;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Types;
     using NLog;
     using Providers;
@@ -27,12 +27,8 @@
 
         public Agent()
         {
-            NATS = new NatsMessagingProvider(
-                ConfigurationManager.AppSettings[Constants.AppSettings.NatsHost],
-                Convert.ToUInt16(ConfigurationManager.AppSettings[Constants.AppSettings.NatsPort]));
-
+            NATS = new NatsMessagingProvider(DeaConfig.NatsHost, DeaConfig.NatsPort);
             helloMessage = new Hello(NATS.UniqueIdentifier, Utility.LocalIPAddress, 12345, 0.99M);
-
             monitorTask = new Task(monitorLoop);
         }
 

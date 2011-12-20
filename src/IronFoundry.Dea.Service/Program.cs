@@ -1,39 +1,49 @@
-﻿namespace IronFoundry.Dea.Service
+﻿namespace WinService
 {
     using System;
     using System.IO;
     using System.ServiceProcess;
-    using NLog;
+    using IronFoundry.Dea.IoC;
+    using IronFoundry.Dea.Logging;
+    using IronFoundry.Dea.WinService;
 
     static class Program
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        static readonly ILog log;
 
-        static void Main()
+        static Program()
+        {
+            Bootstrapper.Bootstrap();
+            log = Bootstrapper.Logger;
+        }
+
+        static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-#if DEBUG
+
             if (Environment.UserInteractive)
             {
-                var svc = new DeaWindowsService();
-                svc.StartService();
-                Console.WriteLine("Hit enter to stop ...");
+                IMultipleServiceManager mgr = Bootstrapper.ServiceManager;
+                mgr.StartServiceManager();
+                log.Info("Hit enter to stop ...");
                 Console.ReadLine();
-                svc.StopService();
+                mgr.StopServiceManager();
             }
             else
-#endif
-                ServiceBase.Run(new DeaWindowsService());
+            {
+                ServiceBase.Run(new[] { Bootstrapper.ServiceBase });
+            }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            logger.Error("Unhandled exception in AppDomain '{0}'", AppDomain.CurrentDomain.FriendlyName);
+            log.Error("Unhandled exception in AppDomain '{0}'", AppDomain.CurrentDomain.FriendlyName);
             var ex = e.ExceptionObject as Exception;
             if (null != ex)
             {
-                logger.Error("Exception:", ex);
+                log.Error(ex);
             }
         }
     }

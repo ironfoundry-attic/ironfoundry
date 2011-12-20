@@ -1,52 +1,51 @@
-﻿namespace IronFoundry.Dea.Service
+﻿namespace IronFoundry.Dea.WinService
 {
     using System;
-    using System.ServiceProcess;
     using System.Threading;
     using System.Threading.Tasks;
-    using NLog;
+    using IronFoundry.Dea.Logging;
 
     [System.ComponentModel.DesignerCategory(@"Code")]
-    partial class DeaWindowsService : ServiceBase
+    public class DeaWindowsService : IService
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private static readonly TimeSpan INITIAL_INTERVAL = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromSeconds(5);
 
+        private readonly ILog log;
         private readonly Agent agent;
         private readonly Task agentTask;
         private readonly Timer agentMonitorTimer;
 
-        public DeaWindowsService()
+        public DeaWindowsService(ILog log)
         {
-            CanPauseAndContinue = false;
-            initializeEventLog();
-            ServiceName = "DeaWindowsService";
+            this.log = log;
             agent = new Agent();
             agentTask = new Task(() => agent.Start());
             agentMonitorTimer = new Timer(agentMonitor);
         }
 
-        public void StartService()
+        public string ServiceName
         {
-            OnStart(null);
+            get { return "IronFoundry.Dea.Service"; }
+        }
+
+        public ushort StartIndex
+        {
+            get { return 10; }
+        }
+
+        public StartServiceResult StartService(IntPtr serviceHandle)
+        {
+            agentTask.Start();
+            agentMonitorTimer.Change(INITIAL_INTERVAL, DEFAULT_INTERVAL);
+            return new StartServiceResult();
         }
 
         public void StopService()
         {
-            OnStop();
-        }
-
-        protected override void OnStart(string[] args)
-        {
-            agentTask.Start();
-            agentMonitorTimer.Change(INITIAL_INTERVAL, DEFAULT_INTERVAL);
-        }
-
-        protected override void OnStop()
-        {
+            agentMonitorTimer.Stop();
             agent.Stop();
-            agentTask.Wait(TimeSpan.FromMinutes(2));
+            agentTask.Wait(TimeSpan.FromMinutes(30));
         }
 
         private void agentMonitor(object argState)
@@ -55,7 +54,7 @@
             t.Stop();
             if (agent.Error)
             {
-                OnStop();
+                StopService();
 #if DEBUG
                 if (Environment.UserInteractive)
                 {
@@ -65,26 +64,10 @@
                 else
 #endif
                 {
-                    base.Stop();
                     return;
                 }
             }
-
             t.Restart(DEFAULT_INTERVAL);
-        }
-
-        private void initializeEventLog()
-        {
-            try
-            {
-                AutoLog = false;
-                EventLogger.Info("Init logging.");
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorException("Unable to setup event log.", ex);
-                AutoLog = true;
-            }
         }
     }
 }

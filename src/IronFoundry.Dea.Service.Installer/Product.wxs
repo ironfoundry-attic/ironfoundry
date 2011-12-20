@@ -30,7 +30,7 @@
     Name="$(var.ProductName)"
     Language="1033"
     Version="$(var.VERSION)"
-    Manufacturer="Tier3"
+    Manufacturer="Tier 3"
     UpgradeCode="$(var.UpgradeCode)">
     
     <!-- InstallerVersion="200" -->
@@ -101,7 +101,7 @@
               <Component Id="IronFoundryRegKey" Guid="{BB5917B4-6CDF-4B35-B58B-DE3C472C5C31}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
                 <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
-                  <RegistryKey Action="createAndRemoveOnUninstall" Key="Tier3">
+                  <RegistryKey Action="createAndRemoveOnUninstall" Key="IronFoundry">
                     <RegistryValue Value="IronFoundry" Type="string" KeyPath="yes"/>
                   </RegistryKey>
                 </RegistryKey>
@@ -151,9 +151,6 @@
                 <File Id="NLog.dll" 
                       Name="NLog.dll" 
                       Source="$(var.SVCBUILDDIR)NLog.dll" />                
-                <File Id="nlog.config"
-                      Name="nlog.config"
-                      Source="$(var.SVCBUILDDIR)nlog.config" />
                 <File Id="ICSharpCode.SharpZipLib.dll"
                       Name="ICSharpCode.SharpZipLib.dll"
                       Source="$(var.SVCBUILDDIR)ICSharpCode.SharpZipLib.dll" />
@@ -169,7 +166,6 @@
                 <File Id="RestSharp.dll"
                       Name="RestSharp.dll"
                       Source="$(var.SVCBUILDDIR)RestSharp.dll" />
-                
 
                 <?if $(var.Configuration) = Debug ?>
                   <File Id="IronFoundry.Dea.Service.pdb"
@@ -212,7 +208,7 @@
               <!-- END (ClientBackup Windows Service) -->
 
             </Directory>
-	  </Directory>
+          </Directory>
         </Directory>
       </Directory>
     </Directory>

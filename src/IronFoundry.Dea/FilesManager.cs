@@ -11,6 +11,7 @@
     using System.Text;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
+    using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Types;
     using NLog;
 
@@ -23,14 +24,14 @@
 
         public FilesManager()
         {
-            Boolean.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.DisableDirCleanup], out disableDirCleanup);
+            disableDirCleanup = DeaConfig.DisableDirCleanup;
+            dropletsPath = DeaConfig.DropletDir;
+            ApplicationPath = DeaConfig.AppDir;
 
-            dropletsPath = ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory];
-            ApplicationPath = ConfigurationManager.AppSettings[Constants.AppSettings.ApplicationsDirectory];
             Directory.CreateDirectory(dropletsPath);
             Directory.CreateDirectory(ApplicationPath);
 
-            SnapshotFile = Path.Combine(ConfigurationManager.AppSettings[Constants.AppSettings.DropletsDirectory], "snapshot.json");
+            SnapshotFile = Path.Combine(dropletsPath, "snapshot.json");
         }
 
         public string ApplicationPath { get; private set; }
