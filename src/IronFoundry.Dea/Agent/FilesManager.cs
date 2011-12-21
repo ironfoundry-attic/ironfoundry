@@ -39,16 +39,16 @@
 
         public string SnapshotFile { get; private set; }
 
-        public string GetApplicationPathFor(Instance argInstance)
+        public string GetApplicationPathFor(Instance instance)
         {
             string instanceDropletsPath, instanceApplicationPath;
-            getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
+            getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
             return instanceApplicationPath;
         }
 
-        public void TakeSnapshot(Snapshot argSnapshot)
+        public void TakeSnapshot(Snapshot snapshot)
         {
-            File.WriteAllText(SnapshotFile, argSnapshot.ToJson(), new ASCIIEncoding());
+            File.WriteAllText(SnapshotFile, snapshot.ToJson(), new ASCIIEncoding());
         }
 
         public Snapshot GetSnapshot()
@@ -64,12 +64,12 @@
             return rv;
         }
 
-        public void CleanupInstanceDirectory(Instance argInstance)
+        public void CleanupInstanceDirectory(Instance instance)
         {
             if (false == disableDirCleanup)
             {
                 string instanceDropletsPath, instanceApplicationPath;
-                getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
+                getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
                 try
                 {
                     if (Directory.Exists(instanceDropletsPath))
@@ -88,16 +88,16 @@
             }
         }
 
-        public bool Stage(Droplet argDroplet, Instance argInstance)
+        public bool Stage(Droplet droplet, Instance instance)
         {
             bool rv = false;
 
-            using (FileData file = getStagedApplicationFile(argDroplet.ExecutableUri))
+            using (FileData file = getStagedApplicationFile(droplet.ExecutableUri))
             {
                 if (null != file)
                 {
                     string instanceDropletsPath, instanceApplicationPath;
-                    getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
+                    getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
                     Directory.CreateDirectory(instanceDropletsPath);
                     Directory.CreateDirectory(instanceApplicationPath);
 
@@ -119,17 +119,17 @@
         }
 
         // TODO not a FilesManager kind of method
-        public void BindServices(Droplet argDroplet, string argIIsName)
+        public void BindServices(Droplet droplet, string iIsName)
         {
-            if (false == argDroplet.Services.IsNullOrEmpty())
+            if (false == droplet.Services.IsNullOrEmpty())
             {
-                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", argIIsName);
+                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", iIsName);
                 if (null != c)
                 {
                     ConnectionStringsSection connectionStringsSection = c.GetSection("connectionStrings") as ConnectionStringsSection;
                     if (null != connectionStringsSection)
                     {
-                        foreach (Service svc in argDroplet.Services.Where(s => s.IsMSSqlServer))
+                        foreach (Service svc in droplet.Services.Where(s => s.IsMSSqlServer))
                         {
                             if (null != svc.Credentials)
                             {
@@ -168,11 +168,11 @@
             }
         }
 
-        private void getInstancePaths(Instance argInstance,
+        private void getInstancePaths(Instance instance,
             out string outInstanceDropletsPath, out string outInstanceApplicationPath)
         {
-            outInstanceDropletsPath = Path.Combine(dropletsPath, argInstance.Dir);
-            outInstanceApplicationPath = Path.Combine(ApplicationPath, argInstance.Dir);
+            outInstanceDropletsPath = Path.Combine(dropletsPath, instance.Dir);
+            outInstanceApplicationPath = Path.Combine(ApplicationPath, instance.Dir);
         }
 
         private FileData getStagedApplicationFile(string executableUri)

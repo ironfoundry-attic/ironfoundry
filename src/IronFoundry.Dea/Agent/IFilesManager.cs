@@ -6,18 +6,20 @@
     {
         string ApplicationPath { get; }
 
-        void BindServices(Droplet argDroplet, string argIIsName);
+        void BindServices(Droplet droplet, string IIsName);
 
-        void CleanupInstanceDirectory(Instance argInstance);
+        void CleanupInstanceDirectory(Instance instance);
 
-        string GetApplicationPathFor(Instance argInstance);
+        string GetApplicationPathFor(Instance instance);
 
         Snapshot GetSnapshot();
 
         string SnapshotFile { get; }
 
-        bool Stage(Droplet argDroplet, Instance argInstance);
+        bool Stage(Droplet droplet, Instance instance);
 
-        void TakeSnapshot(Snapshot argSnapshot);
+        void TakeSnapshot(Snapshot snapshot);
+
+        void RemoveStaged(Droplet droplet, Instance instance);
     }
 }

@@ -30,16 +30,29 @@
 
             For<IMessagingProvider>().Use<NatsMessagingProvider>();
 
-            For<ILog>().Use(f =>
+            For<ILog>().AlwaysUnique().Use(f =>
                 {
+                    ILog rv;
+
                     if (null == f.ParentType)
                     {
-                        return new NLogLogger(defaultLoggerName);
+                        if (null != f.BuildStack && null != f.BuildStack.Current &&
+                            null != f.BuildStack.Current.ConcreteType &&
+                            false == f.BuildStack.Current.ConcreteType.Name.IsNullOrWhiteSpace())
+                        {
+                            rv = new NLogLogger(f.BuildStack.Current.ConcreteType.Name);
+                        }
+                        else
+                        {
+                            rv = new NLogLogger(defaultLoggerName);
+                        }
                     }
                     else
                     {
-                        return new NLogLogger(f.ParentType.FullName);
+                        rv= new NLogLogger(f.ParentType.FullName);
                     }
+
+                    return rv;
                 });
         }
     }

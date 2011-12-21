@@ -165,24 +165,31 @@
             if (filesManager.Stage(droplet, instance))
             {
                 WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.IIsName);
-                instance.Host = binding.Host;
-                instance.Port = binding.Port;
-
-                filesManager.BindServices(droplet, instance.IIsName);
-
-                instance.StateTimestamp = Utility.GetEpochTimestamp();
-
-                instance.OnDeaStart();
-
-                if (false == shutting_down)
+                if (null == binding)
                 {
-                    sendSingleHeartbeat(new Heartbeat(instance));
+                    filesManager.RemoveStaged(droplet, instance);
+                }
+                else
+                {
+                    instance.Host = binding.Host;
+                    instance.Port = binding.Port;
 
-                    registerWithRouter(instance, instance.Uris);
+                    filesManager.BindServices(droplet, instance.IIsName);
 
-                    dropletManager.Add(droplet.ID, instance);
+                    instance.StateTimestamp = Utility.GetEpochTimestamp();
 
-                    takeSnapshot();
+                    instance.OnDeaStart();
+
+                    if (false == shutting_down)
+                    {
+                        sendSingleHeartbeat(new Heartbeat(instance));
+
+                        registerWithRouter(instance, instance.Uris);
+
+                        dropletManager.Add(droplet.ID, instance);
+
+                        takeSnapshot();
+                    }
                 }
             }
         }
