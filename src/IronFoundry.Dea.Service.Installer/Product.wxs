@@ -51,7 +51,7 @@
     <Property Id="ARPHELPLINK" Value="http://www.ironfoundry.org" />
     <Property Id="ARPURLINFOABOUT" Value="http://www.ironfoundry.org" />
     <!--Property Id="ARPHELPTELEPHONE" Value="" /-->
-    <Property Id="ARPCONTACT" Value="support@ironfoundry.org" />
+    <!--Property Id="ARPCONTACT" Value="support@ironfoundry.org" /-->
 
     <!-- Major Upgrade -->
     <Upgrade Id="$(var.UpgradeCode)">
@@ -214,6 +214,8 @@
     </Directory>
 
     <!-- START (User Interface) Reference: http://wix.sourceforge.net/manual-wix3/WixUI_dialog_library.htm -->    
+    <WixVariable Id="WixUIBannerBmp"  Value="Banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp"  Value="WelcomeBanner.bmp" />
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
     <WixVariable Id="WixUISupportPerUser" Value="0" />
     <UIRef Id="WixUI_Common" />
