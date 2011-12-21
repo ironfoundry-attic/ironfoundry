@@ -66,7 +66,12 @@
 
         public void CleanupInstanceDirectory(Instance instance)
         {
-            if (false == disableDirCleanup)
+            CleanupInstanceDirectory(instance, false);
+        }
+
+        public void CleanupInstanceDirectory(Instance instance, bool force = false)
+        {
+            if (force || (false == disableDirCleanup))
             {
                 string instanceDropletsPath, instanceApplicationPath;
                 getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
@@ -81,9 +86,9 @@
                         Directory.Delete(instanceApplicationPath, true);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // TODO
+                    log.Error(ex);
                 }
             }
         }

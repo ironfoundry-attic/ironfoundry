@@ -9,6 +9,7 @@
         void BindServices(Droplet droplet, string IIsName);
 
         void CleanupInstanceDirectory(Instance instance);
+        void CleanupInstanceDirectory(Instance instance, bool force);
 
         string GetApplicationPathFor(Instance instance);
 
@@ -19,7 +20,5 @@
         bool Stage(Droplet droplet, Instance instance);
 
         void TakeSnapshot(Snapshot snapshot);
-
-        void RemoveStaged(Droplet droplet, Instance instance);
     }
 }

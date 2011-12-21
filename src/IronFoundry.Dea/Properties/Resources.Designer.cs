@@ -70,6 +70,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No web instance created for application with name &apos;{0}&apos;..
+        /// </summary>
+        internal static string Agent_ProcessDeaStartNoBindingAvailable {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaStartNoBindingAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Agent.Stop(): Tasks completed..
         /// </summary>
         internal static string Agent_TasksCompletedInStop_Message {

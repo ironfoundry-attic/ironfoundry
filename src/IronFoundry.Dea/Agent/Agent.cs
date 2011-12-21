@@ -10,6 +10,7 @@
     using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Types;
     using Providers;
+    using IronFoundry.Dea.Properties;
 
     public sealed class Agent : IAgent
     {
@@ -167,7 +168,8 @@
                 WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.IIsName);
                 if (null == binding)
                 {
-                    filesManager.RemoveStaged(droplet, instance);
+                    log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.IIsName);
+                    filesManager.CleanupInstanceDirectory(instance, true);
                 }
                 else
                 {

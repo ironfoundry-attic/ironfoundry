@@ -120,6 +120,9 @@
   <data name="Agent_ErrorDetectedInNats_Message" xml:space="preserve">
     <value>Agent detected error in NATS.</value>
   </data>
+  <data name="Agent_ProcessDeaStartNoBindingAvailable" xml:space="preserve">
+    <value>No web instance created for application with name '{0}'.</value>
+  </data>
   <data name="Agent_TasksCompletedInStop_Message" xml:space="preserve">
     <value>Agent.Stop(): Tasks completed.</value>
   </data>
