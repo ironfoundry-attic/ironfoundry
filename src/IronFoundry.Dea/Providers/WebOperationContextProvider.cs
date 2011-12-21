@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Web;
-using System.Text;
-
-namespace IronFoundry.Dea.Providers
+﻿namespace IronFoundry.Dea.Providers
 {
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.ServiceModel.Channels;
+    using System.ServiceModel.Web;
+
     public class WebOperationContextProvider : IWebOperationContextProvider
     {        
         public Uri GetRequestUri()
