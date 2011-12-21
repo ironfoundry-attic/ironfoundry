@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.ServiceModel.Security;
-using System.ServiceModel.Web;
-using IronFoundry.Dea.Config;
-using IronFoundry.Dea.Providers;
-
-namespace IronFoundry.Dea.Services
+﻿namespace IronFoundry.Dea.Services
 {
     using System;
     using System.ServiceModel;
     using System.ServiceModel.Channels;
     using IronFoundry.Dea.Logging;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.ServiceModel.Security;
+    using IronFoundry.Dea.Config;
+    using IronFoundry.Dea.Providers;
+
 
     [ServiceBehavior(Namespace = Constants.FilesServiceNamespace)]
     public class FilesService : IFilesService

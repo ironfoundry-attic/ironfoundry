@@ -3,6 +3,7 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using IronFoundry.Dea.Agent;
     using IronFoundry.Dea.Logging;
 
     [System.ComponentModel.DesignerCategory(@"Code")]

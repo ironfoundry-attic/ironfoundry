@@ -15,8 +15,6 @@
             Index          = argInstance.InstanceIndex;
             State          = argInstance.State;
             StateTimestamp = argInstance.StateTimestamp;
-            FileUri        = String.Empty; // TODO
-            Credentials    = String.Empty; // TODO
             Staged         = argInstance.Staged;
             Stats          = new Stats(argInstance, argUptime);
         }
@@ -52,7 +50,7 @@
         public string FileUri { get; set; }
 
         [JsonProperty(PropertyName = "credentials")]
-        public string Credentials { get; set; }
+        public string[] Credentials { get; set; }
 
         [JsonProperty(PropertyName = "staged")]
         public string Staged { get; set; }

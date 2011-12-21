@@ -39,8 +39,9 @@
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.Web.Administration">
-      <HintPath>..\..\..\..\..\Windows\System32\inetsrv\Microsoft.Web.Administration.dll</HintPath>
+    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Microsoft.Web.Administration.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.0.5\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -54,6 +55,8 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Selectors" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
@@ -63,17 +66,19 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Agent.cs" />
+    <Compile Include="Agent\Agent.cs" />
+    <Compile Include="Agent\IDropletManager.cs" />
     <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\FilesServiceCredentials.cs" />
     <Compile Include="Config\IConfig.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
-    <Compile Include="DropletManager.cs" />
+    <Compile Include="Agent\DropletManager.cs" />
     <Compile Include="Extensions\TimerExtensionMethods.cs" />
-    <Compile Include="FileData.cs" />
-    <Compile Include="FilesManager.cs" />
-    <Compile Include="IAgent.cs" />
-    <Compile Include="IFilesManager.cs" />
+    <Compile Include="Agent\FileData.cs" />
+    <Compile Include="Agent\FilesManager.cs" />
+    <Compile Include="Agent\IAgent.cs" />
+    <Compile Include="Agent\IFilesManager.cs" />
     <Compile Include="IoC\Bootstrapper.cs" />
     <Compile Include="IoC\ServiceRegistry.cs" />
     <Compile Include="JsonConverters\IPAddressConverter.cs" />
@@ -98,6 +103,7 @@
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />
     <Compile Include="Extensions\SocketExtensionMethods.cs" />
     <Compile Include="Services\FilesService.cs" />
+    <Compile Include="Services\FilesServiceValidator.cs" />
     <Compile Include="Services\IFilesService.cs" />
     <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\Discover.cs" />
@@ -130,9 +136,6 @@
     <Compile Include="Types\VcapResponse.cs" />
     <Compile Include="Types\VcapStates.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="WcfInfrastructure\IocSingletonWebServiceHost.cs" />
-    <Compile Include="WcfInfrastructure\SingletonServiceHost.cs" />
-    <Compile Include="WcfInfrastructure\IocSingletonServiceHost.cs" />
     <Compile Include="WcfInfrastructure\IocInstanceProvider.cs" />
     <Compile Include="WcfInfrastructure\IocServiceBehavior.cs" />
     <Compile Include="WcfInfrastructure\IocServiceBehaviorUtil.cs" />
@@ -159,9 +162,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

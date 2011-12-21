@@ -9,13 +9,12 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
+    using IronFoundry.Dea.Config;
+    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Types;
-    using NLog;
 
     public class NatsMessagingProvider : IMessagingProvider
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
 #if DEBUG
         private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromMilliseconds(250);
         private static readonly ushort CONNECTION_ATTEMPT_RETRIES = 5;
@@ -67,13 +66,17 @@
         private Task messageProcessorTask;
         private Task pollTask;
 
-        public NatsMessagingProvider(string argHost, ushort argPort)
+        private readonly ILog log;
+
+        public NatsMessagingProvider(ILog log, IConfig config)
         {
-            host = argHost;
-            port = argPort;
+            this.log  = log;
+            this.host = config.NatsHost;
+            this.port = config.NatsPort;
+
             uniqueIdentifier = Guid.NewGuid();
             sequence = 1;
-            Logger.Debug("NATS Messaging Provider Initialized. Identifier: {0:N}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, argHost, port);
+            log.Debug("NATS Messaging Provider Initialized. Identifier: {0:N}, Server Host: {1}, Server Port: {2}.", UniqueIdentifier, host, port);
         }
 
         public NatsMessagingStatus Status { get; private set; }
@@ -121,11 +124,11 @@
 
             Interlocked.Increment(ref sequence);
 
-            Logger.Debug("NATS Subscribing to subject: {0}, sequence {1}", argSubscription, Sequence);
+            log.Debug("NATS Subscribing to subject: {0}, sequence {1}", argSubscription, Sequence);
 
             string formattedMessage = String.Format(NatsCommandFormats.Subscribe, argSubscription, Sequence);
 
-            Logger.Trace(LogSentFormat, formattedMessage);
+            log.Trace(LogSentFormat, formattedMessage);
 
             write(formattedMessage);
 
@@ -176,11 +179,11 @@
 
             if (rv)
             {
-                Logger.Debug("NATS Connected on Host: {0}, Port: {1}", host, port);
+                log.Debug("NATS Connected on Host: {0}, Port: {1}", host, port);
             }
             else
             {
-                Logger.Fatal("NATS could not connect to Host: {0}, Port: {1}", host, port);
+                log.Fatal("NATS could not connect to Host: {0}, Port: {1}", host, port);
             }
 
             return rv;
@@ -206,10 +209,10 @@
             {
                 var tasks = new[] { pollTask, messageProcessorTask };
                 shutting_down = true;
-                Logger.Debug("NATS Waiting for polling to cease.");
+                log.Debug("NATS Waiting for polling to cease.");
                 Task.WaitAll(tasks);
                 closeNetworking();
-                Logger.Debug("NATS Disconnected.");
+                log.Debug("NATS Disconnected.");
             }
             catch { };
 
@@ -240,14 +243,14 @@
                 return;
             }
 
-            Logger.Debug("NATS Publishing subject: {0},{1}", argSubject, argMessage);
+            log.Debug("NATS Publishing subject: {0},{1}", argSubject, argMessage);
 
             string messageJson = argMessage.ToJson();
 
             string formattedMessage = String.Format(
                 NatsCommandFormats.Publish, argSubject, Encoding.ASCII.GetBytes(messageJson).Length, messageJson);
 
-            Logger.Trace(LogSentFormat, formattedMessage);
+            log.Trace(LogSentFormat, formattedMessage);
 
             write(formattedMessage);
         }
@@ -276,15 +279,15 @@
 
                 if (false == String.IsNullOrWhiteSpace(message))
                 {
-                    Logger.Trace(LogReceivedFormat, message);
+                    log.Trace(LogReceivedFormat, message);
 
                     if (NatsCommand.Ok.Command == message)
                     {
-                        Logger.Trace("NATS Message Acknowledged: {0}", message);
+                        log.Trace("NATS Message Acknowledged: {0}", message);
                     }
                     else if (message.StartsWith(NatsCommand.Information.Command))
                     {
-                        Logger.Trace("NATS Info Message {0}", message);
+                        log.Trace("NATS Info Message {0}", message);
                     }
                     else if (message.StartsWith(NatsCommand.Message.Command))
                     {
@@ -306,20 +309,20 @@
                             }
                         }
 
-                        Logger.Trace(LogReceivedFormat, messageContinuation);
+                        log.Trace(LogReceivedFormat, messageContinuation);
 
                         var receivedMessage = new ReceivedMessage(message + CRLF + messageContinuation);
 
                         if (false == subscriptions.ContainsKey(receivedMessage.Subject))
                         {
-                            Logger.Debug("NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1},{2}.", receivedMessage.Subject, receivedMessage.SubscriptionID, receivedMessage.RawMessage);
+                            log.Debug("NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1},{2}.", receivedMessage.Subject, receivedMessage.SubscriptionID, receivedMessage.RawMessage);
                             continue;
                         }
 
                         var subjectCollection = subscriptions[receivedMessage.Subject];
                         if (false == subjectCollection.ContainsKey(receivedMessage.SubscriptionID))
                         {
-                            Logger.Debug("NATS Message Subscription ID: {0} not found to be subscribed for subject {1}. Ignoring received message {2}.", receivedMessage.SubscriptionID, receivedMessage.Subject, receivedMessage.RawMessage);
+                            log.Debug("NATS Message Subscription ID: {0} not found to be subscribed for subject {1}. Ignoring received message {2}.", receivedMessage.SubscriptionID, receivedMessage.Subject, receivedMessage.RawMessage);
                             continue;
                         }
 

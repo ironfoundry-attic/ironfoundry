@@ -3,9 +3,11 @@
     using System;
     using System.ServiceModel;
 
-    public class PerCallServiceHost : ServiceHost
+    public abstract class PerCallServiceHost : ServiceHost
     {
         public PerCallServiceHost(Type serviceType) : base(serviceType) { }
+
+        public PerCallServiceHost(Type serviceType, Uri baseAddress) : base(serviceType, baseAddress) { }
 
         protected override void OnOpening()
         {

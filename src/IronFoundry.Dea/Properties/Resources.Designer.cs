@@ -70,6 +70,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No web instance created for application with name &apos;{0}&apos;..
+        /// </summary>
+        internal static string Agent_ProcessDeaStartNoBindingAvailable {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaStartNoBindingAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Agent.Stop(): Tasks completed..
         /// </summary>
         internal static string Agent_TasksCompletedInStop_Message {
@@ -84,6 +93,24 @@ namespace IronFoundry.Dea.Properties {
         internal static string Agent_WaitingForTasksInStop_Message {
             get {
                 return ResourceManager.GetString("Agent_WaitingForTasksInStop_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid password &apos;{0}&apos; sent to files service..
+        /// </summary>
+        internal static string FilesServiceValidator_InvalidPassword_Fmt {
+            get {
+                return ResourceManager.GetString("FilesServiceValidator_InvalidPassword_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid username &apos;{0}&apos; sent to files service..
+        /// </summary>
+        internal static string FilesServiceValidator_InvalidUser_Fmt {
+            get {
+                return ResourceManager.GetString("FilesServiceValidator_InvalidUser_Fmt", resourceCulture);
             }
         }
         

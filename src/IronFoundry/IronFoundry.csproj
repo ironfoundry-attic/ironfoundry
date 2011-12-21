@@ -125,7 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\dependencies\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>..\..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=4.0.5.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -134,7 +134,7 @@
     </Reference>
     <Reference Include="RestSharp, Version=102.0.0.0, Culture=neutral, PublicKeyToken=aed551a8db69a9bd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dependencies\RestSharp.dll</HintPath>
+      <HintPath>..\..\lib\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="WindowsBase" />

@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea
+﻿namespace IronFoundry.Dea.Agent
 {
     using System;
     using System.Collections;
@@ -12,21 +12,22 @@
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using IronFoundry.Dea.Config;
+    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Types;
-    using NLog;
 
     public class FilesManager : IFilesManager
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
+        private readonly ILog log;
         private readonly bool disableDirCleanup = false;
         private readonly string dropletsPath;
 
-        public FilesManager(IConfig config)
+        public FilesManager(ILog log, IConfig config)
         {
+            this.log = log;
+
             disableDirCleanup = config.DisableDirCleanup;
-            dropletsPath = config.DropletDir;
-            ApplicationPath = config.AppDir;
+            dropletsPath      = config.DropletDir;
+            ApplicationPath   = config.AppDir;
 
             Directory.CreateDirectory(dropletsPath);
             Directory.CreateDirectory(ApplicationPath);
@@ -38,16 +39,16 @@
 
         public string SnapshotFile { get; private set; }
 
-        public string GetApplicationPathFor(Instance argInstance)
+        public string GetApplicationPathFor(Instance instance)
         {
             string instanceDropletsPath, instanceApplicationPath;
-            getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
+            getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
             return instanceApplicationPath;
         }
 
-        public void TakeSnapshot(Snapshot argSnapshot)
+        public void TakeSnapshot(Snapshot snapshot)
         {
-            File.WriteAllText(SnapshotFile, argSnapshot.ToJson(), new ASCIIEncoding());
+            File.WriteAllText(SnapshotFile, snapshot.ToJson(), new ASCIIEncoding());
         }
 
         public Snapshot GetSnapshot()
@@ -63,12 +64,17 @@
             return rv;
         }
 
-        public void CleanupInstanceDirectory(Instance argInstance)
+        public void CleanupInstanceDirectory(Instance instance)
         {
-            if (false == disableDirCleanup)
+            CleanupInstanceDirectory(instance, false);
+        }
+
+        public void CleanupInstanceDirectory(Instance instance, bool force = false)
+        {
+            if (force || (false == disableDirCleanup))
             {
                 string instanceDropletsPath, instanceApplicationPath;
-                getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
+                getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
                 try
                 {
                     if (Directory.Exists(instanceDropletsPath))
@@ -80,23 +86,23 @@
                         Directory.Delete(instanceApplicationPath, true);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // TODO
+                    log.Error(ex);
                 }
             }
         }
 
-        public bool Stage(Droplet argDroplet, Instance argInstance)
+        public bool Stage(Droplet droplet, Instance instance)
         {
             bool rv = false;
 
-            using (FileData file = getStagedApplicationFile(argDroplet.ExecutableUri))
+            using (FileData file = getStagedApplicationFile(droplet.ExecutableUri))
             {
                 if (null != file)
                 {
                     string instanceDropletsPath, instanceApplicationPath;
-                    getInstancePaths(argInstance, out instanceDropletsPath, out instanceApplicationPath);
+                    getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
                     Directory.CreateDirectory(instanceDropletsPath);
                     Directory.CreateDirectory(instanceApplicationPath);
 
@@ -118,17 +124,17 @@
         }
 
         // TODO not a FilesManager kind of method
-        public void BindServices(Droplet argDroplet, string argIIsName)
+        public void BindServices(Droplet droplet, string iIsName)
         {
-            if (false == argDroplet.Services.IsNullOrEmpty())
+            if (false == droplet.Services.IsNullOrEmpty())
             {
-                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", argIIsName);
+                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", iIsName);
                 if (null != c)
                 {
                     ConnectionStringsSection connectionStringsSection = c.GetSection("connectionStrings") as ConnectionStringsSection;
                     if (null != connectionStringsSection)
                     {
-                        foreach (Service svc in argDroplet.Services.Where(s => s.IsMSSqlServer))
+                        foreach (Service svc in droplet.Services.Where(s => s.IsMSSqlServer))
                         {
                             if (null != svc.Credentials)
                             {
@@ -167,14 +173,14 @@
             }
         }
 
-        private void getInstancePaths(Instance argInstance,
+        private void getInstancePaths(Instance instance,
             out string outInstanceDropletsPath, out string outInstanceApplicationPath)
         {
-            outInstanceDropletsPath = Path.Combine(dropletsPath, argInstance.Dir);
-            outInstanceApplicationPath = Path.Combine(ApplicationPath, argInstance.Dir);
+            outInstanceDropletsPath = Path.Combine(dropletsPath, instance.Dir);
+            outInstanceApplicationPath = Path.Combine(ApplicationPath, instance.Dir);
         }
 
-        private static FileData getStagedApplicationFile(string executableUri)
+        private FileData getStagedApplicationFile(string executableUri)
         {
             FileData rv = null;
 
@@ -191,7 +197,7 @@
                     client.DownloadFile(executableUri, tempFile);
                 }
                 sw.Stop();
-                Logger.Debug("Took {0} time to dowload from {1} to {2}", sw.Elapsed, executableUri, tempFile);
+                log.Debug("Took {0} time to dowload from {1} to {2}", sw.Elapsed, executableUri, tempFile);
 
                 rv = new FileData(new FileStream(tempFile, FileMode.Open), tempFile);
             }
