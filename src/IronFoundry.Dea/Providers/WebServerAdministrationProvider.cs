@@ -6,17 +6,20 @@
     using Microsoft.Web.Administration;
     using System;
     using IronFoundry.Dea.Logging;
+using IronFoundry.Dea.Services;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
         private readonly ILog log;
         private readonly IPAddress localIPAddress;
+        private readonly IFirewallService firewallService;
         private const ushort STARTING_PORT = 9000;
 
-        public WebServerAdministrationProvider(ILog log, IConfig config)
+        public WebServerAdministrationProvider(ILog log, IConfig config, IFirewallService firewallService)
         {
             this.log = log;
             this.localIPAddress = config.LocalIPAddress;
+            this.firewallService = firewallService;
         }
 
         public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
@@ -28,11 +31,14 @@
                 using (var manager = new ServerManager())
                 {
                     ApplicationPool cloudFoundryPool = getApplicationPool(manager, applicationInstanceName);
-
-                    if (cloudFoundryPool == null)
+                    if (null == cloudFoundryPool)
+                    {
                         cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
+                    }
 
                     ushort applicationPort = findNextAvailablePort();
+
+                    firewallService.Open(applicationPort, applicationInstanceName);
 
                     /*
                      * NB: for now, listen on all local IPs, a specific port, and any domain.
@@ -64,18 +70,22 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    var site = getSite(manager, applicationInstanceName);
-                    if (site != null)
+                    ushort port = STARTING_PORT;
+
+                    Site site = getSite(manager, applicationInstanceName);
+                    if (null != site)
                     {
                         manager.Sites.Remove(site);
                         manager.CommitChanges();
                     }
-                    var deletePool = getApplicationPool(manager, applicationInstanceName);
-                    if (deletePool != null)
+                    ApplicationPool applicationPool = getApplicationPool(manager, applicationInstanceName);
+                    if (null != applicationPool)
                     {
-                        manager.ApplicationPools.Remove(deletePool);
+                        manager.ApplicationPools.Remove(applicationPool);
                         manager.CommitChanges();
                     }
+
+                    firewallService.Close(port);
                 }
             }
             catch (Exception ex)
