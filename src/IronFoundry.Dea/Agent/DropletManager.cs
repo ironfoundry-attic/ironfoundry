@@ -9,33 +9,33 @@
         // TODO check this out: http://geekswithblogs.net/BlackRabbitCoder/archive/2011/02/17/c.net-little-wonders-the-concurrentdictionary.aspx
         private readonly IDictionary<uint, IDictionary<Guid, Instance>> droplets = new Dictionary<uint, IDictionary<Guid, Instance>>();
 
-        public void Add(uint argDropletID, IEnumerable<Instance> argInstances)
+        public void Add(uint dropletID, IEnumerable<Instance> instances)
         {
             lock (droplets)
             {
-                foreach (Instance instance in argInstances)
+                foreach (Instance instance in instances)
                 {
-                    Add(argDropletID, instance);
+                    Add(dropletID, instance);
                 }
             }
         }
 
-        public void Add(uint argDropletID, Instance argInstance)
+        public void Add(uint dropletID, Instance instance)
         {
             lock (droplets)
             {
                 IDictionary<Guid, Instance> instances;
-                if (droplets.TryGetValue(argDropletID, out instances))
+                if (droplets.TryGetValue(dropletID, out instances))
                 {
-                    instances.Add(argInstance.InstanceID, argInstance);
+                    instances.Add(instance.InstanceID, instance);
                 }
                 else
                 {
                     instances = new Dictionary<Guid, Instance>
                     {
-                        { argInstance.InstanceID, argInstance }
+                        { instance.InstanceID, instance }
                     };
-                    droplets.Add(argDropletID, instances);
+                    droplets.Add(dropletID, instances);
                 }
             }
         }
@@ -51,12 +51,12 @@
             }
         }
 
-        public void ForAllInstances(Action<Instance> argInstanceAction)
+        public void ForAllInstances(Action<Instance> instanceAction)
         {
-            ForAllInstances(null, argInstanceAction);
+            ForAllInstances(null, instanceAction);
         }
 
-        public void ForAllInstances(uint argDropletID, Action<Instance> argInstanceAction)
+        public void ForAllInstances(uint dropletID, Action<Instance> instanceAction)
         {
             lock (droplets)
             {
@@ -64,20 +64,19 @@
                 {
                     return;
                 }
-
-                IDictionary<Guid, Instance> instanceDict = droplets[argDropletID];
+                IDictionary<Guid, Instance> instanceDict = droplets[dropletID];
                 if (null != instanceDict)
                 {
                     IEnumerable<Instance> instances = instanceDict.Values.ToListOrNull();
                     foreach (Instance instance in instances)
                     {
-                        argInstanceAction(instance);
+                        instanceAction(instance);
                     }
                 }
             }
         }
 
-        public void ForAllInstances(Action<uint> argDropletAction, Action<Instance> argInstanceAction)
+        public void ForAllInstances(Action<uint> dropletAction, Action<Instance> instanceAction)
         {
             lock (droplets)
             {
@@ -85,30 +84,31 @@
                 {
                     return;
                 }
-
-                foreach (KeyValuePair<uint, IDictionary<Guid, Instance>> kvp in droplets)
+                var dropletList = new List<KeyValuePair<uint, IDictionary<Guid, Instance>>>(droplets);
+                foreach (KeyValuePair<uint, IDictionary<Guid, Instance>> kvp in dropletList)
                 {
-                    uint dropletID = kvp.Key;
-                    IDictionary<Guid, Instance> instanceDict = kvp.Value;
-
-                    if (null != argDropletAction)
+                    if (droplets.ContainsKey(kvp.Key))
                     {
-                        argDropletAction(dropletID);
-                    }
-
-                    foreach (Instance instance in instanceDict.Values)
-                    {
-                        argInstanceAction(instance);
+                        uint dropletID = kvp.Key;
+                        if (null != dropletAction)
+                        {
+                            dropletAction(dropletID);
+                        }
+                        var instances = new List<Instance>(kvp.Value.Values);
+                        foreach (Instance instance in instances)
+                        {
+                            instanceAction(instance);
+                        }
                     }
                 }
             }
         }
 
-        public void FromSnapshot(Snapshot argSnapshot)
+        public void FromSnapshot(Snapshot snapshot)
         {
             lock (droplets)
             {
-                foreach (DropletEntry dropletEntry in argSnapshot.Entries)
+                foreach (DropletEntry dropletEntry in snapshot.Entries)
                 {
                     foreach (InstanceEntry instanceEntry in dropletEntry.Instances)
                     {
@@ -157,17 +157,19 @@
             };
         }
 
-        public void InstanceStopped(uint argDropletID, Instance argInstance)
+        public void InstanceStopped(Instance instance)
         {
+            uint dropletID = instance.DropletID;
+
             lock (droplets)
             {
-                IDictionary<Guid, Instance> instanceDict = droplets[argDropletID];
+                IDictionary<Guid, Instance> instanceDict = droplets[dropletID];
                 if (null != instanceDict)
                 {
-                    instanceDict.Remove(argInstance.InstanceID);
+                    instanceDict.Remove(instance.InstanceID);
                     if (instanceDict.IsNullOrEmpty())
                     {
-                        droplets.Remove(argDropletID);
+                        droplets.Remove(dropletID);
                     }
                 }
             }

@@ -8,9 +8,9 @@
     using System.Threading.Tasks;
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
+    using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
     using Providers;
-    using IronFoundry.Dea.Properties;
 
     public sealed class Agent : IAgent
     {
@@ -42,7 +42,7 @@
             this.webServerProvider = webServerAdministrationProvider;
 
             helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort, 0.99M);
-            monitorTask = new Task(monitorLoop);
+            monitorTask = new Task(MonitorLoop);
         }
 
         public bool Error { get; private set; }
@@ -72,19 +72,19 @@
 
                 messagingProvider.Publish(new VcapComponentAnnounce(vcapComponentDiscoverMessage));
 
-                messagingProvider.Subscribe(NatsSubscription.DeaStatus, processDeaStatus);
-                messagingProvider.Subscribe(NatsSubscription.DropletStatus, processDropletStatus);
-                messagingProvider.Subscribe(NatsSubscription.DeaDiscover, processDeaDiscover);
-                messagingProvider.Subscribe(NatsSubscription.DeaFindDroplet, processDeaFindDroplet);
-                messagingProvider.Subscribe(NatsSubscription.DeaUpdate, processDeaUpdate);
-                messagingProvider.Subscribe(NatsSubscription.DeaStop, processDeaStop);
-                messagingProvider.Subscribe(NatsSubscription.GetDeaInstanceStartFor(messagingProvider.UniqueIdentifier), processDeaStart);
-                messagingProvider.Subscribe(NatsSubscription.RouterStart, processRouterStart);
-                messagingProvider.Subscribe(NatsSubscription.HealthManagerStart, processHealthManagerStart);
+                messagingProvider.Subscribe(NatsSubscription.DeaStatus, ProcessDeaStatus);
+                messagingProvider.Subscribe(NatsSubscription.DropletStatus, ProcessDropletStatus);
+                messagingProvider.Subscribe(NatsSubscription.DeaDiscover, ProcessDeaDiscover);
+                messagingProvider.Subscribe(NatsSubscription.DeaFindDroplet, ProcessDeaFindDroplet);
+                messagingProvider.Subscribe(NatsSubscription.DeaUpdate, ProcessDeaUpdate);
+                messagingProvider.Subscribe(NatsSubscription.DeaStop, ProcessDeaStop);
+                messagingProvider.Subscribe(NatsSubscription.GetDeaInstanceStartFor(messagingProvider.UniqueIdentifier), ProcessDeaStart);
+                messagingProvider.Subscribe(NatsSubscription.RouterStart, ProcessRouterStart);
+                messagingProvider.Subscribe(NatsSubscription.HealthManagerStart, ProcessHealthManagerStart);
 
                 messagingProvider.Publish(helloMessage);
 
-                recoverExistingDroplets();
+                RecoverExistingDroplets();
 
                 monitorTask.Start();
 
@@ -94,10 +94,12 @@
             return rv;
         }
 
-        public void Stop() // evacuate_apps_then_quit TODO
+        public void Stop()
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             shutting_down = true;
 
@@ -110,26 +112,38 @@
                 },
                 (instance) =>
                 {
-                    if (instance.IsCrashed)
-                        return;
-
-                    instance.DeaEvacuation();
-
-                    sendExitedNotification(instance);
+                    if (false == instance.IsCrashed)
+                    {
+                        instance.DeaEvacuation();
+                        SendExitedNotification(instance);
+                        instance.Evacuated();
+                    }
                 });
 
-            takeSnapshot();
+            TakeSnapshot();
 
-            messagingProvider.Dispose();
-
-            log.Debug(IronFoundry.Dea.Properties.Resources.Agent_WaitingForTasksInStop_Message);
-
+            log.Debug(Resources.Agent_WaitingForTasksInStop_Message);
             monitorTask.Wait(TimeSpan.FromSeconds(30));
+            log.Debug(Resources.Agent_TasksCompletedInStop_Message);
 
-            log.Debug(IronFoundry.Dea.Properties.Resources.Agent_TasksCompletedInStop_Message);
+            Shutdown();
         }
 
-        private void monitorLoop()
+        private void Shutdown()
+        {
+            shutting_down = true;
+            log.Info("Shutting down..");
+            dropletManager.ForAllInstances((instance) =>
+                {
+                    instance.DeaShutdown();
+                    StopDroplet(instance);
+                });
+            TakeSnapshot();
+            messagingProvider.Dispose();
+            log.Info("Shutting down complete.");
+        }
+
+        private void MonitorLoop()
         {
             while (false == shutting_down)
             {
@@ -141,16 +155,18 @@
                 }
                 else
                 {
-                    sendHeartbeat();
+                    SendHeartbeat();
                 }
                 Thread.Sleep(HEARTBEAT_INTERVAL);
             }
         }
 
-        private void processDeaStart(string message, string reply)
+        private void ProcessDeaStart(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug("Starting processDeaStart: {0}", message);
 
@@ -184,22 +200,24 @@
 
                     if (false == shutting_down)
                     {
-                        sendSingleHeartbeat(new Heartbeat(instance));
+                        SendSingleHeartbeat(new Heartbeat(instance));
 
-                        registerWithRouter(instance, instance.Uris);
+                        RegisterWithRouter(instance, instance.Uris);
 
                         dropletManager.Add(droplet.ID, instance);
 
-                        takeSnapshot();
+                        TakeSnapshot();
                     }
                 }
             }
         }
 
-        private void processDeaUpdate(string message, string reply)
+        private void ProcessDeaUpdate(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug("Starting processDeaUpdate: {0}", message);
 
@@ -215,25 +233,27 @@
 
                     var toAdd = droplet.Uris.Except(currentUris);
 
-                    unregisterWithRouter(argInstance, toRemove.ToArray());
+                    UnregisterWithRouter(argInstance, toRemove.ToArray());
 
-                    registerWithRouter(argInstance, toAdd.ToArray());
+                    RegisterWithRouter(argInstance, toAdd.ToArray());
                 });
 
-            takeSnapshot();
+            TakeSnapshot();
         }
 
-        private void processDeaDiscover(string message, string reply)
+        private void ProcessDeaDiscover(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug("Starting processDeaDiscover: {0}", message);
             Discover discover = Message.FromJson<Discover>(message);
             messagingProvider.Publish(reply, helloMessage);
         }
 
-        private void processDeaStop(string message, string reply)
+        private void ProcessDeaStop(string message, string reply)
         {
             if (shutting_down)
                 return;
@@ -244,59 +264,63 @@
 
             uint dropletID = stopDropletMsg.DropletID;
 
-            dropletManager.ForAllInstances(dropletID, (argInstance) =>
+            dropletManager.ForAllInstances(dropletID, (instance) =>
                 {
-                    if (stopDropletMsg.AppliesTo(argInstance))
+                    if (stopDropletMsg.AppliesTo(instance))
                     {
-                        argInstance.OnDeaStop();
-
-                        // stop_droplet
-                        if (false == argInstance.StopProcessed)
-                        {
-                            sendExitedMessage(argInstance);
-
-                            if (argInstance.IsStartingOrRunning)
-                            {
-                                webServerProvider.UninstallWebApp(argInstance.IIsName);
-                            }
-
-                            argInstance.DeaStopComplete();
-
-                            filesManager.CleanupInstanceDirectory(argInstance);
-
-                            // remove_instance_resources
-
-                            dropletManager.InstanceStopped(dropletID, argInstance);
-
-                            log.Info("Stopped instance {0}", argInstance.LogID);
-
-                            takeSnapshot();
-                        }
+                        instance.OnDeaStop();
+                        StopDroplet(instance);
                     }
                 });
         }
 
-        private void sendExitedMessage(Instance argInstance)
+        private void StopDroplet(Instance instance)
+        {
+            if (instance.StopProcessed)
+            {
+                return;
+            }
+
+            log.Info("Stopping instance {0}", instance.LogID);
+
+            SendExitedMessage(instance);
+
+            webServerProvider.UninstallWebApp(instance.IIsName);
+
+            dropletManager.InstanceStopped(instance);
+
+            instance.DeaStopComplete();
+
+            filesManager.CleanupInstanceDirectory(instance);
+
+            log.Info("Stopped instance {0}", instance.LogID);
+        }
+
+        private void SendExitedMessage(Instance argInstance)
         {
             if (argInstance.IsNotified)
+            {
                 return;
+            }
 
-            unregisterWithRouter(argInstance);
+            UnregisterWithRouter(argInstance);
 
             if (false == argInstance.HasExitReason)
             {
                 argInstance.Crashed();
             }
 
-            sendExitedNotification(argInstance);
+            SendExitedNotification(argInstance);
 
             argInstance.IsNotified = true;
         }
 
-        private void processDeaStatus(string message, string reply)
+        private void ProcessDeaStatus(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug("Starting processDeaStatus: {0}", message);
             var statusMessage = new Status(helloMessage)
@@ -309,10 +333,12 @@
             messagingProvider.Publish(reply, statusMessage);
         }
 
-        private void processDeaFindDroplet(string message, string reply)
+        private void ProcessDeaFindDroplet(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug("Starting processDeaFindDroplet: {0}", message);
 
@@ -347,10 +373,12 @@
             });
         }
 
-        private void processDropletStatus(string message, string reply)
+        private void ProcessDropletStatus(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug("Starting processDropletStatus: {0}", message);
 
@@ -369,10 +397,12 @@
             });
         }
 
-        private void processRouterStart(string message, string reply)
+        private void ProcessRouterStart(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug("Starting processRouterStart: {0}", message);
 
@@ -380,21 +410,23 @@
                 {
                     if (instance.IsRunning)
                     {
-                        registerWithRouter(instance, instance.Uris);
+                        RegisterWithRouter(instance, instance.Uris);
                     }
                 });
         }
 
-        private void processHealthManagerStart(string message, string reply)
+        private void ProcessHealthManagerStart(string message, string reply)
         {
             log.Debug("Starting processHealthManagerStart: {0}", message);
-            sendHeartbeat();
+            SendHeartbeat();
         }
 
-        private void registerWithRouter(Instance argInstance, string[] argUris)
+        private void RegisterWithRouter(Instance argInstance, string[] argUris)
         {
             if (shutting_down || argInstance.Uris.IsNullOrEmpty())
+            {
                 return;
+            }
 
             var routerRegister = new RouterRegister
             {
@@ -408,15 +440,17 @@
             messagingProvider.Publish(routerRegister);
         }
 
-        private void unregisterWithRouter(Instance argInstance)
+        private void UnregisterWithRouter(Instance argInstance)
         {
-            unregisterWithRouter(argInstance, null);
+            UnregisterWithRouter(argInstance, null);
         }
 
-        private void unregisterWithRouter(Instance argInstance, string[] argUris)
+        private void UnregisterWithRouter(Instance argInstance, string[] argUris)
         {
             if (shutting_down || argInstance.Uris.IsNullOrEmpty())
+            {
                 return;
+            }
 
             var routerUnregister = new RouterUnregister
             {
@@ -429,26 +463,27 @@
             messagingProvider.Publish(routerUnregister);
         }
 
-        private void sendExitedNotification(Instance argInstance)
+        private void SendExitedNotification(Instance argInstance)
         {
-            if (argInstance.IsEvacuated)
-                return;
-
-            messagingProvider.Publish(new InstanceExited(argInstance));
-
-            log.Debug("Sent droplet.exited.");
+            if (false == argInstance.IsEvacuated)
+            {
+                messagingProvider.Publish(new InstanceExited(argInstance));
+                log.Debug("Sent droplet.exited.");
+            }
         }
 
-        private void sendHeartbeat()
+        private void SendHeartbeat()
         {
             if (shutting_down || dropletManager.IsEmpty)
+            {
                 return;
+            }
 
             var heartbeats = new List<Heartbeat>();
 
             dropletManager.ForAllInstances((instance) =>
             {
-                instance.UpdateState(getApplicationState(instance.IIsName));
+                instance.UpdateState(GetApplicationState(instance.IIsName));
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
                 heartbeats.Add(new Heartbeat(instance));
             });
@@ -461,10 +496,12 @@
             messagingProvider.Publish( message);
         }
 
-        private string getApplicationState(string name)
+        private string GetApplicationState(string name)
         {
             if (false == webServerProvider.DoesApplicationExist(name))
+            {
                 return VcapStates.DELETED;
+            }
 
             ApplicationInstanceStatus status = webServerProvider.GetStatus(name);
 
@@ -495,24 +532,24 @@
             return rv;
         }
 
-        private void takeSnapshot()
+        private void TakeSnapshot()
         {
             Snapshot snapshot = dropletManager.GetSnapshot();
             filesManager.TakeSnapshot(snapshot);
         }
 
-        private void recoverExistingDroplets()
+        private void RecoverExistingDroplets()
         {
             Snapshot snapshot = filesManager.GetSnapshot();
             if (null != snapshot)
             {
                 dropletManager.FromSnapshot(snapshot);
-                sendHeartbeat();
-                takeSnapshot();
+                SendHeartbeat();
+                TakeSnapshot();
             }
         }
 
-        private void sendSingleHeartbeat(Heartbeat argHeartbeat)
+        private void SendSingleHeartbeat(Heartbeat argHeartbeat)
         {
             var message = new DropletHeartbeat
             {

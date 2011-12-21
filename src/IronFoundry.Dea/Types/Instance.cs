@@ -6,10 +6,10 @@
 
     public class Instance : EntityBase
     {
-        public Instance()
-        {
+        private bool isEvacuated = false;
+        private string logID;
 
-        }
+        public Instance() { }
 
         public Instance(Droplet argDroplet)
         {
@@ -30,7 +30,7 @@
                 Framework     = argDroplet.Framework;
                 Staged        = argDroplet.Name;
                 Sha1          = argDroplet.Sha1;
-                LogID         = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
+                logID         = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
             }
 
             State          = VcapStates.STARTING;
@@ -86,9 +86,6 @@
         [JsonProperty(PropertyName = "state_timestamp")]
         public int StateTimestamp { get; set; }
 
-        [JsonProperty(PropertyName = "log_id")]
-        public string LogID { get;  set; }
-
         [JsonProperty(PropertyName = "port")]
         public ushort Port { get; set; }
 
@@ -97,6 +94,12 @@
 
         [JsonProperty(PropertyName = "exit_reason")]
         public string ExitReason { get;  set; }
+
+        [JsonIgnore]
+        public string LogID
+        {
+            get { return logID; }
+        }
 
         [JsonIgnore]
         public bool HasExitReason
@@ -135,7 +138,10 @@
         }
 
         [JsonIgnore]
-        public bool IsEvacuated { get;  set; }
+        public bool IsEvacuated
+        {
+            get { return isEvacuated; }
+        }
 
         [JsonIgnore]
         public string IIsName
@@ -158,7 +164,19 @@
         public void DeaEvacuation()
         {
             ExitReason = "DEA_EVACUATION";
-            IsEvacuated = true;
+        }
+
+        public void DeaShutdown()
+        {
+            if (VcapStates.CRASHED != State)
+            {
+                ExitReason = "DEA_SHUTDOWN";
+            }
+        }
+
+        public void Evacuated()
+        {
+            isEvacuated = true;
         }
 
         public void OnDeaStop()

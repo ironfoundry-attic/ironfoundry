@@ -1,12 +1,12 @@
 ﻿namespace IronFoundry.Dea.Providers
 {
+    using System;
     using System.Linq;
     using System.Net;
     using IronFoundry.Dea.Config;
-    using Microsoft.Web.Administration;
-    using System;
     using IronFoundry.Dea.Logging;
-using IronFoundry.Dea.Services;
+    using IronFoundry.Dea.Services;
+    using Microsoft.Web.Administration;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
