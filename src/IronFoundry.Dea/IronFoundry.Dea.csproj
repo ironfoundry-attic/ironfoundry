@@ -88,11 +88,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Providers\IMessagingProvider.cs" />
+    <Compile Include="Providers\IWebOperationContextProvider.cs" />
     <Compile Include="Providers\IWebServerAdministrationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\NatsCommand.cs" />
     <Compile Include="Providers\NatsMessagingProvider.cs" />
     <Compile Include="Providers\NatsSubscription.cs" />
+    <Compile Include="Providers\WebOperationContextProvider.cs" />
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />
     <Compile Include="Extensions\SocketExtensionMethods.cs" />
     <Compile Include="Services\FilesService.cs" />

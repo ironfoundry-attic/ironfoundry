@@ -1,4 +1,6 @@
-﻿namespace IronFoundry.Dea
+﻿using System.Diagnostics;
+
+namespace IronFoundry.Dea
 {
     using System;
     using System.Collections.Generic;
@@ -30,7 +32,7 @@
         }
 
         // NB: this allows "break on all exceptions" to be enabled in VS without having the SocketException break
-        [System.Diagnostics.DebuggerStepThrough]
+        [DebuggerStepThrough]
         public static ushort FindNextAvailablePortAfter(ushort argStartingPort)
         {
             for (ushort port = argStartingPort; port < 65535; port++)
@@ -47,13 +49,22 @@
                 catch (SocketException) { }
             }
 
-            return ushort.MinValue;
+            return UInt16.MinValue;
         }
 
         private static IEnumerable<IPAddress> GetLocalIPAddresses()
         {
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToListOrNull();
+        }
+
+        public static string GetFileSizeString(long size)
+        {
+            var sizes = new[] { "B", "K", "M", "G" };
+            int order = 0;
+            while (size >= 1024 && order++ < sizes.Length)
+                size = size / 1024;            
+            return string.Format("{0:0.##}{1}", size, sizes[order]);
         }
     }
 }
