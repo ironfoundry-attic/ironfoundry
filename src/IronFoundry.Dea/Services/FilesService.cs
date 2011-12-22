@@ -52,12 +52,13 @@
                 {
                     var memoryStream = new MemoryStream();
                     var outputStream = new StreamWriter(memoryStream);
+                    outputStream.NewLine = "\n";
 
                     var fileSystemInfos = new DirectoryInfo(path).GetFileSystemInfos().OrderBy(i => i is FileInfo).ToList();
 
                     fileSystemInfos.ForEach(info =>
                     {
-                        var left = info.Name;
+                        var left = string.Format("{0}{1}", info.Name, (info is DirectoryInfo) ? "/" : string.Empty);
                         var right = info is DirectoryInfo ? "-" : Utility.GetFileSizeString((info as FileInfo).Length);
                         outputStream.WriteLine(left + new string(' ', Math.Max(8, 46 - left.Length - right.Length)) + right);
                     });
