@@ -47,7 +47,8 @@ namespace IronFoundry.Dea
             var sizes = new[] { "B", "K", "M", "G" };
             int order = 0;
             while (size >= 1024 && order++ < sizes.Length)
-                size = size / 1024;            
+                size = size / 1024;
+            
             return string.Format("{0:0.##}{1}", size, sizes[order]);
         }
     }

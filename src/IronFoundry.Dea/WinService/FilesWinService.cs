@@ -1,4 +1,6 @@
-﻿namespace IronFoundry.Dea.WinService
+﻿using System.ServiceModel.Description;
+
+namespace IronFoundry.Dea.WinService
 {
     using System;
     using System.ServiceModel;
@@ -18,10 +20,12 @@
             httpBinding.Security.Mode = WebHttpSecurityMode.TransportCredentialOnly;
             httpBinding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
 
-            var serviceHost =  new IocServiceHost(typeof(FilesService), baseAddress);
+            var serviceHost =  new IocServiceHost(typeof(FilesService), baseAddress);               
             base.serviceHost = serviceHost;
 
-            serviceHost.AddServiceEndpoint(typeof(IFilesService), httpBinding, baseAddress);
+            var endpoint = serviceHost.AddServiceEndpoint(                
+                typeof(IFilesService), httpBinding, baseAddress);
+            endpoint.Behaviors.Add(new WebHttpBehavior());
             serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new FilesServiceValidator(config);
             serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom; 
         }

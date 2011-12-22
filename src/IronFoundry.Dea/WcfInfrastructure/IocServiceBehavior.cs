@@ -17,6 +17,7 @@
                 {
                     foreach (EndpointDispatcher ed in cd.Endpoints)
                     {
+                        ed.AddressFilter = new MatchAllMessageFilter();
                         ed.DispatchRuntime.InstanceProvider = 
                             new IocInstanceProvider(serviceDescription.ServiceType);
                     }

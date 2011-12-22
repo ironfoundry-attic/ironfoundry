@@ -11,8 +11,6 @@
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Providers;
 
-
-    [ServiceBehavior(Namespace = Constants.FilesServiceNamespace)]
     public class FilesService : IFilesService
     {
         private readonly ILog log;
