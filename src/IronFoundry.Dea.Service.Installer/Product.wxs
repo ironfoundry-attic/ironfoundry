@@ -21,7 +21,7 @@
   <?endif?>
 
   <!-- Do Not Change These Values (They have dependencies outside of the MSI) -->
-  <?define ProductName = 'Iron Foundry DEA Service' ?>
+  <?define ProductName = 'DEA' ?>
   <?define UpgradeCode = '{748a94e6-f23b-4ff9-b1de-92851ee357d2}' ?> <!-- NEVER CHANGE THIS -->
   <?define RootRegistryPath = "SOFTWARE\IronFoundry\[ProductName]" ?>
 
@@ -35,9 +35,9 @@
     
     <!-- InstallerVersion="200" -->
     <Package 
-      Comments="$(var.ProductName) $(var.VERSION)"
-      Keywords="$(var.ProductName) $(var.VERSION)"
-      Description="$(var.ProductName) $(var.VERSION)"
+      Comments="Iron Foundry $(var.ProductName)"
+      Keywords="Iron Foundry $(var.ProductName)"
+      Description="Provides support for ASP.NET deployment within a Cloud Foundry environment."
       InstallerVersion="200"
       InstallPrivileges="elevated"
       InstallScope="perMachine"
@@ -71,11 +71,18 @@
         Win64="$(var.SEARCH.WIN64.REG)"
         Type="raw"
         Name="INSTALLDIR"
-        Key="SOFTWARE\IronFoundry\[ProductName]"
-        />
+        Key="$(var.RootRegistryPath)" />
     </Property>
 
-    <Property Id="SERVICENAME" Value="$(var.ProductName) Service" />
+    <Property Id="SERVICENAME" Value="Iron Foundry $(var.ProductName) Service">
+      <RegistrySearch
+        Id="RegSERVICENAME"
+        Root="HKLM"
+        Win64="$(var.SEARCH.WIN64.REG)"
+        Type="raw"
+        Name="SERVICENAME"
+        Key="$(var.RootRegistryPath)" />
+    </Property>
     
     <!-- START (Install Conditions) -->
     <Condition Message="[ProductName] setup requires Administrator priveledges. Setup will now exit."><![CDATA[Privileged]]></Condition>
@@ -88,16 +95,25 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="$(var.ProgramFilesDirectoryId)">
         <Directory Id="IronFoundryDirectory" Name="IronFoundry">
-          <Directory Id="WindowsServiceDirectory" Name="DEAService">
+          <Directory Id="WindowsServiceDirectory" Name="$(var.ProductName)">
             <Directory Id="INSTALLDIR" Name=".">
 
-              <!-- START (Install Registry) -->
-              <Component Id="InstallDirRegKey" Guid="{E654A926-26E0-493C-966E-52C09381DB8C}" Win64="$(var.WIN64.COMPONENTS)">
-                <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
-                  <RegistryValue Name="INSTALLDIR" Value="[INSTALLDIR]" Type="string" KeyPath="yes"/>
-                </RegistryKey>
+              <Directory Id="LogDir" Name="logs">
+                <Component Id="MaintainLogDir" Guid="{3CCE87D0-83ED-4445-96CB-346595743F2F}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
+                  <CreateFolder />
+                  <RemoveFolder Id="MaintainLogDir.Remove" On="both" />
+                  <RemoveFile Id="MaintainLogDir.RemoveFile" On="uninstall" Name="*.*" />
+                </Component>
+              </Directory>
+
+              <Component Id="MaintainInstallDir" Guid="{93A36DF5-0F0B-47CC-A2DA-1CD8EDDD2F86}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
+                <CreateFolder />
+                <RemoveFolder Id="Remove.DEA" Directory="WindowsServiceDirectory" On="uninstall" />
+                <RemoveFolder Id="Remove.InstallLocation" On="uninstall" />
+                <RemoveFile Id="RemoveFiles.InstallLocation" Name="*.*" On="uninstall" />
               </Component>
 
+              <!-- START (Install Registry) -->
               <Component Id="IronFoundryRegKey" Guid="{BB5917B4-6CDF-4B35-B58B-DE3C472C5C31}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
                 <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
@@ -116,6 +132,12 @@
                       <RegistryValue Value="[ProductVersion]" Type="string" KeyPath="yes"/>
                     </RegistryKey>
                   </RegistryKey>
+                </RegistryKey>
+              </Component>
+
+              <Component Id="InstallDirRegKey" Guid="{E654A926-26E0-493C-966E-52C09381DB8C}" Win64="$(var.WIN64.COMPONENTS)">
+                <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
+                  <RegistryValue Name="INSTALLDIR" Value="[INSTALLDIR]" Type="string" KeyPath="yes"/>
                 </RegistryKey>
               </Component>
               <!-- END (Install Registry)-->
@@ -148,6 +170,18 @@
                 <File Id="IronFoundry.Dea.Service.exe.config"
                       Name="IronFoundry.Dea.Service.exe.config"
                       Source="$(var.SVCBUILDDIR)IronFoundry.Dea.Service.exe.config" />                
+                <util:XmlFile Id="Config.XmlFile.1" Sequence="1" Action="setValue"
+                    File="[#IronFoundry.Dea.Service.exe.config]"
+                    ElementPath="/ironFoundryDea/@natsHost"
+                    Value="[NATSHOST]"/>
+                <util:XmlFile Id="Config.XmlFile.2" Sequence="1" Action="setValue"
+                    File="[#IronFoundry.Dea.Service.exe.config]"
+                    ElementPath="/ironFoundryDea/@natsPort"
+                    Value="[NATSPORT]"/>
+                <util:XmlFile Id="Config.XmlFile.3" Sequence="1" Action="setValue"
+                    File="[#IronFoundry.Dea.Service.exe.config]"
+                    ElementPath="/ironFoundryDea/@localRoute"
+                    Value="[LOCALROUTE]"/>
                 <File Id="NLog.dll" 
                       Name="NLog.dll" 
                       Source="$(var.SVCBUILDDIR)NLog.dll" />                
@@ -166,32 +200,38 @@
                 <File Id="RestSharp.dll"
                       Name="RestSharp.dll"
                       Source="$(var.SVCBUILDDIR)RestSharp.dll" />
-
-                <?if $(var.Configuration) = Debug ?>
-                  <File Id="IronFoundry.Dea.Service.pdb"
-                        Name="IronFoundry.Dea.Service.pdb"
-                        Source="$(var.SVCBUILDDIR)IronFoundry.Dea.Service.pdb" />
-                  <File Id="IronFoundry.Dea.pdb"
-                        Name="IronFoundry.Dea.pdb"
-                        Source="$(var.SVCBUILDDIR)IronFoundry.Dea.pdb" />
-                  <File Id="IronFoundry.pdb"
-                        Name="IronFoundry.pdb"
-                        Source="$(var.SVCBUILDDIR)IronFoundry.pdb" />
-                  <File Id="Newtonsoft.Json.pdb"
-                        Name="Newtonsoft.Json.pdb"
-                        Source="$(var.SVCBUILDDIR)Newtonsoft.Json.pdb" />
-                <?endif?>
+                <File Id="StructureMap.dll"
+                      Name="StructureMap.dll"
+                      Source="$(var.SVCBUILDDIR)StructureMap.dll" />
+                <File Id="IronFoundry.Dea.Service.pdb"
+                      Name="IronFoundry.Dea.Service.pdb"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Dea.Service.pdb" />
+                <File Id="IronFoundry.Dea.pdb"
+                      Name="IronFoundry.Dea.pdb"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Dea.pdb" />
+                <File Id="IronFoundry.pdb"
+                      Name="IronFoundry.pdb"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.pdb" />
+                <File Id="Newtonsoft.Json.pdb"
+                      Name="Newtonsoft.Json.pdb"
+                      Source="$(var.SVCBUILDDIR)Newtonsoft.Json.pdb" />
+                <File Id="StructureMap.pdb"
+                      Name="StructureMap.pdb"
+                      Source="$(var.SVCBUILDDIR)StructureMap.pdb" />
                 
                 <ServiceInstall Id="IronFoundry.DEA.Service.ServiceInstaller"
                                 Type="ownProcess"
                                 Vital="yes"
                                 Name="[SERVICENAME]"
                                 DisplayName="[SERVICENAME]"
-                                Description="Iron Foundry DEA Service."
+                                Description="Iron Foundry DEA Service"
                                 Start="auto"
                                 Account="LocalSystem"
                                 ErrorControl="ignore"
-                                Interactive="no" />
+                                Interactive="no">
+                  <ServiceDependency Id="Eventlog" />
+                  <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="none" RestartServiceDelayInSeconds="60" ResetPeriodInDays="1" />
+                </ServiceInstall>
                 <ServiceControl Id="IronFoundry.DEA.Service.StartService"
                                 Start="install"
                                 Name="[SERVICENAME]"
@@ -205,7 +245,7 @@
                   <RegistryValue Id="SERVICENAME" Name="ServiceName" Value="[SERVICENAME]" Type="string" />
                 </RegistryKey>
               </Component>
-              <!-- END (ClientBackup Windows Service) -->
+              <!-- END Service -->
 
             </Directory>
           </Directory>
@@ -252,6 +292,8 @@
       <ComponentRef Id="InstallDirRegKey" Primary="yes"/>
       <ComponentRef Id="PerProductRegistryKey" Primary="yes"/>
       <ComponentRef Id="IronFoundryRegKey" Primary="yes"/>
+      <ComponentRef Id="MaintainLogDir" Primary="yes"/>
+      <ComponentRef Id="MaintainInstallDir" Primary="yes"/>
     </ComponentGroup>
 
     <ComponentGroup Id="DeaServiceComponents">      
