@@ -28,7 +28,8 @@
         {
             Message message = null;
 
-            var uriSegments = webContext.GetRequestUri().Segments.ToList().Select(u => u.TrimEnd('/'));                        
+            var uriSegments = webContext.GetRequestUri().Segments.ToList().Select(u => u.TrimEnd('/')).ToList();
+            uriSegments.RemoveRange(0, 2);                        
             var path = uriSegments.Aggregate(config.AppDir, Path.Combine);
 
             if (config.AppDir.Equals(path,StringComparison.InvariantCultureIgnoreCase))
