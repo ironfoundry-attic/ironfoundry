@@ -73,7 +73,7 @@
             }
         }
 
-        [ConfigurationProperty("dropletDir", DefaultValue = @"C:\IronFoundry\droplet", IsRequired = false)]
+        [ConfigurationProperty("dropletDir", DefaultValue = @"C:\IronFoundry\droplets", IsRequired = false)]
         public string DropletDir
         {
             get

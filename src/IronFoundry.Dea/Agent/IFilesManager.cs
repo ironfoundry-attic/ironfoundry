@@ -4,8 +4,6 @@
 
     public interface IFilesManager
     {
-        string ApplicationPath { get; }
-
         void BindServices(Droplet droplet, string IIsName);
 
         void CleanupInstanceDirectory(Instance instance);

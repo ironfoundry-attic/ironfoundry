@@ -19,7 +19,9 @@
     {
         private readonly ILog log;
         private readonly bool disableDirCleanup = false;
+
         private readonly string dropletsPath;
+        private readonly string applicationPath;
 
         public FilesManager(ILog log, IConfig config)
         {
@@ -27,23 +29,20 @@
 
             disableDirCleanup = config.DisableDirCleanup;
             dropletsPath      = config.DropletDir;
-            ApplicationPath   = config.AppDir;
+            applicationPath   = config.AppDir;
 
             Directory.CreateDirectory(dropletsPath);
-            Directory.CreateDirectory(ApplicationPath);
+            Directory.CreateDirectory(applicationPath);
 
             SnapshotFile = Path.Combine(dropletsPath, "snapshot.json");
         }
-
-        public string ApplicationPath { get; private set; }
 
         public string SnapshotFile { get; private set; }
 
         public string GetApplicationPathFor(Instance instance)
         {
-            string instanceDropletsPath, instanceApplicationPath;
-            getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
-            return instanceApplicationPath;
+            InstancePaths paths = GetInstancePaths(instance);
+            return paths.FullAppPath;
         }
 
         public void TakeSnapshot(Snapshot snapshot)
@@ -73,17 +72,16 @@
         {
             if (force || (false == disableDirCleanup))
             {
-                string instanceDropletsPath, instanceApplicationPath;
-                getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
+                InstancePaths paths = GetInstancePaths(instance);
                 try
                 {
-                    if (Directory.Exists(instanceDropletsPath))
+                    if (Directory.Exists(paths.DropletsPath))
                     {
-                        Directory.Delete(instanceDropletsPath, true);
+                        Directory.Delete(paths.DropletsPath, true);
                     }
-                    if (Directory.Exists(instanceApplicationPath))
+                    if (Directory.Exists(paths.BaseAppPath))
                     {
-                        Directory.Delete(instanceApplicationPath, true);
+                        Directory.Delete(paths.BaseAppPath, true);
                     }
                 }
                 catch (Exception ex)
@@ -97,24 +95,23 @@
         {
             bool rv = false;
 
-            using (FileData file = getStagedApplicationFile(droplet.ExecutableUri))
+            using (FileData file = GetStagedApplicationFile(droplet.ExecutableUri))
             {
                 if (null != file)
                 {
-                    string instanceDropletsPath, instanceApplicationPath;
-                    getInstancePaths(instance, out instanceDropletsPath, out instanceApplicationPath);
-                    Directory.CreateDirectory(instanceDropletsPath);
-                    Directory.CreateDirectory(instanceApplicationPath);
+                    InstancePaths paths = GetInstancePaths(instance);
+                    Directory.CreateDirectory(paths.DropletsPath);
+                    Directory.CreateDirectory(paths.BaseAppPath);
 
                     using (var gzipStream = new GZipInputStream(file.FileStream))
                     {
                         var tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
-                        tarArchive.ExtractContents(instanceDropletsPath);
+                        tarArchive.ExtractContents(paths.DropletsPath);
                         tarArchive.Close();
                     }
 
-                    var instanceApplicationDirInfo =  new DirectoryInfo(instanceApplicationPath);
-                    Utility.CopyDirectory(new DirectoryInfo(Path.Combine(instanceDropletsPath, "app")), instanceApplicationDirInfo);
+                    var instanceApplicationDirInfo =  new DirectoryInfo(paths.BaseAppPath);
+                    Utility.CopyDirectory(new DirectoryInfo(paths.DropletsPath), instanceApplicationDirInfo);
 
                     rv = true;
                 }
@@ -124,11 +121,11 @@
         }
 
         // TODO not a FilesManager kind of method
-        public void BindServices(Droplet droplet, string iIsName)
+        public void BindServices(Droplet droplet, string appPath)
         {
             if (false == droplet.Services.IsNullOrEmpty())
             {
-                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", iIsName);
+                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", appPath);
                 if (null != c)
                 {
                     ConnectionStringsSection connectionStringsSection = c.GetSection("connectionStrings") as ConnectionStringsSection;
@@ -173,14 +170,7 @@
             }
         }
 
-        private void getInstancePaths(Instance instance,
-            out string outInstanceDropletsPath, out string outInstanceApplicationPath)
-        {
-            outInstanceDropletsPath = Path.Combine(dropletsPath, instance.Dir);
-            outInstanceApplicationPath = Path.Combine(ApplicationPath, instance.Dir);
-        }
-
-        private FileData getStagedApplicationFile(string executableUri)
+        private FileData GetStagedApplicationFile(string executableUri)
         {
             FileData rv = null;
 
@@ -208,6 +198,28 @@
             }
 
             return rv;
+        }
+
+        private InstancePaths GetInstancePaths(Instance instance)
+        {
+            return new InstancePaths(
+                dropletsPath: Path.Combine(dropletsPath, instance.Staged),
+                baseAppPath: instance.Dir,
+                fullAppPath: Path.Combine(instance.Dir, "app"));
+        }
+
+        private class InstancePaths
+        {
+            public string DropletsPath { get; private set; }
+            public string BaseAppPath { get; private set; }
+            public string FullAppPath { get; private set; }
+
+            public InstancePaths(string dropletsPath, string baseAppPath, string fullAppPath)
+            {
+                this.DropletsPath = dropletsPath;
+                this.BaseAppPath = baseAppPath;
+                this.FullAppPath = fullAppPath;
+            }
         }
     }
 }

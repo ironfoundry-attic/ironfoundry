@@ -1,6 +1,5 @@
 ﻿namespace IronFoundry.Dea.Providers
 {
-
     public enum ApplicationInstanceStatus
     {
         Started,
