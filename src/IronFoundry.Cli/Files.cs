@@ -10,15 +10,23 @@
     {
         static bool Files(IList<string> unparsed)
         {
-            if (unparsed.Count != 2)
+            if (unparsed.Count > 2)
             {
                 Console.Error.WriteLine("Too many arguments for [files]: {0}", String.Join(", ", unparsed.Select(s => String.Format("'{0}'", s))));
                 Console.Error.WriteLine("Usage: vmc files <appname> <path>"); // TODO usage statement standardization
                 return false;
             }
+            if (unparsed.Count < 1)
+            {
+                Console.Error.WriteLine("Not enough arguments for [files]: {0}", String.Join(", ", unparsed.Select(s => String.Format("'{0}'", s))));
+                Console.Error.WriteLine("Usage: vmc files <appname> <path (optional)>"); // TODO usage statement standardization
+                return false;
+            }
 
             string appname = unparsed[0];
-            string path = unparsed[1];
+            string path = string.Empty;
+            if (unparsed.Count == 2)
+                path = unparsed[1];            
 
             IVcapClient vc = new VcapClient();
             byte[] output = vc.FilesSimple(appname, path, 0);
