@@ -61,6 +61,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to http://{0}:{1}/droplets/.
+        /// </summary>
+        internal static string Agent_Droplets_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_Droplets_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Agent detected error in NATS..
         /// </summary>
         internal static string Agent_ErrorDetectedInNats_Message {

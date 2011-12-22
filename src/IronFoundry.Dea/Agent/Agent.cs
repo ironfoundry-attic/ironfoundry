@@ -177,14 +177,14 @@
                 return;
             }
 
-            var instance = new Instance(droplet);
+            var instance = new Instance(config.AppDir, droplet);
 
             if (filesManager.Stage(droplet, instance))
             {
-                WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.IIsName);
+                WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.Staged);
                 if (null == binding)
                 {
-                    log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.IIsName);
+                    log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.Staged);
                     filesManager.CleanupInstanceDirectory(instance, true);
                 }
                 else
@@ -192,7 +192,7 @@
                     instance.Host = binding.Host;
                     instance.Port = binding.Port;
 
-                    filesManager.BindServices(droplet, instance.IIsName);
+                    filesManager.BindServices(droplet, instance.Staged);
 
                     instance.StateTimestamp = Utility.GetEpochTimestamp();
 
@@ -285,7 +285,7 @@
 
             SendExitedMessage(instance);
 
-            webServerProvider.UninstallWebApp(instance.IIsName);
+            webServerProvider.UninstallWebApp(instance.Staged);
 
             dropletManager.InstanceStopped(instance);
 
@@ -357,7 +357,7 @@
 
                             var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance, span)
                             {
-                                FileUri = config.FilesServiceUri.AbsoluteUri,
+                                FileUri = String.Format(CultureInfo.InvariantCulture, Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
                                 Credentials = config.FilesCredentials.ToArray(),
                             };
 
@@ -483,7 +483,7 @@
 
             dropletManager.ForAllInstances((instance) =>
             {
-                instance.UpdateState(GetApplicationState(instance.IIsName));
+                instance.UpdateState(GetApplicationState(instance.Staged));
                 instance.StateTimestamp = Utility.GetEpochTimestamp();
                 heartbeats.Add(new Heartbeat(instance));
             });

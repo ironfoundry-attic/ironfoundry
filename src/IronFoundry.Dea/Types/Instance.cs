@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using System.IO;
     using JsonConverters;
     using Newtonsoft.Json;
 
@@ -11,7 +12,7 @@
 
         public Instance() { }
 
-        public Instance(Droplet argDroplet)
+        public Instance(string appDir, Droplet argDroplet)
         {
             if (null != argDroplet)
             {
@@ -19,7 +20,6 @@
                 InstanceID    = Guid.NewGuid();
                 InstanceIndex = argDroplet.Index;
                 Name          = argDroplet.Name;
-                Dir           = IIsName;
                 Uris          = argDroplet.Uris;
                 Users         = argDroplet.Users;
                 Version       = argDroplet.Version;
@@ -31,6 +31,8 @@
                 Staged        = argDroplet.Name;
                 Sha1          = argDroplet.Sha1;
                 logID         = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
+                Staged        = String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID);
+                Dir           = Path.Combine(appDir, Staged);
             }
 
             State          = VcapStates.STARTING;
@@ -39,49 +41,49 @@
         }
 
         [JsonProperty(PropertyName = "droplet_id")]
-        public uint DropletID { get;  set; }
+        public uint DropletID { get; set; }
 
         [JsonProperty(PropertyName = "instance_id"), JsonConverter(typeof(VcapGuidConverter))]
-        public Guid InstanceID { get;  set; }
+        public Guid InstanceID { get; set; }
 
         [JsonProperty(PropertyName = "instance_index")]
         public uint InstanceIndex { get; set; }
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get;  set; }
+        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "dir")]
-        public string Dir { get;  set; }
+        public string Dir { get; set; }
 
         [JsonProperty(PropertyName = "uris")]
         public string[] Uris { get; set; }
 
         [JsonProperty(PropertyName = "users")]
-        public string[] Users { get;  set; }
+        public string[] Users { get; set; }
 
         [JsonProperty(PropertyName = "version")]
-        public string Version { get;  set; }
+        public string Version { get; set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public int MemQuota { get;  set; }
+        public int MemQuota { get; set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
-        public int DiskQuota { get;  set; }
+        public int DiskQuota { get; set; }
 
         [JsonProperty(PropertyName = "fds_quota")]
-        public int FdsQuota { get;  set; }
+        public int FdsQuota { get; set; }
 
         [JsonProperty(PropertyName = "state")]
-        public string State { get;  set; }
+        public string State { get; set; }
 
         [JsonProperty(PropertyName = "runtime")]
-        public string Runtime { get;  set; }
+        public string Runtime { get; set; }
 
         [JsonProperty(PropertyName = "framework")]
-        public string Framework { get;  set; }
+        public string Framework { get; set; }
 
         [JsonProperty(PropertyName = "start")]
-        public string Start { get;  set; }
+        public string Start { get; set; }
 
         [JsonProperty(PropertyName = "state_timestamp")]
         public int StateTimestamp { get; set; }
@@ -90,10 +92,10 @@
         public ushort Port { get; set; }
 
         [JsonProperty(PropertyName = "staged")]
-        public string Staged { get;  set; }
+        public string Staged { get; set; }
 
         [JsonProperty(PropertyName = "exit_reason")]
-        public string ExitReason { get;  set; }
+        public string ExitReason { get; set; }
 
         [JsonIgnore]
         public string LogID
@@ -108,7 +110,7 @@
         }
 
         [JsonProperty(PropertyName = "sha1")]
-        public string Sha1 { get;  set; }
+        public string Sha1 { get; set; }
 
         [JsonProperty(PropertyName = "host")]
         public string Host { get; set; }
@@ -144,13 +146,7 @@
         }
 
         [JsonIgnore]
-        public string IIsName
-        {
-            get { return String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID); }
-        }
-
-        [JsonIgnore]
-        public bool StopProcessed { get;  set; }
+        public bool StopProcessed { get; set; }
 
         [JsonIgnore]
         public bool IsNotified { get; set; }
