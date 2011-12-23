@@ -1,57 +1,61 @@
-﻿using System;
-using System.ComponentModel;
-using System.Windows.Threading;
-using IronFoundry.Ui.Controls.Model;
-using IronFoundry.Ui.Controls.Mvvm;
-using IronFoundry.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-using IronFoundry.Types;
-
-namespace IronFoundry.Ui.Controls.ViewModel.Explorer
+﻿namespace IronFoundry.Ui.Controls.ViewModel.Explorer
 {
+    using System;
+    using System.ComponentModel;
+    using System.Windows.Threading;
+    using GalaSoft.MvvmLight.Messaging;
     using Model;
     using Mvvm;
+    using Types;
     using Utilities;
+    using Vcap;
 
     public class InstanceTreeViewItemViewModel : TreeViewItemViewModel
     {
-        private Instance instance;
-        private Application app;
-        private ICloudFoundryProvider provider;
+        private readonly Application app;
         public Dispatcher dispatcher;
+        private Instance instance;
+        private ICloudFoundryProvider provider;
 
-        public InstanceTreeViewItemViewModel(Instance instance, ApplicationTreeViewItemViewModel parentApplication) : base(parentApplication, true)
+        public InstanceTreeViewItemViewModel(Instance instance, ApplicationTreeViewItemViewModel parentApplication)
+            : base(parentApplication, true)
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
-            this.app = parentApplication.Application;
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
+                                       Messages.GetCloudFoundryProvider, p => provider = p));
+            app = parentApplication.Application;
             this.instance = instance;
-            this.dispatcher = Dispatcher.CurrentDispatcher;                       
+            dispatcher = Dispatcher.CurrentDispatcher;
         }
 
         public Instance Instance
         {
-            get { return this.instance; }
-            set { this.instance = value; RaisePropertyChanged("Instance"); }
-        }       
+            get { return instance; }
+            set
+            {
+                instance = value;
+                RaisePropertyChanged("Instance");
+            }
+        }
 
         public override void LoadChildren()
         {
             var worker = new BackgroundWorker();
             worker.DoWork += (s, e) =>
             {
-                dispatcher.BeginInvoke((Action)(() => Children.Clear()));
-                ushort id = (ushort)this.instance.ID;
-                var result = provider.GetFiles(app.Parent, app, "/", id);
+                dispatcher.BeginInvoke((Action) (() => Children.Clear()));
+                var id = (ushort) instance.ID;
+                ProviderResponse<VcapFilesResult> result = provider.GetFiles(app.Parent, app, "/", id);
                 if (result.Response == null)
                 {
                     Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
                     return;
                 }
 
-                dispatcher.BeginInvoke((Action)(()=> {
-                    foreach (var dir in result.Response.Directories)
+                dispatcher.BeginInvoke((Action) (() =>
+                {
+                    foreach (VcapFilesResult.FilesResultData dir in result.Response.Directories)
                         base.Children.Add(new FolderTreeViewItemViewModel(dir.Name, dir.Name, app, id));
-                    foreach (var file in result.Response.Files)
+                    foreach (VcapFilesResult.FilesResultData file in result.Response.Files)
                         base.Children.Add(new FileTreeViewItemViewModel(file.Name, file.Name, app, id));
                 }));
             };

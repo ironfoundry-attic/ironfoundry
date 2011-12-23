@@ -25,25 +25,40 @@
 
         public static Icon IconFromExtension(string extension, SystemIconSize size)
         {            
-            RegistryKey currentUser = Registry.CurrentUser;
             var className = "Unknown";
-            var classKey = currentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\"+extension+@"\OpenWithProgids");
+            var classKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\"+extension+@"\OpenWithProgids");
             if (classKey != null)
                 className = classKey.GetValueNames().First();
-            RegistryKey Root = Registry.ClassesRoot;
+            
             if (className.EndsWith("Folder"))
                 className = "Folder";
             if (className.Equals("icofile"))
                 className = "Unknown";
 
-            RegistryKey ApplicationKey = Root.OpenSubKey(className);
+            Icon returnIcon = null;
+            try
+            {
+                returnIcon = IconFromClassName(size, className);
+            }
+            catch
+            {
+                returnIcon = IconFromClassName(size, "Unknown");
+            }
+            return returnIcon;
+        }
 
+        private static Icon IconFromClassName(SystemIconSize size, string className)
+        {
+            var Root = Registry.ClassesRoot;
+            var ApplicationKey = Root.OpenSubKey(className);
             RegistryKey CurrentVer = null;
             try
             {
                 CurrentVer = Root.OpenSubKey(ApplicationKey.OpenSubKey("CurVer").GetValue("").ToString());
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+            }
 
             if (CurrentVer != null)
                 ApplicationKey = CurrentVer;
@@ -51,21 +66,13 @@
             if (ApplicationKey == null)
                 ApplicationKey = Root.OpenSubKey("Unknown");
 
-            string IconLocation =
+            var IconLocation =
                 ApplicationKey.OpenSubKey("DefaultIcon").GetValue("").ToString();
-            string[] IconPath = IconLocation.Split(',');
-
-
+            var IconPath = IconLocation.Split(',');
             IntPtr[] Large = null;
             IntPtr[] Small = null;
-            int iIconPathNumber = 0;
-
-            if (IconPath.Length > 1)
-                iIconPathNumber = 1;
-            else
-                iIconPathNumber = 0;
-
-
+            var iIconPathNumber = 0;
+            iIconPathNumber = IconPath.Length > 1 ? 1 : 0;
             if (IconPath[iIconPathNumber] == null) IconPath[iIconPathNumber] = "0";
             Large = new IntPtr[1];
             Small = new IntPtr[1];

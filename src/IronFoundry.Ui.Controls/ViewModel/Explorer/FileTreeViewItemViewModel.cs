@@ -1,61 +1,60 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using IronFoundry.Ui.Controls.Model;
-using IronFoundry.Ui.Controls.Mvvm;
-using IronFoundry.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-
-namespace IronFoundry.Ui.Controls.ViewModel.Explorer
+﻿namespace IronFoundry.Ui.Controls.ViewModel.Explorer
 {
+    using System;
+    using System.Diagnostics;
+    using System.Drawing;
+    using System.IO;
+    using System.Windows;
+    using System.Windows.Input;
+    using System.Windows.Interop;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
     using Model;
     using Mvvm;
     using Utilities;
+    using Vcap;
+    using Application = Types.Application;
 
     public class FileTreeViewItemViewModel : TreeViewItemViewModel
     {
-        private string name;
-        private IronFoundry.Types.Application app;
-        private string path;
-        private ushort id;
-        private string fileExtension;
-        public RelayCommand<MouseButtonEventArgs> OpenFileCommand { get; private set; }
-        public RelayCommand OpenFileFromContextCommand { get; private set; } 
+        private readonly Application app;
+        private readonly string fileExtension;
+        private readonly ushort id;
+        private readonly string name;
+        private readonly string path;
         private ICloudFoundryProvider provider;
 
-        public FileTreeViewItemViewModel(string name, string path, IronFoundry.Types.Application app, ushort id)
+        public FileTreeViewItemViewModel(string name, string path, Application app, ushort id)
             : base(null, true)
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
+                                       Messages.GetCloudFoundryProvider, p => provider = p));
             this.name = name;
             this.app = app;
             this.path = path;
             this.id = id;
-            this.fileExtension = System.IO.Path.GetExtension(name);
+            fileExtension = Path.GetExtension(name);
             OpenFileCommand = new RelayCommand<MouseButtonEventArgs>(OpenFile);
             OpenFileFromContextCommand = new RelayCommand(OpenFileFromContext);
         }
 
+        public RelayCommand<MouseButtonEventArgs> OpenFileCommand { get; private set; }
+        public RelayCommand OpenFileFromContextCommand { get; private set; }
+
         public string Name
         {
-            get
-            {
-                return this.name;
-            }
-        }       
+            get { return name; }
+        }
 
         public ImageSource Icon
         {
             get
             {
-                var hBitmap = IconUtil.IconFromExtension(fileExtension, IconUtil.SystemIconSize.Small).ToBitmap();
-                return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                Bitmap hBitmap = IconUtil.IconFromExtension(fileExtension, IconUtil.SystemIconSize.Small).ToBitmap();
+                return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
+                                                             BitmapSizeOptions.FromEmptyOptions());
             }
         }
 
@@ -65,7 +64,6 @@ namespace IronFoundry.Ui.Controls.ViewModel.Explorer
             {
                 OpenFile();
             }
-            
         }
 
         private void OpenFileFromContext()
@@ -75,16 +73,16 @@ namespace IronFoundry.Ui.Controls.ViewModel.Explorer
 
         private void OpenFile()
         {
-            var result = provider.GetFiles(app.Parent, app, "/" + path, id);
+            ProviderResponse<VcapFilesResult> result = provider.GetFiles(app.Parent, app, "/" + path, id);
             if (result.Response == null)
             {
                 Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
                 return;
             }
-            var pathToFile = System.IO.Path.GetTempPath() + name;
-            using (var fs = File.Create(pathToFile))
-                using (var bw = new BinaryWriter(fs))
-                    bw.Write(result.Response.File);
+            string pathToFile = Path.GetTempPath() + name;
+            using (FileStream fs = File.Create(pathToFile))
+            using (var bw = new BinaryWriter(fs))
+                bw.Write(result.Response.File);
 
             Process.Start(pathToFile);
         }

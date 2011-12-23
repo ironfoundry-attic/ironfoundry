@@ -1,11 +1,8 @@
-﻿using IronFoundry.Types;
-using IronFoundry.Ui.Controls.Mvvm;
-using IronFoundry.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-
-namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
+﻿namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
 {
+    using GalaSoft.MvvmLight.Messaging;
     using Mvvm;
+    using Types;
     using Utilities;
 
     public class AddCloudUrlViewModel : DialogViewModel
@@ -17,36 +14,45 @@ namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
         {
         }
 
+        public string Name
+        {
+            get { return cloudUrl.ServerType; }
+            set
+            {
+                cloudUrl.ServerType = value;
+                RaisePropertyChanged("Name");
+            }
+        }
+
+        public string Url
+        {
+            get { return cloudUrl.Url; }
+            set
+            {
+                cloudUrl.Url = value;
+                RaisePropertyChanged("Url");
+            }
+        }
+
         protected override void InitializeData()
         {
             Messenger.Default.Send(new NotificationMessageAction<CloudUrl>(Messages.SetAddCloudUrlData,
-                (cloudUrl) =>
-                {
-                    this.cloudUrl = cloudUrl;
-                }));
+                                                                           (cloudUrl) => { this.cloudUrl = cloudUrl; }));
         }
 
         protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<AddCloudUrlViewModel>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.GetAddCloudUrlData))
-                        message.Execute(this);
-                    Cleanup();
-                });
-        }
-
-        public string Name
-        {
-            get { return this.cloudUrl.ServerType; }
-            set { this.cloudUrl.ServerType = value; RaisePropertyChanged("Name"); }
-        }
-
-        public string Url
-        {
-            get { return this.cloudUrl.Url; }
-            set { this.cloudUrl.Url = value; RaisePropertyChanged("Url"); }
+                                                                                        message =>
+                                                                                        {
+                                                                                            if (
+                                                                                                message.Notification.
+                                                                                                    Equals(
+                                                                                                        Messages.
+                                                                                                            GetAddCloudUrlData))
+                                                                                                message.Execute(this);
+                                                                                            Cleanup();
+                                                                                        });
         }
     }
 }

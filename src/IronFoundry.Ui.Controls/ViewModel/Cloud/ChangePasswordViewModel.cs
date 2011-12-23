@@ -1,45 +1,82 @@
-﻿using System;
-using System.ComponentModel;
-using IronFoundry.Ui.Controls.Mvvm;
-using IronFoundry.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-
-namespace IronFoundry.Ui.Controls.ViewModel.Cloud
+﻿namespace IronFoundry.Ui.Controls.ViewModel.Cloud
 {
+    using System;
+    using System.ComponentModel;
+    using GalaSoft.MvvmLight.Messaging;
+    using Model;
     using Mvvm;
+    using Types;
     using Utilities;
 
     public class ChangePasswordViewModel : DialogViewModel
     {
-        private Types.Cloud cloud;
+        private Cloud cloud;
+        private string email;
         private string newPassword;
         private string verifyPassword;
-        private string email;
 
-        public ChangePasswordViewModel() : base(Messages.ChangePasswordDialogResult) { }        
+        public ChangePasswordViewModel() : base(Messages.ChangePasswordDialogResult)
+        {
+        }
+
+        public string NewPassword
+        {
+            get { return newPassword; }
+            set
+            {
+                newPassword = value;
+                RaisePropertyChanged("NewPassword");
+            }
+        }
+
+        public string EMail
+        {
+            get { return email; }
+            set
+            {
+                email = value;
+                RaisePropertyChanged("EMail");
+            }
+        }
+
+        public string VerifyPassword
+        {
+            get { return verifyPassword; }
+            set
+            {
+                verifyPassword = value;
+                RaisePropertyChanged("VerifyPassword");
+            }
+        }
 
         protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<ChangePasswordViewModel>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.GetChangePasswordData))
-                        message.Execute(this);
-                    Messenger.Default.Unregister(this);
-                });
+                                                                                           message =>
+                                                                                           {
+                                                                                               if (
+                                                                                                   message.Notification.
+                                                                                                       Equals(
+                                                                                                           Messages.
+                                                                                                               GetChangePasswordData))
+                                                                                                   message.Execute(this);
+                                                                                               Messenger.Default.
+                                                                                                   Unregister(this);
+                                                                                           });
         }
 
         protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<Types.Cloud>(Messages.SetChangePasswordData, c => {
-                this.EMail = c.Email;
-                this.cloud = c;
+            Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetChangePasswordData, c =>
+            {
+                EMail = c.Email;
+                cloud = c;
             }));
         }
 
         protected override void OnConfirmed(CancelEventArgs e)
         {
-            if (String.IsNullOrEmpty(NewPassword) || 
+            if (String.IsNullOrEmpty(NewPassword) ||
                 String.IsNullOrEmpty(VerifyPassword))
             {
                 e.Cancel = true;
@@ -52,31 +89,13 @@ namespace IronFoundry.Ui.Controls.ViewModel.Cloud
             }
             else
             {
-                var result = provider.ChangePassword(this.cloud, NewPassword);
+                ProviderResponse<bool> result = provider.ChangePassword(cloud, NewPassword);
                 if (!result.Response)
                 {
                     ErrorMessage = result.Message;
                     e.Cancel = true;
                 }
             }
-        }
-
-        public string NewPassword
-        {
-            get { return newPassword; }
-            set { newPassword = value; RaisePropertyChanged("NewPassword"); }
-        }
-
-        public string EMail
-        {
-            get { return email; }
-            set { email = value; RaisePropertyChanged("EMail"); }
-        }
-
-        public string VerifyPassword
-        {
-            get { return verifyPassword; }
-            set { verifyPassword = value; RaisePropertyChanged("VerifyPassword"); }
         }
     }
 }

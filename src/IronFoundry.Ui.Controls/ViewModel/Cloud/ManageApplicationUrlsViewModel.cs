@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using IronFoundry.Ui.Controls.Mvvm;
-using IronFoundry.Ui.Controls.Utilities;
-
-namespace IronFoundry.Ui.Controls.ViewModel.Cloud
+﻿namespace IronFoundry.Ui.Controls.ViewModel.Cloud
 {
+    using System;
+    using System.Collections.ObjectModel;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
     using Mvvm;
     using Utilities;
 
     public class ManageApplicationUrlsViewModel : DialogViewModel
     {
-        public RelayCommand AddCommand { get; private set; }
-        public RelayCommand EditCommand { get; private set; }
-        public RelayCommand RemoveCommand { get; private set; }
-
-        private SafeObservableCollection<string> urls;
         private string selectedUrl;
+        private SafeObservableCollection<string> urls;
 
         public ManageApplicationUrlsViewModel() : base(Messages.ManageApplicationUrlsDialogResult)
         {
@@ -26,32 +19,54 @@ namespace IronFoundry.Ui.Controls.ViewModel.Cloud
             RemoveCommand = new RelayCommand(Remove, CanRemove);
         }
 
+        public RelayCommand AddCommand { get; private set; }
+        public RelayCommand EditCommand { get; private set; }
+        public RelayCommand RemoveCommand { get; private set; }
+
+        public string SelectedUrl
+        {
+            get { return selectedUrl; }
+            set
+            {
+                selectedUrl = value;
+                RaisePropertyChanged("SelectedUrl");
+            }
+        }
+
+        public SafeObservableCollection<string> Urls
+        {
+            get { return urls; }
+            set
+            {
+                urls = value;
+                RaisePropertyChanged("Urls");
+            }
+        }
+
         protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<SafeObservableCollection<string>>(Messages.SetManageApplicationUrlsData, urls => this.Urls = urls.DeepCopy()));
+            Messenger.Default.Send(
+                new NotificationMessageAction<SafeObservableCollection<string>>(Messages.SetManageApplicationUrlsData,
+                                                                                urls => Urls = urls.DeepCopy()));
         }
 
         protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<ManageApplicationUrlsViewModel>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.GetManageApplicationUrlsData))
-                        message.Execute(this);
-                    Cleanup();
-                });
-        }
-
-        public string SelectedUrl
-        {
-            get { return this.selectedUrl; }
-            set { this.selectedUrl = value; RaisePropertyChanged("SelectedUrl"); }
-        }
-
-        public SafeObservableCollection<string> Urls
-        {
-            get { return this.urls; }
-            set { this.urls = value; RaisePropertyChanged("Urls"); }
+                                                                                                  message =>
+                                                                                                  {
+                                                                                                      if (
+                                                                                                          message.
+                                                                                                              Notification
+                                                                                                              .Equals(
+                                                                                                                  Messages
+                                                                                                                      .
+                                                                                                                      GetManageApplicationUrlsData))
+                                                                                                          message.
+                                                                                                              Execute(
+                                                                                                                  this);
+                                                                                                      Cleanup();
+                                                                                                  });
         }
 
         private void Add()
@@ -61,12 +76,12 @@ namespace IronFoundry.Ui.Controls.ViewModel.Cloud
 
         private bool CanEdit()
         {
-            return (!String.IsNullOrEmpty(this.SelectedUrl));
+            return (!String.IsNullOrEmpty(SelectedUrl));
         }
 
         private bool CanRemove()
         {
-            return (!String.IsNullOrEmpty(this.SelectedUrl));
+            return (!String.IsNullOrEmpty(SelectedUrl));
         }
 
         private void Edit()
@@ -79,36 +94,41 @@ namespace IronFoundry.Ui.Controls.ViewModel.Cloud
             if (!isNew)
             {
                 Messenger.Default.Register<NotificationMessageAction<string>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.SetAddApplicationUrlData))
-                        message.Execute(this.SelectedUrl);
-                });
+                                                                              message =>
+                                                                              {
+                                                                                  if (
+                                                                                      message.Notification.Equals(
+                                                                                          Messages.
+                                                                                              SetAddApplicationUrlData))
+                                                                                      message.Execute(SelectedUrl);
+                                                                              });
             }
 
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddApplicationUrl,
-                (confirmed) =>
-                {
-                    if (confirmed)
-                    {
-                        Messenger.Default.Send(new NotificationMessageAction<AddApplicationUrlViewModel>(Messages.GetAddApplicationUrlData,
-                        (viewModel) =>
-                        {
-                            if (!isNew)
-                                this.Urls.Remove(this.SelectedUrl);
-                            var url = viewModel.Url;
-                            this.Urls.Add(url);
-                            this.SelectedUrl = url;
-                        }));
-                    }
-                }));
+                                                                       (confirmed) =>
+                                                                       {
+                                                                           if (confirmed)
+                                                                           {
+                                                                               Messenger.Default.Send(
+                                                                                   new NotificationMessageAction
+                                                                                       <AddApplicationUrlViewModel>(
+                                                                                       Messages.GetAddApplicationUrlData,
+                                                                                       (viewModel) =>
+                                                                                       {
+                                                                                           if (!isNew)
+                                                                                               Urls.Remove(SelectedUrl);
+                                                                                           string url = viewModel.Url;
+                                                                                           Urls.Add(url);
+                                                                                           SelectedUrl = url;
+                                                                                       }));
+                                                                           }
+                                                                       }));
         }
 
         private void Remove()
         {
-            if (this.SelectedUrl != null)
-                this.Urls.Remove(this.SelectedUrl);
+            if (SelectedUrl != null)
+                Urls.Remove(SelectedUrl);
         }
-
     }
 }
