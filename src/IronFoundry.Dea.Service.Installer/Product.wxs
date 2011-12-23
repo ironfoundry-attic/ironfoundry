@@ -25,7 +25,7 @@
   <?define ShortProductName = 'DEA' ?>
   <?define Manufacturer = 'Iron Foundry' ?>
   <?define UpgradeCode = '{748a94e6-f23b-4ff9-b1de-92851ee357d2}' ?><!-- NEVER CHANGE THIS -->
-  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\[ProductName]" ?>
+  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\DEA" ?>
 
   <Product
     Id="*"
@@ -45,7 +45,7 @@
       InstallScope="perMachine"
       Languages="1033"
       Compressed="yes"
-      Platform="$(var.PLATFORM)"
+      Platform="$(sys.BUILDARCH)"
       Manufacturer="$(var.Manufacturer)"
       />
 
@@ -54,6 +54,8 @@
     <Property Id="ARPURLINFOABOUT" Value="http://www.ironfoundry.org" />
     <!--Property Id="ARPHELPTELEPHONE" Value="" /-->
     <Property Id="ARPCONTACT" Value="support@ironfoundry.zendesk.com" />
+    <Icon Id="cloud.ico" SourceFile="$(var.SVCBUILDDIR)CloudFoundrySmall.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="cloud.ico" />
 
     <!-- Major Upgrade -->
     <Upgrade Id="$(var.UpgradeCode)">
@@ -76,7 +78,7 @@
         Key="$(var.RootRegistryPath)" />
     </Property>
 
-    <Property Id="SERVICENAME" Value="$(var.ShortProductName) Service">
+    <Property Id="SERVICENAME" Value="$(var.ProductName) Service">
       <RegistrySearch
         Id="RegSERVICENAME"
         Root="HKLM"
@@ -87,8 +89,14 @@
     </Property>
 
     <!-- START (Install Conditions) -->
-    <Condition Message="[ProductName] setup requires Administrator priveledges. Setup will now exit."><![CDATA[Privileged]]></Condition>
-    <Condition Message="[ProductName] requires .NET Framework 4.0 Full. Setup will now exit."><![CDATA[Installed OR NETFRAMEWORK40FULL]]></Condition>
+    <Condition Message="[ProductName] setup requires Administrator privileges. Setup will now exit.">
+      <![CDATA[Privileged]]>
+    </Condition>
+
+    <Condition Message="[ProductName] requires .NET Framework 4.0 Full. Setup will now exit.">
+      <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
+    </Condition>
+
     <Condition Message="ALLUSERS must be 1. Setup will now exit."><![CDATA[ALLUSERS = 1]]></Condition>
     <!-- END (Install Conditions) -->
 
@@ -237,22 +245,21 @@
                                 Vital="yes"
                                 Name="IronFoundryDEA"
                                 DisplayName="[SERVICENAME]"
-                                Description="[ProductName] Service"
+                                Description="$(var.ProductName) Service"
                                 Start="auto"
                                 Account="LocalSystem"
                                 ErrorControl="ignore"
                                 Interactive="no">
-                  <ServiceDependency Id="Eventlog" />
                   <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="none" RestartServiceDelayInSeconds="60" ResetPeriodInDays="1" />
                 </ServiceInstall>
                 <ServiceControl Id="IronFoundry.DEA.Service.StartService"
                                 Start="install"
-                                Name="[SERVICENAME]"
+                                Name="IronFoundryDEA"
                                 Wait="yes" />
                 <ServiceControl Id="IronFoundry.DEA.Service.StopService"
                                 Stop="uninstall"
                                 Remove="uninstall"
-                                Name="[SERVICENAME]"
+                                Name="IronFoundryDEA"
                                 Wait="yes" />
                 <RegistryKey Id="ServiceNameKey" Action="createAndRemoveOnUninstall" Key="$(var.RootRegistryPath)" Root="HKLM">
                   <RegistryValue Id="SERVICENAME" Name="ServiceName" Value="[SERVICENAME]" Type="string" />
@@ -289,7 +296,8 @@
     <WixVariable Id="ServiceConfigNatsPortProperty" Value="NATSPORT"/>
     <WixVariable Id="ServiceConfigLocalRouteProperty" Value="LOCALROUTE"/>
 
-    <Property Id="WIXUI_FEATURETREE" Value="[ProductName] Service"/>
+    <Property Id="WIXUI_FEATURETREE" Value="$(var.ProductName) Service"/>
+
     <UIRef Id="WixUI_Common" />
 
     <UI>

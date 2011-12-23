@@ -21,7 +21,7 @@
         {
             this.log = log;
             this.services = services.OrderBy(s => s.StartIndex).ToArray();
-            ServiceName = "IronFoundry.Dea.Service";
+            ServiceName = "IronFoundryDEA"; // NB: must match installer Product.wxs
             AutoLog = true;
         }
 
