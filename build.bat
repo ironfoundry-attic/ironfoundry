@@ -25,9 +25,19 @@ if "%DevEnvDir%"=="" (
 powershell -nologo -file clean.ps1
 
 msbuild /v:n /t:build /p:Configuration=Debug /p:Platform=x86 %SLN%
+if ERRORLEVEL 1 goto build_failed
+
 msbuild /v:n /t:build /p:Configuration=Debug /p:Platform=x64 %SLN%
+if ERRORLEVEL 1 goto build_failed
 
 msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x86 /p:WixValues="PLATFORM=x86;VERSION=%VERSION%" %SLN%
+if ERRORLEVEL 1 goto build_failed
+
 msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x64 /p:WixValues="PLATFORM=x64;VERSION=%VERSION%" %SLN%
+if ERRORLEVEL 1 goto build_failed
 
 exit /b %ERRORLEVEL%
+
+:build_failed
+echo Build failed!
+exit /b 1
