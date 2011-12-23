@@ -1,2 +1,2 @@
 ﻿using System.Reflection;
-[assembly: AssemblyTitle("IronFoundry.Dea.Test")]
+[assembly: AssemblyTitle("IronFoundry.Test")]
