@@ -16,15 +16,14 @@ namespace IronFoundry.Dea.WinService
         {
             Uri baseAddress = config.WCFFilesServiceUri;
 
-            var httpBinding = new WebHttpBinding(); // TODO: message sizes
-            httpBinding.Security.Mode = WebHttpSecurityMode.TransportCredentialOnly;
-            httpBinding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
+            var webHttpBinding = new WebHttpBinding();
+            webHttpBinding.Security.Mode = WebHttpSecurityMode.TransportCredentialOnly;
+            webHttpBinding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
 
             var serviceHost =  new IocServiceHost(typeof(FilesService), baseAddress);               
             base.serviceHost = serviceHost;
 
-            var endpoint = serviceHost.AddServiceEndpoint(                
-                typeof(IFilesService), httpBinding, baseAddress);
+            ServiceEndpoint endpoint = serviceHost.AddServiceEndpoint(typeof(IFilesService), webHttpBinding, baseAddress);
             endpoint.Behaviors.Add(new WebHttpBehavior());
             serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new FilesServiceValidator(config);
             serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom; 

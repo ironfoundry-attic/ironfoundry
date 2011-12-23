@@ -9,10 +9,9 @@
     {
         static bool Push(IList<string> unparsed)
         {
-            // TODO match ruby argument parsing
             if (unparsed.Count < 3 || unparsed.Count > 4)
             {
-                Console.Error.WriteLine("Usage: vmc push <appname> <path> <url> [service] --instances N --mem MB"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc push <appname> <path> <url> [service] --instances N --mem MB");
                 return false;
             }
 

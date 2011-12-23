@@ -1,27 +1,19 @@
 ﻿namespace System.Collections.ObjectModel
 {
-    using System.Linq;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.Linq;
     using IronFoundry.Types;
 
     [Serializable]
     public class SafeObservableCollection<T> : ObservableCollection<T>
     {
-        public SafeObservableCollection() : base()
-        {
-            
-        }
+        public SafeObservableCollection() : base() { }
 
-        public SafeObservableCollection(IEnumerable<T> x ) : base(x)
-        {
-            
-        }
+        public SafeObservableCollection(IEnumerable<T> x ) : base(x) { }
 
         public SafeObservableCollection(List<T> x)
-            : base(x)
-        {            
-        }
+            : base(x) { }
 
         public void SafeAdd(T x)
         {

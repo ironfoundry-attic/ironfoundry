@@ -187,6 +187,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exception sending message: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_ExceptionSendingMessage_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_ExceptionSendingMessage_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Successfully reconnected to server..
         /// </summary>
         internal static string NatsMessagingProvider_ReconnectSuccess_Message {

@@ -27,6 +27,6 @@
         public ushort Port { get; set; }
 
         [JsonProperty(PropertyName = "uris")]
-        public string[] Uris { get; set; } // TODO actual System.Uri
+        public string[] Uris { get; set; } // TODO actual System.Uri with converter
     }
 }

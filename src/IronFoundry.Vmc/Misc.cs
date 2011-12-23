@@ -5,7 +5,7 @@
 
     static partial class Program
     {
-        static void debug(string format, params object[] args)
+        static void Debug(string format, params object[] args)
         {
             if (verbosity > 0)
             {
@@ -14,7 +14,7 @@
             }
         }
 
-        static string pretty_size(uint argSize, ushort argPrec = 1)
+        static string PrettySize(uint argSize, ushort argPrec = 1)
         {
             if (argSize == 0)
             {

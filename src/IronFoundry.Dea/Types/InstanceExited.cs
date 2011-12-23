@@ -32,17 +32,17 @@
         [JsonProperty(PropertyName = "crash_timestamp")]
         public int CrashTimestamp { get; private set; }
 
-        public InstanceExited(Instance argInstance)
+        public InstanceExited(Instance instance)
         {
-            ID            = argInstance.DropletID;
-            Version       = argInstance.Version;
-            InstanceID    = argInstance.InstanceID;
-            InstanceIndex = argInstance.InstanceIndex;
-            Reason        = String.Empty; // TODO
+            ID            = instance.DropletID;
+            Version       = instance.Version;
+            InstanceID    = instance.InstanceID;
+            InstanceIndex = instance.InstanceIndex;
+            Reason        = instance.ExitReason;
 
-            if (argInstance.IsCrashed)
+            if (instance.IsCrashed)
             {
-                CrashTimestamp = argInstance.StateTimestamp;
+                CrashTimestamp = instance.StateTimestamp;
             }
         }
     }

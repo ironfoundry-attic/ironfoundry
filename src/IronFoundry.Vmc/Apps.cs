@@ -9,11 +9,10 @@
     {
         static bool Apps(IList<string> unparsed)
         {
-            // TODO match ruby argument parsing
             if (unparsed.Count != 0)
             {
                 Console.Error.WriteLine("Too many arguments for [apps]");
-                Console.Error.WriteLine("Usage: vmc apps"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc apps");
                 return false;
             }
             IVcapClient vc = new VcapClient();

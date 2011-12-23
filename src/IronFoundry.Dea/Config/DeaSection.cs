@@ -60,19 +60,6 @@
             }
         }
 
-        [ConfigurationProperty("stagingDir", DefaultValue = @"C:\IronFoundry\staging", IsRequired = false)]
-        public string StagingDir
-        {
-            get
-            {
-                return (string)this["stagingDir"];
-            }
-            set
-            {
-                this["stagingDir"] = value;
-            }
-        }
-
         [ConfigurationProperty("dropletDir", DefaultValue = @"C:\IronFoundry\droplets", IsRequired = false)]
         public string DropletDir
         {

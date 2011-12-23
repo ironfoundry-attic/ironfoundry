@@ -29,7 +29,6 @@ namespace System.Collections.Generic
 
 namespace System.Collections
 {
-    using System.Linq;
 
     public static class IEnumerableExtensionMethods
     {

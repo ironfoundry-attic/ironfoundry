@@ -159,6 +159,9 @@
   <data name="NatsMessagingProvider_Disconnected_Message" xml:space="preserve">
     <value>Client disconnected from server.</value>
   </data>
+  <data name="NatsMessagingProvider_ExceptionSendingMessage_Fmt" xml:space="preserve">
+    <value>Exception sending message: {0}</value>
+  </data>
   <data name="NatsMessagingProvider_ReconnectSuccess_Message" xml:space="preserve">
     <value>Successfully reconnected to server.</value>
   </data>

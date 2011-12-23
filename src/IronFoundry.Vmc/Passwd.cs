@@ -13,7 +13,7 @@
             if (unparsed.Count != 0)
             {
                 Console.Error.WriteLine("Too many arguments for [change_password]: {0}", String.Join(", ", unparsed.Select(s => String.Format("'{0}'", s))));
-                Console.Error.WriteLine("Usage: vmc passwd"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc passwd");
                 return false;
             }
 

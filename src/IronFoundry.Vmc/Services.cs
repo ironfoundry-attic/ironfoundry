@@ -39,10 +39,9 @@
 
         static bool BindService(IList<string> unparsed)
         {
-            // TODO match ruby argument parsing
             if (unparsed.Count != 2)
             {
-                Console.Error.WriteLine("Usage: vmc bind-service <servicename> <appname>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc bind-service <servicename> <appname>");
                 return false;
             }
 
@@ -56,10 +55,9 @@
 
         static bool UnbindService(IList<string> unparsed)
         {
-            // TODO match ruby argument parsing
             if (unparsed.Count != 2)
             {
-                Console.Error.WriteLine("Usage: vmc unbind-service <servicename> <appname>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc unbind-service <servicename> <appname>");
                 return false;
             }
 
@@ -75,7 +73,7 @@
         {
             if (unparsed.Count != 2)
             {
-                Console.Error.WriteLine("Usage: vmc create-service <service> <servicename>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc create-service <service> <servicename>");
                 return false;
             }
 
@@ -91,7 +89,7 @@
         {
             if (unparsed.Count != 1)
             {
-                Console.Error.WriteLine("Usage: vmc delete-service <servicename>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc delete-service <servicename>");
                 return false;
             }
 

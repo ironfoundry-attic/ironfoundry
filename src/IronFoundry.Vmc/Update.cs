@@ -9,10 +9,9 @@
     {
         static bool Update(IList<string> unparsed)
         {
-            // TODO match ruby argument parsing
             if (unparsed.Count != 2)
             {
-                Console.Error.WriteLine("Usage: vmc update <appname> <path>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc update <appname> <path>");
                 return false;
             }
 

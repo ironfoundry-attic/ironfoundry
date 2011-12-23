@@ -12,10 +12,9 @@
     {
         static bool Info(IList<string> unparsed)
         {
-            // TODO match ruby argument parsing
             if (unparsed.Count != 0)
             {
-                Console.Error.WriteLine("Usage: vmc info"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc info");
                 return false;
             }
 
@@ -49,8 +48,8 @@
 
                     if (null != info.Usage && null != info.Limits)
                     {
-                        string tmem = pretty_size(info.Limits.Memory * 1024 * 1024);
-                        string mem = pretty_size(info.Usage.Memory * 1024 * 1024);
+                        string tmem = PrettySize(info.Limits.Memory * 1024 * 1024);
+                        string mem = PrettySize(info.Usage.Memory * 1024 * 1024);
 
                         Console.WriteLine(String.Format(Resources.Vmc_InfoDisplay_3_Fmt,
                             mem, tmem,
@@ -61,7 +60,6 @@
             }
             else
             {
-                // TODO standardize errors
                 Console.Error.WriteLine(String.Format("Error: {0}", rslt.Message));
             }
 

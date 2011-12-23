@@ -12,7 +12,7 @@
             if (unparsed.Count != 1)
             {
                 Console.Error.WriteLine("Too many arguments for [delete_user]: {0}", String.Join(", ", unparsed.Select(s => String.Format("'{0}'", s))));
-                Console.Error.WriteLine("Usage: vmc delete-user <user>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc delete-user <user>");
                 return false;
             }
 

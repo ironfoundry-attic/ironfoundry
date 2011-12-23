@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net.Sockets;
@@ -11,19 +12,15 @@
     using System.Threading.Tasks;
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
+    using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
 
     public class NatsMessagingProvider : IMessagingProvider
     {
-#if DEBUG
+        private static readonly ushort CONNECTION_ATTEMPT_RETRIES = 10;
+
         private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromMilliseconds(250);
-        private static readonly ushort CONNECTION_ATTEMPT_RETRIES = 5;
         private static readonly TimeSpan CONNECTION_ATTEMPT_INTERVAL = TimeSpan.FromSeconds(10);
-#else
-        private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromMilliseconds(250);
-        private static readonly ushort CONNECTION_ATTEMPT_RETRIES = 5;
-        private static readonly TimeSpan CONNECTION_ATTEMPT_INTERVAL = TimeSpan.FromSeconds(10);
-#endif
 
         private static class NatsCommandFormats
         {
@@ -57,7 +54,6 @@
 
         private int sequence = 1;
         private TcpClient tcpClient;
-        private NetworkStream networkStream;
         private bool shutting_down = false;
         private bool error_occurred = false;
 
@@ -92,14 +88,14 @@
             Hello helloMessage = argMessage as Hello;
             if (null != helloMessage)
             {
-                doPublish(argSubject, helloMessage);
+                DoPublish(argSubject, helloMessage);
                 return;
             }
 
             FindDropletResponse findDropletResponse = argMessage as FindDropletResponse;
             if (null != findDropletResponse)
             {
-                doPublish(argSubject, findDropletResponse);
+                DoPublish(argSubject, findDropletResponse);
                 return;
             }
 
@@ -109,12 +105,12 @@
 
         public void Publish(Message argMessage)
         {
-            doPublish(argMessage.PublishSubject, argMessage);
+            DoPublish(argMessage.PublishSubject, argMessage);
         }
 
         public void Publish(NatsCommand argCommand, Message argMessage)
         {
-            doPublish(argCommand.Command, argMessage);
+            DoPublish(argCommand.Command, argMessage);
         }
 
         public void Subscribe(NatsSubscription argSubscription, Action<string, string> argCallback)
@@ -130,7 +126,7 @@
 
             log.Trace(LogSentFormat, formattedMessage);
 
-            write(formattedMessage);
+            Write(formattedMessage);
 
             lock (subscriptions)
             {
@@ -145,18 +141,18 @@
         public bool Connect()
         {
             if (NatsMessagingStatus.RUNNING != Status)
+            {
                 return false;
+            }
 
             bool rv = false;
 
-            for (ushort i = 0;
-                NatsMessagingStatus.RUNNING == Status && i < CONNECTION_ATTEMPT_RETRIES;
-                ++i)
+            for (ushort i = 0; NatsMessagingStatus.RUNNING == Status && i < CONNECTION_ATTEMPT_RETRIES; ++i)
             {
                 try
                 {
                     tcpClient = new TcpClient(host, port);
-                    networkStream = tcpClient.GetStream();
+                    NetworkStream networkStream = tcpClient.GetStream();
                     if (networkStream.CanTimeout)
                     {
                         networkStream.ReadTimeout = (int)DEFAULT_INTERVAL.TotalMilliseconds; // NB: must use TotalMilliseconds
@@ -191,8 +187,8 @@
 
         public void Start()
         {
-            pollTask = Task.Factory.StartNew(poll);
-            messageProcessorTask = Task.Factory.StartNew(messageProcessor);
+            pollTask = Task.Factory.StartNew(Poll);
+            messageProcessorTask = Task.Factory.StartNew(MessageProcessor);
             Status = NatsMessagingStatus.RUNNING;
         }
 
@@ -211,7 +207,7 @@
                 shutting_down = true;
                 log.Debug("NATS Waiting for polling to cease.");
                 Task.WaitAll(tasks);
-                closeNetworking();
+                CloseNetworking();
                 log.Debug("NATS Disconnected.");
             }
             catch { };
@@ -231,7 +227,7 @@
             Stop();
         }
 
-        private void doPublish(string argSubject, Message argMessage)
+        private void DoPublish(string argSubject, Message argMessage)
         {
             if (Message.RECEIVE_ONLY == argSubject)
             {
@@ -247,22 +243,22 @@
 
             string messageJson = argMessage.ToJson();
 
-            string formattedMessage = String.Format(
+            string formattedMessage = String.Format(CultureInfo.InvariantCulture,
                 NatsCommandFormats.Publish, argSubject, Encoding.ASCII.GetBytes(messageJson).Length, messageJson);
 
             log.Trace(LogSentFormat, formattedMessage);
 
-            write(formattedMessage);
+            Write(formattedMessage);
         }
 
-        private void onFatalError(string argMessage = "")
+        private void OnFatalError(string argMessage = "")
         {
             error_occurred = true;
             Status = NatsMessagingStatus.ERROR;
             StatusMessage = argMessage;
         }
 
-        private void messageProcessor()
+        private void MessageProcessor()
         {
             while (NatsMessagingStatus.RUNNING == Status)
             {
@@ -338,7 +334,7 @@
 
         // NB: this allows "break on exceptions" to be enabled in VS without having that IOException break all the time
         [System.Diagnostics.DebuggerStepThrough]
-        private void poll()
+        private void Poll()
         {
             string incomingData = String.Empty;
             byte[] buffer = new byte[1024];
@@ -348,32 +344,38 @@
                 Thread.Sleep(DEFAULT_INTERVAL);
 
                 if (NatsMessagingStatus.RUNNING != Status)
-                    return;
-
-                if (false == networkStream.CanRead)
                 {
-                    onFatalError(IronFoundry.Dea.Properties.Resources.NatsMessagingProvider_CantReadFromStream_Message);
+                    return;
+                }
+
+                if (tcpClient.Connected && false == tcpClient.GetStream().CanRead)
+                {
+                    OnFatalError(IronFoundry.Dea.Properties.Resources.NatsMessagingProvider_CantReadFromStream_Message);
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
-                    return;
-
-                if (false == StillConnected)
                 {
-                    onFatalError(IronFoundry.Dea.Properties.Resources.NatsMessagingProvider_Disconnected_Message);
+                    return;
+                }
+
+                if (false == tcpClient.Connected)
+                {
+                    OnFatalError(IronFoundry.Dea.Properties.Resources.NatsMessagingProvider_Disconnected_Message);
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
+                {
                     return;
+                }
 
                 int receivedDataLength = 0;
                 try
                 {
-                    receivedDataLength = networkStream.Read(buffer, 0, buffer.Length);
+                    receivedDataLength = tcpClient.GetStream().Read(buffer, 0, buffer.Length);
                 }
                 catch (IOException ex)
                 {
-                    bool shouldRethrow = dealWithException(ex);
+                    bool shouldRethrow = HandleException(ex);
                     if (shouldRethrow)
                     {
                         throw;
@@ -385,7 +387,9 @@
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
+                {
                     return;
+                }
 
                 if (receivedDataLength > 0)
                 {
@@ -421,32 +425,31 @@
                 }
 
                 if (NatsMessagingStatus.RUNNING != Status)
+                {
                     return;
+                }
             }
         }
 
-        private void closeNetworking()
+        private void CloseNetworking()
         {
-            try
-            {
-                networkStream.Close();
-                networkStream.Dispose();
-                tcpClient.Close();
-            }
-            catch { }
+            tcpClient.GetStream().Close();
+            tcpClient.Close();
         }
 
-        private void write(string message)
+        private void Write(string message)
         {
             if (NatsMessagingStatus.RUNNING != Status)
+            {
                 return;
+            }
 
             while (NatsMessagingStatus.RUNNING == Status)
             {
                 try
                 {
                     Byte[] data = ASCIIEncoding.ASCII.GetBytes(message);
-                    networkStream.Write(data, 0, data.Length);
+                    tcpClient.GetStream().Write(data, 0, data.Length);
                     /*
                      * NB: Flush () not necessary
                      * http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.flush.aspx
@@ -455,19 +458,17 @@
                 }
                 catch (IOException ex)
                 {
-                    bool shouldRethrow = dealWithException(ex);
+                    log.Error(ex, Resources.NatsMessagingProvider_ExceptionSendingMessage_Fmt, message);
+                    bool shouldRethrow = HandleException(ex);
                     if (shouldRethrow)
                     {
                         throw;
                     }
                 }
-
-                // Give it another shot
-                Thread.Sleep(DEFAULT_INTERVAL);
             }
         }
 
-        private bool dealWithException(IOException ex)
+        private bool HandleException(IOException ex)
         {
             bool rethrow = false;
 
@@ -482,7 +483,7 @@
                         // NB: http://msdn.microsoft.com/en-us/library/bk6w7hs8.aspx
                         break;
                     case SocketErrorCode.ConnectionAborted :
-                        onFatalError(IronFoundry.Dea.Properties.Resources.NatsMessagingProvider_Disconnected_Message);
+                        OnFatalError(IronFoundry.Dea.Properties.Resources.NatsMessagingProvider_Disconnected_Message);
                         break;
                     default :
                         rethrow = true;
@@ -491,11 +492,6 @@
             }
 
             return rethrow;
-        }
-
-        private bool StillConnected
-        {
-            get { return tcpClient.Client.IsConnected(); }
         }
 
         private class ReceivedMessage

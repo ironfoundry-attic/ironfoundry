@@ -136,7 +136,6 @@
 
         private static void ProcessResponse(RestResponse response)
         {
-            // TODO process error codes!
             if (VMC_HTTP_ERROR_CODES.Contains((ushort)response.StatusCode))
             {
                 Exception parseException = null;
