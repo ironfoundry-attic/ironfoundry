@@ -21,13 +21,14 @@
   <?endif?>
 
   <!-- Do Not Change These Values (They have dependencies outside of the MSI) -->
+  <?define LongProductName = 'Iron Foundry DEA Service' ?>
   <?define ProductName = 'DEA' ?>
   <?define UpgradeCode = '{748a94e6-f23b-4ff9-b1de-92851ee357d2}' ?> <!-- NEVER CHANGE THIS -->
-  <?define RootRegistryPath = "SOFTWARE\IronFoundry\[ProductName]" ?>
+  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\[ProductName]" ?>
 
   <Product 
     Id="*"
-    Name="$(var.ProductName)"
+    Name="$(var.LongProductName)"
     Language="1033"
     Version="$(var.VERSION)"
     Manufacturer="Tier 3"
@@ -35,8 +36,8 @@
     
     <!-- InstallerVersion="200" -->
     <Package 
-      Comments="Iron Foundry $(var.ProductName)"
-      Keywords="Iron Foundry $(var.ProductName)"
+      Comments="$(var.LongProductName)"
+      Keywords="$(var.LongProductName)"
       Description="Provides support for ASP.NET deployment within a Cloud Foundry environment."
       InstallerVersion="200"
       InstallPrivileges="elevated"
@@ -74,7 +75,7 @@
         Key="$(var.RootRegistryPath)" />
     </Property>
 
-    <Property Id="SERVICENAME" Value="Iron Foundry $(var.ProductName) Service">
+    <Property Id="SERVICENAME" Value="$(var.LongProductName)">
       <RegistrySearch
         Id="RegSERVICENAME"
         Root="HKLM"
@@ -94,7 +95,7 @@
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="$(var.ProgramFilesDirectoryId)">
-        <Directory Id="IronFoundryDirectory" Name="IronFoundry">
+        <Directory Id="IronFoundryDirectory" Name="Iron Foundry">
           <Directory Id="WindowsServiceDirectory" Name="$(var.ProductName)">
             <Directory Id="INSTALLDIR" Name=".">
 
@@ -117,8 +118,8 @@
               <Component Id="IronFoundryRegKey" Guid="{BB5917B4-6CDF-4B35-B58B-DE3C472C5C31}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
                 <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
-                  <RegistryKey Action="createAndRemoveOnUninstall" Key="IronFoundry">
-                    <RegistryValue Value="IronFoundry" Type="string" KeyPath="yes"/>
+                  <RegistryKey Action="createAndRemoveOnUninstall" Key="Iron Foundry">
+                    <RegistryValue Value="Iron Foundry" Type="string" KeyPath="yes"/>
                   </RegistryKey>
                 </RegistryKey>
               </Component>
@@ -126,7 +127,7 @@
               <Component Id="PerProductRegistryKey" Guid="{112F503E-8AF1-4532-96F9-DECC8A58A34C}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
                 <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
-                  <RegistryKey Action="create" Key="IronFoundry">
+                  <RegistryKey Action="create" Key="Iron Foundry">
                     <Permission User="Administrators" GenericRead="yes" Read="yes" GenericWrite="yes" Write="yes" TakeOwnership="yes" />
                     <RegistryKey Action="createAndRemoveOnUninstall" Key="[ProductName]">
                       <RegistryValue Value="[ProductVersion]" Type="string" KeyPath="yes"/>
@@ -172,15 +173,15 @@
                       Source="$(var.SVCBUILDDIR)IronFoundry.Dea.Service.exe.config" />                
                 <util:XmlFile Id="Config.XmlFile.1" Sequence="1" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
-                    ElementPath="/ironFoundryDea/@natsHost"
+                    ElementPath="/configuration/ironFoundryDea/@natsHost"
                     Value="[NATSHOST]"/>
                 <util:XmlFile Id="Config.XmlFile.2" Sequence="1" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
-                    ElementPath="/ironFoundryDea/@natsPort"
+                    ElementPath="/configuration/ironFoundryDea/@natsPort"
                     Value="[NATSPORT]"/>
                 <util:XmlFile Id="Config.XmlFile.3" Sequence="1" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
-                    ElementPath="/ironFoundryDea/@localRoute"
+                    ElementPath="/configuration/ironFoundryDea/@localRoute"
                     Value="[LOCALROUTE]"/>
                 <File Id="NLog.dll" 
                       Name="NLog.dll" 
@@ -222,7 +223,7 @@
                 <ServiceInstall Id="IronFoundry.DEA.Service.ServiceInstaller"
                                 Type="ownProcess"
                                 Vital="yes"
-                                Name="[SERVICENAME]"
+                                Name="IronFoundryDEA"
                                 DisplayName="[SERVICENAME]"
                                 Description="Iron Foundry DEA Service"
                                 Start="auto"

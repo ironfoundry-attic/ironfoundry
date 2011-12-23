@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using IronFoundry.Dea.Properties;
     using NLog;
     using NLog.Config;
@@ -11,8 +10,8 @@
     public class NLogLogger : ILog
     {
         private const string MachineName = ".";
-        private const string Source = "IronFoundry.Dea.Service";
-        private const string LogName = "IronFoundry";
+        private const string Source = "IronFoundry.Dea.Service"; // NB: must sync with installer
+        private const string LogName = "Iron Foundry";
 
         private static readonly IDictionary<LogLevel, ushort> eventIDMap = new Dictionary<LogLevel, ushort>
         {
@@ -132,7 +131,21 @@
         {
             try
             {
+                bool sourceExists = false;
+
+                /*
+                 * TODO
                 if (EventLog.SourceExists(Source))
+                {
+                    sourceExists = true;
+                }
+                else
+                {
+                    sourceExists = true;
+                }
+                 */
+
+                if (sourceExists)
                 {
                     LoggingConfiguration config = LogManager.Configuration;
 

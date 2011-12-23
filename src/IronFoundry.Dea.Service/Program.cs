@@ -13,16 +13,16 @@
 
         static Program()
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
             Bootstrapper.Bootstrap();
             log = Bootstrapper.Logger;
         }
 
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
-            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-
             if (Environment.UserInteractive)
             {
                 IMultipleServiceManager mgr = Bootstrapper.ServiceManager;
