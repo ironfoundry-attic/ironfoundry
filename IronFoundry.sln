@@ -44,7 +44,7 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "IronFoundry.Dea.Service.Ins
 		{8704AF02-615E-4679-B183-FB7164408FA0} = {8704AF02-615E-4679-B183-FB7164408FA0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Test", "test\IronFoundry.Dea.Test\IronFoundry.Test.csproj", "{34013CB7-3FF3-4061-9E45-CB6101F5977A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Test", "test\IronFoundry.Test\IronFoundry.Test.csproj", "{34013CB7-3FF3-4061-9E45-CB6101F5977A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Ui.Controls", "src\IronFoundry.Ui.Controls\IronFoundry.Ui.Controls.csproj", "{C6E076BF-108A-4379-AE35-8F47059F4331}"
 EndProject
@@ -53,8 +53,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.VisualStudioExtension", "src\IronFoundry.VisualStudioExtension\IronFoundry.VisualStudioExtension.csproj", "{8393BB9D-7606-46AA-A399-8008F686CB7D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Vmc", "src\IronFoundry.Vmc\IronFoundry.Vmc.csproj", "{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}"
-EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "IronFoundry.CloudFoundryExplorer.Installer", "src\IronFoundry.CloudFoundryExplorer.Installer\IronFoundry.CloudFoundryExplorer.Installer.wixproj", "{A69A56DE-5151-4B0D-A9E2-0DD668EA4308}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -134,12 +132,6 @@ Global
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}.Release|x64.Build.0 = Release|Any CPU
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}.Release|x86.ActiveCfg = Release|Any CPU
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2}.Release|x86.Build.0 = Release|Any CPU
-		{A69A56DE-5151-4B0D-A9E2-0DD668EA4308}.Debug|x64.ActiveCfg = Debug|x86
-		{A69A56DE-5151-4B0D-A9E2-0DD668EA4308}.Debug|x86.ActiveCfg = Debug|x86
-		{A69A56DE-5151-4B0D-A9E2-0DD668EA4308}.Debug|x86.Build.0 = Debug|x86
-		{A69A56DE-5151-4B0D-A9E2-0DD668EA4308}.Release|x64.ActiveCfg = Release|x86
-		{A69A56DE-5151-4B0D-A9E2-0DD668EA4308}.Release|x86.ActiveCfg = Release|x86
-		{A69A56DE-5151-4B0D-A9E2-0DD668EA4308}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,7 +145,6 @@ Global
 		{8FA37E43-3BAD-4287-B873-253A2A1AF227} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{8393BB9D-7606-46AA-A399-8008F686CB7D} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{61CEB826-82CF-4DFB-A2CC-10F80F8326A2} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
-		{A69A56DE-5151-4B0D-A9E2-0DD668EA4308} = {612435DA-4BBF-49B5-B0AA-36E6529C1D8B}
 		{34013CB7-3FF3-4061-9E45-CB6101F5977A} = {9E04D2BE-86B8-47B9-809D-84506CFDF42D}
 	EndGlobalSection
 EndGlobal
