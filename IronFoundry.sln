@@ -6,16 +6,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9E04D2BE-86B8-47B9-809D-84506CFDF42D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{097A69C8-07B2-435F-896F-D81AA9C58284}"
-	ProjectSection(SolutionItems) = preProject
-		LICENSE.txt = LICENSE.txt
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{698503AC-EC27-439E-8E0B-9FD89901C91B}"
 	ProjectSection(SolutionItems) = preProject
 		src\CommonAssemblyInfo.cs = src\CommonAssemblyInfo.cs
 		common\IronFoundry.snk = common\IronFoundry.snk
 		LICENSE.txt = LICENSE.txt
-		README = README
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry", "src\IronFoundry\IronFoundry.csproj", "{506CCDF4-11FE-4138-8061-25495EEBF8E0}"
