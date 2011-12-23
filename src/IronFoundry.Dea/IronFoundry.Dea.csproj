@@ -34,6 +34,12 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>IronFoundry.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -101,7 +107,6 @@
     <Compile Include="Providers\NatsSubscription.cs" />
     <Compile Include="Providers\WebOperationContextProvider.cs" />
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />
-    <Compile Include="Extensions\SocketExtensionMethods.cs" />
     <Compile Include="Services\FilesService.cs" />
     <Compile Include="Services\FilesServiceValidator.cs" />
     <Compile Include="Services\FirewallService.cs" />
@@ -151,6 +156,7 @@
     <Compile Include="WinService\ServiceStatusUtil.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="IronFoundry.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

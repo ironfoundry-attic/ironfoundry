@@ -12,7 +12,7 @@
             if (unparsed.Count != 0)
             {
                 Console.Error.WriteLine("Too many arguments for [add_user]: {0}", String.Join(", ", unparsed.Select(s => String.Format("'{0}'", s))));
-                Console.Error.WriteLine("Usage: vmc add-user"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc add-user");
                 return false;
             }
 

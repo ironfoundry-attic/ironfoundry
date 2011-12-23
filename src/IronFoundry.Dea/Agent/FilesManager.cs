@@ -158,9 +158,12 @@
                                     builder.Password = svc.Credentials.Password;
                                 }
 
+                                if (false == svc.Credentials.Name.IsNullOrWhiteSpace())
+                                {
+                                    builder.InitialCatalog = svc.Credentials.Name;
+                                }
+
                                 defaultConnectionStringSettings.ConnectionString = builder.ConnectionString;
-                                // TODO
-                                // builder.InitialCatalog 
                                 break;
                             }
                         }
@@ -193,8 +196,7 @@
             }
             catch
             {
-                // TODO
-                // Can happen if there's a 404 or something.
+                // TODO Can happen if there's a 404 or something.
             }
 
             return rv;

@@ -9,8 +9,8 @@
     [System.ComponentModel.DesignerCategory(@"Code")]
     public class DeaWinService : IService
     {
-        private static readonly TimeSpan INITIAL_INTERVAL = TimeSpan.FromSeconds(30);
-        private static readonly TimeSpan DEFAULT_INTERVAL = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan ThirtySecondInterval = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan FiveSecondInterval = TimeSpan.FromSeconds(5);
 
         private readonly ILog log;
         private readonly IAgent agent;
@@ -39,7 +39,7 @@
         public StartServiceResult StartService(IntPtr serviceHandle)
         {
             agentTask.Start();
-            agentMonitorTimer.Change(INITIAL_INTERVAL, DEFAULT_INTERVAL);
+            agentMonitorTimer.Change(ThirtySecondInterval, FiveSecondInterval);
             return new StartServiceResult();
         }
 
@@ -47,7 +47,7 @@
         {
             agentMonitorTimer.Stop();
             agent.Stop();
-            agentTask.Wait(TimeSpan.FromMinutes(30));
+            agentTask.Wait(ThirtySecondInterval);
         }
 
         private void agentMonitor(object argState)
@@ -69,7 +69,7 @@
                     return;
                 }
             }
-            t.Restart(DEFAULT_INTERVAL);
+            t.Restart(FiveSecondInterval);
         }
     }
 }

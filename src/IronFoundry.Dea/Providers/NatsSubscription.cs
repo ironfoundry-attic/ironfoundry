@@ -57,13 +57,6 @@ namespace IronFoundry.Dea.Providers
             {
                 get { return subscription; }
             }
-
-            /*
-            public NatsSubscription GetSubscriptionFor(Guid argUuid)
-            {
-                return String.Format(Subscriptions.deaInstanceStart, argUuid);
-            }
-             */
         }
 
         private class DeaStopSubscription : NatsSubscription

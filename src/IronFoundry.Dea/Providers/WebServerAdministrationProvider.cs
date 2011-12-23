@@ -30,13 +30,13 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    ApplicationPool cloudFoundryPool = getApplicationPool(manager, applicationInstanceName);
+                    ApplicationPool cloudFoundryPool = GetApplicationPool(manager, applicationInstanceName);
                     if (null == cloudFoundryPool)
                     {
                         cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
                     }
 
-                    ushort applicationPort = findNextAvailablePort();
+                    ushort applicationPort = FindNextAvailablePort();
 
                     firewallService.Open(applicationPort, applicationInstanceName);
 
@@ -72,13 +72,13 @@
                 {
                     ushort port = STARTING_PORT;
 
-                    Site site = getSite(manager, applicationInstanceName);
+                    Site site = GetSite(manager, applicationInstanceName);
                     if (null != site)
                     {
                         manager.Sites.Remove(site);
                         manager.CommitChanges();
                     }
-                    ApplicationPool applicationPool = getApplicationPool(manager, applicationInstanceName);
+                    ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
                     if (null != applicationPool)
                     {
                         manager.ApplicationPools.Remove(applicationPool);
@@ -102,7 +102,7 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    var site = getSite(manager, applicationInstanceName);
+                    var site = GetSite(manager, applicationInstanceName);
                     rv = site != null;
                 }
             }
@@ -120,7 +120,7 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    ApplicationPool applicationPool = getApplicationPool(manager, applicationInstanceName);
+                    ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
                     applicationPool.Start();
                 }
             }
@@ -136,7 +136,7 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    var applicationPool = getApplicationPool(manager, applicationInstanceName);
+                    var applicationPool = GetApplicationPool(manager, applicationInstanceName);
                     applicationPool.Stop();
                 }
             }
@@ -152,7 +152,7 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    var applicationPool = getApplicationPool(manager, applicationInstanceName);
+                    var applicationPool = GetApplicationPool(manager, applicationInstanceName);
                     applicationPool.Recycle();
                 }
             }
@@ -170,8 +170,8 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    ApplicationPool applicationPool = getApplicationPool(manager, applicationInstanceName);
-                    Site applicationSite = getSite(manager, applicationInstanceName);
+                    ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                    Site applicationSite = GetSite(manager, applicationInstanceName);
                     if (applicationSite.State == ObjectState.Stopped || applicationPool.State == ObjectState.Stopped)
                     {
                         rv = ApplicationInstanceStatus.Stopped;
@@ -198,18 +198,17 @@
             return rv;
         }
 
-
-        private static ApplicationPool getApplicationPool(ServerManager argManager, string argName)
+        private static ApplicationPool GetApplicationPool(ServerManager argManager, string argName)
         {
             return argManager.ApplicationPools.FirstOrDefault(a => a.Name == argName);
         }
 
-        private static Site getSite(ServerManager argManager, string argName)
+        private static Site GetSite(ServerManager argManager, string argName)
         {
             return argManager.Sites.FirstOrDefault(s => s.Name == argName);
         }
 
-        private static ushort findNextAvailablePort()
+        private static ushort FindNextAvailablePort()
         {
             return Utility.FindNextAvailablePortAfter(STARTING_PORT);
         }

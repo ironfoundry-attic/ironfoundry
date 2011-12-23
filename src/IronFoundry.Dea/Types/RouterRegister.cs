@@ -27,7 +27,7 @@
         public ushort Port { get; set; }
 
         [JsonProperty(PropertyName = "uris")]
-        public string[] Uris { get; set; } // TODO actual System.Uri
+        public string[] Uris { get; set; }
 
         [JsonProperty(PropertyName = "tags")] // TODO why tags plural?
         public Tag Tag { get; set; }

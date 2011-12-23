@@ -10,11 +10,10 @@
 
         static bool Delete(IList<string> unparsed)
         {
-            // TODO match ruby argument parsing
             if (unparsed.Count != 1)
             {
                 Console.Error.WriteLine("Not enough arguments for [delete]");
-                Console.Error.WriteLine("Usage: vmc delete <appname>"); // TODO usage statement standardization
+                Console.Error.WriteLine("Usage: vmc delete <appname>");
                 return false;
             }
 

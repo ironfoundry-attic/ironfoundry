@@ -8,11 +8,6 @@
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        /*
-         * From cloud_controller/app/models/service.rb
-         * # Service types no longer exist, synthesize one if possible to be legacy api compliant
-         * def synthesize_service_type
-         */
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
 
@@ -40,7 +35,7 @@
         [JsonIgnore]
         public bool IsMSSqlServer
         {
-            get { return false == Vendor.IsNullOrWhiteSpace() && "mssql" == Vendor; } // TODO
+            get { return false == Vendor.IsNullOrWhiteSpace() && "mssql" == Vendor; } // TODO OK for now
         }
     }
 }

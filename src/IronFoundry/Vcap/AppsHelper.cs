@@ -5,10 +5,10 @@
     using System.IO;
     using System.Security.Cryptography;
     using System.Threading;
+    using ICSharpCode.SharpZipLib.Zip;
     using IronFoundry;
     using IronFoundry.Properties;
     using IronFoundry.Types;
-    using ICSharpCode.SharpZipLib.Zip;
     using Newtonsoft.Json;
     using RestSharp;
 
@@ -23,8 +23,6 @@
             {
                 app.Start();
                 UpdateApplication(app);
-                // NB: Ruby vmc does a LOT more steps here
-                // TODO wait for start?
                 isStarted(app.Name);
             }
         }
