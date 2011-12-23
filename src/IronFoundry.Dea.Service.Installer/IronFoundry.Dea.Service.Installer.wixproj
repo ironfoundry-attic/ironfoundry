@@ -24,7 +24,7 @@
     <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug;PLATFORM=x64;VERSION=1.0.0.0</DefineConstants>
+    <DefineConstants>Debug;PLATFORM=x64;VERSION=1.1.0.0</DefineConstants>
     <OutputPath>bin\$(Configuration)_$(Platform)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
   </PropertyGroup>
@@ -35,7 +35,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
+    <Content Include="Banner.bmp" />
     <Content Include="ServiceConfigDialog.wxi" />
+    <Content Include="WelcomeBanner.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IronFoundry.Dea.Service\IronFoundry.Dea.Service.csproj">

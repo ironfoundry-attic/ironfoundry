@@ -4,9 +4,9 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.5</ProductVersion>
-    <ProjectGuid>{a69a56de-5151-4b0d-a9e2-0dd668ea4308}</ProjectGuid>
+    <ProjectGuid>{06d5737f-3dfc-4a35-95af-5adac04a6ace}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>IronFoundry.CloudFoundryExplorer</OutputName>
+    <OutputName>IronFoundry.Vmc</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -29,6 +29,16 @@
     <Content Include="WelcomeBanner.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IronFoundry.Vmc\IronFoundry.Vmc.csproj">
+      <Name>IronFoundry.Vmc</Name>
+      <Project>{61ceb826-82cf-4dfb-a2cc-10f80f8326a2}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <WixExtension Include="WixUtilExtension">
       <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
       <Name>WixUtilExtension</Name>
@@ -41,16 +51,6 @@
       <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
       <Name>WixNetFxExtension</Name>
     </WixExtension>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IronFoundry.CloudFoundryExplorer\IronFoundry.CloudFoundryExplorer.csproj">
-      <Name>IronFoundry.CloudFoundryExplorer</Name>
-      <Project>{8fa37e43-3bad-4287-b873-253a2a1af227}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

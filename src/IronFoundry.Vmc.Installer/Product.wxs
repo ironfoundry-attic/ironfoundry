@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix   
+<Wix
   xmlns="http://schemas.microsoft.com/wix/2006/wi"
   xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
   xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
   <?ifndef var.VERSION ?>
-    <?define VERSION = '1.1.0.0' ?>
+  <?define VERSION = '1.1.0.0' ?>
   <?endif?>
 
-  <?define var.BUILDDIR = $(var.IronFoundry.CloudFoundryExplorer.TargetDir)?>
+  <?define var.BUILDDIR = $(var.IronFoundry.Vmc.TargetDir)?>
 
   <?if $(sys.BUILDARCH) = x64?>
-    <?define SEARCH.WIN64.REG = 'yes' ?>
-    <?define WIN64.COMPONENTS = 'yes' ?>
-    <?define ProgramFilesDirectoryId = 'ProgramFiles64Folder' ?>
+  <?define SEARCH.WIN64.REG = 'yes' ?>
+  <?define WIN64.COMPONENTS = 'yes' ?>
+  <?define ProgramFilesDirectoryId = 'ProgramFiles64Folder' ?>
   <?else?>
-    <?define SEARCH.WIN64.REG = 'no' ?>
-    <?define WIN64.COMPONENTS = 'no' ?>
-    <?define ProgramFilesDirectoryId = 'ProgramFilesFolder' ?>
+  <?define SEARCH.WIN64.REG = 'no' ?>
+  <?define WIN64.COMPONENTS = 'no' ?>
+  <?define ProgramFilesDirectoryId = 'ProgramFilesFolder' ?>
   <?endif?>
 
   <!-- Do Not Change These Values -->
-  <?define ProductName = 'Cloud Foundry Explorer' ?>
-  <?define ShortProductName = 'Cloud Foundry Explorer' ?>
+  <?define ProductName = 'Vmc Command Line Tool' ?>
+  <?define ShortProductName = 'Vmc Command Line Tool' ?>
   <?define Manufacturer = 'Iron Foundry' ?>
-  <?define UpgradeCode = '{8AC812C3-342A-4055-B08B-E1BC280CFDE0}' ?><!-- NEVER CHANGE THIS -->
-  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\CloudFoundryExplorer" ?>
+  <?define UpgradeCode = '{8AC812C3-342A-4055-B08B-E1BC280CFDE0}' ?>
+  <!-- NEVER CHANGE THIS -->
+  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\Vmc" ?>
 
   <Product
   Id="*"
@@ -39,7 +40,7 @@
     <Package
       Comments="$(var.ProductName)"
       Keywords="$(var.ProductName)"
-      Description="Cloud Foundry Explorer is an application for interacting with Cloud Foundry and Iron Foundry environments."
+      Description="Vmc is an application for interacting with Cloud Foundry and Iron Foundry environments."
       InstallerVersion="200"
       InstallPrivileges="elevated"
       InstallScope="perMachine"
@@ -90,31 +91,35 @@
     <Condition Message="ALLUSERS must be 1. Setup will now exit."><![CDATA[ALLUSERS = 1]]></Condition>
     <!-- END (Install Conditions) -->
 
-    <Media Id="1" Cabinet="IronFoundry.CloudFoundryExplorer.cab" EmbedCab="yes" />
+    <Media Id="1" Cabinet="IronFoundry.Vmc.cab" EmbedCab="yes" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="$(var.ProgramFilesDirectoryId)">
         <Directory Id="IronFoundryDirectory" Name="Iron Foundry">
-          <Directory Id="CloudFoundryExplorerDirectory" Name="$(var.ShortProductName)">
-            <Directory Id="INSTALLDIR" Name=".">
-
+          <Directory Id="VmcDirectory" Name="$(var.ShortProductName)">
+            <Directory Id="INSTALLDIR" Name=".">              
               <Directory Id="LogDir" Name="logs">
-                <Component Id="MaintainLogDir" Guid="{F711A2FA-33C8-414F-AE0B-D0393CC865AB}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
+                <Component Id="MaintainLogDir" Guid="{79431335-5180-4386-9FC3-F5A36D788852}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
                   <CreateFolder />
                   <RemoveFolder Id="MaintainLogDir.Remove" On="both" />
                   <RemoveFile Id="MaintainLogDir.RemoveFile" On="uninstall" Name="*.*" />
                 </Component>
               </Directory>
 
-              <Component Id="MaintainInstallDir" Guid="{A5F16FFF-1969-4523-ADA0-2BCA99899010}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
+              <Component Id="MaintainInstallDir" Guid="{EB915960-06A4-4FE4-A4E7-0929D9E651D6}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
                 <CreateFolder />
-                <RemoveFolder Id="Remove.CloudFoundryExplorer" Directory="CloudFoundryExplorerDirectory" On="uninstall" />
+                <RemoveFolder Id="Remove.Vmc" Directory="VmcDirectory" On="uninstall" />
                 <RemoveFolder Id="Remove.InstallLocation" On="uninstall" />
                 <RemoveFile Id="RemoveFiles.InstallLocation" Name="*.*" On="uninstall" />
               </Component>
 
+              <Component Id="SetEnvironmentPath" Guid="{00603CD6-CBCD-4138-A1A8-1F7D87E71D14}" Win64="$(var.WIN64.COMPONENTS)">
+                <CreateFolder />
+                <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]" Permanent="no" Part="last" Action="set" System="yes" />
+              </Component>
+
               <!-- START (Install Registry) -->
-              <Component Id="IronFoundryRegKey" Guid="{64B21AC1-3D8C-404D-B65D-4BE639CFDD35}" Win64="$(var.WIN64.COMPONENTS)">
+              <Component Id="IronFoundryRegKey" Guid="{B404F2C7-1494-4729-A39D-D36FFF3C66EE}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
                 <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
                   <RegistryKey Action="createAndRemoveOnUninstall" Key="Iron Foundry">
@@ -123,7 +128,7 @@
                 </RegistryKey>
               </Component>
 
-              <Component Id="PerProductRegistryKey" Guid="{95EFDE60-0272-4843-A8BA-85E23747ABD4}" Win64="$(var.WIN64.COMPONENTS)">
+              <Component Id="PerProductRegistryKey" Guid="{79D45A2D-B6DE-40FF-B41D-BED8636C5871}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
                 <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
                   <RegistryKey Action="create" Key="Iron Foundry">
@@ -135,7 +140,7 @@
                 </RegistryKey>
               </Component>
 
-              <Component Id="InstallDirRegKey" Guid="{773ABC9F-96C2-4AE0-B197-87EACE9BA9C2}" Win64="$(var.WIN64.COMPONENTS)">
+              <Component Id="InstallDirRegKey" Guid="{32BF3B92-64BC-4E3C-96F6-336247F7CA8A}" Win64="$(var.WIN64.COMPONENTS)">
                 <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
                   <RegistryValue Name="INSTALLDIR" Value="[INSTALLDIR]" Type="string" KeyPath="yes"/>
                 </RegistryKey>
@@ -143,29 +148,9 @@
               <!-- END (Install Registry)-->
 
               <!-- START (StartMenu Shortcuts) -->
-              <Directory Id="ProgramMenuFolder">                
-                <Directory Id="ApplicationProgramsFolder" Name="$(var.Manufacturer)">
-                  <Component Id="ApplicationShortcut" Guid="{7EEA94DB-8E16-4667-9B8B-562CDB12B485}">
-                    <?if $(var.Configuration) = Debug ?>
-                    <Shortcut Id="ApplicationStartMenuShortcut"
-                              Name="Cloud Foundry Explorer (DEBUG)"
-                              Description="Cloud Foundry Explorer application."
-                              Target="[INSTALLDIR]\CloudFoundryExplorer.exe"
-                              WorkingDirectory="INSTALLDIR" />
-                    <?else?>
-                    <Shortcut Id="ApplicationStartMenuShortcut"
-                              Name="Cloud Foundry Explorer"
-                              Description="Cloud Foundry Explorer application."
-                              Target="[INSTALLDIR]\CloudFoundryExplorer.exe"
-                              WorkingDirectory="INSTALLDIR" />
-                    <?endif?>
-                    <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
-                    <RemoveFolder Id="ProgramMenuFolder" On="uninstall" />
-                    <RegistryKey Root="HKCU" Action="none" Key="$(var.RootRegistryPath)">
-                      <RegistryValue Type="integer" Name="ApplicationShortcut" Value="1" KeyPath="yes" />
-                    </RegistryKey>
-                  </Component>
-                  <Component Id="UninstallShortcut" Guid="{61EF8DAD-3336-438E-86F9-A8CC7EAB193D}">
+              <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="$(var.Manufacturer)">                  
+                  <Component Id="UninstallShortcut" Guid="{8FF7F246-6183-401D-8356-AB35B9A35B8C}">
                     <Shortcut Id="UninstallProduct"
                               Name="Uninstall $(var.ShortProductName)"
                               Description="Uninstalls $(var.ProductName)"
@@ -177,42 +162,19 @@
                       <RegistryValue Type="integer" Name="UninstallShortcut" Value="1" KeyPath="yes" />
                     </RegistryKey>
                   </Component>
-                  
-                  
                 </Directory>
               </Directory>
               <!-- END (StartMenu Shortcuts) -->
-              <Component Id="IronFoundry.CloudFoundryExplorer" Guid="{2F48A109-984A-4423-A908-3567DB04C8C2}" Win64="$(var.WIN64.COMPONENTS)">
-                <File Id="CloudFoundryExplorer.exe"
-                          Name="CloudFoundryExplorer.exe"
-                          Source="$(var.BUILDDIR)CloudFoundryExplorer.exe" />
-                <File Id="CloudFoundryExplorer.exe.config"
-                                          Name="CloudFoundryExplorer.exe.config"
-                                          Source="$(var.BUILDDIR)CloudFoundryExplorer.exe.config" />
-                <File Id="CloudFoundrySmall.ico"
-                                          Name="CloudFoundrySmall.ico"
-                                          Source="$(var.BUILDDIR)CloudFoundrySmall.ico" />
-                <File Id="GalaSoft.MvvmLight.Extras.WPF4.dll"
-                                          Name="GalaSoft.MvvmLight.Extras.WPF4.dll"
-                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.Extras.WPF4.dll" />
-                <File Id="GalaSoft.MvvmLight.Extras.WPF4.xml"
-                                          Name="GalaSoft.MvvmLight.Extras.WPF4.xml"
-                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.Extras.WPF4.xml" />
-                <File Id="GalaSoft.MvvmLight.WPF4.dll"
-                                          Name="GalaSoft.MvvmLight.WPF4.dll"
-                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.WPF4.dll" />
-                <File Id="GalaSoft.MvvmLight.WPF4.xml"
-                                          Name="GalaSoft.MvvmLight.WPF4.xml"
-                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.WPF4.xml" />
+              <Component Id="IronFoundry.Vmc" Guid="{0AA9C85D-AD55-438D-9FEC-CD0FD3B8F883}" Win64="$(var.WIN64.COMPONENTS)">
                 <File Id="ICSharpCode.SharpZipLib.dll"
-                                          Name="ICSharpCode.SharpZipLib.dll"
-                                          Source="$(var.BUILDDIR)ICSharpCode.SharpZipLib.dll" />
+                         Name="ICSharpCode.SharpZipLib.dll"
+                         Source="$(var.BUILDDIR)ICSharpCode.SharpZipLib.dll" />
                 <File Id="IronFoundry.dll"
                                           Name="IronFoundry.dll"
                                           Source="$(var.BUILDDIR)IronFoundry.dll" />
-                <File Id="IronFoundry.Ui.Controls.dll"
-                                          Name="IronFoundry.Ui.Controls.dll"
-                                          Source="$(var.BUILDDIR)IronFoundry.Ui.Controls.dll" />
+                <File Id="NDesk.Options.dll"
+                                          Name="NDesk.Options.dll"
+                                          Source="$(var.BUILDDIR)NDesk.Options.dll" />
                 <File Id="Newtonsoft.Json.dll"
                                           Name="Newtonsoft.Json.dll"
                                           Source="$(var.BUILDDIR)Newtonsoft.Json.dll" />
@@ -222,34 +184,22 @@
                 <File Id="RestSharp.dll"
                                           Name="RestSharp.dll"
                                           Source="$(var.BUILDDIR)RestSharp.dll" />
-                <File Id="System.Windows.Interactivity.dll"
-                                          Name="System.Windows.Interactivity.dll"
-                                          Source="$(var.BUILDDIR)System.Windows.Interactivity.dll" />
-                <File Id="System.Windows.Interactivity.xml"
-                                          Name="System.Windows.Interactivity.xml"
-                                          Source="$(var.BUILDDIR)System.Windows.Interactivity.xml" />
-                <File Id="WPFToolkit.Extended.dll"
-                                          Name="WPFToolkit.Extended.dll"
-                                          Source="$(var.BUILDDIR)WPFToolkit.Extended.dll" />
+                <File Id="Vmc.exe"
+                                          Name="Vmc.exe"
+                                          Source="$(var.BUILDDIR)Vmc.exe" />
+                <File Id="Vmc.exe.config"
+                                          Name="Vmc.exe.config"
+                                          Source="$(var.BUILDDIR)Vmc.exe.config" />
                 <?if $(var.Configuration) = Debug ?>
-                <File Id="CloudFoundryExplorer.pdb"
-                                          Name="CloudFoundryExplorer.pdb"
-                                          Source="$(var.BUILDDIR)CloudFoundryExplorer.pdb" />
-                <File Id="GalaSoft.MvvmLight.Extras.WPF4.pdb"
-                                          Name="GalaSoft.MvvmLight.Extras.WPF4.pdb"
-                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.Extras.WPF4.pdb" />
-                <File Id="GalaSoft.MvvmLight.WPF4.pdb"
-                                          Name="GalaSoft.MvvmLight.WPF4.pdb"
-                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.WPF4.pdb" />
                 <File Id="IronFoundry.pdb"
                                           Name="IronFoundry.pdb"
                                           Source="$(var.BUILDDIR)IronFoundry.pdb" />
-                <File Id="IronFoundry.Ui.Controls.pdb"
-                                          Name="IronFoundry.Ui.Controls.pdb"
-                                          Source="$(var.BUILDDIR)IronFoundry.Ui.Controls.pdb" />
                 <File Id="Newtonsoft.Json.pdb"
                                           Name="Newtonsoft.Json.pdb"
                                           Source="$(var.BUILDDIR)Newtonsoft.Json.pdb" />
+                <File Id="Vmc.pdb"
+                                          Name="Vmc.pdb"
+                                          Source="$(var.BUILDDIR)Vmc.pdb" />
                 <?endif?>
               </Component>
             </Directory>
@@ -308,16 +258,16 @@
 
     <ComponentGroup Id="CommonComponents">
       <ComponentRef Id="InstallDirRegKey" Primary="yes"/>
+      <ComponentRef Id="SetEnvironmentPath" Primary="yes" />
       <ComponentRef Id="PerProductRegistryKey" Primary="yes"/>
       <ComponentRef Id="IronFoundryRegKey" Primary="yes"/>
       <ComponentRef Id="MaintainLogDir" Primary="yes"/>
       <ComponentRef Id="MaintainInstallDir" Primary="yes"/>
     </ComponentGroup>
 
-    <ComponentGroup Id="AppComponents">
-      <ComponentRef Id="ApplicationShortcut" Primary="yes"/>
+    <ComponentGroup Id="AppComponents">      
       <ComponentRef Id="UninstallShortcut" Primary="yes"/>
-      <ComponentRef Id="IronFoundry.CloudFoundryExplorer" Primary="yes"/>
+      <ComponentRef Id="IronFoundry.Vmc" Primary="yes"/>
     </ComponentGroup>
 
     <InstallUISequence>
@@ -336,9 +286,9 @@
              Title="$(var.ShortProductName)"
              Description="$(var.ProductName) $(var.VERSION)"
              Level="1" AllowAdvertise="no" InstallDefault="local"
-             Absent="disallow" ConfigurableDirectory="INSTALLDIR" TypicalDefault="install">      
+             Absent="disallow" ConfigurableDirectory="INSTALLDIR" TypicalDefault="install">
       <ComponentGroupRef Id="CommonComponents" />
       <ComponentGroupRef Id="AppComponents" />
     </Feature>
-	</Product>
+  </Product>
 </Wix>
