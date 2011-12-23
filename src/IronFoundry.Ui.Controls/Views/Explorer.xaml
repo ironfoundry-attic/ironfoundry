@@ -1,0 +1,64 @@
+﻿<Window x:Class="IronFoundry.Ui.Controls.Views.Explorer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"         
+        xmlns:vw="clr-namespace:IronFoundry.Ui.Controls"
+        xmlns:vm="clr-namespace:IronFoundry.Ui.Controls.ViewModel"
+        xmlns:Views="clr-namespace:IronFoundry.Ui.Controls.Views"
+        xmlns:Cloud="clr-namespace:IronFoundry.Ui.Controls.ViewModel.Cloud" mc:Ignorable="d" 
+        Height="740" Width="1200" 
+        WindowStartupLocation="CenterOwner"
+        Title="Cloud Foundry Explorer"
+        Icon="../Images/CloudFoundrySmall.ico">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Resources\Resources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="50" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
+                <DockPanel>
+                    <Image DockPanel.Dock="Left" Source="../Images/cloud_foundry_logo_400.png" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Label DockPanel.Dock="Left" Content="EXPLORER" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" 
+                           FontWeight="Bold" FontSize="28" Margin="5,0,0,0" />
+                    <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Red" FontSize="12" Margin="10,0,0,0" Content="{Binding ErrorMessage}" />
+                </DockPanel>
+            </Border>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="250"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="200*" MinWidth="200" />
+            </Grid.ColumnDefinitions>
+            <Views:CloudExplorer Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            <GridSplitter ResizeDirection="Columns" Grid.Column="1" Width="5" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"/>
+            <TabControl Grid.Column="2" x:Name="Clouds" 
+                    ItemsSource="{Binding Clouds}"
+                    SelectedItem="{Binding SelectedCloudView}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type Cloud:CloudViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Cloud.ServerName}" VerticalAlignment="Center"/>
+                            <Button Width="15" Height="17" Content="X" Command="{Binding DataContext.CloseCloudCommand, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type Window}}}" 
+                                                                   CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}" Margin="5,0,0,0" FontSize="8" FontWeight="Bold" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate DataType="{x:Type Cloud:CloudViewModel}">
+                        <Views:CloudView />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </Grid>
+    </Grid>    
+</Window>

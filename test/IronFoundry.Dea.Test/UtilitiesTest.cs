@@ -1,60 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Xunit;
-
-namespace IronFoundry.Dea.Test
+﻿namespace IronFoundry.Test
 {
+    using Dea;
+    using Xunit;
+
     public class UtiltiesTest
     {
         [Fact]
         public void GetFileSizeStringTest_Bytes()
         {
-            long size = 1023;
-            var sizeString = Utility.GetFileSizeString(size);
+            var sizeString = Utility.GetFileSizeString(1023);
             Assert.Equal("1023B", sizeString);
         }
 
         [Fact]
         public void GetFileSizeStringTest_KilobytesLower()
         {
-            long size = 1024;
-            var sizeString = Utility.GetFileSizeString(size);
+            var sizeString = Utility.GetFileSizeString(1024);
             Assert.Equal("1K", sizeString);
         }
 
         [Fact]
         public void GetFileSizeStringTest_KilobytesUpper()
         {
-            long size = 1048575;
-            var sizeString = Utility.GetFileSizeString(size);
-            Assert.Equal("1023K", sizeString);
+            var sizeString = Utility.GetFileSizeString(948575);
+            Assert.Equal("926.34K", sizeString);
         }
 
         [Fact]
         public void GetFileSizeStringTest_MegabytesLower()
         {
-            long size = 1048576;
-            var sizeString = Utility.GetFileSizeString(size);
+            var sizeString = Utility.GetFileSizeString(1048576);
             Assert.Equal("1M", sizeString);
         }
 
         [Fact]
         public void GetFileSizeStringTest_MegabytesUpper()
         {
-            long size = 1073741823;
-            var sizeString = Utility.GetFileSizeString(size);
-            Assert.Equal("1023M", sizeString);
+            var sizeString = Utility.GetFileSizeString(973741823);
+            Assert.Equal("928.63M", sizeString);
         }
 
         [Fact]
         public void GetFileSizeStringTest_GigabytesLower()
         {
-            long size = 1073741824;
-            var sizeString = Utility.GetFileSizeString(size);
+            var sizeString = Utility.GetFileSizeString(1073741824);
             Assert.Equal("1G", sizeString);
-        }        
+        }
     }
 }
