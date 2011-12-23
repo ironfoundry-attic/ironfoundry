@@ -45,11 +45,15 @@ namespace IronFoundry.Dea
         public static string GetFileSizeString(long size)
         {
             var sizes = new[] { "B", "K", "M", "G" };
-            int order = 0;
-            while (size >= 1024 && order++ < sizes.Length)
+            var decimalSize = Convert.ToDecimal(size);
+            var index = 0;
+            while (size >= 1024 && index++ < sizes.Length)
+            {
                 size = size / 1024;
-            
-            return string.Format("{0:0.##}{1}", size, sizes[order]);
+                decimalSize = decimalSize / 1024m;
+            }
+
+            return string.Format("{0:0.##}{1}", decimalSize, sizes[index]);
         }
     }
 }
