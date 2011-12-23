@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
+    <Content Include="ServiceConfigDialog.wxi" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IronFoundry.Dea.Service\IronFoundry.Dea.Service.csproj">
