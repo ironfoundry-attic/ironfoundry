@@ -113,20 +113,13 @@
                 <RemoveFile Id="RemoveFiles.InstallLocation" Name="*.*" On="uninstall" />
               </Component>
 
-              <Component Id="SetEnvironmentPath" Guid="{00603CD6-CBCD-4138-A1A8-1F7D87E71D14}" Win64="$(var.WIN64.COMPONENTS)">
+              <Component Id="SetEnvironmentPath" Guid="{00603CD6-CBCD-4138-A1A8-1F7D87E71D14}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes">
                 <CreateFolder />
                 <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]" Permanent="no" Part="last" Action="set" System="yes" />
               </Component>
 
               <!-- START (Install Registry) -->
-              <Component Id="IronFoundryRegKey" Guid="{B404F2C7-1494-4729-A39D-D36FFF3C66EE}" Win64="$(var.WIN64.COMPONENTS)">
-                <Condition><![CDATA[ALLUSERS = 1]]></Condition>
-                <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
-                  <RegistryKey Action="createAndRemoveOnUninstall" Key="Iron Foundry">
-                    <RegistryValue Value="Iron Foundry" Type="string" KeyPath="yes"/>
-                  </RegistryKey>
-                </RegistryKey>
-              </Component>
+              <?include IronFoundryRegKey.wxi ?>
 
               <Component Id="PerProductRegistryKey" Guid="{79D45A2D-B6DE-40FF-B41D-BED8636C5871}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>

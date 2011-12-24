@@ -124,14 +124,7 @@
               </Component>
 
               <!-- START (Install Registry) -->
-              <Component Id="IronFoundryRegKey" Guid="{BB5917B4-6CDF-4B35-B58B-DE3C472C5C31}" Win64="$(var.WIN64.COMPONENTS)">
-                <Condition><![CDATA[ALLUSERS = 1]]></Condition>
-                <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
-                  <RegistryKey Action="createAndRemoveOnUninstall" Key="Iron Foundry">
-                    <RegistryValue Value="Iron Foundry" Type="string" KeyPath="yes"/>
-                  </RegistryKey>
-                </RegistryKey>
-              </Component>
+              <?include IronFoundryRegKey.wxi?>
 
               <Component Id="PerProductRegistryKey" Guid="{112F503E-8AF1-4532-96F9-DECC8A58A34C}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>

@@ -6,19 +6,33 @@
     <ProductVersion>3.5</ProductVersion>
     <ProjectGuid>{06d5737f-3dfc-4a35-95af-5adac04a6ace}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>IronFoundry.Vmc</OutputName>
+    <OutputName Condition="'$(Platform)' == 'x86'">IronFoundry.Vmc.x86</OutputName>
+    <OutputName Condition="'$(Platform)' == 'x64'">IronFoundry.Vmc.x64</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <RestorePackages>true</RestorePackages>
+    <IncludeSearchPaths>$(SolutionDir)\src\wixshared\</IncludeSearchPaths>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug;PLATFORM=x86;VERSION=1.1.0.0</DefineConstants>
+    <OutputPath>bin\$(Configuration)_$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DefineConstants>Debug;PLATFORM=x86;VERSION=1.1.0.0</DefineConstants>
+    <OutputPath>bin\$(Configuration)_$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>$([MSBuild]::Unescape($(WixValues)))</DefineConstants>
+    <OutputPath>bin\$(Configuration)_$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineConstants>$([MSBuild]::Unescape($(WixValues)))</DefineConstants>
+    <OutputPath>bin\$(Configuration)_$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
@@ -53,6 +67,7 @@
     </WixExtension>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
 	Other similar extension points exist, see Wix.targets.
