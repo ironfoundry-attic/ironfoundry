@@ -3,7 +3,9 @@
 setlocal
 
 set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
-set SLN="%~dp0\CloudFoundry.Net.sln"
+
+set SLN="%~dp0\IronFoundry.sln"
+set VERSION=1.1.0.0
 
 if not exist %VCVARSALL% (
     echo Required file %VCVARSALL% not found.
@@ -22,7 +24,20 @@ if "%DevEnvDir%"=="" (
 
 powershell -nologo -file clean.ps1
 
-msbuild /v:n /t:build /p:Configuration=Debug /p:Platform="Any CPU" %SLN%
-msbuild /v:n /t:build /p:Configuration=Release /p:Platform="Any CPU" %SLN%
+msbuild /v:n /t:build /p:Configuration=Debug /p:Platform=x86 %SLN%
+if ERRORLEVEL 1 goto build_failed
+
+msbuild /v:n /t:build /p:Configuration=Debug /p:Platform=x64 %SLN%
+if ERRORLEVEL 1 goto build_failed
+
+msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x86 /p:WixValues="VERSION=%VERSION%" %SLN%
+if ERRORLEVEL 1 goto build_failed
+
+msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x64 /p:WixValues="VERSION=%VERSION%" %SLN%
+if ERRORLEVEL 1 goto build_failed
 
 exit /b %ERRORLEVEL%
+
+:build_failed
+echo Build failed!
+exit /b 1

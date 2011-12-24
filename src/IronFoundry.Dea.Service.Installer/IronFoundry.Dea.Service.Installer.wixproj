@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.5</ProductVersion>
+    <ProjectGuid>{625f78c8-657a-499b-842f-4b5589dea8f2}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName Condition="'$(Platform)' == 'x86'">IronFoundry.Dea.Service.x86</OutputName>
+    <OutputName Condition="'$(Platform)' == 'x64'">IronFoundry.Dea.Service.x64</OutputName>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\ironfoundry\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <IncludeSearchPaths>$(SolutionDir)\src\wixshared\</IncludeSearchPaths>
+    <OutputPath>bin\$(Configuration)_$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DefineConstants>Debug;PLATFORM=x86;VERSION=1.0.0.0</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineConstants>$([MSBuild]::Unescape($(WixValues)))</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DefineConstants>Debug;PLATFORM=x64;VERSION=1.1.0.0</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineConstants>$([MSBuild]::Unescape($(WixValues)))</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Product.wxs" />
+    <Content Include="Banner.bmp" />
+    <Content Include="ServiceConfigDialog.wxi" />
+    <Content Include="WelcomeBanner.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IronFoundry.Dea.Service\IronFoundry.Dea.Service.csproj">
+      <Name>IronFoundry.Dea.Service</Name>
+      <Project>{8704af02-615e-4679-b183-fb7164408fa0}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="License.rtf" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!--
+  To modify your build process, add your task inside one of the targets below and uncomment it.
+  Other similar extension points exist, see Wix.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

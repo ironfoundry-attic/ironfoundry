@@ -2,5 +2,6 @@ bin/
 obj/
 *.suo
 packages/
-
 *.user
+_ReSharper.IronFoundry/
+/_ReSharper.IronFoundry/

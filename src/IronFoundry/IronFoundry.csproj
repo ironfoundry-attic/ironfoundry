@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IronFoundry</RootNamespace>
+    <AssemblyName>IronFoundry</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\ironfoundry\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>IronFoundry.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Extensions\IEnumerableExtensionMethods.cs" />
+    <Compile Include="Extensions\ObjectExtensionMethods.cs" />
+    <Compile Include="Extensions\StringExtensionMethods.cs" />
+    <Compile Include="Extensions\UriExtensionMethods.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Types\AccessToken.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\Application.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\Crash.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\ExternalInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\IMergeable.cs" />
+    <Compile Include="Types\Info.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\Instance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\Limits.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\Message.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\Preferences.cs" />
+    <Compile Include="Types\ProvisionedService.cs" />
+    <Compile Include="Types\Cloud.cs" />
+    <Compile Include="Types\CloudUrl.cs" />
+    <Compile Include="Types\StatInfo.cs" />
+    <Compile Include="Types\Framework.cs" />
+    <Compile Include="Types\Stats.cs" />
+    <Compile Include="Types\EntityBase.cs" />
+    <Compile Include="Types\SystemService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\Usage.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\VcapResponse.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Types\VcapStates.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utilities\Constants.cs" />
+    <Compile Include="Utilities\CustomSerializationBinder.cs" />
+    <Compile Include="Extensions\SafeObservableCollection.cs" />
+    <Compile Include="Utilities\Utilities.cs" />
+    <Compile Include="Vcap\BaseVmcHelper.cs" />
+    <Compile Include="Vcap\Constants.cs" />
+    <Compile Include="Vcap\MiscHelper.cs" />
+    <Compile Include="Vcap\UserHelper.cs" />
+    <Compile Include="Vcap\VcapCredentialManager.cs" />
+    <Compile Include="Vcap\VcapFilesResult.cs" />
+    <Compile Include="Vcap\VmcExceptions.cs" />
+    <Compile Include="Vcap\VcapRequest.cs" />
+    <Compile Include="Vcap\VcapClientResult.cs" />
+    <Compile Include="Vcap\InfoHelper.cs" />
+    <Compile Include="Vcap\VmcAdministration.cs" />
+    <Compile Include="Vcap\AppsHelper.cs" />
+    <Compile Include="Vcap\VcapClient.cs" />
+    <Compile Include="Vcap\ServicesHelper.cs" />
+    <Compile Include="Vcap\Entities.cs" />
+    <Compile Include="Vcap\IVcapClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="IronFoundry.snk" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=4.0.5.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.4.0.5\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=102.0.0.0, Culture=neutral, PublicKeyToken=aed551a8db69a9bd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
+</Project>

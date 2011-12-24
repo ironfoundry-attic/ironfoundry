@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Agent_Droplets_Fmt" xml:space="preserve">
+    <value>http://{0}:{1}/droplets/</value>
+  </data>
+  <data name="Agent_ErrorDetectedInNats_Message" xml:space="preserve">
+    <value>Agent detected error in NATS.</value>
+  </data>
+  <data name="Agent_ProcessDeaStartNoBindingAvailable" xml:space="preserve">
+    <value>No web instance created for application with name '{0}'.</value>
+  </data>
+  <data name="Agent_TasksCompletedInStop_Message" xml:space="preserve">
+    <value>Agent.Stop(): Tasks completed.</value>
+  </data>
+  <data name="Agent_WaitingForTasksInStop_Message" xml:space="preserve">
+    <value>Agent.Stop(): Waiting for tasks.</value>
+  </data>
+  <data name="FilesServiceValidator_InvalidPassword_Fmt" xml:space="preserve">
+    <value>Invalid password '{0}' sent to files service.</value>
+  </data>
+  <data name="FilesServiceValidator_InvalidUser_Fmt" xml:space="preserve">
+    <value>Invalid username '{0}' sent to files service.</value>
+  </data>
+  <data name="InternalLog_ErrorInSettingUpEventLogger_Message" xml:space="preserve">
+    <value>Error setting up Event Log logger!</value>
+  </data>
+  <data name="NatsMessagingProvider_AttemptingReconnectTwice_Message" xml:space="preserve">
+    <value>Invalid attempt to reconnect twice.</value>
+  </data>
+  <data name="NatsMessagingProvider_AttemptingReconnect_Message" xml:space="preserve">
+    <value>Attempting reconnect to server.</value>
+  </data>
+  <data name="NatsMessagingProvider_AttemptingStopTwice_Message" xml:space="preserve">
+    <value>Invalid attempt to stop twice.</value>
+  </data>
+  <data name="NatsMessagingProvider_CantReadFromStream_Message" xml:space="preserve">
+    <value>Can't read from network stream.</value>
+  </data>
+  <data name="NatsMessagingProvider_ConnectFailed_Fmt" xml:space="preserve">
+    <value>Connection attempt {0} of {1} failed. Retrying.</value>
+  </data>
+  <data name="NatsMessagingProvider_ConnectionFailed_Fmt" xml:space="preserve">
+    <value>NATS could not connect to Host: {0}, Port: {1}</value>
+  </data>
+  <data name="NatsMessagingProvider_ConnectSuccess_Fmt" xml:space="preserve">
+    <value>NATS Connected on Host: {0}, Port: {1}</value>
+  </data>
+  <data name="NatsMessagingProvider_CouldNotReconnect_Message" xml:space="preserve">
+    <value>Could not reconnect to server.</value>
+  </data>
+  <data name="NatsMessagingProvider_Disconnected_Message" xml:space="preserve">
+    <value>Client disconnected from server.</value>
+  </data>
+  <data name="NatsMessagingProvider_ExceptionSendingMessage_Fmt" xml:space="preserve">
+    <value>Exception sending message: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_InfoMessage_Fmt" xml:space="preserve">
+    <value>NATS Info message: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_MessageAck_Fmt" xml:space="preserve">
+    <value>NATS Message Acknowledged: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_NoMessageSubscribers_Fmt" xml:space="preserve">
+    <value>NATS Message no subscribers for subject {0} with subscription ID {1}. Ignoring received message: {2}</value>
+  </data>
+  <data name="NatsMessagingProvider_NonSubscribedSubject_Fmt" xml:space="preserve">
+    <value>NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1}, {2}</value>
+  </data>
+  <data name="NatsMessagingProvider_PublishMessage_Fmt" xml:space="preserve">
+    <value>NATS Publishing subject: {0} message: {1}</value>
+  </data>
+  <data name="NatsMessagingProvider_PublishReceiveOnlyMessage" xml:space="preserve">
+    <value>Attempt to publish receive-only message!</value>
+  </data>
+  <data name="NatsMessagingProvider_ReconnectSuccess_Message" xml:space="preserve">
+    <value>Successfully reconnected to server.</value>
+  </data>
+  <data name="NatsMessagingProvider_WaitingForTasks_Message" xml:space="preserve">
+    <value>NATS provider waiting for tasks to complete.</value>
+  </data>
+  <data name="WcfService_ErrorClosingHost_Fmt" xml:space="preserve">
+    <value>Error closing WCF host! Message: {0}</value>
+  </data>
+  <data name="WcfService_NotConfiguredToRun_Fmt" xml:space="preserve">
+    <value>WCF ServiceHost '{0}' NOT configured to run.</value>
+  </data>
+  <data name="WcfService_StartingHost_Fmt" xml:space="preserve">
+    <value>Starting WCF ServiceHost '{0}'</value>
+  </data>
+  <data name="WcfService_StoppingHost_Fmt" xml:space="preserve">
+    <value>Stopping WCF ServiceHost '{0}'</value>
+  </data>
+  <data name="NatsMessagingProvider_InvalidPublishAttempt_Fmt" xml:space="preserve">
+    <value>Invalid attempt to publish message of type '{0}' with subject '{1}'</value>
+  </data>
+  <data name="NatsMessagingProvider_SubscribingToSubject_Fmt" xml:space="preserve">
+    <value>NATS Subscribing to subject: {0}, sequence {1}</value>
+  </data>
+  <data name="NatsMessagingProvider_Initialized_Fmt" xml:space="preserve">
+    <value>NATS Messaging Provider Initialized. Identifier: {0:N}, Server Host: {1}, Server Port: {2}.</value>
+  </data>
+  <data name="NatsMessagingProvider_LogReceived_Fmt" xml:space="preserve">
+    <value>NATS Msg Recv: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_LogSent_Fmt" xml:space="preserve">
+    <value>NATS Msg Sent: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_PublishConnect_Fmt" xml:space="preserve">
+    <value>NATS Connect message: {0}</value>
+  </data>
+  <data name="Agent_Shutdown_Message" xml:space="preserve">
+    <value>Agent shutdown complete.</value>
+  </data>
+  <data name="Agent_ShuttingDown_Message" xml:space="preserve">
+    <value>Agent shutting down ...</value>
+  </data>
+  <data name="Agent_DEAComponentType" xml:space="preserve">
+    <value>DEA</value>
+  </data>
+  <data name="Agent_NonAspDotNet_Message" xml:space="preserve">
+    <value>This DEA does not support non-ASP.NET frameworks!</value>
+  </data>
+  <data name="Agent_InstanceExited_Fmt" xml:space="preserve">
+    <value>Instance exited: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaDiscover_Fmt" xml:space="preserve">
+    <value>ProcessDeaDiscover Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessDeaFindDroplet_Fmt" xml:space="preserve">
+    <value>ProcessDeaFindDroplet: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaStart_Fmt" xml:space="preserve">
+    <value>ProcessDeaStart: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaStatus_Fmt" xml:space="preserve">
+    <value>ProcessDeaStatus Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessDeaStop_Fmt" xml:space="preserve">
+    <value>ProcessDeaStop: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaUpdate_Fmt" xml:space="preserve">
+    <value>ProcessDeaUpdate: {0}</value>
+  </data>
+  <data name="Agent_ProcessDropletStatus_Fmt" xml:space="preserve">
+    <value>ProcessDropletStatus Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessHealthManagerStart_Fmt" xml:space="preserve">
+    <value>ProcessHealthManagerStart Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessRouterStart_Fmt" xml:space="preserve">
+    <value>ProcessRouterStart Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_StoppedInstance_Fmt" xml:space="preserve">
+    <value>Stopped instance: {0}</value>
+  </data>
+  <data name="Agent_StoppingInstance_Fmt" xml:space="preserve">
+    <value>Stopping instance: {0}</value>
+  </data>
+</root>
