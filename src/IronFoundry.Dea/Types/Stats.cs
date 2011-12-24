@@ -51,5 +51,10 @@
 
         [JsonProperty(PropertyName = "usage")]
         public Usage Usage { get; set; }
+
+        public override bool CanPublishWithSubject(string subject)
+        {
+            return false == subject.IsNullOrWhiteSpace();
+        }
     }
 }

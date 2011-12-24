@@ -57,5 +57,10 @@
 
         [JsonProperty(PropertyName = "stats")]
         public Stats Stats { get; set; }
+
+        public override bool CanPublishWithSubject(string subject)
+        {
+            return false == subject.IsNullOrWhiteSpace();
+        }
     }
 }

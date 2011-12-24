@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Dea.Types
 {
+    using System;
     using Newtonsoft.Json;
 
     public class Status : Hello
@@ -21,5 +22,10 @@
 
         public Status(Hello argHello)
             : base(argHello.ID, argHello.IPAddress, argHello.Port, argHello.Version) { }
+
+        public override bool CanPublishWithSubject(string subject)
+        {
+            return false == subject.IsNullOrWhiteSpace();
+        }
     }
 }

@@ -153,6 +153,15 @@
   <data name="NatsMessagingProvider_CantReadFromStream_Message" xml:space="preserve">
     <value>Can't read from network stream.</value>
   </data>
+  <data name="NatsMessagingProvider_ConnectFailed_Fmt" xml:space="preserve">
+    <value>Connection attempt {0} of {1} failed. Retrying.</value>
+  </data>
+  <data name="NatsMessagingProvider_ConnectionFailed_Fmt" xml:space="preserve">
+    <value>NATS could not connect to Host: {0}, Port: {1}</value>
+  </data>
+  <data name="NatsMessagingProvider_ConnectSuccess_Fmt" xml:space="preserve">
+    <value>NATS Connected on Host: {0}, Port: {1}</value>
+  </data>
   <data name="NatsMessagingProvider_CouldNotReconnect_Message" xml:space="preserve">
     <value>Could not reconnect to server.</value>
   </data>
@@ -162,8 +171,29 @@
   <data name="NatsMessagingProvider_ExceptionSendingMessage_Fmt" xml:space="preserve">
     <value>Exception sending message: {0}</value>
   </data>
+  <data name="NatsMessagingProvider_InfoMessage_Fmt" xml:space="preserve">
+    <value>NATS Info message: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_MessageAck_Fmt" xml:space="preserve">
+    <value>NATS Message Acknowledged: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_NoMessageSubscribers_Fmt" xml:space="preserve">
+    <value>NATS Message no subscribers for subject {0} with subscription ID {1}. Ignoring received message: {2}</value>
+  </data>
+  <data name="NatsMessagingProvider_NonSubscribedSubject_Fmt" xml:space="preserve">
+    <value>NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1}, {2}</value>
+  </data>
+  <data name="NatsMessagingProvider_PublishMessage_Fmt" xml:space="preserve">
+    <value>NATS Publishing subject: {0} message: {1}</value>
+  </data>
+  <data name="NatsMessagingProvider_PublishReceiveOnlyMessage" xml:space="preserve">
+    <value>Attempt to publish receive-only message!</value>
+  </data>
   <data name="NatsMessagingProvider_ReconnectSuccess_Message" xml:space="preserve">
     <value>Successfully reconnected to server.</value>
+  </data>
+  <data name="NatsMessagingProvider_WaitingForTasks_Message" xml:space="preserve">
+    <value>NATS provider waiting for tasks to complete.</value>
   </data>
   <data name="WcfService_ErrorClosingHost_Fmt" xml:space="preserve">
     <value>Error closing WCF host! Message: {0}</value>
@@ -176,5 +206,71 @@
   </data>
   <data name="WcfService_StoppingHost_Fmt" xml:space="preserve">
     <value>Stopping WCF ServiceHost '{0}'</value>
+  </data>
+  <data name="NatsMessagingProvider_InvalidPublishAttempt_Fmt" xml:space="preserve">
+    <value>Invalid attempt to publish message of type '{0}' with subject '{1}'</value>
+  </data>
+  <data name="NatsMessagingProvider_SubscribingToSubject_Fmt" xml:space="preserve">
+    <value>NATS Subscribing to subject: {0}, sequence {1}</value>
+  </data>
+  <data name="NatsMessagingProvider_Initialized_Fmt" xml:space="preserve">
+    <value>NATS Messaging Provider Initialized. Identifier: {0:N}, Server Host: {1}, Server Port: {2}.</value>
+  </data>
+  <data name="NatsMessagingProvider_LogReceived_Fmt" xml:space="preserve">
+    <value>NATS Msg Recv: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_LogSent_Fmt" xml:space="preserve">
+    <value>NATS Msg Sent: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_PublishConnect_Fmt" xml:space="preserve">
+    <value>NATS Connect message: {0}</value>
+  </data>
+  <data name="Agent_Shutdown_Message" xml:space="preserve">
+    <value>Agent shutdown complete.</value>
+  </data>
+  <data name="Agent_ShuttingDown_Message" xml:space="preserve">
+    <value>Agent shutting down ...</value>
+  </data>
+  <data name="Agent_DEAComponentType" xml:space="preserve">
+    <value>DEA</value>
+  </data>
+  <data name="Agent_NonAspDotNet_Message" xml:space="preserve">
+    <value>This DEA does not support non-ASP.NET frameworks!</value>
+  </data>
+  <data name="Agent_InstanceExited_Fmt" xml:space="preserve">
+    <value>Instance exited: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaDiscover_Fmt" xml:space="preserve">
+    <value>ProcessDeaDiscover Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessDeaFindDroplet_Fmt" xml:space="preserve">
+    <value>ProcessDeaFindDroplet: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaStart_Fmt" xml:space="preserve">
+    <value>ProcessDeaStart: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaStatus_Fmt" xml:space="preserve">
+    <value>ProcessDeaStatus Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessDeaStop_Fmt" xml:space="preserve">
+    <value>ProcessDeaStop: {0}</value>
+  </data>
+  <data name="Agent_ProcessDeaUpdate_Fmt" xml:space="preserve">
+    <value>ProcessDeaUpdate: {0}</value>
+  </data>
+  <data name="Agent_ProcessDropletStatus_Fmt" xml:space="preserve">
+    <value>ProcessDropletStatus Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessHealthManagerStart_Fmt" xml:space="preserve">
+    <value>ProcessHealthManagerStart Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_ProcessRouterStart_Fmt" xml:space="preserve">
+    <value>ProcessRouterStart Msg: {0} Reply: {1}</value>
+  </data>
+  <data name="Agent_StoppedInstance_Fmt" xml:space="preserve">
+    <value>Stopped instance: {0}</value>
+  </data>
+  <data name="Agent_StoppingInstance_Fmt" xml:space="preserve">
+    <value>Stopping instance: {0}</value>
   </data>
 </root>

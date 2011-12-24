@@ -1,4 +1,8 @@
-﻿namespace IronFoundry.Dea.Providers
+﻿using System;
+using System.Globalization;
+using System.Text;
+using IronFoundry.Dea.Types;
+namespace IronFoundry.Dea.Providers
 {
     public abstract class NatsCommand
     {
@@ -12,6 +16,29 @@
             public const string message     = "MSG";
             public const string publish     = "PUB";
             public const string subscribe   = "SUB";
+            public const string connect     = "CONNECT";
+        }
+
+        private static class NatsCommandFormats
+        {
+            public static readonly string ConnectFmt = NatsCommand.Connect.Command + " {0}\r\n";
+
+            /// <summary>
+            /// Format for sending publish messages. First parameter is the subject,
+            /// second parameter is the actual byte length of the message (you should
+            /// retrieve this by converting the string to an ascii message than retrieving
+            /// the byte array length that's produced),
+            /// third parameter is the actual message (should be in JSON format).
+            /// </summary>
+            public static readonly string PublishFmt = NatsCommand.Publish.Command + " {0}  {1}\r\n{2}\r\n";
+
+            /// <summary>
+            /// Format for sending subscribe message. First parameter is the subject,
+            /// second parameter is a sequential integer identifier. For every subscribe message
+            /// a running tally of unique integers is used in order to reply back to the
+            /// subscribed message.
+            /// </summary>
+            public static readonly string SubscribeFmt = NatsCommand.Subscribe.Command + " {0}  {1}\r\n";
         }
 
         public static readonly NatsCommand Ok          = new OKCommand();
@@ -22,8 +49,26 @@
         public static readonly NatsCommand Message     = new MessageCommand();
         public static readonly NatsCommand Publish     = new PublishCommand();
         public static readonly NatsCommand Subscribe   = new SubscribeCommand();
+        public static readonly NatsCommand Connect     = new ConnectCommand();
 
         public abstract string Command { get; }
+
+        public static string FormatSubscribeMessage(NatsSubscription subscription, int Sequence)
+        {
+            return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.SubscribeFmt, subscription, Sequence);
+        }
+
+        public static string FormatPublishMessage(string subject, Message message)
+        {
+            string messageJson = message.ToJson();
+            return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.PublishFmt, subject, Encoding.ASCII.GetBytes(messageJson).Length, messageJson);
+        }
+
+        public static string FormatConnectMessage(Connect message)
+        {
+            string messageJson = message.ToJson();
+            return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.ConnectFmt, message);
+        }
 
         private class OKCommand : NatsCommand
         {
@@ -86,6 +131,14 @@
             public override string Command
             {
                 get { return NatsCommands.subscribe; }
+            }
+        }
+
+        private class ConnectCommand : NatsCommand
+        {
+            public override string Command
+            {
+                get { return NatsCommands.connect; }
             }
         }
     }

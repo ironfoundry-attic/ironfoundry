@@ -3,7 +3,7 @@
     public interface IAgent
     {
         bool Error { get; }
-        bool Start();
+        void Start();
         void Stop();
     }
 }

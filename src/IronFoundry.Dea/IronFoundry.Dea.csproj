@@ -80,6 +80,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
     <Compile Include="Agent\DropletManager.cs" />
+    <Compile Include="Extensions\TaskExtensionMethods.cs" />
     <Compile Include="Extensions\TimerExtensionMethods.cs" />
     <Compile Include="Agent\FileData.cs" />
     <Compile Include="Agent\FilesManager.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Services\FirewallService.cs" />
     <Compile Include="Services\IFilesService.cs" />
     <Compile Include="Services\IFirewallService.cs" />
+    <Compile Include="Types\Connect.cs" />
     <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\Discover.cs" />
     <Compile Include="Types\Droplet.cs" />

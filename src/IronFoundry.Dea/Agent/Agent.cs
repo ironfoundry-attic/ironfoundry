@@ -14,7 +14,7 @@
 
     public sealed class Agent : IAgent
     {
-        private static readonly TimeSpan HEARTBEAT_INTERVAL = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan TenSecondsInterval = TimeSpan.FromSeconds(10);
 
         private readonly ILog log;
         private readonly IConfig config;
@@ -47,21 +47,19 @@
 
         public bool Error { get; private set; }
 
-        public bool Start()
+        public void Start()
         {
-            bool rv = false;
-
             if (messagingProvider.Connect())
             {
                 messagingProvider.Start();
 
                 var vcapComponentDiscoverMessage = new VcapComponentDiscover(
-                    argType: "DEA",
-                    argIndex: 1,
-                    argUuid: messagingProvider.UniqueIdentifier, 
-                    argHost: config.LocalIPAddress.ToString(),
-                    argCredentials: messagingProvider.UniqueIdentifier,
-                    argStart: DateTime.Now);
+                    type: Resources.Agent_DEAComponentType,
+                    index: 1,
+                    uuid: messagingProvider.UniqueIdentifier,
+                    host: config.LocalIPAddress.ToString(),
+                    credentials: messagingProvider.UniqueIdentifier,
+                    start: DateTime.Now);
 
                 messagingProvider.Subscribe(NatsSubscription.VcapComponentDiscover,
                     (msg, reply) =>
@@ -87,11 +85,12 @@
                 RecoverExistingDroplets();
 
                 monitorTask.Start();
-
-                rv = true;
             }
-
-            return rv;
+            else
+            {
+                log.Error(Resources.Agent_ErrorDetectedInNats_Message);
+                Error = true;
+            }
         }
 
         public void Stop()
@@ -103,44 +102,22 @@
 
             shutting_down = true;
 
-            log.Info("Evacuating applications..");
+            log.Info(Resources.Agent_ShuttingDown_Message);
 
-            dropletManager.ForAllInstances(
-                (dropletID) =>
-                {
-                    log.Debug("Evacuating app {0}", dropletID);
-                },
-                (instance) =>
+            dropletManager.ForAllInstances((instance) =>
                 {
                     if (false == instance.IsCrashed)
                     {
-                        instance.DeaEvacuation();
-                        SendExitedNotification(instance);
-                        instance.Evacuated();
+                        instance.DeaShutdown();
+                        StopDroplet(instance);
                     }
                 });
 
             TakeSnapshot();
 
-            log.Debug(Resources.Agent_WaitingForTasksInStop_Message);
-            monitorTask.Wait(TimeSpan.FromSeconds(30));
-            log.Debug(Resources.Agent_TasksCompletedInStop_Message);
-
-            Shutdown();
-        }
-
-        private void Shutdown()
-        {
-            shutting_down = true;
-            log.Info("Shutting down..");
-            dropletManager.ForAllInstances((instance) =>
-                {
-                    instance.DeaShutdown();
-                    StopDroplet(instance);
-                });
-            TakeSnapshot();
             messagingProvider.Dispose();
-            log.Info("Shutting down complete.");
+
+            log.Info(Resources.Agent_Shutdown_Message);
         }
 
         private void MonitorLoop()
@@ -149,7 +126,7 @@
             {
                 if (NatsMessagingStatus.RUNNING != messagingProvider.Status)
                 {
-                    log.Error(IronFoundry.Dea.Properties.Resources.Agent_ErrorDetectedInNats_Message);
+                    log.Error(Resources.Agent_ErrorDetectedInNats_Message);
                     Error = true;
                     return;
                 }
@@ -157,7 +134,7 @@
                 {
                     SendHeartbeat();
                 }
-                Thread.Sleep(HEARTBEAT_INTERVAL);
+                Thread.Sleep(TenSecondsInterval);
             }
         }
 
@@ -168,12 +145,12 @@
                 return;
             }
 
-            log.Debug("Starting processDeaStart: {0}", message);
+            log.Debug(Resources.Agent_ProcessDeaStart_Fmt, message);
 
             Droplet droplet = Message.FromJson<Droplet>(message);
             if (false == droplet.FrameworkSupported)
             {
-                log.Debug("This DEA does not support non-aspdotnet frameworks");
+                log.Info(Resources.Agent_NonAspDotNet_Message);
                 return;
             }
 
@@ -219,23 +196,23 @@
                 return;
             }
 
-            log.Debug("Starting processDeaUpdate: {0}", message);
+            log.Debug(Resources.Agent_ProcessDeaUpdate_Fmt, message);
 
             Droplet droplet = Message.FromJson<Droplet>(message);
 
-            dropletManager.ForAllInstances(droplet.ID, (argInstance) =>
+            dropletManager.ForAllInstances(droplet.ID, (instance) =>
                 {
-                    string[] currentUris = argInstance.Uris.ToArrayOrNull(); // NB: will create new array
+                    string[] currentUris = instance.Uris.ToArrayOrNull(); // NB: will create new array
 
-                    argInstance.Uris = droplet.Uris;
+                    instance.Uris = droplet.Uris;
 
                     var toRemove = currentUris.Except(droplet.Uris);
 
                     var toAdd = droplet.Uris.Except(currentUris);
 
-                    UnregisterWithRouter(argInstance, toRemove.ToArray());
+                    UnregisterWithRouter(instance, toRemove.ToArray());
 
-                    RegisterWithRouter(argInstance, toAdd.ToArray());
+                    RegisterWithRouter(instance, toAdd.ToArray());
                 });
 
             TakeSnapshot();
@@ -248,7 +225,8 @@
                 return;
             }
 
-            log.Debug("Starting processDeaDiscover: {0}", message);
+            log.Debug(Resources.Agent_ProcessDeaDiscover_Fmt, message, reply);
+
             Discover discover = Message.FromJson<Discover>(message);
             messagingProvider.Publish(reply, helloMessage);
         }
@@ -258,7 +236,7 @@
             if (shutting_down)
                 return;
 
-            log.Debug("Starting processDeaStop: {0}", message);
+            log.Debug(Resources.Agent_ProcessDeaStop_Fmt, message);
 
             StopDroplet stopDropletMsg = Message.FromJson<StopDroplet>(message);
 
@@ -281,7 +259,7 @@
                 return;
             }
 
-            log.Info("Stopping instance {0}", instance.LogID);
+            log.Info(Resources.Agent_StoppingInstance_Fmt, instance.LogID);
 
             SendExitedMessage(instance);
 
@@ -293,26 +271,26 @@
 
             filesManager.CleanupInstanceDirectory(instance);
 
-            log.Info("Stopped instance {0}", instance.LogID);
+            log.Info(Resources.Agent_StoppedInstance_Fmt, instance.LogID);
         }
 
-        private void SendExitedMessage(Instance argInstance)
+        private void SendExitedMessage(Instance instance)
         {
-            if (argInstance.IsNotified)
+            if (instance.IsNotified)
             {
                 return;
             }
 
-            UnregisterWithRouter(argInstance);
+            UnregisterWithRouter(instance);
 
-            if (false == argInstance.HasExitReason)
+            if (false == instance.HasExitReason)
             {
-                argInstance.Crashed();
+                instance.Crashed();
             }
 
-            SendExitedNotification(argInstance);
+            SendExitedNotification(instance);
 
-            argInstance.IsNotified = true;
+            instance.IsNotified = true;
         }
 
         private void ProcessDeaStatus(string message, string reply)
@@ -322,7 +300,8 @@
                 return;
             }
 
-            log.Debug("Starting processDeaStatus: {0}", message);
+            log.Debug(Resources.Agent_ProcessDeaStatus_Fmt, message, reply);
+
             var statusMessage = new Status(helloMessage)
             {
                 MaxMemory      = 4096,
@@ -340,7 +319,7 @@
                 return;
             }
 
-            log.Debug("Starting processDeaFindDroplet: {0}", message);
+            log.Debug(Resources.Agent_ProcessDeaFindDroplet_Fmt, message);
 
             FindDroplet findDroplet = Message.FromJson<FindDroplet>(message);
 
@@ -380,7 +359,7 @@
                 return;
             }
 
-            log.Debug("Starting processDropletStatus: {0}", message);
+            log.Debug(Resources.Agent_ProcessDropletStatus_Fmt, message, reply);
 
             dropletManager.ForAllInstances((instance) =>
             {
@@ -404,7 +383,7 @@
                 return;
             }
 
-            log.Debug("Starting processRouterStart: {0}", message);
+            log.Debug(Resources.Agent_ProcessRouterStart_Fmt, message, reply);
 
             dropletManager.ForAllInstances((instance) =>
                 {
@@ -417,13 +396,13 @@
 
         private void ProcessHealthManagerStart(string message, string reply)
         {
-            log.Debug("Starting processHealthManagerStart: {0}", message);
+            log.Debug(Resources.Agent_ProcessHealthManagerStart_Fmt, message, reply);
             SendHeartbeat();
         }
 
-        private void RegisterWithRouter(Instance argInstance, string[] argUris)
+        private void RegisterWithRouter(Instance instance, string[] uris)
         {
-            if (shutting_down || argInstance.Uris.IsNullOrEmpty())
+            if (shutting_down || instance.Uris.IsNullOrEmpty())
             {
                 return;
             }
@@ -431,23 +410,23 @@
             var routerRegister = new RouterRegister
             {
                 Dea  = messagingProvider.UniqueIdentifier,
-                Host = argInstance.Host,
-                Port = argInstance.Port,
-                Uris = argUris ?? argInstance.Uris,
-                Tag  = new Tag { Framework = argInstance.Framework, Runtime = argInstance.Runtime }
+                Host = instance.Host,
+                Port = instance.Port,
+                Uris = uris ?? instance.Uris,
+                Tag  = new Tag { Framework = instance.Framework, Runtime = instance.Runtime }
             };
 
             messagingProvider.Publish(routerRegister);
         }
 
-        private void UnregisterWithRouter(Instance argInstance)
+        private void UnregisterWithRouter(Instance instance)
         {
-            UnregisterWithRouter(argInstance, null);
+            UnregisterWithRouter(instance, instance.Uris);
         }
 
-        private void UnregisterWithRouter(Instance argInstance, string[] argUris)
+        private void UnregisterWithRouter(Instance instance, string[] uris)
         {
-            if (shutting_down || argInstance.Uris.IsNullOrEmpty())
+            if (instance.Uris.IsNullOrEmpty())
             {
                 return;
             }
@@ -455,20 +434,20 @@
             var routerUnregister = new RouterUnregister
             {
                 Dea  = messagingProvider.UniqueIdentifier,
-                Host = argInstance.Host,
-                Port = argInstance.Port,
-                Uris = argUris ?? argInstance.Uris,
+                Host = instance.Host,
+                Port = instance.Port,
+                Uris = uris ?? instance.Uris,
             };
 
             messagingProvider.Publish(routerUnregister);
         }
 
-        private void SendExitedNotification(Instance argInstance)
+        private void SendExitedNotification(Instance instance)
         {
-            if (false == argInstance.IsEvacuated)
+            if (false == instance.IsEvacuated)
             {
-                messagingProvider.Publish(new InstanceExited(argInstance));
-                log.Debug("Sent droplet.exited.");
+                messagingProvider.Publish(new InstanceExited(instance));
+                log.Debug(Resources.Agent_InstanceExited_Fmt, instance.LogID);
             }
         }
 
@@ -549,11 +528,11 @@
             }
         }
 
-        private void SendSingleHeartbeat(Heartbeat argHeartbeat)
+        private void SendSingleHeartbeat(Heartbeat heartbeat)
         {
             var message = new DropletHeartbeat
             {
-                Droplets = new[] { argHeartbeat }
+                Droplets = new[] { heartbeat }
             };
             messagingProvider.Publish(message);
         }

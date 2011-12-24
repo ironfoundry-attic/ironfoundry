@@ -15,5 +15,10 @@
 
         [JsonIgnore]
         public string RawJson { get; set; }
+
+        public virtual bool CanPublishWithSubject(string subject)
+        {
+            return false;
+        }
     }
 }

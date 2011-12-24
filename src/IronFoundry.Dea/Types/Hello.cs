@@ -34,5 +34,10 @@
             Port      = filesServicePort;
             Version   = argVersion;
         }
+
+        public override bool CanPublishWithSubject(string subject)
+        {
+            return false == subject.IsNullOrWhiteSpace();
+        }
     }
 }

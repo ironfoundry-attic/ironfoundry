@@ -61,6 +61,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DEA.
+        /// </summary>
+        internal static string Agent_DEAComponentType {
+            get {
+                return ResourceManager.GetString("Agent_DEAComponentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to http://{0}:{1}/droplets/.
         /// </summary>
         internal static string Agent_Droplets_Fmt {
@@ -79,11 +88,146 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Instance exited: {0}.
+        /// </summary>
+        internal static string Agent_InstanceExited_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_InstanceExited_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This DEA does not support non-ASP.NET frameworks!.
+        /// </summary>
+        internal static string Agent_NonAspDotNet_Message {
+            get {
+                return ResourceManager.GetString("Agent_NonAspDotNet_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessDeaDiscover Msg: {0} Reply: {1}.
+        /// </summary>
+        internal static string Agent_ProcessDeaDiscover_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaDiscover_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessDeaFindDroplet: {0}.
+        /// </summary>
+        internal static string Agent_ProcessDeaFindDroplet_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaFindDroplet_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessDeaStart: {0}.
+        /// </summary>
+        internal static string Agent_ProcessDeaStart_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaStart_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No web instance created for application with name &apos;{0}&apos;..
         /// </summary>
         internal static string Agent_ProcessDeaStartNoBindingAvailable {
             get {
                 return ResourceManager.GetString("Agent_ProcessDeaStartNoBindingAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessDeaStatus Msg: {0} Reply: {1}.
+        /// </summary>
+        internal static string Agent_ProcessDeaStatus_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaStatus_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessDeaStop: {0}.
+        /// </summary>
+        internal static string Agent_ProcessDeaStop_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaStop_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessDeaUpdate: {0}.
+        /// </summary>
+        internal static string Agent_ProcessDeaUpdate_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaUpdate_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessDropletStatus Msg: {0} Reply: {1}.
+        /// </summary>
+        internal static string Agent_ProcessDropletStatus_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDropletStatus_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessHealthManagerStart Msg: {0} Reply: {1}.
+        /// </summary>
+        internal static string Agent_ProcessHealthManagerStart_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessHealthManagerStart_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcessRouterStart Msg: {0} Reply: {1}.
+        /// </summary>
+        internal static string Agent_ProcessRouterStart_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessRouterStart_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Agent shutdown complete..
+        /// </summary>
+        internal static string Agent_Shutdown_Message {
+            get {
+                return ResourceManager.GetString("Agent_Shutdown_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Agent shutting down ....
+        /// </summary>
+        internal static string Agent_ShuttingDown_Message {
+            get {
+                return ResourceManager.GetString("Agent_ShuttingDown_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stopped instance: {0}.
+        /// </summary>
+        internal static string Agent_StoppedInstance_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_StoppedInstance_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stopping instance: {0}.
+        /// </summary>
+        internal static string Agent_StoppingInstance_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_StoppingInstance_Fmt", resourceCulture);
             }
         }
         
@@ -169,6 +313,33 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection attempt {0} of {1} failed. Retrying..
+        /// </summary>
+        internal static string NatsMessagingProvider_ConnectFailed_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_ConnectFailed_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS could not connect to Host: {0}, Port: {1}.
+        /// </summary>
+        internal static string NatsMessagingProvider_ConnectionFailed_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_ConnectionFailed_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Connected on Host: {0}, Port: {1}.
+        /// </summary>
+        internal static string NatsMessagingProvider_ConnectSuccess_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_ConnectSuccess_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not reconnect to server..
         /// </summary>
         internal static string NatsMessagingProvider_CouldNotReconnect_Message {
@@ -196,11 +367,128 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NATS Info message: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_InfoMessage_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_InfoMessage_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Messaging Provider Initialized. Identifier: {0:N}, Server Host: {1}, Server Port: {2}..
+        /// </summary>
+        internal static string NatsMessagingProvider_Initialized_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_Initialized_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid attempt to publish message of type &apos;{0}&apos; with subject &apos;{1}&apos;.
+        /// </summary>
+        internal static string NatsMessagingProvider_InvalidPublishAttempt_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_InvalidPublishAttempt_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Msg Recv: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_LogReceived_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_LogReceived_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Msg Sent: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_LogSent_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_LogSent_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Message Acknowledged: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_MessageAck_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_MessageAck_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Message no subscribers for subject {0} with subscription ID {1}. Ignoring received message: {2}.
+        /// </summary>
+        internal static string NatsMessagingProvider_NoMessageSubscribers_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_NoMessageSubscribers_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1}, {2}.
+        /// </summary>
+        internal static string NatsMessagingProvider_NonSubscribedSubject_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_NonSubscribedSubject_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Connect message: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_PublishConnect_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_PublishConnect_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Publishing subject: {0} message: {1}.
+        /// </summary>
+        internal static string NatsMessagingProvider_PublishMessage_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_PublishMessage_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempt to publish receive-only message!.
+        /// </summary>
+        internal static string NatsMessagingProvider_PublishReceiveOnlyMessage {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_PublishReceiveOnlyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Successfully reconnected to server..
         /// </summary>
         internal static string NatsMessagingProvider_ReconnectSuccess_Message {
             get {
                 return ResourceManager.GetString("NatsMessagingProvider_ReconnectSuccess_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS Subscribing to subject: {0}, sequence {1}.
+        /// </summary>
+        internal static string NatsMessagingProvider_SubscribingToSubject_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_SubscribingToSubject_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS provider waiting for tasks to complete..
+        /// </summary>
+        internal static string NatsMessagingProvider_WaitingForTasks_Message {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_WaitingForTasks_Message", resourceCulture);
             }
         }
         
