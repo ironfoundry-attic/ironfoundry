@@ -25,7 +25,7 @@
   <?define ShortProductName = 'Cloud Foundry Explorer' ?>
   <?define Manufacturer = 'Iron Foundry' ?>
   <?define UpgradeCode = '{8AC812C3-342A-4055-B08B-E1BC280CFDE0}' ?><!-- NEVER CHANGE THIS -->
-  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\CloudFoundryExplorer" ?>
+  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\$(var.ShortProductName)" ?>
 
   <Product
   Id="*"
