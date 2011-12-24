@@ -1,31 +1,31 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using IronFoundry.Ui.Controls.Model;
-using IronFoundry.Ui.Controls.Mvvm;
-using IronFoundry.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Messaging;
-
-namespace IronFoundry.Ui.Controls.ViewModel.Explorer
+﻿namespace IronFoundry.Ui.Controls.ViewModel.Explorer
 {
+    using System;
+    using System.Drawing;
+    using System.Windows;
+    using System.Windows.Interop;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using GalaSoft.MvvmLight.Messaging;
     using Model;
     using Mvvm;
     using Utilities;
+    using Vcap;
+    using Application = Types.Application;
 
     public class FolderTreeViewItemViewModel : TreeViewItemViewModel
     {
+        private readonly Application app;
+        private readonly ushort id;
+        private readonly string name;
+        private readonly string path;
         private ICloudFoundryProvider provider;
-        private string name;
-        private IronFoundry.Types.Application app;
-        private string path;
-        private ushort id;
 
-        public FolderTreeViewItemViewModel(string name, string path, IronFoundry.Types.Application app, ushort id)
+        public FolderTreeViewItemViewModel(string name, string path, Application app, ushort id)
             : base(null, true)
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
+                                       Messages.GetCloudFoundryProvider, p => provider = p));
             this.name = name;
             this.app = app;
             this.path = path;
@@ -34,35 +34,33 @@ namespace IronFoundry.Ui.Controls.ViewModel.Explorer
 
         public string Name
         {
-            get
-            {
-                return name;
-            }
-        }
-
-        public override void LoadChildren()
-        {
-            Children.Clear();
-            var result = provider.GetFiles(app.Parent, app, path, id);
-            if (result.Response == null)
-            {
-                Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
-                return;
-            }
-
-            foreach (var dir in result.Response.Directories)
-                base.Children.Add(new FolderTreeViewItemViewModel(dir.Name, path + "/" + dir.Name, app, id));
-            foreach (var file in result.Response.Files)
-                base.Children.Add(new FileTreeViewItemViewModel(file.Name, path + "/" + file.Name, app, id));
+            get { return name; }
         }
 
         public ImageSource Icon
         {
             get
             {
-                var hBitmap = IconUtil.IconFromExtension("Directory", IconUtil.SystemIconSize.Small).ToBitmap();
-                return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                Bitmap hBitmap = IconUtil.IconFromExtension("Directory", IconUtil.SystemIconSize.Small).ToBitmap();
+                return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
+                                                             BitmapSizeOptions.FromEmptyOptions());
             }
+        }
+
+        public override void LoadChildren()
+        {
+            Children.Clear();
+            ProviderResponse<VcapFilesResult> result = provider.GetFiles(app.Parent, app, path, id);
+            if (result.Response == null)
+            {
+                Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
+                return;
+            }
+
+            foreach (VcapFilesResult.FilesResultData dir in result.Response.Directories)
+                base.Children.Add(new FolderTreeViewItemViewModel(dir.Name, path + "/" + dir.Name, app, id));
+            foreach (VcapFilesResult.FilesResultData file in result.Response.Files)
+                base.Children.Add(new FileTreeViewItemViewModel(file.Name, path + "/" + file.Name, app, id));
         }
     }
 }

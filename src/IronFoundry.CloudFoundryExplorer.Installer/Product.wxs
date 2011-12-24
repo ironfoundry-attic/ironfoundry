@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix   
+  xmlns="http://schemas.microsoft.com/wix/2006/wi"
+  xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+  xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+
+  <?ifndef var.VERSION ?>
+    <?define VERSION = '1.1.0.0' ?>
+  <?endif?>
+
+  <?define var.BUILDDIR = $(var.IronFoundry.CloudFoundryExplorer.TargetDir)?>
+
+  <?if $(sys.BUILDARCH) = x64?>
+    <?define SEARCH.WIN64.REG = 'yes' ?>
+    <?define WIN64.COMPONENTS = 'yes' ?>
+    <?define ProgramFilesDirectoryId = 'ProgramFiles64Folder' ?>
+  <?else?>
+    <?define SEARCH.WIN64.REG = 'no' ?>
+    <?define WIN64.COMPONENTS = 'no' ?>
+    <?define ProgramFilesDirectoryId = 'ProgramFilesFolder' ?>
+  <?endif?>
+
+  <!-- Do Not Change These Values -->
+  <?define ProductName = 'Cloud Foundry Explorer' ?>
+  <?define ShortProductName = 'Cloud Foundry Explorer' ?>
+  <?define Manufacturer = 'Iron Foundry' ?>
+  <?define UpgradeCode = '{8AC812C3-342A-4055-B08B-E1BC280CFDE0}' ?><!-- NEVER CHANGE THIS -->
+  <?define RootRegistryPath = "SOFTWARE\Iron Foundry\CloudFoundryExplorer" ?>
+
+  <Product
+  Id="*"
+  Name="$(var.ProductName)"
+  Language="1033"
+  Version="$(var.VERSION)"
+  Manufacturer="Iron Foundry"
+  UpgradeCode="$(var.UpgradeCode)">
+
+    <!-- InstallerVersion="200" -->
+    <Package
+      Comments="$(var.ProductName)"
+      Keywords="$(var.ProductName)"
+      Description="Cloud Foundry Explorer is an application for interacting with Cloud Foundry and Iron Foundry environments."
+      InstallerVersion="200"
+      InstallPrivileges="elevated"
+      InstallScope="perMachine"
+      Languages="1033"
+      Compressed="yes"
+      Platform="$(sys.BUILDARCH)"
+      Manufacturer="$(var.Manufacturer)"
+      />
+
+    <!-- Add Remove Programs Properties -->
+    <Property Id="ARPHELPLINK" Value="http://www.ironfoundry.org" />
+    <Property Id="ARPURLINFOABOUT" Value="http://www.ironfoundry.org" />
+    <!--Property Id="ARPHELPTELEPHONE" Value="" /-->
+    <Property Id="ARPCONTACT" Value="support@ironfoundry.zendesk.com" />
+    <Icon Id="cloud.ico" SourceFile="$(var.BUILDDIR)CloudFoundrySmall.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="cloud.ico" />
+
+    <!-- Major Upgrade -->
+    <Upgrade Id="$(var.UpgradeCode)">
+      <UpgradeVersion Minimum="$(var.VERSION)" IncludeMinimum="no" OnlyDetect="yes" Property="NEWERVERSIONDETECTED" Language="1033" />
+      <UpgradeVersion Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="$(var.VERSION)" IncludeMaximum="no"
+        Property="OLDERVERSIONBEINGUPGRADED" OnlyDetect="no" IgnoreRemoveFailure="yes" MigrateFeatures="yes" Language="1033"/>
+    </Upgrade>
+
+    <PropertyRef Id="NETFRAMEWORK40FULL"/>
+    <PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR"/>
+    <PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR64"/>
+
+    <Property Id="INSTALLDIR">
+      <RegistrySearch
+        Id="RegINSTALLDIR"
+        Root="HKLM"
+        Win64="$(var.SEARCH.WIN64.REG)"
+        Type="raw"
+        Name="INSTALLDIR"
+        Key="$(var.RootRegistryPath)" />
+    </Property>
+
+    <!-- START (Install Conditions) -->
+    <Condition Message="[ProductName] setup requires Administrator privileges. Setup will now exit.">
+      <![CDATA[Privileged]]>
+    </Condition>
+
+    <Condition Message="[ProductName] requires .NET Framework 4.0 Full. Setup will now exit.">
+      <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
+    </Condition>
+
+    <Condition Message="ALLUSERS must be 1. Setup will now exit."><![CDATA[ALLUSERS = 1]]></Condition>
+    <!-- END (Install Conditions) -->
+
+    <Media Id="1" Cabinet="IronFoundry.CloudFoundryExplorer.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="$(var.ProgramFilesDirectoryId)">
+        <Directory Id="IronFoundryDirectory" Name="Iron Foundry">
+          <Directory Id="CloudFoundryExplorerDirectory" Name="$(var.ShortProductName)">
+            <Directory Id="INSTALLDIR" Name=".">
+
+              <Directory Id="LogDir" Name="logs">
+                <Component Id="MaintainLogDir" Guid="{F711A2FA-33C8-414F-AE0B-D0393CC865AB}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
+                  <CreateFolder />
+                  <RemoveFolder Id="MaintainLogDir.Remove" On="both" />
+                  <RemoveFile Id="MaintainLogDir.RemoveFile" On="uninstall" Name="*.*" />
+                </Component>
+              </Directory>
+
+              <Component Id="MaintainInstallDir" Guid="{A5F16FFF-1969-4523-ADA0-2BCA99899010}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="yes" >
+                <CreateFolder />
+                <RemoveFolder Id="Remove.CloudFoundryExplorer" Directory="CloudFoundryExplorerDirectory" On="uninstall" />
+                <RemoveFolder Id="Remove.InstallLocation" On="uninstall" />
+                <RemoveFile Id="RemoveFiles.InstallLocation" Name="*.*" On="uninstall" />
+              </Component>
+
+              <!-- START (Install Registry) -->
+              <Component Id="IronFoundryRegKey" Guid="{64B21AC1-3D8C-404D-B65D-4BE639CFDD35}" Win64="$(var.WIN64.COMPONENTS)">
+                <Condition><![CDATA[ALLUSERS = 1]]></Condition>
+                <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
+                  <RegistryKey Action="createAndRemoveOnUninstall" Key="Iron Foundry">
+                    <RegistryValue Value="Iron Foundry" Type="string" KeyPath="yes"/>
+                  </RegistryKey>
+                </RegistryKey>
+              </Component>
+
+              <Component Id="PerProductRegistryKey" Guid="{95EFDE60-0272-4843-A8BA-85E23747ABD4}" Win64="$(var.WIN64.COMPONENTS)">
+                <Condition><![CDATA[ALLUSERS = 1]]></Condition>
+                <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
+                  <RegistryKey Action="create" Key="Iron Foundry">
+                    <Permission User="Administrators" GenericRead="yes" Read="yes" GenericWrite="yes" Write="yes" TakeOwnership="yes" />
+                    <RegistryKey Action="createAndRemoveOnUninstall" Key="$(var.ShortProductName)">
+                      <RegistryValue Value="[ProductVersion]" Type="string" KeyPath="yes"/>
+                    </RegistryKey>
+                  </RegistryKey>
+                </RegistryKey>
+              </Component>
+
+              <Component Id="InstallDirRegKey" Guid="{773ABC9F-96C2-4AE0-B197-87EACE9BA9C2}" Win64="$(var.WIN64.COMPONENTS)">
+                <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
+                  <RegistryValue Name="INSTALLDIR" Value="[INSTALLDIR]" Type="string" KeyPath="yes"/>
+                </RegistryKey>
+              </Component>
+              <!-- END (Install Registry)-->
+
+              <!-- START (StartMenu Shortcuts) -->
+              <Directory Id="ProgramMenuFolder">                
+                <Directory Id="ApplicationProgramsFolder" Name="$(var.Manufacturer)">
+                  <Component Id="ApplicationShortcut" Guid="{7EEA94DB-8E16-4667-9B8B-562CDB12B485}">
+                    <?if $(var.Configuration) = Debug ?>
+                    <Shortcut Id="ApplicationStartMenuShortcut"
+                              Name="Cloud Foundry Explorer (DEBUG)"
+                              Description="Cloud Foundry Explorer application."
+                              Target="[INSTALLDIR]\CloudFoundryExplorer.exe"
+                              WorkingDirectory="INSTALLDIR" />
+                    <?else?>
+                    <Shortcut Id="ApplicationStartMenuShortcut"
+                              Name="Cloud Foundry Explorer"
+                              Description="Cloud Foundry Explorer application."
+                              Target="[INSTALLDIR]\CloudFoundryExplorer.exe"
+                              WorkingDirectory="INSTALLDIR" />
+                    <?endif?>
+                    <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+                    <RemoveFolder Id="ProgramMenuFolder" On="uninstall" />
+                    <RegistryKey Root="HKCU" Action="none" Key="$(var.RootRegistryPath)">
+                      <RegistryValue Type="integer" Name="ApplicationShortcut" Value="1" KeyPath="yes" />
+                    </RegistryKey>
+                  </Component>
+                  <Component Id="UninstallShortcut" Guid="{61EF8DAD-3336-438E-86F9-A8CC7EAB193D}">
+                    <Shortcut Id="UninstallProduct"
+                              Name="Uninstall $(var.ShortProductName)"
+                              Description="Uninstalls $(var.ProductName)"
+                              Target="[System64Folder]msiexec.exe"
+                              Arguments="/x [ProductCode]"/>
+                    <RemoveFolder Id="ApplicationProgramsFolderUninstall" On="uninstall" />
+                    <RemoveFolder Id="ProgramMenuFolderUninstall" On="uninstall" />
+                    <RegistryKey Root="HKCU" Action="none" Key="$(var.RootRegistryPath)">
+                      <RegistryValue Type="integer" Name="UninstallShortcut" Value="1" KeyPath="yes" />
+                    </RegistryKey>
+                  </Component>
+                  
+                  
+                </Directory>
+              </Directory>
+              <!-- END (StartMenu Shortcuts) -->
+              <Component Id="IronFoundry.CloudFoundryExplorer" Guid="{2F48A109-984A-4423-A908-3567DB04C8C2}" Win64="$(var.WIN64.COMPONENTS)">
+                <File Id="CloudFoundryExplorer.exe"
+                          Name="CloudFoundryExplorer.exe"
+                          Source="$(var.BUILDDIR)CloudFoundryExplorer.exe" />
+                <File Id="CloudFoundryExplorer.exe.config"
+                                          Name="CloudFoundryExplorer.exe.config"
+                                          Source="$(var.BUILDDIR)CloudFoundryExplorer.exe.config" />
+                <File Id="CloudFoundrySmall.ico"
+                                          Name="CloudFoundrySmall.ico"
+                                          Source="$(var.BUILDDIR)CloudFoundrySmall.ico" />
+                <File Id="GalaSoft.MvvmLight.Extras.WPF4.dll"
+                                          Name="GalaSoft.MvvmLight.Extras.WPF4.dll"
+                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.Extras.WPF4.dll" />
+                <File Id="GalaSoft.MvvmLight.Extras.WPF4.xml"
+                                          Name="GalaSoft.MvvmLight.Extras.WPF4.xml"
+                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.Extras.WPF4.xml" />
+                <File Id="GalaSoft.MvvmLight.WPF4.dll"
+                                          Name="GalaSoft.MvvmLight.WPF4.dll"
+                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.WPF4.dll" />
+                <File Id="GalaSoft.MvvmLight.WPF4.xml"
+                                          Name="GalaSoft.MvvmLight.WPF4.xml"
+                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.WPF4.xml" />
+                <File Id="ICSharpCode.SharpZipLib.dll"
+                                          Name="ICSharpCode.SharpZipLib.dll"
+                                          Source="$(var.BUILDDIR)ICSharpCode.SharpZipLib.dll" />
+                <File Id="IronFoundry.dll"
+                                          Name="IronFoundry.dll"
+                                          Source="$(var.BUILDDIR)IronFoundry.dll" />
+                <File Id="IronFoundry.Ui.Controls.dll"
+                                          Name="IronFoundry.Ui.Controls.dll"
+                                          Source="$(var.BUILDDIR)IronFoundry.Ui.Controls.dll" />
+                <File Id="Newtonsoft.Json.dll"
+                                          Name="Newtonsoft.Json.dll"
+                                          Source="$(var.BUILDDIR)Newtonsoft.Json.dll" />
+                <File Id="Newtonsoft.Json.xml"
+                                          Name="Newtonsoft.Json.xml"
+                                          Source="$(var.BUILDDIR)Newtonsoft.Json.xml" />
+                <File Id="RestSharp.dll"
+                                          Name="RestSharp.dll"
+                                          Source="$(var.BUILDDIR)RestSharp.dll" />
+                <File Id="System.Windows.Interactivity.dll"
+                                          Name="System.Windows.Interactivity.dll"
+                                          Source="$(var.BUILDDIR)System.Windows.Interactivity.dll" />
+                <File Id="System.Windows.Interactivity.xml"
+                                          Name="System.Windows.Interactivity.xml"
+                                          Source="$(var.BUILDDIR)System.Windows.Interactivity.xml" />
+                <File Id="WPFToolkit.Extended.dll"
+                                          Name="WPFToolkit.Extended.dll"
+                                          Source="$(var.BUILDDIR)WPFToolkit.Extended.dll" />
+                <?if $(var.Configuration) = Debug ?>
+                <File Id="CloudFoundryExplorer.pdb"
+                                          Name="CloudFoundryExplorer.pdb"
+                                          Source="$(var.BUILDDIR)CloudFoundryExplorer.pdb" />
+                <File Id="GalaSoft.MvvmLight.Extras.WPF4.pdb"
+                                          Name="GalaSoft.MvvmLight.Extras.WPF4.pdb"
+                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.Extras.WPF4.pdb" />
+                <File Id="GalaSoft.MvvmLight.WPF4.pdb"
+                                          Name="GalaSoft.MvvmLight.WPF4.pdb"
+                                          Source="$(var.BUILDDIR)GalaSoft.MvvmLight.WPF4.pdb" />
+                <File Id="IronFoundry.pdb"
+                                          Name="IronFoundry.pdb"
+                                          Source="$(var.BUILDDIR)IronFoundry.pdb" />
+                <File Id="IronFoundry.Ui.Controls.pdb"
+                                          Name="IronFoundry.Ui.Controls.pdb"
+                                          Source="$(var.BUILDDIR)IronFoundry.Ui.Controls.pdb" />
+                <File Id="Newtonsoft.Json.pdb"
+                                          Name="Newtonsoft.Json.pdb"
+                                          Source="$(var.BUILDDIR)Newtonsoft.Json.pdb" />
+                <?endif?>
+              </Component>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- START (User Interface) Reference: http://wix.sourceforge.net/manual-wix3/WixUI_dialog_library.htm -->
+    <WixVariable Id="WixUIBannerBmp"  Value="Banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp"  Value="WelcomeBanner.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <WixVariable Id="WixUISupportPerUser" Value="0" />
+    <Property Id="WIXUI_FEATURETREE" Value="$(var.ProductName)"/>
+
+    <UIRef Id="WixUI_Common" />
+
+    <UI>
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode"    Value="FeatureTree" />
+
+      <DialogRef Id="ErrorDlg"        />
+      <DialogRef Id="FatalError"      />
+      <DialogRef Id="FilesInUse"      />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg"      />
+      <DialogRef Id="ProgressDlg"     />
+      <DialogRef Id="ResumeDlg"       />
+      <DialogRef Id="UserExit"        />
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg"><![CDATA[LicenseAccepted = "1"]]></Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+      <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Order="1" Value="LicenseAgreementDlg"><![CDATA[NOT Installed]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Order="2" Value="MaintenanceTypeDlg"><![CDATA[Installed]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Order="1" Value="VerifyReadyDlg">1</Publish>
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Order="1" Value="MaintenanceTypeDlg" Event="NewDialog"><![CDATA[WixUI_InstallMode = "Remove"]]></Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Order="2" Value="CustomizeDlg" Event="NewDialog"><![CDATA[NOT WixUI_InstallMode = "Remove"]]></Publish>
+
+      <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton"  Event="NewDialog" Value="CustomizeDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton"  Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton"  Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back"          Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="1">1</Publish>
+    </UI>
+    <!-- END (User Interface) -->
+
+    <ComponentGroup Id="CommonComponents">
+      <ComponentRef Id="InstallDirRegKey" Primary="yes"/>
+      <ComponentRef Id="PerProductRegistryKey" Primary="yes"/>
+      <ComponentRef Id="IronFoundryRegKey" Primary="yes"/>
+      <ComponentRef Id="MaintainLogDir" Primary="yes"/>
+      <ComponentRef Id="MaintainInstallDir" Primary="yes"/>
+    </ComponentGroup>
+
+    <ComponentGroup Id="AppComponents">
+      <ComponentRef Id="ApplicationShortcut" Primary="yes"/>
+      <ComponentRef Id="UninstallShortcut" Primary="yes"/>
+      <ComponentRef Id="IronFoundry.CloudFoundryExplorer" Primary="yes"/>
+    </ComponentGroup>
+
+    <InstallUISequence>
+      <FindRelatedProducts Before="LaunchConditions" />
+      <Custom Action="NewerVersion" After="FindRelatedProducts"><![CDATA[NEWERVERSIONDETECTED]]></Custom>
+    </InstallUISequence>
+
+    <CustomAction Id="NewerVersion" Error="This version or a newer version of [ProductName] is already installed." />
+
+    <InstallExecuteSequence>
+      <Custom Action="NewerVersion" Before="FindRelatedProducts"><![CDATA[NEWERVERSIONDETECTED]]></Custom>
+      <RemoveExistingProducts After="InstallFinalize"/>
+    </InstallExecuteSequence>
+
+    <Feature Id="Product"
+             Title="$(var.ShortProductName)"
+             Description="$(var.ProductName) $(var.VERSION)"
+             Level="1" AllowAdvertise="no" InstallDefault="local"
+             Absent="disallow" ConfigurableDirectory="INSTALLDIR" TypicalDefault="install">      
+      <ComponentGroupRef Id="CommonComponents" />
+      <ComponentGroupRef Id="AppComponents" />
+    </Feature>
+	</Product>
+</Wix>

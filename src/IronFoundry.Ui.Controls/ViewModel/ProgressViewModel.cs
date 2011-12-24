@@ -1,47 +1,87 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel
 {
+    using System.ComponentModel;
     using System.Windows.Input;
     using GalaSoft.MvvmLight.Messaging;
-    using System.ComponentModel;
     using Mvvm;
     using Utilities;
 
     public class ProgressViewModel : DialogViewModel
     {
-        private int progressValue;
-        private string progressText;
-        private string title;
-        private bool canExecuteConfirmed;
         private bool canExecuteCancelled;
+        private bool canExecuteConfirmed;
         private bool isCancelVisible = true;
+        private string progressText;
+        private int progressValue;
+        private string title;
 
         public ProgressViewModel() : base(Messages.ProgressDialogResult)
         {
-            this.canExecuteConfirmed = false;
-            this.canExecuteCancelled = true;
+            canExecuteConfirmed = false;
+            canExecuteCancelled = true;
             Messenger.Default.Register<ProgressMessage>(this,
-                message =>
-                {
-                    this.ProgressValue = message.Value;
-                    this.ProgressText = message.Text;
-                    if (this.ProgressValue == 100)
-                    {
-                        this.canExecuteCancelled = false;
-                        this.canExecuteConfirmed = true;                        
-                    }
-                    CommandManager.InvalidateRequerySuggested();
-                });
+                                                        message =>
+                                                        {
+                                                            ProgressValue = message.Value;
+                                                            ProgressText = message.Text;
+                                                            if (ProgressValue == 100)
+                                                            {
+                                                                canExecuteCancelled = false;
+                                                                canExecuteConfirmed = true;
+                                                            }
+                                                            CommandManager.InvalidateRequerySuggested();
+                                                        });
 
             Messenger.Default.Register<ProgressError>(this,
-                error =>
-                    {
-                        this.ProgressText = error.Text;
-                        this.ProgressValue = 100;
-                        this.ErrorMessage = error.Text;
-                        this.canExecuteCancelled = false;
-                        this.canExecuteConfirmed = true;
-                        CommandManager.InvalidateRequerySuggested();
-                });
+                                                      error =>
+                                                      {
+                                                          ProgressText = error.Text;
+                                                          ProgressValue = 100;
+                                                          ErrorMessage = error.Text;
+                                                          canExecuteCancelled = false;
+                                                          canExecuteConfirmed = true;
+                                                          CommandManager.InvalidateRequerySuggested();
+                                                      });
+        }
+
+        public string Title
+        {
+            get { return title; }
+            set
+            {
+                title = value;
+                RaisePropertyChanged("Title");
+            }
+        }
+
+        public int ProgressValue
+        {
+            get { return progressValue; }
+            set
+            {
+                progressValue = value;
+                RaisePropertyChanged("ProgressValue");
+            }
+        }
+
+        public string ProgressText
+        {
+            get { return progressText; }
+            set
+            {
+                progressText = value;
+                RaisePropertyChanged("ProgressText");
+            }
+        }
+
+        public bool IsCancelVisible
+        {
+            get { return isCancelVisible; }
+            set
+            {
+                isCancelVisible = value;
+                RaisePropertyChanged("IsCancelVisible");
+            }
         }
 
         protected override void OnConfirmed(CancelEventArgs args)
@@ -56,43 +96,19 @@
 
         protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetProgressData, (s) => this.Title = s));
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.SetProgressCancelButtonVisible, (b) => this.IsCancelVisible = b));
+            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetProgressData, (s) => Title = s));
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.SetProgressCancelButtonVisible,
+                                                                       (b) => IsCancelVisible = b));
         }
 
         protected override bool CanExecuteConfirmed()
         {
-            return this.canExecuteConfirmed;
+            return canExecuteConfirmed;
         }
 
         protected override bool CanExecuteCancelled()
         {
-            return this.canExecuteCancelled;
+            return canExecuteCancelled;
         }
-
-        public string Title
-        {
-            get { return this.title; }
-            set { this.title = value; RaisePropertyChanged("Title"); }
-        }
-
-        public int ProgressValue
-        {
-            get { return this.progressValue; }
-            set { this.progressValue = value; RaisePropertyChanged("ProgressValue"); }
-        }
-
-        public string ProgressText
-        {
-            get { return this.progressText; }
-            set { this.progressText = value; RaisePropertyChanged("ProgressText"); }
-        }
-
-        public bool IsCancelVisible
-        {
-            get { return this.isCancelVisible; }
-            set { this.isCancelVisible = value; RaisePropertyChanged("IsCancelVisible"); }
-        }
-
     }
 }

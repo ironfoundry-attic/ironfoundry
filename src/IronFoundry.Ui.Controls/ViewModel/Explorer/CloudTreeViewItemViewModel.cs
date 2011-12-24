@@ -1,74 +1,76 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Windows.Input;
-using IronFoundry.Types;
-using IronFoundry.Ui.Controls.Model;
-using IronFoundry.Ui.Controls.Mvvm;
-using IronFoundry.Ui.Controls.Utilities;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-
-namespace IronFoundry.Ui.Controls.ViewModel.Explorer
+﻿namespace IronFoundry.Ui.Controls.ViewModel.Explorer
 {
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
+    using System.Windows.Input;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Messaging;
     using Model;
     using Mvvm;
+    using Types;
     using Utilities;
 
     public class CloudTreeViewItemViewModel : TreeViewItemViewModel
     {
-        private Types.Cloud cloud;
+        private readonly BackgroundWorker connector = new BackgroundWorker();
+        private Cloud cloud;
         private ICloudFoundryProvider provider;
-        public RelayCommand<MouseButtonEventArgs> OpenCloudCommand { get; private set; }
-        public RelayCommand RemoveCloudCommand { get; private set; }
-        public RelayCommand ConnectCommand { get; private set; }
-        public RelayCommand DisconnectCommand { get; private set; }
-        public RelayCommand RefreshCommand { get; private set; }
-        private BackgroundWorker connector = new BackgroundWorker();
 
-        public CloudTreeViewItemViewModel(Types.Cloud cloud)
+        public CloudTreeViewItemViewModel(Cloud cloud)
             : base(null, false)
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
+                                       Messages.GetCloudFoundryProvider, p => provider = p));
             OpenCloudCommand = new RelayCommand<MouseButtonEventArgs>(OpenCloud);
             RemoveCloudCommand = new RelayCommand(RemoveCloud);
             ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
             DisconnectCommand = new RelayCommand(Disconnect, CanExecuteDisconnect);
             RefreshCommand = new RelayCommand(Refresh);
 
-            this.Cloud = cloud;
+            Cloud = cloud;
             if (Cloud.IsConnected)
-                foreach (var application in Cloud.Applications)
+                foreach (Application application in Cloud.Applications)
                     Children.Add(new ApplicationTreeViewItemViewModel(application, this));
 
-            this.Cloud.Applications.CollectionChanged += Applications_CollectionChanged;
+            Cloud.Applications.CollectionChanged += Applications_CollectionChanged;
             connector.DoWork += BeginConnect;
             connector.RunWorkerCompleted += EndConnect;
             connector.RunWorkerAsync();
         }
 
-        public Types.Cloud Cloud
+        public RelayCommand<MouseButtonEventArgs> OpenCloudCommand { get; private set; }
+        public RelayCommand RemoveCloudCommand { get; private set; }
+        public RelayCommand ConnectCommand { get; private set; }
+        public RelayCommand DisconnectCommand { get; private set; }
+        public RelayCommand RefreshCommand { get; private set; }
+
+        public Cloud Cloud
         {
-            get { return this.cloud; }
-            set { this.cloud = value; RaisePropertyChanged("Cloud"); }
+            get { return cloud; }
+            set
+            {
+                cloud = value;
+                RaisePropertyChanged("Cloud");
+            }
         }
 
         private void OpenCloud(MouseButtonEventArgs e)
         {
             if (e == null || e.ClickCount >= 2)
-                Messenger.Default.Send(new NotificationMessage<Types.Cloud>(this, this.Cloud, Messages.OpenCloud));
+                Messenger.Default.Send(new NotificationMessage<Cloud>(this, Cloud, Messages.OpenCloud));
         }
 
         private void BeginConnect(object sender, DoWorkEventArgs args)
         {
-            args.Result = provider.Connect(this.Cloud);
+            args.Result = provider.Connect(Cloud);
         }
 
         private void EndConnect(object sender, RunWorkerCompletedEventArgs args)
         {
-            var result = args.Result as ProviderResponse<Types.Cloud>;
+            var result = args.Result as ProviderResponse<Cloud>;
             if (result.Response != null)
-                this.Cloud.Merge(result.Response);
+                Cloud.Merge(result.Response);
             else
                 Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
         }
@@ -111,34 +113,34 @@ namespace IronFoundry.Ui.Controls.ViewModel.Explorer
             var comparer = new ApplicationEqualityComparer();
             if (e.Action.Equals(NotifyCollectionChangedAction.Add))
             {
-                foreach (var item in e.NewItems)
+                foreach (object item in e.NewItems)
                 {
                     var app = item as Application;
                     base.Children.Add(new ApplicationTreeViewItemViewModel(app, this));
                 }
             }
             else if (e.Action.Equals(NotifyCollectionChangedAction.Remove))
-            {                
-                foreach (var item in e.OldItems)
+            {
+                foreach (object item in e.OldItems)
                 {
                     var appsToRemove = new List<TreeViewItemViewModel>();
                     var app = item as Application;
-                    foreach (var treeView in base.Children)
+                    foreach (TreeViewItemViewModel treeView in base.Children)
                     {
                         var appTreeView = treeView as ApplicationTreeViewItemViewModel;
                         if (comparer.Equals(appTreeView.Application, app))
                             appsToRemove.Add(treeView);
                     }
-                    foreach (var treeView in appsToRemove)
+                    foreach (TreeViewItemViewModel treeView in appsToRemove)
                         base.Children.Remove(treeView);
                 }
             }
             else if (e.Action.Equals(NotifyCollectionChangedAction.Replace))
             {
-                foreach(var item in e.NewItems)
+                foreach (object item in e.NewItems)
                 {
                     var app = item as Application;
-                    foreach (var treeView in base.Children)
+                    foreach (TreeViewItemViewModel treeView in base.Children)
                     {
                         var appTreeView = treeView as ApplicationTreeViewItemViewModel;
                         if (comparer.Equals(appTreeView.Application, app))
@@ -152,6 +154,6 @@ namespace IronFoundry.Ui.Controls.ViewModel.Explorer
             }
             else if (e.Action.Equals(NotifyCollectionChangedAction.Reset))
                 base.Children.Clear();
-        }      
+        }
     }
 }

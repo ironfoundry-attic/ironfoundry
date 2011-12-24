@@ -5,19 +5,18 @@
     using System.Linq;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
-    using IronFoundry.Types;
+    using Model;
     using Mvvm;
+    using Types;
     using Utilities;
 
     public class UpdateViewModel : DialogViewModel
     {
-        private Types.Cloud selectedCloud;
         private Application application;
-        private string pushFromDirectory;
         private bool canChangeDirectory = true;
         private string name;
-        public RelayCommand ManageCloudsCommand { get; private set; }
-        public RelayCommand ChooseDirectoryCommand { get; private set; }
+        private string pushFromDirectory;
+        private Types.Cloud selectedCloud;
 
         public UpdateViewModel() : base(Messages.UpdateDialogResult)
         {
@@ -25,47 +24,17 @@
             ChooseDirectoryCommand = new RelayCommand(ChooseDirectory, CanChooseDirectory);
         }
 
-        protected override void RegisterGetData()
-        {
-            Messenger.Default.Register<NotificationMessageAction<UpdateViewModel>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.GetUpdateAppData))
-                        message.Execute(this);
-                    Cleanup();
-                });
-        }
-
-        protected override void InitializeData()
-        {
-            Messenger.Default.Send(new NotificationMessageAction<Guid>(Messages.SetUpdateAppData,
-                (id) =>
-                {                    
-                    this.SelectedCloud = Clouds.SingleOrDefault(i => i.ID == id);
-                }));
-
-            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetPushAppDirectory,
-                (directory) =>
-                {
-                    this.PushFromDirectory = directory;
-                    this.CanChangeDirectory = false;
-                }));
-        }
-
-        protected override bool CanExecuteConfirmed()
-        {
-            return SelectedCloud != null && SelectedApplication != null;
-        }
-
-        private bool CanChooseDirectory()
-        {
-            return this.canChangeDirectory;
-        }
+        public RelayCommand ManageCloudsCommand { get; private set; }
+        public RelayCommand ChooseDirectoryCommand { get; private set; }
 
         public string Name
         {
-            get { return this.name; }
-            set { this.name = value; RaisePropertyChanged("Name"); }
+            get { return name; }
+            set
+            {
+                name = value;
+                RaisePropertyChanged("Name");
+            }
         }
 
         public SafeObservableCollection<Types.Cloud> Clouds
@@ -75,22 +44,25 @@
 
         public Types.Cloud SelectedCloud
         {
-            get { return this.selectedCloud; }
+            get { return selectedCloud; }
             set
             {
-                this.selectedCloud = value;
-                if (this.selectedCloud != null)
+                selectedCloud = value;
+                if (selectedCloud != null)
                 {
-                    var local = this.provider.Connect(this.selectedCloud);
+                    ProviderResponse<Types.Cloud> local = provider.Connect(selectedCloud);
                     if (local.Response != null)
                     {
-                        this.selectedCloud.Services.Synchronize(local.Response.Services, new ProvisionedServiceEqualityComparer());
-                        this.selectedCloud.Applications.Synchronize(local.Response.Applications, new ApplicationEqualityComparer());
-                        this.selectedCloud.AvailableServices.Synchronize(local.Response.AvailableServices, new SystemServiceEqualityComparer());
+                        selectedCloud.Services.Synchronize(local.Response.Services,
+                                                           new ProvisionedServiceEqualityComparer());
+                        selectedCloud.Applications.Synchronize(local.Response.Applications,
+                                                               new ApplicationEqualityComparer());
+                        selectedCloud.AvailableServices.Synchronize(local.Response.AvailableServices,
+                                                                    new SystemServiceEqualityComparer());
                     }
                     else
                     {
-                        this.ErrorMessage = local.Message;
+                        ErrorMessage = local.Message;
                     }
                 }
                 RaisePropertyChanged("SelectedCloud");
@@ -102,30 +74,81 @@
         {
             get
             {
-                if (this.selectedCloud == null)
+                if (selectedCloud == null)
                     return null;
                 else
-                    return this.selectedCloud.Applications;
+                    return selectedCloud.Applications;
             }
-
         }
 
         public Application SelectedApplication
         {
-            get { return this.application; }
-            set { this.application = value; RaisePropertyChanged("SelectedApplication"); }
+            get { return application; }
+            set
+            {
+                application = value;
+                RaisePropertyChanged("SelectedApplication");
+            }
         }
 
         public string PushFromDirectory
         {
-            get { return this.pushFromDirectory; }
-            set { this.pushFromDirectory = value; RaisePropertyChanged("PushFromDirectory"); }
+            get { return pushFromDirectory; }
+            set
+            {
+                pushFromDirectory = value;
+                RaisePropertyChanged("PushFromDirectory");
+            }
         }
 
         public bool CanChangeDirectory
         {
-            get { return this.canChangeDirectory; }
-            set { this.canChangeDirectory = value; RaisePropertyChanged("CanChangeDirectory"); }
+            get { return canChangeDirectory; }
+            set
+            {
+                canChangeDirectory = value;
+                RaisePropertyChanged("CanChangeDirectory");
+            }
+        }
+
+        protected override void RegisterGetData()
+        {
+            Messenger.Default.Register<NotificationMessageAction<UpdateViewModel>>(this,
+                                                                                   message =>
+                                                                                   {
+                                                                                       if (
+                                                                                           message.Notification.Equals(
+                                                                                               Messages.GetUpdateAppData))
+                                                                                           message.Execute(this);
+                                                                                       Cleanup();
+                                                                                   });
+        }
+
+        protected override void InitializeData()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<Guid>(Messages.SetUpdateAppData,
+                                                                       (id) =>
+                                                                       {
+                                                                           SelectedCloud =
+                                                                               Clouds.SingleOrDefault(i => i.ID == id);
+                                                                       }));
+
+            Messenger.Default.Send(new NotificationMessageAction<string>(Messages.SetPushAppDirectory,
+                                                                         (directory) =>
+                                                                         {
+                                                                             PushFromDirectory = directory;
+                                                                             CanChangeDirectory = false;
+                                                                         }));
+        }
+
+        protected override bool CanExecuteConfirmed()
+        {
+            return SelectedCloud != null && SelectedApplication != null;
+        }
+
+        private bool CanChooseDirectory()
+        {
+            return canChangeDirectory;
         }
 
         private void ManageClouds()
@@ -138,7 +161,7 @@
             Messenger.Default.Send(new NotificationMessageAction<string>(Messages.ChooseDirectory, (directory) =>
             {
                 if (directory != null)
-                    this.PushFromDirectory = directory;
+                    PushFromDirectory = directory;
             }));
         }
     }
