@@ -121,11 +121,7 @@
 
             bool rv = false;
 
-#if DEBUG
-            for (ushort i = 1; NatsMessagingStatus.RUNNING == Status && i <= 1; ++i)
-#else
-            for (ushort i = 1; NatsMessagingStatus.RUNNING == Status && i <= CONNECTION_ATTEMPT_RETRIES; ++i)
-#endif
+            for (ushort i = 1; NatsMessagingStatus.RUNNING == Status && i <= ConnectionAttemptRetries; ++i)
             {
                 try
                 {
