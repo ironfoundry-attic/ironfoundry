@@ -268,6 +268,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Iron Foundry DEA Files Service.
+        /// </summary>
+        internal static string FilesWinService_ServiceName {
+            get {
+                return ResourceManager.GetString("FilesWinService_ServiceName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error setting up Event Log logger!.
         /// </summary>
         internal static string InternalLog_ErrorInSettingUpEventLogger_Message {

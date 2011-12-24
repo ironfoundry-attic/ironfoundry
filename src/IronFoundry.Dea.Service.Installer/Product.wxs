@@ -104,7 +104,7 @@
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="$(var.ProgramFilesDirectoryId)">
-        <Directory Id="IronFoundryDirectory" Name="Iron Foundry">
+        <Directory Id="IronFoundryDirectory" Name="$(var.Manufacturer)">
           <Directory Id="WindowsServiceDirectory" Name="$(var.ShortProductName)">
             <Directory Id="INSTALLDIR" Name=".">
 
@@ -124,7 +124,7 @@
               </Component>
 
               <!-- START (Install Registry) -->
-              <?include IronFoundryRegKey.wxi?>
+              <?include IronFoundryShared.wxi?>
 
               <Component Id="PerProductRegistryKey" Guid="{112F503E-8AF1-4532-96F9-DECC8A58A34C}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
@@ -174,14 +174,22 @@
                     File="[#IronFoundry.Dea.Service.exe.config]"
                     ElementPath="/configuration/ironFoundryDea/@natsHost"
                     Value="[NATSHOST]"/>
-                <util:XmlFile Id="Config.XmlFile.2" Sequence="1" Action="setValue"
+                <util:XmlFile Id="Config.XmlFile.2" Sequence="2" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
                     ElementPath="/configuration/ironFoundryDea/@natsPort"
                     Value="[NATSPORT]"/>
-                <util:XmlFile Id="Config.XmlFile.3" Sequence="1" Action="setValue"
+                <util:XmlFile Id="Config.XmlFile.3" Sequence="3" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
                     ElementPath="/configuration/ironFoundryDea/@localRoute"
                     Value="[LOCALROUTE]"/>
+                <util:XmlFile Id="Config.XmlFile.4" Sequence="4" Action="setValue"
+                    File="[#IronFoundry.Dea.Service.exe.config]"
+                    ElementPath="/configuration/ironFoundryDea/@appDir"
+                    Value="[APPDIR]"/>
+                <util:XmlFile Id="Config.XmlFile.5" Sequence="5" Action="setValue"
+                    File="[#IronFoundry.Dea.Service.exe.config]"
+                    ElementPath="/configuration/ironFoundryDea/@dropletDir"
+                    Value="[DROPLETDIR]"/>
               </Component>
 
               <Component Id="ServiceConfigKeys" Guid="{0FCFE86A-787E-420A-B1E7-13A0F68758E9}" Win64="$(var.WIN64.COMPONENTS)">
@@ -189,6 +197,8 @@
                   <RegistryValue Id="regNatsHost" Name="NatsHost" Value="[NATSHOST]" Type="string"/>
                   <RegistryValue Id="regNatsPort" Name="NatsPort" Value="[NATSPORT]" Type="string"/>
                   <RegistryValue Id="regLocalRoute" Name="LocalRoute" Value="[LOCALROUTE]" Type="string"/>
+                  <RegistryValue Id="regAppDir" Name="AppDir" Value="[APPDIR]" Type="string"/>
+                  <RegistryValue Id="regDropletDir" Name="DropletDir" Value="[DROPLETDIR]" Type="string"/>
                 </RegistryKey>
               </Component>
               
@@ -205,15 +215,9 @@
                 <File Id="IronFoundry.Dea.dll"
                       Name="IronFoundry.Dea.dll"
                       Source="$(var.SVCBUILDDIR)IronFoundry.Dea.dll" />
-                <File Id="IronFoundry.dll"
-                      Name="IronFoundry.dll"
-                      Source="$(var.SVCBUILDDIR)IronFoundry.dll" />
                 <File Id="Newtonsoft.Json.dll"
                       Name="Newtonsoft.Json.dll"
                       Source="$(var.SVCBUILDDIR)Newtonsoft.Json.dll" />
-                <File Id="RestSharp.dll"
-                      Name="RestSharp.dll"
-                      Source="$(var.SVCBUILDDIR)RestSharp.dll" />
                 <File Id="StructureMap.dll"
                       Name="StructureMap.dll"
                       Source="$(var.SVCBUILDDIR)StructureMap.dll" />
@@ -223,9 +227,6 @@
                 <File Id="IronFoundry.Dea.pdb"
                       Name="IronFoundry.Dea.pdb"
                       Source="$(var.SVCBUILDDIR)IronFoundry.Dea.pdb" />
-                <File Id="IronFoundry.pdb"
-                      Name="IronFoundry.pdb"
-                      Source="$(var.SVCBUILDDIR)IronFoundry.pdb" />
                 <File Id="Newtonsoft.Json.pdb"
                       Name="Newtonsoft.Json.pdb"
                       Source="$(var.SVCBUILDDIR)Newtonsoft.Json.pdb" />
@@ -276,6 +277,12 @@
     <Property Id="LOCALROUTE" Secure="yes">
       <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regLocalRoute" Name="LocalRoute" />
     </Property>
+    <Property Id="APPDIR" Secure="yes" Value="C:\IronFoundry\apps">
+      <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regAppDir" Name="AppDir" />
+    </Property>
+    <Property Id="DROPLETDIR" Secure="yes" Value="C:\IronFoundry\droplets">
+      <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regDropletDir" Name="DropletDir" />
+    </Property>
     <!-- END (Configuration Settings) -->
 
     <!-- START (User Interface) Reference: http://wix.sourceforge.net/manual-wix3/WixUI_dialog_library.htm -->
@@ -288,6 +295,8 @@
     <WixVariable Id="ServiceConfigNatsHostProperty" Value="NATSHOST"/>
     <WixVariable Id="ServiceConfigNatsPortProperty" Value="NATSPORT"/>
     <WixVariable Id="ServiceConfigLocalRouteProperty" Value="LOCALROUTE"/>
+    <WixVariable Id="ServiceConfigAppDirProperty" Value="APPDIR"/>
+    <WixVariable Id="ServiceConfigDropletDirProperty" Value="DROPLETDIR"/>
 
     <Property Id="WIXUI_FEATURETREE" Value="$(var.ProductName) Service"/>
 
@@ -345,6 +354,7 @@
       <ComponentRef Id="IronFoundryRegKey" Primary="yes"/>
       <ComponentRef Id="MaintainLogDir" Primary="yes"/>
       <ComponentRef Id="MaintainInstallDir" Primary="yes"/>
+      <ComponentRef Id="MaintainIronFoundryDir" Primary="yes"/>
     </ComponentGroup>
 
     <ComponentGroup Id="DeaServiceComponents">

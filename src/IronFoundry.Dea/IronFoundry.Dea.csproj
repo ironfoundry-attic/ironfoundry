@@ -80,6 +80,8 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
     <Compile Include="Agent\DropletManager.cs" />
+    <Compile Include="Extensions\IEnumerableExtensionMethods.cs" />
+    <Compile Include="Extensions\StringExtensionMethods.cs" />
     <Compile Include="Extensions\TaskExtensionMethods.cs" />
     <Compile Include="Extensions\TimerExtensionMethods.cs" />
     <Compile Include="Agent\FileData.cs" />
@@ -160,12 +162,6 @@
   <ItemGroup>
     <None Include="IronFoundry.snk" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IronFoundry\IronFoundry.csproj">
-      <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
-      <Name>IronFoundry</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

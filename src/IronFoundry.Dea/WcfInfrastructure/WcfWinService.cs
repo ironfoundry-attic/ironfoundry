@@ -30,7 +30,7 @@
             get { return serviceHost.Description.ServiceType.FullName; }
         }
 
-        public StartServiceResult StartService(IntPtr ignored)
+        public virtual StartServiceResult StartService(IntPtr ignored)
         {
             if (shouldRun)
             {
@@ -44,7 +44,7 @@
             return new StartServiceResult();
         }
 
-        public void StopService()
+        public virtual void StopService()
         {
             if (shouldRun && null != serviceHost)
             {

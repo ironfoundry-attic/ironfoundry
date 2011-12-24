@@ -273,4 +273,7 @@
   <data name="Agent_StoppingInstance_Fmt" xml:space="preserve">
     <value>Stopping instance: {0}</value>
   </data>
+  <data name="FilesWinService_ServiceName" xml:space="preserve">
+    <value>Iron Foundry DEA Files Service</value>
+  </data>
 </root>

@@ -119,7 +119,7 @@
               </Component>
 
               <!-- START (Install Registry) -->
-              <?include IronFoundryRegKey.wxi ?>
+              <?include IronFoundryShared.wxi ?>
 
               <Component Id="PerProductRegistryKey" Guid="{79D45A2D-B6DE-40FF-B41D-BED8636C5871}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
@@ -256,6 +256,7 @@
       <ComponentRef Id="IronFoundryRegKey" Primary="yes"/>
       <ComponentRef Id="MaintainLogDir" Primary="yes"/>
       <ComponentRef Id="MaintainInstallDir" Primary="yes"/>
+      <ComponentRef Id="MaintainIronFoundryDir" Primary="yes"/>
     </ComponentGroup>
 
     <ComponentGroup Id="AppComponents">      

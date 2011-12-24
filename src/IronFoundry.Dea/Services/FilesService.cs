@@ -1,14 +1,13 @@
 ﻿namespace IronFoundry.Dea.Services
 {
     using System;
-    using System.ServiceModel;
-    using System.ServiceModel.Channels;
-    using IronFoundry.Dea.Logging;
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.ServiceModel.Channels;
     using System.ServiceModel.Security;
     using IronFoundry.Dea.Config;
+    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Providers;
 
     public class FilesService : IFilesService

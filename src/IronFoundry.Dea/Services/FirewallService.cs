@@ -9,45 +9,32 @@
     /// </summary>
     public class FirewallService : IFirewallService
     {
-        private readonly bool firewallEnabled;
-
-        public FirewallService()
-        {
-            INetFwMgr fwMgr = getFirewallManager();
-            this.firewallEnabled = fwMgr.LocalPolicy.CurrentProfile.FirewallEnabled;
-        }
-
+        // TODO: Enable rules in all profiles
         public void Open(ushort port, string name)
         {
-            if (firewallEnabled)
-            {
-                Type netFwOpenPortType = Type.GetTypeFromProgID("HNetCfg.FWOpenPort");
-                INetFwOpenPort openPort = (INetFwOpenPort)Activator.CreateInstance(netFwOpenPortType);
-                openPort.Port = port;
-                openPort.Name = name;
-                openPort.Enabled = true;
-                openPort.Protocol = NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
+            INetFwOpenPort openPort = getComObject<INetFwOpenPort>("HNetCfg.FWOpenPort");
+            openPort.Port = port;
+            openPort.Name = name;
+            openPort.Enabled = true;
+            openPort.Scope = NET_FW_SCOPE_.NET_FW_SCOPE_ALL;
+            openPort.Protocol = NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
 
-                INetFwMgr fwMgr = getFirewallManager();
-                INetFwOpenPorts openPorts = (INetFwOpenPorts)fwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts;
-                openPorts.Add(openPort);
-            }
+            INetFwMgr fwMgr = getComObject<INetFwMgr>("HNetCfg.FwMgr");
+            INetFwOpenPorts openPorts = (INetFwOpenPorts)fwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts;
+            openPorts.Add(openPort);
         }
 
         public void Close(ushort port)
         {
-            if (firewallEnabled)
-            {
-                INetFwMgr fwMgr = getFirewallManager();
-                INetFwOpenPorts openPorts = (INetFwOpenPorts)fwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts;
-                openPorts.Remove(port, NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP);
-            }
+            INetFwMgr fwMgr = getComObject<INetFwMgr>("HNetCfg.FwMgr");
+            INetFwOpenPorts openPorts = (INetFwOpenPorts)fwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts;
+            openPorts.Remove(port, NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP);
         }
 
-        private static INetFwMgr getFirewallManager()
+        private static T getComObject<T>(string progID)
         {
-            Type firewallManagerType = Type.GetTypeFromProgID("HNetCfg.FwMgr");
-            return (INetFwMgr)Activator.CreateInstance(firewallManagerType);
+            Type t = Type.GetTypeFromProgID(progID, true);
+            return (T)Activator.CreateInstance(t);
         }
     }
 }
