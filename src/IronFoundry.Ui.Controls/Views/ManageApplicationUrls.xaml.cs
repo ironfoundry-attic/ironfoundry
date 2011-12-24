@@ -1,22 +1,18 @@
-﻿using System.Windows;
-using GalaSoft.MvvmLight.Messaging;
-using IronFoundry.Ui.Controls.Utilities;
-using IronFoundry.Ui.Controls.ViewModel;
-using IronFoundry.Ui.Controls.ViewModel.Cloud;
-
-namespace IronFoundry.Ui.Controls.Views
+﻿namespace IronFoundry.Ui.Controls.Views
 {
+    using System.Windows;
+    using GalaSoft.MvvmLight.Messaging;
     using Utilities;
     using ViewModel.Cloud;
 
     /// <summary>
-	/// Interaction logic for ManageCloudUrls.xaml
-	/// </summary>
-	public partial class ManageApplicationUrls : Window
-	{
+    /// Interaction logic for ManageCloudUrls.xaml
+    /// </summary>
+    public partial class ManageApplicationUrls : Window
+    {
         public ManageApplicationUrls()
-		{
-			this.InitializeComponent();
+        {
+            this.InitializeComponent();
             this.DataContext = new ManageApplicationUrlsViewModel();
             this.Closed += (s, e) => Messenger.Default.Unregister(this);
 
@@ -58,6 +54,6 @@ namespace IronFoundry.Ui.Controls.Views
                        message.Execute(result.GetValueOrDefault());
                    }
                });
-		}
-	}
+        }
+    }
 }

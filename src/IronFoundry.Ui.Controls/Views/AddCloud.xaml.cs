@@ -1,12 +1,9 @@
-﻿using IronFoundry.Ui.Controls.ViewModel.AddCloud;
-
-namespace IronFoundry.Ui.Controls.Views
+﻿namespace IronFoundry.Ui.Controls.Views
 {
     using System.Windows;
-    using Controls.ViewModel;
     using GalaSoft.MvvmLight.Messaging;
+    using IronFoundry.Ui.Controls.ViewModel.AddCloud;
     using Utilities;
-    using ViewModel.AddCloud;
 
     /// <summary>
     /// Interaction logic for AddCloud.xaml

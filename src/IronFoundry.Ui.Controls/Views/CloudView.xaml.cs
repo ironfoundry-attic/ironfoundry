@@ -1,10 +1,8 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using GalaSoft.MvvmLight.Messaging;
-using IronFoundry.Ui.Controls.Utilities;
-
-namespace IronFoundry.Ui.Controls.Views
+﻿namespace IronFoundry.Ui.Controls.Views
 {
+    using System.Windows;
+    using System.Windows.Controls;
+    using GalaSoft.MvvmLight.Messaging;
     using Utilities;
 
     /// <summary>

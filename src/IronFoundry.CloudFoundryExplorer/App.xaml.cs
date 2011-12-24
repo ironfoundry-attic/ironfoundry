@@ -1,6 +1,6 @@
 ﻿namespace IronFoundry.CloudFoundryExplorer
 {
-    using Ui.Controls.Model;
+    using IronFoundry.Ui.Controls.Model;
 
     public partial class App : System.Windows.Application
     {

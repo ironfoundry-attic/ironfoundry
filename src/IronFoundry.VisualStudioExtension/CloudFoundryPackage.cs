@@ -1,7 +1,6 @@
 ﻿namespace IronFoundry.VisualStudioExtension
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.ComponentModel.Design;
     using System.Diagnostics;
@@ -9,10 +8,10 @@
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Windows.Interop;
-    using IronFoundry.Types;
-    using IronFoundry.Vcap;
     using EnvDTE;
     using GalaSoft.MvvmLight.Messaging;
+    using IronFoundry.Types;
+    using IronFoundry.Vcap;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Ui.Controls.Model;

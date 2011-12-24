@@ -1,22 +1,18 @@
-﻿using System.Windows;
-using GalaSoft.MvvmLight.Messaging;
-using IronFoundry.Ui.Controls.Utilities;
-using IronFoundry.Ui.Controls.ViewModel;
-using IronFoundry.Ui.Controls.ViewModel.Cloud;
-
-namespace IronFoundry.Ui.Controls.Views
+﻿namespace IronFoundry.Ui.Controls.Views
 {
+    using System.Windows;
+    using GalaSoft.MvvmLight.Messaging;
     using Utilities;
     using ViewModel.Cloud;
 
     /// <summary>
     /// Interaction logic for ProvisionService.xaml
-	/// </summary>
-	public partial class CreateService : Window
-	{
+    /// </summary>
+    public partial class CreateService : Window
+    {
         public CreateService()
-		{
-			this.InitializeComponent();
+        {
+            this.InitializeComponent();
             this.DataContext = new CreateServiceViewModel();
             this.Closed += (s, e) => Messenger.Default.Unregister(this);
 
@@ -30,6 +26,6 @@ namespace IronFoundry.Ui.Controls.Views
                         Messenger.Default.Unregister(this);
                     }
                 });
-		}
-	}
+        }
+    }
 }

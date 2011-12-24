@@ -1,11 +1,7 @@
-﻿using System.Windows;
-using GalaSoft.MvvmLight.Messaging;
-using IronFoundry.Ui.Controls.Utilities;
-using IronFoundry.Ui.Controls.ViewModel;
-using IronFoundry.Ui.Controls.ViewModel.AddCloud;
-
-namespace IronFoundry.Ui.Controls.Views
+﻿namespace IronFoundry.Ui.Controls.Views
 {
+    using System.Windows;
+    using GalaSoft.MvvmLight.Messaging;
     using Utilities;
     using ViewModel.AddCloud;
 

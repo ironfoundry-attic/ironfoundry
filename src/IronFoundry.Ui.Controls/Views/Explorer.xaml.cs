@@ -1,13 +1,6 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using IronFoundry.Ui.Controls.ViewModel;
-using IronFoundry.Ui.Controls.Utilities;
-using System.Windows.Interop;
-using System;
-using System.Windows.Media.Imaging;
-
-namespace IronFoundry.Ui.Controls.Views
+﻿namespace IronFoundry.Ui.Controls.Views
 {
+    using System.Windows;
     using ViewModel;
 
     /// <summary>

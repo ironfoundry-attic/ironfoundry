@@ -1,9 +1,8 @@
-﻿﻿using System.Collections.ObjectModel;
-﻿using System.Linq;
-﻿using GalaSoft.MvvmLight;
-
-namespace IronFoundry.Ui.Controls.Mvvm
+﻿namespace IronFoundry.Ui.Controls.Mvvm
 {
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using GalaSoft.MvvmLight;
     public class TreeViewItemViewModel : ViewModelBase
     {
         private static readonly TreeViewItemViewModel placeholderChild = new TreeViewItemViewModel();
