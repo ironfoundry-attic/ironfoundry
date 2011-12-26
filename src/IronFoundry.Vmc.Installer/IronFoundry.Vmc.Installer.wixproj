@@ -35,6 +35,7 @@
   <ItemGroup>
     <Content Include="Banner.bmp" />
     <Content Include="License.rtf" />
+    <None Include="README_wixproj.txt" />
     <Content Include="WelcomeBanner.bmp" />
   </ItemGroup>
   <ItemGroup>

@@ -32,6 +32,7 @@
   <ItemGroup>
     <Compile Include="Product.wxs" />
     <Content Include="Banner.bmp" />
+    <None Include="README_wixproj.txt" />
     <Content Include="ServiceConfigDialog.wxi" />
     <Content Include="WelcomeBanner.bmp" />
   </ItemGroup>
