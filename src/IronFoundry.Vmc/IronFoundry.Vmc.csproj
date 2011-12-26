@@ -58,8 +58,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
+    <Compile Include="..\shared\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\shared\ExtensionMethods.cs">
+      <Link>ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="Apps.cs" />
     <Compile Include="AddUser.cs" />

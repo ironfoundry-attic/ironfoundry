@@ -12,20 +12,20 @@
       <Text>Please fill out the settings below and click next to continue.</Text>
     </Control>
 
-    <Control Id="NatsHostText" Type="Text" X="41" Y="86" Width="50" Height="10" Text="&amp;NATS Host:" />
-    <Control Id="NatsHostBox" Type="Edit" X="94" Y="84" Width="150" Height="15" Property="!(wix.ServiceConfigNatsHostProperty)" />
+    <Control Id="NatsHostText" Type="Text" X="40" Y="87" Width="56" Height="17" Text="&amp;NATS Host:" />
+    <Control Id="NatsHostBox" Type="Edit" X="100" Y="84" Width="150" Height="17" Property="!(wix.ServiceConfigNatsHostProperty)" />
 
-    <Control Id="NatsPortText" Type="Text" X="41" Y="108" Width="50" Height="10" Text="&amp;NATS Port: (default is 4222)" />
-    <Control Id="NatsPortBox" Type="Edit" X="94" Y="106" Width="150" Height="15" Property="!(wix.ServiceConfigNatsPortProperty)" />
+    <Control Id="NatsPortText" Type="Text" X="40" Y="109" Width="56" Height="17" Text="&amp;NATS Port: " />
+    <Control Id="NatsPortBox" Type="Edit" X="100" Y="106" Width="150" Height="17" Property="!(wix.ServiceConfigNatsPortProperty)" />
 
-    <Control Id="LocalRouteText" Type="Text" X="41" Y="130" Width="50" Height="10" Text="&amp;Local IP:" />
-    <Control Id="LocalRouteBox" Type="Edit" X="94" Y="128" Width="150" Height="15" Property="!(wix.ServiceConfigLocalRouteProperty)" />
+    <Control Id="LocalRouteText" Type="Text" X="40" Y="131" Width="56" Height="17" Text="&amp;Local IP:" />
+    <Control Id="LocalRouteBox" Type="Edit" X="100" Y="128" Width="150" Height="17" Property="!(wix.ServiceConfigLocalRouteProperty)" />
 
-    <Control Id="AppDirText" Type="Text" X="41" Y="152" Width="50" Height="10" Text="&amp;App Dir:" />
-    <Control Id="AppDirBox" Type="Edit" X="94" Y="150" Width="150" Height="15" Property="!(wix.ServiceConfigAppDirProperty)" />
+    <Control Id="AppDirText" Type="Text" X="40" Y="153" Width="56" Height="17" Text="&amp;App Dir:" />
+    <Control Id="AppDirBox" Type="Edit" X="100" Y="150" Width="150" Height="17" Property="!(wix.ServiceConfigAppDirProperty)" />
 
-    <Control Id="DropletDirText" Type="Text" X="41" Y="174" Width="50" Height="10" Text="&amp;Droplet Dir:" />
-    <Control Id="DropletDirBox" Type="Edit" X="94" Y="172" Width="150" Height="15" Property="!(wix.ServiceConfigDropletDirProperty)" />
+    <Control Id="DropletDirText" Type="Text" X="40" Y="175" Width="56" Height="17" Text="&amp;Droplet Dir:" />
+    <Control Id="DropletDirBox" Type="Edit" X="100" Y="172" Width="150" Height="17" Property="!(wix.ServiceConfigDropletDirProperty)" />
 
     <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
 

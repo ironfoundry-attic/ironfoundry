@@ -9,26 +9,28 @@
     /// </summary>
     public class FirewallService : IFirewallService
     {
-        // TODO: Enable rules in all profiles
+        const string INetFwPolicy2ProgID = "HNetCfg.FwPolicy2";
+        const string INetFwRuleProgID = "HNetCfg.FWRule";
+
         public void Open(ushort port, string name)
         {
-            INetFwOpenPort openPort = getComObject<INetFwOpenPort>("HNetCfg.FWOpenPort");
-            openPort.Port = port;
-            openPort.Name = name;
-            openPort.Enabled = true;
-            openPort.Scope = NET_FW_SCOPE_.NET_FW_SCOPE_ALL;
-            openPort.Protocol = NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
+            INetFwRule2 firewallRule = getComObject<INetFwRule2>(INetFwRuleProgID);
+            firewallRule.Description = name;
+            firewallRule.Name = name;
+            firewallRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
+            firewallRule.Enabled = true;
+            firewallRule.InterfaceTypes = "All";
+            firewallRule.Protocol = (int)NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
+            firewallRule.LocalPorts = port.ToString();
 
-            INetFwMgr fwMgr = getComObject<INetFwMgr>("HNetCfg.FwMgr");
-            INetFwOpenPorts openPorts = (INetFwOpenPorts)fwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts;
-            openPorts.Add(openPort);
+            INetFwPolicy2 firewallPolicy = getComObject<INetFwPolicy2>(INetFwPolicy2ProgID);
+            firewallPolicy.Rules.Add(firewallRule);
         }
 
-        public void Close(ushort port)
+        public void Close(string name)
         {
-            INetFwMgr fwMgr = getComObject<INetFwMgr>("HNetCfg.FwMgr");
-            INetFwOpenPorts openPorts = (INetFwOpenPorts)fwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts;
-            openPorts.Remove(port, NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP);
+            INetFwPolicy2 firewallPolicy = getComObject<INetFwPolicy2>(INetFwPolicy2ProgID);
+            firewallPolicy.Rules.Remove(name);
         }
 
         private static T getComObject<T>(string progID)

@@ -69,8 +69,11 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
+    <Compile Include="..\shared\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\shared\ExtensionMethods.cs">
+      <Link>Extensions\ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="Agent\Agent.cs" />
     <Compile Include="Agent\IDropletManager.cs" />
@@ -80,8 +83,6 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
     <Compile Include="Agent\DropletManager.cs" />
-    <Compile Include="Extensions\IEnumerableExtensionMethods.cs" />
-    <Compile Include="Extensions\StringExtensionMethods.cs" />
     <Compile Include="Extensions\TaskExtensionMethods.cs" />
     <Compile Include="Extensions\TimerExtensionMethods.cs" />
     <Compile Include="Agent\FileData.cs" />

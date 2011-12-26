@@ -48,7 +48,7 @@
 
         public override void StopService()
         {
-            firewallService.Close(config.FilesServicePort);
+            firewallService.Close(Resources.FilesWinService_ServiceName);
             base.StopService();
         }
     }

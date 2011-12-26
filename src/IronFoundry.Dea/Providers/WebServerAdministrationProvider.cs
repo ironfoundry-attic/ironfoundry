@@ -70,8 +70,6 @@
             {
                 using (var manager = new ServerManager())
                 {
-                    ushort port = STARTING_PORT;
-
                     Site site = GetSite(manager, applicationInstanceName);
                     if (null != site)
                     {
@@ -84,9 +82,9 @@
                         manager.ApplicationPools.Remove(applicationPool);
                         manager.CommitChanges();
                     }
-
-                    firewallService.Close(port);
                 }
+
+                firewallService.Close(applicationInstanceName);
             }
             catch (Exception ex)
             {
