@@ -74,7 +74,7 @@
                     type: Resources.Agent_DEAComponentType,
                     index: 1,
                     uuid: messagingProvider.UniqueIdentifier,
-                    host: config.LocalIPAddress.ToString(),
+                    host: config.MonitoringServiceHostStr,
                     credentials: config.MonitoringCredentials);
 
                 varzProvider.Discover = discoverMessage;

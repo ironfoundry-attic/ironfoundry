@@ -9,7 +9,8 @@
     {
         private const string publishSubject = "vcap.component.discover";
 
-        public VcapComponentDiscover(string type, int index, Guid uuid, string host, ServiceCredential credentials)
+        public VcapComponentDiscover(string type, int index, Guid uuid,
+            string host, ServiceCredential credentials)
             : base(type, index, uuid, host, credentials, DateTime.Now) { }
 
         [JsonIgnore]

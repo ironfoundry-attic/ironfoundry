@@ -23,16 +23,16 @@
             Uri baseAddress = config.MonitoringServiceUri;
 
             var webHttpBinding = new WebHttpBinding();
-            webHttpBinding.Security.Mode = WebHttpSecurityMode.TransportCredentialOnly;
-            webHttpBinding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
-
+            // webHttpBinding.Security.Mode = WebHttpSecurityMode.TransportCredentialOnly;
+            // webHttpBinding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
+            webHttpBinding.Security.Mode = WebHttpSecurityMode.None;
             var serviceHost =  new IocServiceHost(typeof(MonitoringService), baseAddress);               
             base.serviceHost = serviceHost;
 
             ServiceEndpoint endpoint = serviceHost.AddServiceEndpoint(typeof(IMonitoringService), webHttpBinding, baseAddress);
             endpoint.Behaviors.Add(new WebHttpBehavior());
-            serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new CustomUserNamePasswordValidator(config.MonitoringCredentials);
-            serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom; 
+            //serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new CustomUserNamePasswordValidator(config.MonitoringCredentials);
+            //serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom; 
         }
 
         public override ushort StartIndex

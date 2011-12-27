@@ -21,5 +21,6 @@
         ushort MonitoringServicePort { get; }
         Uri MonitoringServiceUri { get; }
         ServiceCredential MonitoringCredentials { get; }
+        string MonitoringServiceHostStr { get; }
     }
 }

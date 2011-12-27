@@ -4,6 +4,7 @@
     using System.Configuration;
     using System.Net;
     using System.Net.Sockets;
+    using System.Globalization;
 
     public class Config : IConfig
     {
@@ -17,6 +18,7 @@
         private readonly ServiceCredential monitoringCredentials;
 
         private readonly ushort monitoringServicePort;
+        private readonly string monitoringServiceHostStr;
 
         public Config()
         {
@@ -27,6 +29,8 @@
 
             this.monitoringServicePort = Utility.RandomFreePort();
             this.monitoringServiceUri = new Uri(String.Format("http://localhost:{0}", MonitoringServicePort));
+            this.monitoringServiceHostStr = String.Format(CultureInfo.InvariantCulture,
+                "{0}:{1}", localIPAddress, monitoringServicePort);
 
             this.filesCredentials = new ServiceCredential();
             this.monitoringCredentials = new ServiceCredential();
@@ -95,6 +99,11 @@
         public Uri MonitoringServiceUri
         {
             get { return monitoringServiceUri; }
+        }
+
+        public string MonitoringServiceHostStr
+        {
+            get { return monitoringServiceHostStr; }
         }
 
         private IPAddress GetLocalIPAddress()
