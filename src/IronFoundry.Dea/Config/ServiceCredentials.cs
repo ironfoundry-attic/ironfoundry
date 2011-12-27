@@ -2,12 +2,12 @@
 {
     using System;
 
-    public class FilesServiceCredentials
+    public class ServiceCredentials
     {
         private readonly string username;
         private readonly string password;
 
-        public FilesServiceCredentials()
+        public ServiceCredentials()
         {
             this.username = getRandomCredential();
             this.password = getRandomCredential();

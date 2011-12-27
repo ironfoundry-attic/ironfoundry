@@ -276,4 +276,14 @@
   <data name="FilesWinService_ServiceName" xml:space="preserve">
     <value>Iron Foundry DEA Files Service</value>
   </data>
+  <data name="MonitoringWinService_ServiceName" xml:space="preserve">
+    <value>Iron Foundry DEA Monitoring Service</value>
+  </data>
+  <data name="HealthzProvider_GetHealthzCalled_Message" xml:space="preserve">
+    <value>HealthzProvider.GetHealthz() called.</value>
+  </data>
+  <data name="VarzProvider_GetVarzJson_Fmt" xml:space="preserve">
+    <value>VarzProvdider.GetVarzJson():
+{0}</value>
+  </data>
 </root>

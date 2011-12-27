@@ -23,5 +23,10 @@
             WebOperationContext.Current.OutgoingResponse.StatusCode = code;
             WebOperationContext.Current.OutgoingResponse.StatusDescription = description;
         }
+
+        public Message CreateTextResponse(string message, string contentType)
+        {
+            return WebOperationContext.Current.CreateTextResponse(message, contentType);
+        }
     }
 }

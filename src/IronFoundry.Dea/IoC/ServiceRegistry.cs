@@ -1,6 +1,4 @@
-﻿using IronFoundry.Dea.Providers;
-
-namespace IronFoundry.Dea.IoC
+﻿namespace IronFoundry.Dea.IoC
 {
     using System;
     using System.Reflection;
@@ -29,7 +27,8 @@ namespace IronFoundry.Dea.IoC
             });
 
             For<IConfig>().Singleton().Use<Config>();
-            For<IWebOperationContextProvider>().Singleton().Use<WebOperationContextProvider>();
+            For<IHealthzProvider>().Singleton().Use<HealthzProvider>();
+            For<IVarzProvider>().Singleton().Use<VarzProvider>();
 
             For<IMessagingProvider>().Use<NatsMessagingProvider>();
 

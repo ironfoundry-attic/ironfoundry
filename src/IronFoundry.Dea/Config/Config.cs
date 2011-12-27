@@ -8,18 +8,33 @@
     public class Config : IConfig
     {
         private readonly DeaSection deaSection;
-        private readonly FilesServiceCredentials filesCredentials;
         private readonly IPAddress localIPAddress;
+
         private readonly Uri filesServiceUri;
-        private readonly Uri wcfFilesServiceUri;
+        private readonly Uri monitoringServiceUri;
+
+        private readonly ServiceCredentials filesCredentials;
+        private readonly ServiceCredentials monitoringCredentials;
+
+        private readonly ushort monitoringServicePort;
 
         public Config()
         {
             this.deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
-            this.filesCredentials = new FilesServiceCredentials();
             this.localIPAddress = GetLocalIPAddress();
-            this.filesServiceUri = new Uri(String.Format("http://{0}:{1}", localIPAddress, FilesServicePort));
-            this.wcfFilesServiceUri = new Uri(String.Format("http://localhost:{0}", FilesServicePort));
+
+            this.filesServiceUri = new Uri(String.Format("http://localhost:{0}", FilesServicePort));
+
+            this.monitoringServicePort = Utility.RandomFreePort();
+            this.monitoringServiceUri = new Uri(String.Format("http://localhost:{0}", MonitoringServicePort));
+
+            this.filesCredentials = new ServiceCredentials();
+            this.monitoringCredentials = new ServiceCredentials();
+        }
+
+        public ushort MaxMemoryMB
+        {
+            get { return deaSection.MaxMemoryMB; }
         }
 
         public bool DisableDirCleanup
@@ -52,9 +67,19 @@
             get { return deaSection.FilesServicePort; }
         }
 
-        public FilesServiceCredentials FilesCredentials
+        public ushort MonitoringServicePort
+        {
+            get { return monitoringServicePort; }
+        }
+
+        public ServiceCredentials FilesCredentials
         {
             get { return filesCredentials; }
+        }
+
+        public ServiceCredentials MonitoringCredentials
+        {
+            get { return monitoringCredentials; }
         }
 
         public IPAddress LocalIPAddress
@@ -67,9 +92,9 @@
             get { return filesServiceUri; }
         }
 
-        public Uri WCFFilesServiceUri
+        public Uri MonitoringServiceUri
         {
-            get { return wcfFilesServiceUri; }
+            get { return monitoringServiceUri; }
         }
 
         private IPAddress GetLocalIPAddress()

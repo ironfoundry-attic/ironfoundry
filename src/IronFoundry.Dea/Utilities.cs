@@ -55,5 +55,14 @@ namespace IronFoundry.Dea
 
             return string.Format("{0:0.##}{1}", decimalSize, sizes[index]);
         }
+
+        public static ushort RandomFreePort()
+        {
+            var socket = new TcpListener(IPAddress.Any, 0);
+            socket.Start();
+            ushort rv = Convert.ToUInt16(((IPEndPoint)socket.LocalEndpoint).Port);
+            socket.Stop();
+            return rv;
+        }
     }
 }

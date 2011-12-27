@@ -14,25 +14,36 @@
 
     public sealed class Agent : IAgent
     {
-        private static readonly TimeSpan TenSecondsInterval = TimeSpan.FromSeconds(10);
+        private readonly TimeSpan OneSecondInterval = TimeSpan.FromSeconds(1);
+        private readonly TimeSpan TwoSecondsInterval = TimeSpan.FromSeconds(2);
+        private readonly TimeSpan TenSecondsInterval = TimeSpan.FromSeconds(10);
 
         private readonly ILog log;
         private readonly IConfig config;
         private readonly IMessagingProvider messagingProvider;
-        private readonly IWebServerAdministrationProvider webServerProvider;
-        private readonly IDropletManager dropletManager;
         private readonly IFilesManager filesManager;
+        private readonly IDropletManager dropletManager;
+        private readonly IWebServerAdministrationProvider webServerProvider;
+        IVarzProvider varzProvider;
 
         private readonly Hello helloMessage;
-        private readonly Task monitorTask;
+
+        private readonly Task heartbeatTask;
+        private readonly Task varzTask;
+        private readonly Task monitorAppsTask;
 
         private bool shutting_down = false;
+
+        private ushort maxMemoryMB;
+
+        private VcapComponentDiscover discoverMessage;
 
         public Agent(ILog log, IConfig config,
             IMessagingProvider messagingProvider,
             IFilesManager filesManager,
             IDropletManager dropletManager,
-            IWebServerAdministrationProvider webServerAdministrationProvider)
+            IWebServerAdministrationProvider webServerAdministrationProvider,
+            IVarzProvider varzProvider)
         {
             this.log               = log;
             this.config            = config;
@@ -40,9 +51,15 @@
             this.filesManager      = filesManager;
             this.dropletManager    = dropletManager;
             this.webServerProvider = webServerAdministrationProvider;
+            this.varzProvider      = varzProvider;
 
             helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort, 0.99M);
-            monitorTask = new Task(MonitorLoop);
+
+            heartbeatTask = new Task(HeartbeatLoop);
+            varzTask = new Task(SnapshotVarz);
+            monitorAppsTask = new Task(MonitorApps);
+
+            this.maxMemoryMB = config.MaxMemoryMB;
         }
 
         public bool Error { get; private set; }
@@ -53,22 +70,23 @@
             {
                 messagingProvider.Start();
 
-                var vcapComponentDiscoverMessage = new VcapComponentDiscover(
+                discoverMessage = new VcapComponentDiscover(
                     type: Resources.Agent_DEAComponentType,
                     index: 1,
                     uuid: messagingProvider.UniqueIdentifier,
                     host: config.LocalIPAddress.ToString(),
-                    credentials: messagingProvider.UniqueIdentifier,
-                    start: DateTime.Now);
+                    credentials: messagingProvider.UniqueIdentifier);
+
+                varzProvider.Discover = discoverMessage;
 
                 messagingProvider.Subscribe(NatsSubscription.VcapComponentDiscover,
                     (msg, reply) =>
                     {
-                        // TODO update_discover_uptime
-                        messagingProvider.Publish(reply, vcapComponentDiscoverMessage);
+                        discoverMessage.UpdateUptime();
+                        messagingProvider.Publish(reply, discoverMessage);
                     });
 
-                messagingProvider.Publish(new VcapComponentAnnounce(vcapComponentDiscoverMessage));
+                messagingProvider.Publish(new VcapComponentAnnounce(discoverMessage));
 
                 messagingProvider.Subscribe(NatsSubscription.DeaStatus, ProcessDeaStatus);
                 messagingProvider.Subscribe(NatsSubscription.DropletStatus, ProcessDropletStatus);
@@ -84,7 +102,9 @@
 
                 RecoverExistingDroplets();
 
-                monitorTask.Start();
+                heartbeatTask.Start();
+                varzTask.Start();
+                monitorAppsTask.Start();
             }
             else
             {
@@ -120,7 +140,7 @@
             log.Info(Resources.Agent_Shutdown_Message);
         }
 
-        private void MonitorLoop()
+        private void HeartbeatLoop()
         {
             while (false == shutting_down)
             {
@@ -535,6 +555,88 @@
                 Droplets = new[] { heartbeat }
             };
             messagingProvider.Publish(message);
+        }
+
+        private void SnapshotVarz()
+        {
+            while (false == shutting_down)
+            {
+                varzProvider.MaxMemoryMB = this.maxMemoryMB;
+                varzProvider.MemoryReservedMB = 0; // TODO
+                varzProvider.MemoryUsedMB = 0; // TODO
+                varzProvider.MaxClients = 1024;
+                if (this.shutting_down)
+                {
+                    varzProvider.State = VcapStates.SHUTTING_DOWN;
+                }
+                Thread.Sleep(OneSecondInterval);
+            }
+        }
+
+        private void MonitorApps()
+        {
+            while (false == shutting_down)
+            {
+                Thread.Sleep(TwoSecondsInterval);
+
+                var runningAppsJson = new List<string>();
+
+                if (dropletManager.IsEmpty)
+                {
+                    varzProvider.MemoryUsedMB = 0;
+                    return;
+                }
+
+                var metrics = new Dictionary<string, IDictionary<string, Metric>>
+                {
+                    { "framework", new Dictionary<string, Metric>() }, 
+                    { "runtime", new Dictionary<string, Metric>() }
+                };
+
+                dropletManager.ForAllInstances((instance) =>
+                    {
+                        if (false == instance.IsRunning)
+                        {
+                            return;
+                        }
+
+                        foreach (KeyValuePair<string, IDictionary<string, Metric>> kvp in metrics)
+                        {
+                            var metric = new Metric();
+
+                            if (kvp.Key == "framework")
+                            {
+                                if (false == metrics.ContainsKey(instance.Framework))
+                                {
+                                    kvp.Value[instance.Framework] = metric;
+                                }
+                                metric = kvp.Value[instance.Framework];
+                            }
+
+                            if (kvp.Key == "runtime")
+                            {
+                                if (!metrics.ContainsKey(instance.Runtime))
+                                {
+                                    kvp.Value[instance.Runtime] = metric;
+                                }
+                                metric = kvp.Value[instance.Runtime];
+                            }
+
+                            metric.UsedMemory = 0; // TODO KB
+                            metric.ReservedMemory = 0; // TODO KB
+                            metric.UsedDisk = 0; // TODO BYTES
+                            metric.UsedCpu = 0; // TODO
+                        }
+
+                        string instanceJson = instance.ToJson();
+                        runningAppsJson.Add(instanceJson);
+                    }
+                );
+
+                varzProvider.RunningAppsJson = runningAppsJson;
+                varzProvider.FrameworkMetrics = metrics["framework"];
+                varzProvider.RuntimeMetrics = metrics["runtime"];
+            }
         }
     }
 }

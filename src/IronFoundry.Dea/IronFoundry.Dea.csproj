@@ -78,7 +78,7 @@
     <Compile Include="Agent\Agent.cs" />
     <Compile Include="Agent\IDropletManager.cs" />
     <Compile Include="Config\Config.cs" />
-    <Compile Include="Config\FilesServiceCredentials.cs" />
+    <Compile Include="Config\ServiceCredentials.cs" />
     <Compile Include="Config\IConfig.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
@@ -102,6 +102,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Providers\HealthzProvider.cs" />
+    <Compile Include="Providers\IVarzProvider.cs" />
     <Compile Include="Providers\IMessagingProvider.cs" />
     <Compile Include="Providers\IWebOperationContextProvider.cs" />
     <Compile Include="Providers\IWebServerAdministrationProvider.cs" />
@@ -109,13 +111,17 @@
     <Compile Include="Providers\NatsCommand.cs" />
     <Compile Include="Providers\NatsMessagingProvider.cs" />
     <Compile Include="Providers\NatsSubscription.cs" />
+    <Compile Include="Providers\VarzProvider.cs" />
     <Compile Include="Providers\WebOperationContextProvider.cs" />
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />
     <Compile Include="Services\FilesService.cs" />
-    <Compile Include="Services\FilesServiceValidator.cs" />
+    <Compile Include="Services\CustomUserNamePasswordValidator.cs" />
     <Compile Include="Services\FirewallService.cs" />
     <Compile Include="Services\IFilesService.cs" />
     <Compile Include="Services\IFirewallService.cs" />
+    <Compile Include="Providers\IHealthzProvider.cs" />
+    <Compile Include="Services\IMonitoringService.cs" />
+    <Compile Include="Services\MonitoringService.cs" />
     <Compile Include="Types\Connect.cs" />
     <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\Discover.cs" />
@@ -132,6 +138,7 @@
     <Compile Include="Types\InstanceExited.cs" />
     <Compile Include="Types\Limits.cs" />
     <Compile Include="Types\Message.cs" />
+    <Compile Include="Types\Metric.cs" />
     <Compile Include="Types\RouterRegister.cs" />
     <Compile Include="Types\RouterUnregister.cs" />
     <Compile Include="Types\Service.cs" />
@@ -154,6 +161,7 @@
     <Compile Include="WcfInfrastructure\IocServiceHost.cs" />
     <Compile Include="WcfInfrastructure\PerCallServiceHost.cs" />
     <Compile Include="WcfInfrastructure\WcfWinService.cs" />
+    <Compile Include="WinService\MonitoringWinService.cs" />
     <Compile Include="WinService\DeaWinService.cs" />
     <Compile Include="WinService\FilesWinService.cs" />
     <Compile Include="WinService\IService.cs" />

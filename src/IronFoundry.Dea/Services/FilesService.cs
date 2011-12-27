@@ -31,8 +31,10 @@
             uriSegments.RemoveRange(0, 2);                        
             var path = uriSegments.Aggregate(config.AppDir, Path.Combine);
 
-            if (config.AppDir.Equals(path,StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityAccessDeniedException();                
+            if (config.AppDir.Equals(path, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityAccessDeniedException();
+            }
 
             try
             {
@@ -57,9 +59,9 @@
 
                     fileSystemInfos.ForEach(info =>
                     {
-                        var left = string.Format("{0}{1}", info.Name, (info is DirectoryInfo) ? "/" : string.Empty);
+                        var left = string.Format("{0}{1}", info.Name, (info is DirectoryInfo) ? "/" : String.Empty);
                         var right = info is DirectoryInfo ? "-" : Utility.GetFileSizeString((info as FileInfo).Length);
-                        outputStream.WriteLine(left + new string(' ', Math.Max(8, 46 - left.Length - right.Length)) + right);
+                        outputStream.WriteLine(left + new String(' ', Math.Max(8, 46 - left.Length - right.Length)) + right);
                     });
 
                     outputStream.Flush();

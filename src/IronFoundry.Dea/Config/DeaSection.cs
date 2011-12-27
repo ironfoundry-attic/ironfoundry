@@ -98,5 +98,18 @@
                 this["filesServicePort"] = value;
             }
         }
+
+        [ConfigurationProperty("maxMemoryMB", DefaultValue = "4096", IsRequired = false)]
+        public ushort MaxMemoryMB
+        {
+            get
+            {
+                return Convert.ToUInt16(this["maxMemoryMB"]);
+            }
+            set
+            {
+                this["maxMemoryMB"] = value;
+            }
+        }
     }
 }

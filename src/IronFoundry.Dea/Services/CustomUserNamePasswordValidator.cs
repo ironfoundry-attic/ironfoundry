@@ -6,13 +6,13 @@
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Properties;
 
-    public class FilesServiceValidator : UserNamePasswordValidator
+    public class CustomUserNamePasswordValidator : UserNamePasswordValidator
     {
-        private readonly FilesServiceCredentials credentials;
+        private readonly ServiceCredentials credentials;
 
-        public FilesServiceValidator(IConfig config)
+        public CustomUserNamePasswordValidator(ServiceCredentials credentials)
         {
-            this.credentials = config.FilesCredentials;
+            this.credentials = credentials;
         }
 
         public override void Validate(string userName, string password)

@@ -4,7 +4,8 @@
 
     public static class Constants
     {
-        public const string FilesServiceNamespace = @"http://ironfoundry.org/dea/filesservice"; // NB: should match app.config
+        public const string FilesServiceNamespace = @"http://ironfoundry.org/dea/filesservice";
+        public const string MonitoringServiceNamespace = @"http://ironfoundry.org/dea/monitoringservice";
 
         public const string SupportedFramework = "aspdotnet";
 

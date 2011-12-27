@@ -10,5 +10,7 @@
         Uri GetRequestUri();
         Message CreateStreamResponse(Stream stream, string contentType);
         void SetOutgoingResponse(HttpStatusCode code, string description);
+
+        Message CreateTextResponse(string message, string contentType);
     }
 }

@@ -1,16 +1,15 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using System.Globalization;
     using Newtonsoft.Json;
 
     public class VcapComponentDiscover : VcapComponentBase
     {
         private const string publishSubject = "vcap.component.discover";
 
-        public VcapComponentDiscover(
-            string type, int index, Guid uuid,
-            string host, Guid credentials, DateTime start)
-            : base(type, index, uuid, host, credentials, start) { }
+        public VcapComponentDiscover(string type, int index, Guid uuid, string host, Guid credentials)
+            : base(type, index, uuid, host, credentials, DateTime.Now) { }
 
         public VcapComponentDiscover(VcapComponentBase vcapComponentBase)
             : base(vcapComponentBase) { }
@@ -21,9 +20,18 @@
             get { return publishSubject; }
         }
 
+        [JsonProperty(PropertyName = "uptime")]
+        public string Uptime { get; private set; }
+
         public override bool CanPublishWithSubject(string subject)
         {
             return false == subject.IsNullOrWhiteSpace();
+        }
+
+        public void UpdateUptime()
+        {
+            TimeSpan uptimeSpan = DateTime.Now - base.Start;
+            this.Uptime = String.Format(CultureInfo.InvariantCulture, "{0}d:{1}h:{2}m:{3}s", uptimeSpan.Days, uptimeSpan.Hours, uptimeSpan.Minutes, uptimeSpan.Seconds);
         }
     }
 }

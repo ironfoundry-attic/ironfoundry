@@ -277,11 +277,29 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HealthzProvider.GetHealthz() called..
+        /// </summary>
+        internal static string HealthzProvider_GetHealthzCalled_Message {
+            get {
+                return ResourceManager.GetString("HealthzProvider_GetHealthzCalled_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error setting up Event Log logger!.
         /// </summary>
         internal static string InternalLog_ErrorInSettingUpEventLogger_Message {
             get {
                 return ResourceManager.GetString("InternalLog_ErrorInSettingUpEventLogger_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Iron Foundry DEA Monitoring Service.
+        /// </summary>
+        internal static string MonitoringWinService_ServiceName {
+            get {
+                return ResourceManager.GetString("MonitoringWinService_ServiceName", resourceCulture);
             }
         }
         
@@ -498,6 +516,16 @@ namespace IronFoundry.Dea.Properties {
         internal static string NatsMessagingProvider_WaitingForTasks_Message {
             get {
                 return ResourceManager.GetString("NatsMessagingProvider_WaitingForTasks_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VarzProvdider.GetVarzJson():
+        ///{0}.
+        /// </summary>
+        internal static string VarzProvider_GetVarzJson_Fmt {
+            get {
+                return ResourceManager.GetString("VarzProvider_GetVarzJson_Fmt", resourceCulture);
             }
         }
         
