@@ -8,9 +8,9 @@
 
     public class CustomUserNamePasswordValidator : UserNamePasswordValidator
     {
-        private readonly ServiceCredentials credentials;
+        private readonly ServiceCredential credentials;
 
-        public CustomUserNamePasswordValidator(ServiceCredentials credentials)
+        public CustomUserNamePasswordValidator(ServiceCredential credentials)
         {
             this.credentials = credentials;
         }

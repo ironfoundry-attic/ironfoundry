@@ -1,20 +1,17 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using IronFoundry.Dea.Config;
     using Newtonsoft.Json;
 
     public class VcapComponentAnnounce : VcapComponentBase
     {
         private const string publishSubject = "vcap.component.announce";
 
-        public VcapComponentAnnounce(
-            string argType, int argIndex, Guid argUuid,
-            string argHost, Guid argCredentials, DateTime argStart)
-            : base(argType, argIndex, argUuid,
-                   argHost, argCredentials, argStart) { }
+        public VcapComponentAnnounce(string type, int index, Guid uuid, string host, ServiceCredential credentials, DateTime start)
+            : base(type, index, uuid, host, credentials, start) { }
 
-        public VcapComponentAnnounce(VcapComponentBase argVcapComponentBase)
-            : base(argVcapComponentBase) { }
+        public VcapComponentAnnounce(VcapComponentBase vcapComponentBase) : base(vcapComponentBase) { }
 
         [JsonIgnore]
         public override string PublishSubject

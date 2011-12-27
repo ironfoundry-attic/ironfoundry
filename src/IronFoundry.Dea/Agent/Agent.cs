@@ -75,7 +75,7 @@
                     index: 1,
                     uuid: messagingProvider.UniqueIdentifier,
                     host: config.LocalIPAddress.ToString(),
-                    credentials: messagingProvider.UniqueIdentifier);
+                    credentials: config.MonitoringCredentials);
 
                 varzProvider.Discover = discoverMessage;
 

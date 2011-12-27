@@ -37,7 +37,7 @@
 
         public override ushort StartIndex
         {
-            get { return 0; }
+            get { return 1; }
         }
 
         public override StartServiceResult StartService(IntPtr ignored)

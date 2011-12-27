@@ -2,17 +2,15 @@
 {
     using System;
     using System.Globalization;
+    using IronFoundry.Dea.Config;
     using Newtonsoft.Json;
 
     public class VcapComponentDiscover : VcapComponentBase
     {
         private const string publishSubject = "vcap.component.discover";
 
-        public VcapComponentDiscover(string type, int index, Guid uuid, string host, Guid credentials)
+        public VcapComponentDiscover(string type, int index, Guid uuid, string host, ServiceCredential credentials)
             : base(type, index, uuid, host, credentials, DateTime.Now) { }
-
-        public VcapComponentDiscover(VcapComponentBase vcapComponentBase)
-            : base(vcapComponentBase) { }
 
         [JsonIgnore]
         public override string PublishSubject

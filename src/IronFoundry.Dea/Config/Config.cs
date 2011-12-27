@@ -13,8 +13,8 @@
         private readonly Uri filesServiceUri;
         private readonly Uri monitoringServiceUri;
 
-        private readonly ServiceCredentials filesCredentials;
-        private readonly ServiceCredentials monitoringCredentials;
+        private readonly ServiceCredential filesCredentials;
+        private readonly ServiceCredential monitoringCredentials;
 
         private readonly ushort monitoringServicePort;
 
@@ -28,8 +28,8 @@
             this.monitoringServicePort = Utility.RandomFreePort();
             this.monitoringServiceUri = new Uri(String.Format("http://localhost:{0}", MonitoringServicePort));
 
-            this.filesCredentials = new ServiceCredentials();
-            this.monitoringCredentials = new ServiceCredentials();
+            this.filesCredentials = new ServiceCredential();
+            this.monitoringCredentials = new ServiceCredential();
         }
 
         public ushort MaxMemoryMB
@@ -72,12 +72,12 @@
             get { return monitoringServicePort; }
         }
 
-        public ServiceCredentials FilesCredentials
+        public ServiceCredential FilesCredentials
         {
             get { return filesCredentials; }
         }
 
-        public ServiceCredentials MonitoringCredentials
+        public ServiceCredential MonitoringCredentials
         {
             get { return monitoringCredentials; }
         }

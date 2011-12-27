@@ -78,7 +78,7 @@
     <Compile Include="Agent\Agent.cs" />
     <Compile Include="Agent\IDropletManager.cs" />
     <Compile Include="Config\Config.cs" />
-    <Compile Include="Config\ServiceCredentials.cs" />
+    <Compile Include="Config\ServiceCredential.cs" />
     <Compile Include="Config\IConfig.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />

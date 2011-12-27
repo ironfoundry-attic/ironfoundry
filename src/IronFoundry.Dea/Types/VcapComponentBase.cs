@@ -1,11 +1,14 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using IronFoundry.Dea.Config;
     using JsonConverters;
     using Newtonsoft.Json;
 
     public abstract class VcapComponentBase : Message
     {
+        private ServiceCredential credentials;
+
         [JsonProperty(PropertyName = "type")]
         public string Type { get; private set; }
 
@@ -18,26 +21,39 @@
         [JsonProperty(PropertyName = "host")]
         public string Host { get; private set; }
 
-        [JsonProperty(PropertyName = "credentials"), JsonConverter(typeof(VcapGuidConverter))]
-        public Guid Credentials { get; private set; }
-
         [JsonProperty(PropertyName = "start"), JsonConverter(typeof(VcapDateTimeConverter))]
         public DateTime Start { get; private set; }
 
-        public VcapComponentBase(
-            string argType, int argIndex, Guid argUuid,
-            string argHost, Guid argCredentials, DateTime argStart)
+        [JsonProperty(PropertyName = "credentials")]
+        public string[] CredentialsAry { get; private set; }
+
+        [JsonIgnore]
+        public ServiceCredential Credentials
         {
-            Type        = argType;
-            Index       = argIndex;
-            Uuid        = argUuid;
-            Host        = argHost;
-            Credentials = argCredentials;
-            Start       = argStart;
+            get { return credentials; }
+            private set
+            {
+                this.credentials = value;
+                if (null != this.credentials)
+                {
+                    CredentialsAry = new string[] { credentials.Username, credentials.Password };
+                }
+            }
         }
 
-        public VcapComponentBase(VcapComponentBase argCopyFrom)
-            : this(argCopyFrom.Type, argCopyFrom.Index, argCopyFrom.Uuid,
-                   argCopyFrom.Host, argCopyFrom.Credentials, argCopyFrom.Start) { }
+        public VcapComponentBase(
+            string type, int index, Guid uuid,
+            string host, ServiceCredential credentials, DateTime start)
+        {
+            Type        = type;
+            Index       = index;
+            Uuid        = uuid;
+            Host        = host;
+            Start       = start;
+            Credentials = credentials;
+        }
+
+        public VcapComponentBase(VcapComponentBase copyFrom)
+            : this(copyFrom.Type, copyFrom.Index, copyFrom.Uuid, copyFrom.Host, copyFrom.Credentials, copyFrom.Start) { }
     }
 }

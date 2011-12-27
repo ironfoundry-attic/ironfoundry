@@ -16,10 +16,10 @@
 
         ushort FilesServicePort { get; }
         Uri FilesServiceUri { get; }
-        ServiceCredentials FilesCredentials { get; }
+        ServiceCredential FilesCredentials { get; }
 
         ushort MonitoringServicePort { get; }
         Uri MonitoringServiceUri { get; }
-        ServiceCredentials MonitoringCredentials { get; }
+        ServiceCredential MonitoringCredentials { get; }
     }
 }
