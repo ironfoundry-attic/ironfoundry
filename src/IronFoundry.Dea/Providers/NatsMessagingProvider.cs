@@ -18,7 +18,8 @@
     {
         private static readonly ushort ConnectionAttemptRetries = 10;
 
-        private readonly TimeSpan WaitOneTimeSpan = TimeSpan.FromMilliseconds(250);
+        private readonly TimeSpan Seconds_5 = TimeSpan.FromSeconds(5);
+        private readonly TimeSpan Milliseconds_250 = TimeSpan.FromMilliseconds(250);
 
         private const string CRLF = "\r\n";
 
@@ -130,7 +131,7 @@
                     networkStream = tcpClient.GetStream();
                     if (networkStream.CanTimeout)
                     {
-                        networkStream.ReadTimeout = (int)WaitOneTimeSpan.TotalMilliseconds;
+                        networkStream.ReadTimeout = (int)Seconds_5.TotalMilliseconds;
                     }
                     rv = true;
                 }
@@ -247,7 +248,7 @@
         {
             while (NatsMessagingStatus.RUNNING == Status)
             {
-                messageQueuedEvent.WaitOne(WaitOneTimeSpan);
+                messageQueuedEvent.WaitOne(Milliseconds_250);
 
                 string message = null;
                 lock (messageQueue)
@@ -286,7 +287,7 @@
                             {
                                 break;
                             }
-                            messageQueuedEvent.WaitOne(WaitOneTimeSpan);
+                            messageQueuedEvent.WaitOne(Milliseconds_250);
                         }
 
                         log.Trace(Resources.NatsMessagingProvider_LogReceived_Fmt, messageContinuation);
