@@ -14,10 +14,8 @@
     public interface IMessagingProvider : IDisposable
     {
         NatsMessagingStatus Status { get; }
-        string StatusMessage { get; }
 
         Guid UniqueIdentifier { get; }
-        int Sequence { get; }
 
         void Publish(string subject, Message message);
         void Publish(NatsCommand argCommand, Message argMessage);
@@ -25,8 +23,7 @@
 
         void Subscribe(NatsSubscription argSubscription, Action<string, string> argCallback);
 
-        bool Connect();
-        void Start();
+        bool Start();
         void Stop();
     }
 }

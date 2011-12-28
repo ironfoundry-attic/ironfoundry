@@ -340,15 +340,6 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can&apos;t read from network stream..
-        /// </summary>
-        internal static string NatsMessagingProvider_CantReadFromStream_Message {
-            get {
-                return ResourceManager.GetString("NatsMessagingProvider_CantReadFromStream_Message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Connection attempt {0} of {1} failed. Retrying..
         /// </summary>
         internal static string NatsMessagingProvider_ConnectFailed_Fmt {
@@ -385,7 +376,7 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Client disconnected from server..
+        ///   Looks up a localized string similar to NATS disconnected from server!.
         /// </summary>
         internal static string NatsMessagingProvider_Disconnected_Message {
             get {
@@ -417,6 +408,15 @@ namespace IronFoundry.Dea.Properties {
         internal static string NatsMessagingProvider_Initialized_Fmt {
             get {
                 return ResourceManager.GetString("NatsMessagingProvider_Initialized_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid message received: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_InvalidMessage_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_InvalidMessage_Fmt", resourceCulture);
             }
         }
         
@@ -516,6 +516,15 @@ namespace IronFoundry.Dea.Properties {
         internal static string NatsMessagingProvider_SubscribingToSubject_Fmt {
             get {
                 return ResourceManager.GetString("NatsMessagingProvider_SubscribingToSubject_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown received message: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_UnknownReceivedMessage_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_UnknownReceivedMessage_Fmt", resourceCulture);
             }
         }
         

@@ -64,15 +64,18 @@
                 {
                     return;
                 }
-                IDictionary<Guid, Instance> instanceDict = droplets[dropletID];
-                if (null != instanceDict)
+                if (droplets.ContainsKey(dropletID))
                 {
-                    IEnumerable<Instance> instances = instanceDict.Values.ToListOrNull(); // NB: copies list
-                    if (null != instances)
+                    IDictionary<Guid, Instance> instanceDict = droplets[dropletID];
+                    if (null != instanceDict)
                     {
-                        foreach (Instance instance in instances)
+                        IEnumerable<Instance> instances = instanceDict.Values.ToListOrNull(); // NB: copies list
+                        if (null != instances)
                         {
-                            instanceAction(instance);
+                            foreach (Instance instance in instances)
+                            {
+                                instanceAction(instance);
+                            }
                         }
                     }
                 }
@@ -166,13 +169,16 @@
 
             lock (droplets)
             {
-                IDictionary<Guid, Instance> instanceDict = droplets[dropletID];
-                if (null != instanceDict)
+                if (droplets.ContainsKey(dropletID))
                 {
-                    instanceDict.Remove(instance.InstanceID);
-                    if (instanceDict.IsNullOrEmpty())
+                    IDictionary<Guid, Instance> instanceDict = droplets[dropletID];
+                    if (null != instanceDict)
                     {
-                        droplets.Remove(dropletID);
+                        instanceDict.Remove(instance.InstanceID);
+                        if (instanceDict.IsNullOrEmpty())
+                        {
+                            droplets.Remove(dropletID);
+                        }
                     }
                 }
             }

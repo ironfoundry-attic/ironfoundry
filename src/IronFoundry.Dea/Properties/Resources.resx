@@ -150,9 +150,6 @@
   <data name="NatsMessagingProvider_AttemptingStopTwice_Message" xml:space="preserve">
     <value>Invalid attempt to stop twice.</value>
   </data>
-  <data name="NatsMessagingProvider_CantReadFromStream_Message" xml:space="preserve">
-    <value>Can't read from network stream.</value>
-  </data>
   <data name="NatsMessagingProvider_ConnectFailed_Fmt" xml:space="preserve">
     <value>Connection attempt {0} of {1} failed. Retrying.</value>
   </data>
@@ -166,7 +163,7 @@
     <value>Could not reconnect to server.</value>
   </data>
   <data name="NatsMessagingProvider_Disconnected_Message" xml:space="preserve">
-    <value>Client disconnected from server.</value>
+    <value>NATS disconnected from server!</value>
   </data>
   <data name="NatsMessagingProvider_ExceptionSendingMessage_Fmt" xml:space="preserve">
     <value>Exception sending message: {0}</value>
@@ -288,5 +285,11 @@
   </data>
   <data name="Agent_ProcessDeaDiscoverUnsupportedRuntime_Fmt" xml:space="preserve">
     <value>ProcessDeaDiscover: unsupported runtime '{0}'</value>
+  </data>
+  <data name="NatsMessagingProvider_UnknownReceivedMessage_Fmt" xml:space="preserve">
+    <value>Unknown received message: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_InvalidMessage_Fmt" xml:space="preserve">
+    <value>Invalid message received: {0}</value>
   </data>
 </root>

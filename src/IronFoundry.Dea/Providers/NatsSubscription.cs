@@ -1,8 +1,13 @@
-﻿using System;
-namespace IronFoundry.Dea.Providers
+﻿namespace IronFoundry.Dea.Providers
 {
-    public abstract class NatsSubscription
+    using System;
+
+    public abstract class NatsSubscription : IEquatable<NatsSubscription>
     {
+        private static object sync = new object();
+        private static int staticSequence = 0;
+        private int instanceSequence = 0;
+
         private static class Subscriptions
         {
             public const string deaInstanceStart      = "dea.{0:N}.start"; // NB: argument is VCAP GUID
@@ -32,7 +37,21 @@ namespace IronFoundry.Dea.Providers
             return new DeaInstanceStartSubscription(String.Format(Subscriptions.deaInstanceStart, argUuid));
         }
 
-        public abstract string Subscription { get; }
+        public NatsSubscription()
+        {
+            lock (sync)
+            {
+                ++staticSequence;
+                instanceSequence = staticSequence;
+            }
+        }
+
+        public int Sequence
+        {
+            get { return instanceSequence; }
+        }
+
+        protected abstract string Subscription { get; }
 
         public override string ToString()
         {
@@ -44,6 +63,23 @@ namespace IronFoundry.Dea.Providers
             return Subscription.GetHashCode();
         }
 
+        public bool Equals(NatsSubscription other)
+        {
+            bool rv = false;
+
+            if (null != other)
+            {
+                rv = this.GetHashCode() == other.GetHashCode();
+            }
+
+            return rv;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as NatsSubscription);
+        }
+
         public class DeaInstanceStartSubscription : NatsSubscription
         {
             private readonly string subscription;
@@ -53,7 +89,7 @@ namespace IronFoundry.Dea.Providers
                 subscription = argSubscription;
             }
 
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return subscription; }
             }
@@ -61,7 +97,7 @@ namespace IronFoundry.Dea.Providers
 
         private class DeaStopSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.deaStop; }
             }
@@ -69,7 +105,7 @@ namespace IronFoundry.Dea.Providers
 
         private class DeaStatusSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.deaStatus; }
             }
@@ -77,7 +113,7 @@ namespace IronFoundry.Dea.Providers
 
         private class DropletStatusSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.dropletStatus; }
             }
@@ -85,7 +121,7 @@ namespace IronFoundry.Dea.Providers
 
         private class DeaDiscoverSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.deaDiscover; }
             }
@@ -93,7 +129,7 @@ namespace IronFoundry.Dea.Providers
 
         private class DeaFindDropletSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.deaFindDroplet; }
             }
@@ -101,7 +137,7 @@ namespace IronFoundry.Dea.Providers
 
         private class DeaUpdateSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.deaUpdate; }
             }
@@ -109,7 +145,7 @@ namespace IronFoundry.Dea.Providers
 
         private class RouterStartSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.routerStart; }
             }
@@ -117,7 +153,7 @@ namespace IronFoundry.Dea.Providers
 
         private class HealthManagerStartSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.healthManagerStart; }
             }
@@ -125,7 +161,7 @@ namespace IronFoundry.Dea.Providers
 
         private class VcapComponentDiscoverSubscription : NatsSubscription
         {
-            public override string Subscription
+            protected override string Subscription
             {
                 get { return Subscriptions.vcapComponentDiscover; }
             }

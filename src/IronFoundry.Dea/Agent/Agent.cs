@@ -24,7 +24,7 @@
         private readonly IFilesManager filesManager;
         private readonly IDropletManager dropletManager;
         private readonly IWebServerAdministrationProvider webServerProvider;
-        IVarzProvider varzProvider;
+        private readonly IVarzProvider varzProvider;
 
         private readonly Hello helloMessage;
 
@@ -66,10 +66,8 @@
 
         public void Start()
         {
-            if (messagingProvider.Connect())
+            if (messagingProvider.Start())
             {
-                messagingProvider.Start();
-
                 discoverMessage = new VcapComponentDiscover(
                     type: Resources.Agent_DEAComponentType,
                     uuid: messagingProvider.UniqueIdentifier,
