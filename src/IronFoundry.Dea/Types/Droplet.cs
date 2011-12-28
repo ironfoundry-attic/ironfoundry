@@ -45,7 +45,7 @@
         public string[] Users { get; set; }
 
         [JsonProperty(PropertyName = "index")]
-        public uint Index { get; set; }
+        public uint InstanceIndex { get; set; }
 
         [JsonIgnore]
         public bool FrameworkSupported

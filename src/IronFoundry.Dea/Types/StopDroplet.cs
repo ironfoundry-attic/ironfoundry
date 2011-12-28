@@ -14,7 +14,7 @@
         [JsonProperty(PropertyName = "version")]
         public string Version { get; set; }
 
-        [JsonProperty(PropertyName = "instance_ids"), JsonConverter(typeof(VcapGuidArrayConverter))]
+        [JsonProperty(PropertyName = "instances"), JsonConverter(typeof(VcapGuidArrayConverter))]
         public Guid[] InstanceIDs { get; set; }
 
         [JsonProperty(PropertyName = "indices")]
@@ -23,14 +23,15 @@
         [JsonProperty(PropertyName = "states")]
         public string[] InstanceStates { get; set; }
 
-        public bool AppliesTo(Instance argInstance)
+        public bool AppliesTo(Instance instance)
         {
-            bool versionMatched = String.IsNullOrWhiteSpace(Version) || Version == argInstance.Version;
-            bool instanceMatched = InstanceIDs.IsNullOrEmpty() || InstanceIDs.Contains(argInstance.InstanceID);
-            bool indexMatched = InstanceIndices.IsNullOrEmpty() || InstanceIndices.Contains(argInstance.InstanceIndex);
-            bool stateMatched = InstanceStates.IsNullOrEmpty() || InstanceStates.Contains(argInstance.State);
+            bool dropletMatched = DropletID == instance.DropletID;
+            bool versionMatched = Version.IsNullOrWhiteSpace() || Version == instance.Version;
+            bool instanceMatched = InstanceIDs.IsNullOrEmpty() || InstanceIDs.Contains(instance.InstanceID);
+            bool indexMatched = InstanceIndices.IsNullOrEmpty() || InstanceIndices.Contains(instance.InstanceIndex);
+            bool stateMatched = InstanceStates.IsNullOrEmpty() || InstanceStates.Contains(instance.State);
 
-            return versionMatched && instanceMatched && indexMatched && stateMatched;
+            return dropletMatched && versionMatched && instanceMatched && indexMatched && stateMatched;
         }
     }
 }

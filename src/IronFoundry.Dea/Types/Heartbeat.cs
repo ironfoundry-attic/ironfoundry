@@ -6,14 +6,14 @@
 
     public class Heartbeat : Message
     {
-        public Heartbeat(Instance argInstance)
+        public Heartbeat(Instance instance)
         {
-            Droplet        = argInstance.DropletID;
-            Version        = argInstance.Version;
-            InstanceID     = argInstance.InstanceID;
-            Index          = argInstance.InstanceIndex;
-            State          = argInstance.State;
-            StateTimestamp = argInstance.StateTimestamp;
+            Droplet        = instance.DropletID;
+            Version        = instance.Version;
+            InstanceID     = instance.InstanceID;
+            Index          = instance.InstanceIndex;
+            State          = instance.State;
+            StateTimestamp = instance.StateTimestamp;
         }
 
         [JsonProperty(PropertyName = "droplet")]

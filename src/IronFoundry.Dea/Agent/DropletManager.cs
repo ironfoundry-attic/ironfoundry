@@ -67,10 +67,13 @@
                 IDictionary<Guid, Instance> instanceDict = droplets[dropletID];
                 if (null != instanceDict)
                 {
-                    IEnumerable<Instance> instances = instanceDict.Values.ToListOrNull();
-                    foreach (Instance instance in instances)
+                    IEnumerable<Instance> instances = instanceDict.Values.ToListOrNull(); // NB: copies list
+                    if (null != instances)
                     {
-                        instanceAction(instance);
+                        foreach (Instance instance in instances)
+                        {
+                            instanceAction(instance);
+                        }
                     }
                 }
             }

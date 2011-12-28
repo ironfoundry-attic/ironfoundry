@@ -8,7 +8,7 @@
     {
         private const string publishSubject = "vcap.component.announce";
 
-        public VcapComponentAnnounce(string type, int index, Guid uuid, string host, ServiceCredential credentials, DateTime start)
+        public VcapComponentAnnounce(string type, string index, Guid uuid, string host, ServiceCredential credentials, DateTime start)
             : base(type, index, uuid, host, credentials, start) { }
 
         public VcapComponentAnnounce(VcapComponentBase vcapComponentBase) : base(vcapComponentBase) { }

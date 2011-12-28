@@ -18,7 +18,7 @@
     {
         private static readonly ushort ConnectionAttemptRetries = 10;
 
-        private static readonly TimeSpan OneSecondInterval = TimeSpan.FromSeconds(1);
+        private readonly TimeSpan WaitOneTimeSpan = TimeSpan.FromMilliseconds(250);
 
         private const string CRLF = "\r\n";
 
@@ -36,6 +36,7 @@
         private NetworkStream networkStream;
 
         private readonly Queue<string> messageQueue = new Queue<string>();
+        private readonly AutoResetEvent messageQueuedEvent = new AutoResetEvent(false);
 
         private Task messageProcessorTask;
         private Task pollTask;
@@ -125,11 +126,11 @@
             {
                 try
                 {
-                    tcpClient = new TcpClient(host, port);
+                    tcpClient = new TcpClient(host, port) { NoDelay = true };
                     networkStream = tcpClient.GetStream();
                     if (networkStream.CanTimeout)
                     {
-                        networkStream.ReadTimeout = (int)OneSecondInterval.TotalMilliseconds; // NB: must use TotalMilliseconds
+                        networkStream.ReadTimeout = (int)WaitOneTimeSpan.TotalMilliseconds;
                     }
                     rv = true;
                 }
@@ -246,7 +247,7 @@
         {
             while (NatsMessagingStatus.RUNNING == Status)
             {
-                Thread.Sleep(OneSecondInterval);
+                messageQueuedEvent.WaitOne(WaitOneTimeSpan);
 
                 string message = null;
                 lock (messageQueue)
@@ -279,14 +280,13 @@
                                 if (false == messageQueue.IsNullOrEmpty())
                                 {
                                     messageContinuation = messageQueue.Dequeue();
-                                    break;
                                 }
                             }
-
-                            if (String.IsNullOrWhiteSpace(messageContinuation))
+                            if (false == messageContinuation.IsNullOrWhiteSpace())
                             {
-                                Thread.Sleep(OneSecondInterval);
+                                break;
                             }
+                            messageQueuedEvent.WaitOne(WaitOneTimeSpan);
                         }
 
                         log.Trace(Resources.NatsMessagingProvider_LogReceived_Fmt, messageContinuation);
@@ -320,54 +320,65 @@
         [System.Diagnostics.DebuggerStepThrough]
         private void Poll()
         {
-            string incomingData = String.Empty;
             byte[] readBuffer = new byte[tcpClient.ReceiveBufferSize];
 
             while (NatsMessagingStatus.RUNNING == Status)
             {
-                int receivedDataLength = 0;
-                try
+                var incomingDataSB = new StringBuilder();
+                if (networkStream.CanRead)
                 {
-                    receivedDataLength = networkStream.Read(readBuffer, 0, readBuffer.Length);
-                }
-                catch (IOException ex)
-                {
-                    HandleException(ex, SocketError.TimedOut);
+                    try
+                    {
+                        do
+                        {
+                            int bytesRead = networkStream.Read(readBuffer, 0, readBuffer.Length);
+                            incomingDataSB.AppendFormat("{0}", Encoding.ASCII.GetString(readBuffer, 0, bytesRead));
+                        } while (networkStream.DataAvailable);
+                    }
+                    catch (IOException ex)
+                    {
+                        HandleException(ex, SocketError.TimedOut);
+                    }
                 }
 
-                if (NatsMessagingStatus.RUNNING == Status && receivedDataLength > 0)
+                if (NatsMessagingStatus.RUNNING == Status && incomingDataSB.Length > 0)
                 {
-                    incomingData += Encoding.ASCII.GetString(readBuffer, 0, receivedDataLength);
-
+                    string incomingData = incomingDataSB.ToString();
                     if (incomingData.Contains(CRLF)) // CRLF == at least one message
                     {
                         // Read a complete message
                         string[] messages = incomingData.Split(new[] { CRLF }, StringSplitOptions.RemoveEmptyEntries);
-                        lock (messageQueue)
+                        if (false == incomingData.EndsWith(CRLF))
                         {
-                            if (false == incomingData.EndsWith(CRLF))
+                            incomingData = messages.Last(); // Last bit of data is incomplete, preserve
+                            for (uint i = 0; i < messages.Length; ++i) // NB: will leave off the last partial message
                             {
-                                incomingData = messages.Last(); // Last bit of data is incomplete, preserve
-                                for (uint i = 0; i < messages.Length; ++i) // NB: will leave off the last partial message
+                                if (false == String.IsNullOrWhiteSpace(messages[i]))
                                 {
-                                    if (false == String.IsNullOrWhiteSpace(messages[i]))
+                                    lock (messageQueue)
                                     {
                                         messageQueue.Enqueue(messages[i]);
+                                        messageQueuedEvent.Set();
                                     }
                                 }
                             }
-                            else
+                        }
+                        else
+                        {
+                            incomingData = String.Empty;
+                            foreach (string msg in messages.Where(msg => false == String.IsNullOrWhiteSpace(msg)))
                             {
-                                incomingData = String.Empty;
-                                foreach (string msg in messages.Where(msg => false == String.IsNullOrWhiteSpace(msg)))
+                                lock (messageQueue)
                                 {
                                     messageQueue.Enqueue(msg);
+                                    messageQueuedEvent.Set();
                                 }
                             }
                         }
                     }
                 }
             }
+            messageQueuedEvent.Set();
         }
 
         private void CloseNetworking()
@@ -413,9 +424,9 @@
         {
             var message = new Connect
             {
-                Verbose = false,
+                Verbose  = false,
                 Pedantic = false,
-                User = String.Empty,
+                User     = String.Empty,
                 Password = String.Empty,
             };
             string msgstr = NatsCommand.FormatConnectMessage(message);

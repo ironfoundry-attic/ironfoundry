@@ -115,6 +115,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ProcessDeaDiscover: unsupported runtime &apos;{0}&apos;.
+        /// </summary>
+        internal static string Agent_ProcessDeaDiscoverUnsupportedRuntime_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_ProcessDeaDiscoverUnsupportedRuntime_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ProcessDeaFindDroplet: {0}.
         /// </summary>
         internal static string Agent_ProcessDeaFindDroplet_Fmt {

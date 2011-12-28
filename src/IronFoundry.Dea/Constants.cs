@@ -8,6 +8,7 @@
         public const string MonitoringServiceNamespace = @"http://ironfoundry.org/dea/monitoringservice";
 
         public const string SupportedFramework = "aspdotnet";
+        public const string SupportedRuntime = "aspdotnet40";
 
         public const string JsonDateFormat = "yyyy-MM-dd HH:mm:ss zz00";
 

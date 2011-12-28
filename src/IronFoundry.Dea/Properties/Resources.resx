@@ -286,4 +286,7 @@
     <value>VarzProvdider.GetVarzJson():
 {0}</value>
   </data>
+  <data name="Agent_ProcessDeaDiscoverUnsupportedRuntime_Fmt" xml:space="preserve">
+    <value>ProcessDeaDiscover: unsupported runtime '{0}'</value>
+  </data>
 </root>

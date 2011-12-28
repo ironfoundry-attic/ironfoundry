@@ -12,24 +12,24 @@
 
         public Instance() { }
 
-        public Instance(string appDir, Droplet argDroplet)
+        public Instance(string appDir, Droplet droplet)
         {
-            if (null != argDroplet)
+            if (null != droplet)
             {
-                DropletID     = argDroplet.ID;
+                DropletID     = droplet.ID;
                 InstanceID    = Guid.NewGuid();
-                InstanceIndex = argDroplet.Index;
-                Name          = argDroplet.Name;
-                Uris          = argDroplet.Uris;
-                Users         = argDroplet.Users;
-                Version       = argDroplet.Version;
-                MemQuota      = argDroplet.Limits.Mem * (1024 * 1024);
-                DiskQuota     = argDroplet.Limits.Disk * (1024 * 1024);
-                FdsQuota      = argDroplet.Limits.FDs;
-                Runtime       = argDroplet.Runtime;
-                Framework     = argDroplet.Framework;
-                Staged        = argDroplet.Name;
-                Sha1          = argDroplet.Sha1;
+                InstanceIndex = droplet.InstanceIndex;
+                Name          = droplet.Name;
+                Uris          = droplet.Uris;
+                Users         = droplet.Users;
+                Version       = droplet.Version;
+                MemQuota      = droplet.Limits.Mem * (1024 * 1024);
+                DiskQuota     = droplet.Limits.Disk * (1024 * 1024);
+                FdsQuota      = droplet.Limits.FDs;
+                Runtime       = droplet.Runtime;
+                Framework     = droplet.Framework;
+                Staged        = droplet.Name;
+                Sha1          = droplet.Sha1;
                 logID         = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
                 Staged        = String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID);
                 Dir           = Path.Combine(appDir, Staged);
@@ -196,6 +196,7 @@
 
         public void OnDeaStart()
         {
+            StateTimestamp = Utility.GetEpochTimestamp();
             State = VcapStates.RUNNING;
         }
 

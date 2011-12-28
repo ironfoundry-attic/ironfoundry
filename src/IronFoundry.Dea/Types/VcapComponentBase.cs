@@ -13,7 +13,7 @@
         public string Type { get; private set; }
 
         [JsonProperty(PropertyName = "index")]
-        public int Index { get; private set; }
+        public string Index { get; private set; }
 
         [JsonProperty(PropertyName = "uuid"), JsonConverter(typeof(VcapGuidConverter))]
         public Guid Uuid { get; private set; }
@@ -42,7 +42,7 @@
         }
 
         public VcapComponentBase(
-            string type, int index, Guid uuid,
+            string type, string index, Guid uuid,
             string host, ServiceCredential credentials, DateTime start)
         {
             Type        = type;

@@ -16,7 +16,7 @@
     {
         private readonly TimeSpan OneSecondInterval = TimeSpan.FromSeconds(1);
         private readonly TimeSpan TwoSecondsInterval = TimeSpan.FromSeconds(2);
-        private readonly TimeSpan TenSecondsInterval = TimeSpan.FromSeconds(10);
+        private readonly TimeSpan FiveSecondsInterval = TimeSpan.FromSeconds(5);
 
         private readonly ILog log;
         private readonly IConfig config;
@@ -53,7 +53,7 @@
             this.webServerProvider = webServerAdministrationProvider;
             this.varzProvider      = varzProvider;
 
-            helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort, 0.99M);
+            helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
 
             heartbeatTask = new Task(HeartbeatLoop);
             varzTask = new Task(SnapshotVarz);
@@ -72,7 +72,6 @@
 
                 discoverMessage = new VcapComponentDiscover(
                     type: Resources.Agent_DEAComponentType,
-                    index: 1,
                     uuid: messagingProvider.UniqueIdentifier,
                     host: config.MonitoringServiceHostStr,
                     credentials: config.MonitoringCredentials);
@@ -154,7 +153,7 @@
                 {
                     SendHeartbeat();
                 }
-                Thread.Sleep(TenSecondsInterval);
+                Thread.Sleep(FiveSecondsInterval);
             }
         }
 
@@ -190,8 +189,6 @@
                     instance.Port = binding.Port;
 
                     filesManager.BindServices(droplet, instance.Staged);
-
-                    instance.StateTimestamp = Utility.GetEpochTimestamp();
 
                     instance.OnDeaStart();
 
@@ -248,13 +245,22 @@
             log.Debug(Resources.Agent_ProcessDeaDiscover_Fmt, message, reply);
 
             Discover discover = Message.FromJson<Discover>(message);
-            messagingProvider.Publish(reply, helloMessage);
+            if (discover.Runtime == Constants.SupportedRuntime)
+            {
+                messagingProvider.Publish(reply, helloMessage);
+            }
+            else
+            {
+                log.Debug(Resources.Agent_ProcessDeaDiscoverUnsupportedRuntime_Fmt, discover.Runtime);
+            }
         }
 
         private void ProcessDeaStop(string message, string reply)
         {
             if (shutting_down)
+            {
                 return;
+            }
 
             log.Debug(Resources.Agent_ProcessDeaStop_Fmt, message);
 

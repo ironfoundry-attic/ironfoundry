@@ -21,7 +21,7 @@
         public string State { get; set; }
 
         public Status(Hello argHello)
-            : base(argHello.ID, argHello.IPAddress, argHello.Port, argHello.Version) { }
+            : base(argHello.ID, argHello.IPAddress, argHello.Port) { }
 
         public override bool CanPublishWithSubject(string subject)
         {

@@ -27,12 +27,12 @@
         [JsonProperty(PropertyName="version")]
         public decimal Version { get; private set; }
 
-        public Hello(Guid argID, IPAddress argAddress, ushort filesServicePort, decimal argVersion)
+        public Hello(Guid argID, IPAddress argAddress, ushort filesServicePort)
         {
             ID        = argID;
             IPAddress = argAddress;
             Port      = filesServicePort;
-            Version   = argVersion;
+            Version   = 0.99m;
         }
 
         public override bool CanPublishWithSubject(string subject)

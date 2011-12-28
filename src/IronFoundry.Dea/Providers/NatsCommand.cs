@@ -1,9 +1,10 @@
-﻿using System;
-using System.Globalization;
-using System.Text;
-using IronFoundry.Dea.Types;
-namespace IronFoundry.Dea.Providers
+﻿namespace IronFoundry.Dea.Providers
 {
+    using System;
+    using System.Globalization;
+    using System.Text;
+    using IronFoundry.Dea.Types;
+
     public abstract class NatsCommand
     {
         private static class NatsCommands
