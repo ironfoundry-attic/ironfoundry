@@ -137,13 +137,13 @@
                             {
                                 SqlConnectionStringBuilder builder;
                                 ConnectionStringSettings defaultConnectionStringSettings = connectionStringsSection.ConnectionStrings["Default"];
-                                if (null != defaultConnectionStringSettings)
+                                if (null == defaultConnectionStringSettings)
                                 {
-                                    builder = new SqlConnectionStringBuilder(defaultConnectionStringSettings.ConnectionString);
+                                    builder = new SqlConnectionStringBuilder();
                                 }
                                 else
                                 {
-                                    builder = new SqlConnectionStringBuilder();
+                                    builder = new SqlConnectionStringBuilder(defaultConnectionStringSettings.ConnectionString);
                                 }
 
                                 builder.DataSource = svc.Credentials.Host;
@@ -163,7 +163,14 @@
                                     builder.InitialCatalog = svc.Credentials.Name;
                                 }
 
-                                defaultConnectionStringSettings.ConnectionString = builder.ConnectionString;
+                                if (null == defaultConnectionStringSettings)
+                                {
+                                    connectionStringsSection.ConnectionStrings.Add(new ConnectionStringSettings("Default", builder.ConnectionString));
+                                }
+                                else
+                                {
+                                    defaultConnectionStringSettings.ConnectionString = builder.ConnectionString;
+                                }
                                 break;
                             }
                         }
