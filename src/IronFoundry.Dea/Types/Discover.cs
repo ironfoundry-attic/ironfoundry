@@ -5,7 +5,7 @@
     public class Discover : EntityBase
     {
         [JsonProperty(PropertyName = "droplet")]
-        public int Droplet { get; set; }
+        public uint DropletID { get; set; }
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

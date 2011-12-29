@@ -9,10 +9,12 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Timers;
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
+    using Timer = System.Timers.Timer;
 
     public class NatsMessagingProvider : IMessagingProvider
     {
@@ -68,6 +70,18 @@
             if (message.CanPublishWithSubject(subject))
             {
                 DoPublish(subject, message);
+            }
+            else
+            {
+                throw new InvalidOperationException(String.Format(Resources.NatsMessagingProvider_InvalidPublishAttempt_Fmt, message.GetType().Name, subject));
+            }
+        }
+
+        public void Publish(string subject, Message message, uint delay)
+        {
+            if (message.CanPublishWithSubject(subject))
+            {
+                DoPublish(subject, message, delay);
             }
             else
             {
@@ -243,7 +257,7 @@
             return rv;
         }
 
-        private void DoPublish(string subject, Message message)
+        private void DoPublish(string subject, Message message, uint delay = 0)
         {
             if (Message.RECEIVE_ONLY == subject)
             {
@@ -258,7 +272,29 @@
             log.Debug(Resources.NatsMessagingProvider_PublishMessage_Fmt, subject, message);
             string formattedMessage = NatsCommand.FormatPublishMessage(subject, message);
             log.Trace(Resources.NatsMessagingProvider_LogSent_Fmt, formattedMessage);
-            Write(formattedMessage);
+
+            if (delay == 0)
+            {
+                Write(formattedMessage);
+            }
+            else
+            {
+                Timer delayTimer = null;
+                try
+                {
+                    delayTimer = new Timer(delay) { AutoReset = false };
+                    delayTimer.Elapsed += (object sender, ElapsedEventArgs args) => Write(formattedMessage);
+                    delayTimer.Enabled = true;
+                    delayTimer = null;
+                }
+                finally
+                {
+                    if (delayTimer != null)
+                    {
+                        delayTimer.Close();
+                    }
+                }
+            }
         }
 
         private void SendSubscription(NatsSubscription subscription)

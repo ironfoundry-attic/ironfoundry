@@ -245,7 +245,12 @@
             Discover discover = Message.FromJson<Discover>(message);
             if (discover.Runtime == Constants.SupportedRuntime)
             {
-                messagingProvider.Publish(reply, helloMessage);
+                uint delay = 0;
+                dropletManager.ForAllInstances(discover.DropletID, (instance) =>
+                    {
+                        delay += 10; // NB: 10 milliseconds delay per app
+                    });
+                messagingProvider.Publish(reply, helloMessage, delay);
             }
             else
             {

@@ -18,6 +18,7 @@
         Guid UniqueIdentifier { get; }
 
         void Publish(string subject, Message message);
+        void Publish(string reply, Message message, uint delay);
         void Publish(NatsCommand argCommand, Message argMessage);
         void Publish(Message argMessage);
 
