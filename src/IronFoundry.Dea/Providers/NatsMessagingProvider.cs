@@ -269,7 +269,7 @@
                 return;
             }
 
-            log.Debug(Resources.NatsMessagingProvider_PublishMessage_Fmt, subject, message);
+            log.Debug(Resources.NatsMessagingProvider_PublishMessage_Fmt, subject, delay, message);
             string formattedMessage = NatsCommand.FormatPublishMessage(subject, message);
             log.Trace(Resources.NatsMessagingProvider_LogSent_Fmt, formattedMessage);
 
@@ -373,7 +373,14 @@
                             if (NatsMessagingStatus.RUNNING == Status)
                             {
                                 Action<string, string> callback = subjectCollection[receivedMessage.SubscriptionID];
-                                callback(receivedMessage.RawMessage, receivedMessage.InboxID);
+                                try
+                                {
+                                    callback(receivedMessage.RawMessage, receivedMessage.InboxID);
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error(ex, Resources.NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt, natsSubscription.ToString());
+                                }
                             }
                         }
                         else

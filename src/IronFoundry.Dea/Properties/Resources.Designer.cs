@@ -385,6 +385,15 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NATS callback exception for subscription &apos;{0}&apos;.
+        /// </summary>
+        internal static string NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exception sending message: {0}.
         /// </summary>
         internal static string NatsMessagingProvider_ExceptionSendingMessage_Fmt {
@@ -484,7 +493,7 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NATS Publishing subject: {0} message: {1}.
+        ///   Looks up a localized string similar to NATS Publishing subject: {0} delay: {1} message: {2}.
         /// </summary>
         internal static string NatsMessagingProvider_PublishMessage_Fmt {
             get {
