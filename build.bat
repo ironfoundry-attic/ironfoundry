@@ -5,7 +5,7 @@ setlocal
 set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
 
 set SLN="%~dp0\IronFoundry.sln"
-set VERSION=1.2.0.0
+set VERSION=1.3.0.0
 
 if not exist %VCVARSALL% (
     echo Required file %VCVARSALL% not found.
