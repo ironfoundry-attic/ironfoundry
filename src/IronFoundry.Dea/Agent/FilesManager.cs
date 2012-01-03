@@ -147,6 +147,7 @@
                                 }
 
                                 builder.DataSource = svc.Credentials.Host;
+                                builder.ConnectTimeout = 30;
 
                                 if (svc.Credentials.Password.IsNullOrWhiteSpace() || svc.Credentials.Username.IsNullOrWhiteSpace())
                                 {
@@ -154,6 +155,7 @@
                                 }
                                 else
                                 {
+                                    builder.IntegratedSecurity = false;
                                     builder.UserID = svc.Credentials.Username;
                                     builder.Password = svc.Credentials.Password;
                                 }
