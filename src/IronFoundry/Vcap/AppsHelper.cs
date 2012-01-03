@@ -223,7 +223,11 @@
                     {
                         appcloudResources = checkResources(resources.ToArray());
                     }
-                    if (false == appcloudResources.IsNullOrEmpty())
+                    if (appcloudResources.IsNullOrEmpty())
+                    {
+                        appcloudResources = resources.ToArrayOrNull();
+                    }
+                    else
                     {
                         foreach (Resource r in appcloudResources)
                         {
