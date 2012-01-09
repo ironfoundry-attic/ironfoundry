@@ -22,6 +22,7 @@
         private readonly IConfig config;
         private readonly IMessagingProvider messagingProvider;
         private readonly IFilesManager filesManager;
+        private readonly IConfigManager configManager;
         private readonly IDropletManager dropletManager;
         private readonly IWebServerAdministrationProvider webServerProvider;
         private readonly IVarzProvider varzProvider;
@@ -41,6 +42,7 @@
         public Agent(ILog log, IConfig config,
             IMessagingProvider messagingProvider,
             IFilesManager filesManager,
+            IConfigManager configManager,
             IDropletManager dropletManager,
             IWebServerAdministrationProvider webServerAdministrationProvider,
             IVarzProvider varzProvider)
@@ -49,6 +51,7 @@
             this.config            = config;
             this.messagingProvider = messagingProvider;
             this.filesManager      = filesManager;
+            this.configManager     = configManager;
             this.dropletManager    = dropletManager;
             this.webServerProvider = webServerAdministrationProvider;
             this.varzProvider      = varzProvider;
@@ -186,7 +189,8 @@
                     instance.Host = binding.Host;
                     instance.Port = binding.Port;
 
-                    filesManager.BindServices(droplet, instance.Staged);
+                    configManager.BindServices(droplet, instance);
+                    configManager.SetupEnvironment(droplet, instance);
 
                     instance.OnDeaStart();
 

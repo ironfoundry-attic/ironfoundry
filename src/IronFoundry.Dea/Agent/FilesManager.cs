@@ -1,12 +1,8 @@
 ﻿namespace IronFoundry.Dea.Agent
 {
     using System;
-    using System.Collections;
-    using System.Configuration;
-    using System.Data.SqlClient;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Text;
     using ICSharpCode.SharpZipLib.GZip;
@@ -18,6 +14,7 @@
     public class FilesManager : IFilesManager
     {
         private readonly ILog log;
+        private readonly IConfig config;
         private readonly bool disableDirCleanup = false;
 
         private readonly string dropletsPath;
@@ -26,6 +23,7 @@
         public FilesManager(ILog log, IConfig config)
         {
             this.log = log;
+            this.config = config;
 
             disableDirCleanup = config.DisableDirCleanup;
             dropletsPath      = config.DropletDir;
@@ -118,68 +116,6 @@
             }
 
             return rv;
-        }
-
-        // TODO not a FilesManager kind of method
-        public void BindServices(Droplet droplet, string appPath)
-        {
-            if (false == droplet.Services.IsNullOrEmpty())
-            {
-                Configuration c = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/", appPath);
-                if (null != c)
-                {
-                    ConnectionStringsSection connectionStringsSection = c.GetSection("connectionStrings") as ConnectionStringsSection;
-                    if (null != connectionStringsSection)
-                    {
-                        foreach (Service svc in droplet.Services.Where(s => s.IsMSSqlServer))
-                        {
-                            if (null != svc.Credentials)
-                            {
-                                SqlConnectionStringBuilder builder;
-                                ConnectionStringSettings defaultConnectionStringSettings = connectionStringsSection.ConnectionStrings["Default"];
-                                if (null == defaultConnectionStringSettings)
-                                {
-                                    builder = new SqlConnectionStringBuilder();
-                                }
-                                else
-                                {
-                                    builder = new SqlConnectionStringBuilder(defaultConnectionStringSettings.ConnectionString);
-                                }
-
-                                builder.DataSource = svc.Credentials.Host;
-                                builder.ConnectTimeout = 30;
-
-                                if (svc.Credentials.Password.IsNullOrWhiteSpace() || svc.Credentials.Username.IsNullOrWhiteSpace())
-                                {
-                                    builder.IntegratedSecurity = true;
-                                }
-                                else
-                                {
-                                    builder.IntegratedSecurity = false;
-                                    builder.UserID = svc.Credentials.Username;
-                                    builder.Password = svc.Credentials.Password;
-                                }
-
-                                if (false == svc.Credentials.Name.IsNullOrWhiteSpace())
-                                {
-                                    builder.InitialCatalog = svc.Credentials.Name;
-                                }
-
-                                if (null == defaultConnectionStringSettings)
-                                {
-                                    connectionStringsSection.ConnectionStrings.Add(new ConnectionStringSettings("Default", builder.ConnectionString));
-                                }
-                                else
-                                {
-                                    defaultConnectionStringSettings.ConnectionString = builder.ConnectionString;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    c.Save();
-                }
-            }
         }
 
         private FileData GetStagedApplicationFile(string executableUri)

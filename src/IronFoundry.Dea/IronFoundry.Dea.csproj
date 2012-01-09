@@ -76,6 +76,8 @@
       <Link>Extensions\ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="Agent\Agent.cs" />
+    <Compile Include="Agent\ConfigManager.cs" />
+    <Compile Include="Agent\IConfigManager.cs" />
     <Compile Include="Agent\IDropletManager.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ServiceCredential.cs" />
