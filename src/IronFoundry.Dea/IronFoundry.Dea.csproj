@@ -85,6 +85,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
     <Compile Include="Agent\DropletManager.cs" />
+    <Compile Include="Extensions\RegexExtensionMethods.cs" />
     <Compile Include="Extensions\TaskExtensionMethods.cs" />
     <Compile Include="Extensions\TcpClientExtensionMethods.cs" />
     <Compile Include="Extensions\TimerExtensionMethods.cs" />

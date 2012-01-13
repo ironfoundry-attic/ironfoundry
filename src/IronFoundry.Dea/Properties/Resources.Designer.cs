@@ -421,15 +421,6 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid message received: {0}.
-        /// </summary>
-        internal static string NatsMessagingProvider_InvalidMessage_Fmt {
-            get {
-                return ResourceManager.GetString("NatsMessagingProvider_InvalidMessage_Fmt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid attempt to publish message of type &apos;{0}&apos; with subject &apos;{1}&apos;.
         /// </summary>
         internal static string NatsMessagingProvider_InvalidPublishAttempt_Fmt {
@@ -466,11 +457,29 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NATS Message no subscribers for subject {0} with subscription ID {1}. Ignoring received message: {2}.
+        ///   Looks up a localized string similar to NATS ERR: {0}.
         /// </summary>
-        internal static string NatsMessagingProvider_NoMessageSubscribers_Fmt {
+        internal static string NatsMessagingProvider_NatsErrorReceived_Fmt {
             get {
-                return ResourceManager.GetString("NatsMessagingProvider_NoMessageSubscribers_Fmt", resourceCulture);
+                return ResourceManager.GetString("NatsMessagingProvider_NatsErrorReceived_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS INFO: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_NatsInfoReceived_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_NatsInfoReceived_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS UNKNOWN: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_NatsUnknownReceived_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_NatsUnknownReceived_Fmt", resourceCulture);
             }
         }
         

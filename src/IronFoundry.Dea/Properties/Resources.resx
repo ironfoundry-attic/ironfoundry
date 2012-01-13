@@ -174,9 +174,6 @@
   <data name="NatsMessagingProvider_MessageAck_Fmt" xml:space="preserve">
     <value>NATS Message Acknowledged: {0}</value>
   </data>
-  <data name="NatsMessagingProvider_NoMessageSubscribers_Fmt" xml:space="preserve">
-    <value>NATS Message no subscribers for subject {0} with subscription ID {1}. Ignoring received message: {2}</value>
-  </data>
   <data name="NatsMessagingProvider_NonSubscribedSubject_Fmt" xml:space="preserve">
     <value>NATS Message Subject: {0} not found to be subscribed. Ignoring received message {1}, {2}</value>
   </data>
@@ -289,10 +286,16 @@
   <data name="NatsMessagingProvider_UnknownReceivedMessage_Fmt" xml:space="preserve">
     <value>Unknown received message: {0}</value>
   </data>
-  <data name="NatsMessagingProvider_InvalidMessage_Fmt" xml:space="preserve">
-    <value>Invalid message received: {0}</value>
-  </data>
   <data name="NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt" xml:space="preserve">
     <value>NATS callback exception for subscription '{0}'</value>
+  </data>
+  <data name="NatsMessagingProvider_NatsErrorReceived_Fmt" xml:space="preserve">
+    <value>NATS ERR: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_NatsUnknownReceived_Fmt" xml:space="preserve">
+    <value>NATS UNKNOWN: {0}</value>
+  </data>
+  <data name="NatsMessagingProvider_NatsInfoReceived_Fmt" xml:space="preserve">
+    <value>NATS INFO: {0}</value>
   </data>
 </root>

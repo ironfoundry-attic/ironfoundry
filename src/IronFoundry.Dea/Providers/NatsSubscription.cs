@@ -5,8 +5,8 @@
     public abstract class NatsSubscription : IEquatable<NatsSubscription>
     {
         private static object sync = new object();
-        private static int staticSequence = 0;
-        private int instanceSequence = 0;
+        private static int staticSubscriptionID = 0;
+        private int instanceSubscriptionID = 0;
 
         private static class Subscriptions
         {
@@ -41,14 +41,14 @@
         {
             lock (sync)
             {
-                ++staticSequence;
-                instanceSequence = staticSequence;
+                ++staticSubscriptionID;
+                instanceSubscriptionID = staticSubscriptionID;
             }
         }
 
-        public int Sequence
+        public int SubscriptionID
         {
-            get { return instanceSequence; }
+            get { return instanceSubscriptionID; }
         }
 
         protected abstract string Subscription { get; }

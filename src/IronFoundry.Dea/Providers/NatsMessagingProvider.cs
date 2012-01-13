@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Net.Sockets;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -18,20 +18,38 @@
 
     public class NatsMessagingProvider : IMessagingProvider
     {
+        private enum ParseState
+        {
+            AWAITING_CONTROL_LINE, // nats, client.rb, 47
+            AWAITING_MSG_PAYLOAD,
+        }
+
+        private const string PongResponse = "PONG\r\n";
+
+        private static readonly RegexOptions commonOptions = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+
+        private static readonly Regex MSG     = new Regex(@"\AMSG\s+([^\s]+)\s+([^\s]+)\s+(([^\s]+)[^\S\r\n]+)?(\d+)\r\n", commonOptions);
+        private static readonly Regex OK      = new Regex(@"\A\+OK\s*\r\n", commonOptions);
+        private static readonly Regex ERR     = new Regex(@"\A-ERR\s+('.+')?\r\n", commonOptions);
+        private static readonly Regex PING    = new Regex(@"\APING\s*\r\n", commonOptions);
+        private static readonly Regex PONG    = new Regex(@"\APONG\s*\r\n", commonOptions);
+        private static readonly Regex INFO    = new Regex(@"\AINFO\s+([^\r\n]+)\r\n", commonOptions);
+        private static readonly Regex UNKNOWN = new Regex(@"\A(.*)\r\n", commonOptions);
+
         private static readonly ushort ConnectionAttemptRetries = 60;
 
         private readonly TimeSpan Seconds_5 = TimeSpan.FromSeconds(5);
         private readonly TimeSpan Seconds_10 = TimeSpan.FromSeconds(10);
 
         private const string CRLF = "\r\n";
+        private static readonly int CRLFLen = CRLF.Length;
 
         private readonly string host;
         private readonly ushort port;
 
-        private readonly IDictionary<string, NatsSubscription> subscriptionsByName =
-            new Dictionary<string, NatsSubscription>();
-        private readonly IDictionary<NatsSubscription, IDictionary<int, Action<string, string>>> subscriptions
-            = new Dictionary<NatsSubscription, IDictionary<int, Action<string, string>>>();
+        private readonly IList<NatsSubscription> subscriptions = new List<NatsSubscription>();
+        private readonly IDictionary<int, IList<Action<string, string>>> subscriptionCallbacks =
+            new Dictionary<int, IList<Action<string, string>>>();
 
         private readonly Guid uniqueIdentifier;
 
@@ -39,7 +57,7 @@
 
         private TcpClient tcpClient;
 
-        private readonly Queue<string> messageQueue = new Queue<string>();
+        private readonly Queue<ReceivedMessage> messageQueue = new Queue<ReceivedMessage>();
         private readonly AutoResetEvent messageQueuedEvent = new AutoResetEvent(false);
 
         private readonly Queue<string> messagesPendingWrite = new Queue<string>();
@@ -48,6 +66,8 @@
         private Task pollTask;
 
         private readonly ILog log;
+
+        private ParseState currentParseState = ParseState.AWAITING_CONTROL_LINE;
 
         public NatsMessagingProvider(ILog log, IConfig config)
         {
@@ -110,12 +130,17 @@
 
             lock (subscriptions)
             {
-                if (false == subscriptions.ContainsKey(subscription))
+                if (false == subscriptions.Contains(subscription))
                 {
-                    subscriptions.Add(subscription, new Dictionary<int, Action<string, string>>());
-                    subscriptionsByName.Add(subscription.ToString(), subscription);
+                    subscriptions.Add(subscription);
                 }
-                subscriptions[subscription].Add(subscription.Sequence, callback);
+
+                int subscriptionID = subscription.SubscriptionID;
+                if (false == subscriptionCallbacks.ContainsKey(subscriptionID))
+                {
+                    subscriptionCallbacks.Add(subscriptionID, new List<Action<string, string>>());
+                }
+                subscriptionCallbacks[subscriptionID].Add(callback);
             }
         }
 
@@ -193,7 +218,7 @@
             {
                 lock (subscriptions)
                 {
-                    foreach (NatsSubscription subscription in subscriptions.Keys)
+                    foreach (NatsSubscription subscription in subscriptions)
                     {
                         SendSubscription(subscription);
                     }
@@ -246,6 +271,7 @@
 
             if (rv)
             {
+                currentParseState = ParseState.AWAITING_CONTROL_LINE;
                 log.Debug(Resources.NatsMessagingProvider_ConnectSuccess_Fmt, host, port);
                 SendConnectMessage();
             }
@@ -299,8 +325,8 @@
 
         private void SendSubscription(NatsSubscription subscription)
         {
-            log.Debug(Resources.NatsMessagingProvider_SubscribingToSubject_Fmt, subscription, subscription.Sequence);
-            string formattedMessage = NatsCommand.FormatSubscribeMessage(subscription, subscription.Sequence);
+            log.Debug(Resources.NatsMessagingProvider_SubscribingToSubject_Fmt, subscription, subscription.SubscriptionID);
+            string formattedMessage = NatsCommand.FormatSubscribeMessage(subscription, subscription.SubscriptionID);
             log.Trace(Resources.NatsMessagingProvider_LogSent_Fmt, formattedMessage);
             Write(formattedMessage);
         }
@@ -311,7 +337,7 @@
             {
                 messageQueuedEvent.WaitOne(Seconds_5);
 
-                string message = null;
+                ReceivedMessage message = null;
                 lock (messageQueue)
                 {
                     if (false == messageQueue.IsNullOrEmpty())
@@ -320,94 +346,68 @@
                     }
                 }
 
-                if (false == String.IsNullOrWhiteSpace(message))
+                if (null != message)
                 {
                     log.Trace(Resources.NatsMessagingProvider_LogReceived_Fmt, message);
 
-                    if (NatsCommand.Ok.Command == message)
+                    if (false == subscriptionCallbacks.ContainsKey(message.SubscriptionID))
                     {
-                        log.Trace(Resources.NatsMessagingProvider_MessageAck_Fmt, message);
+                        log.Debug(Resources.NatsMessagingProvider_NonSubscribedSubject_Fmt,
+                            message.Subject, message.SubscriptionID, message.Message);
+                        continue;
                     }
-                    else if (message.StartsWith(NatsCommand.Information.Command))
+
+                    if (NatsMessagingStatus.RUNNING == Status)
                     {
-                        log.Trace(Resources.NatsMessagingProvider_InfoMessage_Fmt, message);
-                    }
-                    else if (message.StartsWith(NatsCommand.Message.Command))
-                    {
-                        string messageContinuation = null;
-                        while (true)
+                        IList<Action<string, string>> callbacks = subscriptionCallbacks[message.SubscriptionID];
+                        if (false == callbacks.IsNullOrEmpty())
                         {
-                            lock (messageQueue)
+                            foreach (var callback in callbacks)
                             {
-                                if (false == messageQueue.IsNullOrEmpty())
-                                {
-                                    messageContinuation = messageQueue.Dequeue();
-                                }
-                            }
-                            if (false == messageContinuation.IsNullOrWhiteSpace())
-                            {
-                                break;
-                            }
-                            messageQueuedEvent.WaitOne(Seconds_5);
-                        }
-
-                        log.Trace(Resources.NatsMessagingProvider_LogReceived_Fmt, messageContinuation);
-
-                        var receivedMessage = new ReceivedMessage(log, message, messageContinuation);
-                        if (receivedMessage.IsValid)
-                        {
-                            if (false == subscriptionsByName.ContainsKey(receivedMessage.Subject))
-                            {
-                                log.Debug(Resources.NatsMessagingProvider_NonSubscribedSubject_Fmt, receivedMessage.Subject, receivedMessage.SubscriptionID, receivedMessage.RawMessage);
-                                continue;
-                            }
-
-                            NatsSubscription natsSubscription = subscriptionsByName[receivedMessage.Subject];
-                            var subjectCollection = subscriptions[natsSubscription];
-                            if (false == subjectCollection.ContainsKey(receivedMessage.SubscriptionID))
-                            {
-                                log.Debug(Resources.NatsMessagingProvider_NoMessageSubscribers_Fmt, receivedMessage.Subject, receivedMessage.SubscriptionID, receivedMessage.RawMessage);
-                                continue;
-                            }
-
-                            if (NatsMessagingStatus.RUNNING == Status)
-                            {
-                                Action<string, string> callback = subjectCollection[receivedMessage.SubscriptionID];
                                 try
                                 {
-                                    callback(receivedMessage.RawMessage, receivedMessage.InboxID);
+                                    callback(message.Message, message.InboxID);
                                 }
                                 catch (Exception ex)
                                 {
-                                    log.Error(ex, Resources.NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt, natsSubscription.ToString());
+                                    log.Error(ex, Resources.NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt, message.Subject);
                                 }
                             }
-                        }
-                        else
-                        {
-                            log.Error(Resources.NatsMessagingProvider_InvalidMessage_Fmt, receivedMessage.ToString());
                         }
                     }
                 }
             }
         }
 
-        // NB: this allows "break on exceptions" to be enabled in VS without having that IOException break all the time
-        [System.Diagnostics.DebuggerStepThrough]
         private void Poll()
         {
             byte[] readBuffer = new byte[tcpClient.ReceiveBufferSize];
 
+            // These are for the current message
+            string subject = null;
+            int subscriptionID = 0;
+            int needed = 0;
+            string inboxID = null;
+            StringBuilder messageBuffer = null;
+
             while (NatsMessagingStatus.RUNNING == Status)
             {
-                var incomingDataSB = new StringBuilder();
+
+            ReceiveMoreData:
+
                 bool interrupted = false, disconnected = false;
+
+                if (null == messageBuffer)
+                {
+                    messageBuffer = new StringBuilder();
+                }
+
                 try
                 {
                     do
                     {
                         int bytesRead = tcpClient.Read(readBuffer);
-                        incomingDataSB.Append(Encoding.ASCII.GetString(readBuffer, 0, bytesRead));
+                        messageBuffer.Append(Encoding.ASCII.GetString(readBuffer, 0, bytesRead));
                     }
                     while (tcpClient.DataAvailable());
                 }
@@ -438,39 +438,128 @@
                     break;
                 }
 
-                if (NatsMessagingStatus.RUNNING == Status && incomingDataSB.Length > 0)
+                if (NatsMessagingStatus.RUNNING == Status && messageBuffer.Length > 0)
                 {
-                    string incomingData = incomingDataSB.ToString();
-                    if (incomingData.Contains(CRLF)) // CRLF == at least one message
+                    while (null != messageBuffer)
                     {
-                        // Read a complete message
-                        string[] messages = incomingData.Split(new[] { CRLF }, StringSplitOptions.RemoveEmptyEntries);
-                        if (false == incomingData.EndsWith(CRLF))
+                        string incomingData = messageBuffer.ToString();
+                        log.Trace("Parsing: '{0}'", incomingData);
+
+                        switch (currentParseState)
                         {
-                            incomingData = messages.Last(); // Last bit of data is incomplete, preserve
-                            for (uint i = 0; i < messages.Length; ++i) // NB: will leave off the last partial message
-                            {
-                                if (false == String.IsNullOrWhiteSpace(messages[i]))
+                            case ParseState.AWAITING_CONTROL_LINE:
                                 {
-                                    lock (messageQueue)
+                                    if (MSG.IsMatch(incomingData))
                                     {
-                                        messageQueue.Enqueue(messages[i]);
-                                        messageQueuedEvent.Set();
+                                        Match match = MSG.Match(incomingData);
+                                        incomingData = match.Postmatch(incomingData);
+                                        GroupCollection groups = match.Groups;
+                                        if (groups.Count > 0)
+                                        {
+                                            subject = groups[1].Value;
+                                            subscriptionID = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
+                                            inboxID = groups[4].Value;
+                                            needed = Convert.ToInt32(groups[5].Value, CultureInfo.InvariantCulture);
+                                            currentParseState = ParseState.AWAITING_MSG_PAYLOAD;
+                                        }
+                                    }
+                                    else if (OK.IsMatch(incomingData))
+                                    {
+                                        Match match = OK.Match(incomingData);
+                                        incomingData = match.Postmatch(incomingData);
+                                    }
+                                    else if (ERR.IsMatch(incomingData))
+                                    {
+                                        Match match = ERR.Match(incomingData);
+                                        incomingData = match.Postmatch(incomingData);
+                                        GroupCollection groups = match.Groups;
+                                        if (groups.Count > 0)
+                                        {
+                                            string errorData = match.Groups[1].Value;
+                                            log.Info(Resources.NatsMessagingProvider_NatsErrorReceived_Fmt, errorData);
+                                        }
+                                    }
+                                    else if (PING.IsMatch(incomingData))
+                                    {
+                                        Write(PongResponse);
+                                        Match match = PING.Match(incomingData);
+                                        incomingData = match.Postmatch(incomingData);
+                                    }
+                                    else if (PONG.IsMatch(incomingData))
+                                    {
+                                        // TODO: callbacks?
+                                        Match match = PONG.Match(incomingData);
+                                        incomingData = match.Postmatch(incomingData);
+                                    }
+                                    else if (INFO.IsMatch(incomingData))
+                                    {
+                                        Match match = INFO.Match(incomingData);
+                                        incomingData = match.Postmatch(incomingData);
+                                        GroupCollection groups = match.Groups;
+                                        if (groups.Count > 0)
+                                        {
+                                            string infoData = groups[1].Value;
+                                            log.Info(Resources.NatsMessagingProvider_NatsInfoReceived_Fmt, infoData);
+                                        }
+                                    }
+                                    else if (UNKNOWN.IsMatch(incomingData))
+                                    {
+                                        Match match = UNKNOWN.Match(incomingData);
+                                        incomingData = match.Postmatch(incomingData);
+                                        log.Error(Resources.NatsMessagingProvider_NatsUnknownReceived_Fmt, match.Value);
+                                    }
+                                    else
+                                    {
+                                        // If we are here we do not have a complete line yet that we understand.
+                                        goto ReceiveMoreData;
+                                    }
+
+                                    messageBuffer.Clear();
+                                    messageBuffer.Append(incomingData);
+                                    if (0 == messageBuffer.Length)
+                                    {
+                                        messageBuffer = null;
                                     }
                                 }
-                            }
-                        }
-                        else
-                        {
-                            incomingData = String.Empty;
-                            foreach (string msg in messages.Where(msg => false == String.IsNullOrWhiteSpace(msg)))
-                            {
-                                lock (messageQueue)
+                                break;
+                            case ParseState.AWAITING_MSG_PAYLOAD:
                                 {
-                                    messageQueue.Enqueue(msg);
-                                    messageQueuedEvent.Set();
+                                    if (messageBuffer.Length < (needed + CRLFLen))
+                                    {
+                                        goto ReceiveMoreData;
+                                    }
+                                    else
+                                    {
+                                        string message = messageBuffer.ToString(0, needed);
+
+                                        var receivedMessage = new ReceivedMessage(subject, subscriptionID, inboxID, message);
+                                        lock (messageQueue)
+                                        {
+                                            messageQueue.Enqueue(receivedMessage);
+                                            messageQueuedEvent.Set();
+                                        }
+
+                                        int startIndex = needed + CRLFLen;
+                                        int length = messageBuffer.Length - startIndex;
+                                        string remaining = messageBuffer.ToString(startIndex, length);
+
+                                        if (remaining.Length > 0)
+                                        {
+                                            messageBuffer = new StringBuilder(remaining);
+                                        }
+                                        else
+                                        {
+                                            messageBuffer = null;
+                                        }
+
+                                        // NB: do resets last
+                                        inboxID = String.Empty;
+                                        subscriptionID = 0;
+                                        needed = 0;
+                                        currentParseState = ParseState.AWAITING_CONTROL_LINE;
+                                    }
                                 }
-                            }
+                                break;
                         }
                     }
                 }
@@ -559,63 +648,17 @@
 
         private class ReceivedMessage
         {
-            /*
-             * From ruby NATS:
-               MSG      = /\AMSG\s+([^\s]+)\s+([^\s]+)\s+(([^\s]+)[^\S\r\n]+)?(\d+)\r\n/i #:nodoc:
-               OK       = /\A\+OK\s*\r\n/i #:nodoc:
-               ERR      = /\A-ERR\s+('.+')?\r\n/i #:nodoc:
-               PING     = /\APING\s*\r\n/i #:nodoc:
-               PONG     = /\APONG\s*\r\n/i #:nodoc:
-               INFO     = /\AINFO\s+([^\r\n]+)\r\n/i  #:nodoc:
-               UNKNOWN  = /\A(.*)\r\n/  #:nodoc:
-             */
-            private static readonly Regex stdMsg = new Regex(@"\AMSG\s+([^\s]+)\s+([^\s]+)\s+(([^\s]+)[^\S\r\n]+)?(\d+)\r\n", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-            private readonly bool isValid = false;
-
+            private readonly string subject;
+            private readonly int subscriptionID;
+            private readonly string inboxID;
             private readonly string message;
 
-            private readonly int subscriptionID;
-            private readonly int size;
-            private readonly string inboxID;
-            private readonly string subject;
-            private readonly string rawMessage;
-
-            public ReceivedMessage(ILog log, string messageStart, string messageContinuation)
+            public ReceivedMessage(string subject, int subscriptionID, string inboxID, string message)
             {
-                message = String.Format("{0}\r\n{1}", messageStart, messageContinuation);
-                if (stdMsg.IsMatch(message))
-                {
-                    Match match = stdMsg.Match(message);
-                    GroupCollection groups = match.Groups;
-                    if (groups.Count > 0)
-                    {
-                        subject = groups[1].Value;
-                        inboxID = groups[4].Value;
-                        if (Int32.TryParse(groups[2].Value, out subscriptionID))
-                        {
-                            if (Int32.TryParse(groups[5].Value, out size))
-                            {
-                                isValid = true;
-                                rawMessage = stdMsg.Replace(message, String.Empty);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    log.Debug(Resources.NatsMessagingProvider_UnknownReceivedMessage_Fmt, message);
-                }
-            }
-
-            public bool IsValid
-            {
-                get { return isValid; }
-            }
-
-            public string RawMessage
-            {
-                get { return rawMessage; }
+                this.subject        = subject;
+                this.subscriptionID = subscriptionID;
+                this.inboxID        = inboxID;
+                this.message        = message;
             }
 
             public string Subject
@@ -633,9 +676,14 @@
                 get { return inboxID; }
             }
 
+            public string Message
+            {
+                get { return message; }
+            }
+
             public override string ToString()
             {
-                return message;
+                return String.Format("Subject: {0} SubID: {1} InboxID: {2} Message: {3}", subject, subscriptionID, inboxID, message);
             }
         }
     }
