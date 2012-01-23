@@ -385,6 +385,24 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NATS disconnected in Poll().
+        /// </summary>
+        internal static string NatsMessagingProvider_DisconnectedInPoll_Message {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_DisconnectedInPoll_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NATS disconnected in Write(), message: {0}.
+        /// </summary>
+        internal static string NatsMessagingProvider_DisconnectedInWrite_Fmt {
+            get {
+                return ResourceManager.GetString("NatsMessagingProvider_DisconnectedInWrite_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NATS callback exception for subscription &apos;{0}&apos;.
         /// </summary>
         internal static string NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt {

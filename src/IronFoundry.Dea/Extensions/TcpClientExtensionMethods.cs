@@ -23,7 +23,7 @@
         public static void CloseStream(this TcpClient client)
         {
             NetworkStream stream = client.GetStream();
-            stream.Close(500);
+            stream.Close();
             stream.Dispose();
         }
     }

@@ -74,16 +74,22 @@
                     if (null != site)
                     {
                         manager.Sites.Remove(site);
-                        manager.CommitChanges();
                     }
                     ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
                     if (null != applicationPool)
                     {
                         manager.ApplicationPools.Remove(applicationPool);
-                        manager.CommitChanges();
                     }
+                    manager.CommitChanges();
                 }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
 
+            try
+            {
                 firewallService.Close(applicationInstanceName);
             }
             catch (Exception ex)

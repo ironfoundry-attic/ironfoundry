@@ -381,6 +381,11 @@
 
         private void Poll()
         {
+            if (shuttingDown)
+            {
+                return;
+            }
+
             byte[] readBuffer = new byte[tcpClient.ReceiveBufferSize];
 
             // These are for the current message
@@ -411,8 +416,9 @@
                     }
                     while (tcpClient.DataAvailable());
                 }
-                catch (InvalidOperationException)
+                catch (InvalidOperationException ex)
                 {
+                    log.Error(ex, Resources.NatsMessagingProvider_DisconnectedInPoll_Message);
                     disconnected = true;
                 }
                 catch (IOException ex)
@@ -423,7 +429,6 @@
 
                 if (disconnected && false == shuttingDown)
                 {
-                    log.Error(Resources.NatsMessagingProvider_Disconnected_Message);
                     if (false == Reconnect())
                     {
                         log.Fatal(Resources.NatsMessagingProvider_CouldNotReconnect_Message);
@@ -576,6 +581,10 @@
                     tcpClient.CloseStream();
                     tcpClient.Close();
                 }
+                catch (InvalidOperationException)
+                {
+                    // NB: this can happen when trying to close on a disconnected socket. Ignore.
+                }
                 catch (Exception ex)
                 {
                     log.Error(ex);
@@ -609,7 +618,7 @@
 
                 if (false == written)
                 {
-                    log.Error(Resources.NatsMessagingProvider_Disconnected_Message);
+                    log.Error(Resources.NatsMessagingProvider_DisconnectedInWrite_Fmt, message);
                     messagesPendingWrite.Enqueue(message);
                 }
             }

@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{097A69C8-0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{698503AC-EC27-439E-8E0B-9FD89901C91B}"
 	ProjectSection(SolutionItems) = preProject
+		build.bat = build.bat
 		src\shared\CommonAssemblyInfo.cs = src\shared\CommonAssemblyInfo.cs
 		src\shared\ExtensionMethods.cs = src\shared\ExtensionMethods.cs
 		common\IronFoundry.snk = common\IronFoundry.snk

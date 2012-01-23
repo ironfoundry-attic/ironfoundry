@@ -298,4 +298,10 @@
   <data name="NatsMessagingProvider_NatsInfoReceived_Fmt" xml:space="preserve">
     <value>NATS INFO: {0}</value>
   </data>
+  <data name="NatsMessagingProvider_DisconnectedInPoll_Message" xml:space="preserve">
+    <value>NATS disconnected in Poll()</value>
+  </data>
+  <data name="NatsMessagingProvider_DisconnectedInWrite_Fmt" xml:space="preserve">
+    <value>NATS disconnected in Write(), message: {0}</value>
+  </data>
 </root>
