@@ -7,9 +7,11 @@
     using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Services;
     using Microsoft.Web.Administration;
+    using System.Threading;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
+        private readonly object serverManagerLock = new object();
         private readonly ILog log;
         private readonly IPAddress localIPAddress;
         private readonly IFirewallService firewallService;
@@ -28,32 +30,35 @@
 
             try
             {
-                using (var manager = new ServerManager())
+                lock (serverManagerLock)
                 {
-                    ApplicationPool cloudFoundryPool = GetApplicationPool(manager, applicationInstanceName);
-                    if (null == cloudFoundryPool)
+                    using (var manager = new ServerManager())
                     {
-                        cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
+                        ApplicationPool cloudFoundryPool = GetApplicationPool(manager, applicationInstanceName);
+                        if (null == cloudFoundryPool)
+                        {
+                            cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
+                        }
+
+                        ushort applicationPort = FindNextAvailablePort();
+
+                        firewallService.Open(applicationPort, applicationInstanceName);
+
+                        /*
+                         * NB: for now, listen on all local IPs, a specific port, and any domain.
+                         * TODO: should we limit by host header here?
+                         * TODO: use local IP here?
+                         */
+                        manager.Sites.Add(applicationInstanceName, "http", "*:" + applicationPort.ToString() + ":", localDirectory);
+
+                        manager.Sites[applicationInstanceName].Applications[0].ApplicationPoolName = applicationInstanceName;
+
+                        cloudFoundryPool.ManagedRuntimeVersion = "v4.0";
+
+                        manager.CommitChanges();
+
+                        rv = new WebServerAdministrationBinding() { Host = localIPAddress.ToString(), Port = applicationPort };
                     }
-
-                    ushort applicationPort = FindNextAvailablePort();
-
-                    firewallService.Open(applicationPort, applicationInstanceName);
-
-                    /*
-                     * NB: for now, listen on all local IPs, a specific port, and any domain.
-                     * TODO: should we limit by host header here?
-                     * TODO: use local IP here?
-                     */
-                    manager.Sites.Add(applicationInstanceName, "http", "*:" + applicationPort.ToString() + ":", localDirectory);
-
-                    manager.Sites[applicationInstanceName].Applications[0].ApplicationPoolName = applicationInstanceName;
-
-                    cloudFoundryPool.ManagedRuntimeVersion = "v4.0";
-
-                    manager.CommitChanges();
-
-                    rv = new WebServerAdministrationBinding() { Host = localIPAddress.ToString(), Port = applicationPort };
                 }
             }
             catch (Exception ex)
@@ -68,19 +73,38 @@
         {
             try
             {
-                using (var manager = new ServerManager())
+                lock (serverManagerLock)
                 {
-                    Site site = GetSite(manager, applicationInstanceName);
-                    if (null != site)
+                    using (var manager = new ServerManager())
                     {
-                        manager.Sites.Remove(site);
+                        Site site = GetSite(manager, applicationInstanceName);
+                        if (null != site)
+                        {
+                            manager.Sites.Remove(site);
+                        }
+                        ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
+                        if (null != applicationPool)
+                        {
+                            ObjectState poolState = applicationPool.State;
+                            ushort tries = 0;
+                            do
+                            {
+                                poolState = applicationPool.Stop();
+                                ++tries;
+                                if (ObjectState.Stopped == poolState)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    Thread.Sleep(250);
+                                }
+                            }
+                            while (tries < 5);
+                            manager.ApplicationPools.Remove(applicationPool);
+                        }
+                        manager.CommitChanges();
                     }
-                    ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
-                    if (null != applicationPool)
-                    {
-                        manager.ApplicationPools.Remove(applicationPool);
-                    }
-                    manager.CommitChanges();
                 }
             }
             catch (Exception ex)
@@ -116,54 +140,6 @@
             }
 
             return rv;
-        }
-
-        public void Start(string applicationInstanceName)
-        {
-            try
-            {
-                using (var manager = new ServerManager())
-                {
-                    ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
-                    applicationPool.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-        }
-
-        public void Stop(string applicationInstanceName)
-        {
-            try
-            {
-                using (var manager = new ServerManager())
-                {
-                    var applicationPool = GetApplicationPool(manager, applicationInstanceName);
-                    applicationPool.Stop();
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-        }
-
-        public void Restart(string applicationInstanceName)
-        {
-            try
-            {
-                using (var manager = new ServerManager())
-                {
-                    var applicationPool = GetApplicationPool(manager, applicationInstanceName);
-                    applicationPool.Recycle();
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
         }
 
         public ApplicationInstanceStatus GetStatus(string applicationInstanceName)

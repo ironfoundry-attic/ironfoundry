@@ -19,9 +19,6 @@
     {
         WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName);
         void UninstallWebApp(string applicationInstanceName);
-        void Start(string applicationInstanceName);
-        void Stop(string applicationInstanceName);
-        void Restart(string applicationInstanceName);
         ApplicationInstanceStatus GetStatus(string applicationInstanceName);
         bool DoesApplicationExist(string applicationInstanceName);
     }
