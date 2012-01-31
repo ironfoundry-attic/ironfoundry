@@ -47,6 +47,7 @@
             return returnIcon;
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         private static Icon IconFromClassName(SystemIconSize size, string className)
         {
             var Root = Registry.ClassesRoot;
@@ -66,8 +67,7 @@
             if (ApplicationKey == null)
                 ApplicationKey = Root.OpenSubKey("Unknown");
 
-            var IconLocation =
-                ApplicationKey.OpenSubKey("DefaultIcon").GetValue("").ToString();
+            var IconLocation = ApplicationKey.OpenSubKey("DefaultIcon").GetValue("").ToString();
             var IconPath = IconLocation.Split(',');
             IntPtr[] Large = null;
             IntPtr[] Small = null;

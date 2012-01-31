@@ -9,8 +9,11 @@
         bool DisableDirCleanup { get; }
         string DropletDir { get; }
         string AppDir { get; }
+
         string NatsHost { get; }
         ushort NatsPort { get; }
+        string NatsUser { get; }
+        string NatsPassword { get; }
 
         IPAddress LocalIPAddress { get; }
 

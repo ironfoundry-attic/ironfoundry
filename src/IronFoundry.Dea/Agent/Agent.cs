@@ -144,16 +144,7 @@
         {
             while (false == shutting_down)
             {
-                if (NatsMessagingStatus.RUNNING != messagingProvider.Status)
-                {
-                    log.Error(Resources.Agent_ErrorDetectedInNats_Message);
-                    Error = true;
-                    return;
-                }
-                else
-                {
-                    SendHeartbeat();
-                }
+                SendHeartbeat();
                 Thread.Sleep(FiveSecondsInterval);
             }
         }
@@ -578,7 +569,7 @@
                 varzProvider.MemoryReservedMB = 0; // TODO
                 varzProvider.MemoryUsedMB = 0; // TODO
                 varzProvider.MaxClients = 1024;
-                if (this.shutting_down)
+                if (shutting_down)
                 {
                     varzProvider.State = VcapStates.SHUTTING_DOWN;
                 }

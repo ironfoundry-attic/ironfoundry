@@ -34,7 +34,9 @@
         private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<ICloudFoundryProvider> message)
         {
             if (message.Notification.Equals(Messages.GetCloudFoundryProvider))
+            {
                 message.Execute(this);
+            }
         }
 
         private void CloudChanged(object sender, PropertyChangedEventArgs e)
@@ -61,7 +63,9 @@
         private void Clouds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (this.CloudsChanged != null)
+            {
                 this.CloudsChanged(sender, e);
+            }
             SaveChanges();
         }
 
@@ -213,7 +217,7 @@
 
         public ProviderResponse<SafeObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud)
         {
-            ProviderResponse<SafeObservableCollection<ProvisionedService>> response = new ProviderResponse<SafeObservableCollection<ProvisionedService>>();
+            var response = new ProviderResponse<SafeObservableCollection<ProvisionedService>>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -228,7 +232,7 @@
 
         public ProviderResponse<SafeObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application)
         {
-            ProviderResponse<SafeObservableCollection<StatInfo>> response = new ProviderResponse<SafeObservableCollection<StatInfo>>();
+            var response = new ProviderResponse<SafeObservableCollection<StatInfo>>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -243,7 +247,7 @@
 
         public ProviderResponse<bool> UpdateApplication(Application app, Cloud cloud)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -261,7 +265,7 @@
 
         public ProviderResponse<bool> Start(Application app, Cloud cloud)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -277,7 +281,7 @@
 
         public ProviderResponse<bool> Stop(Application app, Cloud cloud)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -293,7 +297,7 @@
 
         public ProviderResponse<bool> Restart(Application app, Cloud cloud)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -309,7 +313,7 @@
 
         public ProviderResponse<bool> Delete(Application app, Cloud cloud)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -323,11 +327,9 @@
             return response;
         }
 
-        
-
         public ProviderResponse<bool> CreateService(Cloud cloud, string serviceName, string provisionedServiceName)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -343,11 +345,9 @@
             return response;            
         }
 
-        
-
         public ProviderResponse<bool> ChangePassword(Cloud cloud, string newPassword)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -365,7 +365,7 @@
 
         public ProviderResponse<bool> RegisterAccount(Cloud cloud,string email, string password)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -381,11 +381,9 @@
             return response; 
         }
 
-       
-
         public ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId)
         {
-            ProviderResponse<VcapFilesResult> response = new ProviderResponse<VcapFilesResult>();
+            var response = new ProviderResponse<VcapFilesResult>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -401,7 +399,7 @@
 
         public ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);
@@ -419,7 +417,7 @@
 
         public ProviderResponse<bool> Update(Cloud cloud, Application app, string directoryToPushFrom)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            var response = new ProviderResponse<bool>();
             try
             {
                 IVcapClient client = new VcapClient(cloud);

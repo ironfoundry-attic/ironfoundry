@@ -3,18 +3,8 @@
     using System;
     using Types;
 
-    public enum NatsMessagingStatus
-    {
-        RUNNING,
-        STOPPING,
-        STOPPED,
-        ERROR,
-    }
-
     public interface IMessagingProvider : IDisposable
     {
-        NatsMessagingStatus Status { get; }
-
         Guid UniqueIdentifier { get; }
 
         void Publish(string subject, Message message);

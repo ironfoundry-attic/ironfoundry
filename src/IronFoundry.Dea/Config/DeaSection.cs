@@ -33,6 +33,32 @@
             }
         }
 
+        [ConfigurationProperty("natsUser", IsRequired = false)]
+        public string NatsUser
+        {
+            get
+            {
+                return (string)this["natsUser"];
+            }
+            set
+            {
+                this["natsUser"] = value;
+            }
+        }
+
+        [ConfigurationProperty("natsPassword", IsRequired = false)]
+        public string NatsPassword
+        {
+            get
+            {
+                return (string)this["natsPassword"];
+            }
+            set
+            {
+                this["natsPassword"] = value;
+            }
+        }
+
         [ConfigurationProperty("localRoute", DefaultValue = "127.0.0.1", IsRequired = false)]
         public string LocalRoute
         {

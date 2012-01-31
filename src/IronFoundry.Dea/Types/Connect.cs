@@ -13,7 +13,7 @@
         [JsonProperty(PropertyName = "user")]
         public string User { get; set; }
 
-        [JsonProperty(PropertyName = "password")]
+        [JsonProperty(PropertyName = "pass")]
         public string Password { get; set; }
     }
 }

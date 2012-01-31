@@ -40,22 +40,18 @@
             dispatcher = Dispatcher.CurrentDispatcher;
             Cloud = cloud;
 
-            ChangePasswordCommand = new RelayCommand(ChangePassword);
-            ValidateAccountCommand = new RelayCommand(ValidateAccount, CanExecuteValidateAccount);
-            ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
-            DisconnectCommand = new RelayCommand(Disconnect, CanExecuteDisconnect);
-            StartCommand = new RelayCommand(Start, CanExecuteStart);
-            StopCommand = new RelayCommand(Stop, CanExecuteStopActions);
-            RestartCommand = new RelayCommand(Restart, CanExecuteStopActions);
-            ManageApplicationUrlsCommand = new RelayCommand(ManageApplicationUrls);
+            ChangePasswordCommand           = new RelayCommand(ChangePassword);
+            ValidateAccountCommand          = new RelayCommand(ValidateAccount, CanExecuteValidateAccount);
+            ConnectCommand                  = new RelayCommand(Connect, CanExecuteConnect);
+            DisconnectCommand               = new RelayCommand(Disconnect, CanExecuteDisconnect);
+            StartCommand                    = new RelayCommand(Start, CanExecuteStart);
+            StopCommand                     = new RelayCommand(Stop, CanExecuteStopActions);
+            RestartCommand                  = new RelayCommand(Restart, CanExecuteStopActions);
+            ManageApplicationUrlsCommand    = new RelayCommand(ManageApplicationUrls);
             RemoveApplicationServiceCommand = new RelayCommand(RemoveApplicationService);
-            ProvisionServiceCommand = new RelayCommand(CreateService);
-            RefreshCommand = new RelayCommand(Refresh, CanExecuteRefresh);
-            DeleteApplicationCommand = new RelayCommand(DeleteApplication);
-
-            var instanceTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(3)};
-            instanceTimer.Tick += RefreshApplication;
-            instanceTimer.Start();
+            ProvisionServiceCommand         = new RelayCommand(CreateService);
+            RefreshCommand                  = new RelayCommand(Refresh, CanExecuteRefresh);
+            DeleteApplicationCommand        = new RelayCommand(DeleteApplication);
         }
 
         #region Properties
@@ -542,7 +538,7 @@
                 var result = e.Result as Application;
                 if (result != null)
                     RefreshSelectedApplication(result);
-                Messenger.Default.Send(new ProgressMessage(100, "Application Stopped."));
+                Messenger.Default.Send(new ProgressMessage(100, "Application Started."));
                 applicationStarting = false;
             };
             worker.RunWorkerAsync();

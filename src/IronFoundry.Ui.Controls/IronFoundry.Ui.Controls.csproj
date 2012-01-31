@@ -82,6 +82,9 @@
     <Compile Include="..\shared\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\shared\ExtensionMethods.cs">
+      <Link>Utilities\ExtensionMethods.cs</Link>
+    </Compile>
     <Compile Include="Converters\CsvConverter.cs" />
     <Compile Include="Converters\TitleCaseConverter.cs" />
     <Compile Include="Model\CloudFoundryProvider.cs" />

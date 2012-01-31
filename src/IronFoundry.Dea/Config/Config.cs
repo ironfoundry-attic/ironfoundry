@@ -2,9 +2,9 @@
 {
     using System;
     using System.Configuration;
+    using System.Globalization;
     using System.Net;
     using System.Net.Sockets;
-    using System.Globalization;
 
     public class Config : IConfig
     {
@@ -66,6 +66,16 @@
             get { return deaSection.NatsPort; }
         }
 
+        public string NatsUser
+        {
+            get { return deaSection.NatsUser; }
+        }
+
+        public string NatsPassword
+        {
+            get { return deaSection.NatsPassword; }
+        }
+
         public ushort FilesServicePort
         {
             get { return deaSection.FilesServicePort; }
@@ -108,9 +118,14 @@
 
         private IPAddress GetLocalIPAddress()
         {
-            using (UdpClient udpClient = new UdpClient())
+            string localRoute = deaSection.LocalRoute;
+            if (Utility.IsLocalhost(localRoute))
             {
-                udpClient.Connect(deaSection.LocalRoute, 1);
+                localRoute = deaSection.NatsHost;
+            }
+            using (var udpClient = new UdpClient())
+            {
+                udpClient.Connect(localRoute, 1);
                 IPEndPoint ep = (IPEndPoint)udpClient.Client.LocalEndPoint;
                 return ep.Address;
             }

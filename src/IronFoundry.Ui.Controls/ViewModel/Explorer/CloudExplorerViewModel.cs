@@ -25,15 +25,22 @@
 
         public CloudExplorerViewModel()
         {
-            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
-                                       Messages.GetCloudFoundryProvider, (p) => provider = p));
+            Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, (p) => provider = p));
             dispatcher = Dispatcher.CurrentDispatcher;
             AddCloudCommand = new RelayCommand(AddCloud);
             PushAppCommand = new RelayCommand(PushApp);
             UpdateAppCommand = new RelayCommand(UpdateApp);
-            foreach (Cloud cloud in provider.Clouds)
-                clouds.Add(new CloudTreeViewItemViewModel(cloud));
-            provider.CloudsChanged += CloudsCollectionChanged;
+            if (null != provider)
+            {
+                if (null != provider.Clouds)
+                {
+                    foreach (Cloud cloud in provider.Clouds)
+                    {
+                        clouds.Add(new CloudTreeViewItemViewModel(cloud));
+                    }
+                }
+                provider.CloudsChanged += CloudsCollectionChanged;
+            }
         }
 
         public RelayCommand AddCloudCommand { get; set; }

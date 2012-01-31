@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
-
-namespace IronFoundry.Dea
+﻿namespace IronFoundry.Dea
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using Microsoft.VisualBasic.Devices;
@@ -63,6 +63,18 @@ namespace IronFoundry.Dea
             ushort rv = Convert.ToUInt16(((IPEndPoint)socket.LocalEndpoint).Port);
             socket.Stop();
             return rv;
+        }
+
+        public static IPAddress GetLocalAddress()
+        {
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            return host.AddressList.Where(a => a.AddressFamily == AddressFamily.InterNetwork).FirstOrDefault();
+        }
+
+        public static bool IsLocalhost(string localRoute)
+        {
+            return localRoute.Equals("127.0.0.1", StringComparison.InvariantCultureIgnoreCase) ||
+                localRoute.Equals("localhost", StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

@@ -24,6 +24,15 @@
             AWAITING_MSG_PAYLOAD,
         }
 
+        private enum NatsMessagingStatus
+        {
+            CONNECTING,
+            RUNNING,
+            STOPPING,
+            STOPPED,
+            ERROR,
+        }
+
         private const string PongResponse = "PONG\r\n";
 
         private static readonly RegexOptions commonOptions = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
@@ -44,8 +53,10 @@
         private const string CRLF = "\r\n";
         private static readonly int CRLFLen = CRLF.Length;
 
-        private readonly string host;
-        private readonly ushort port;
+        private readonly string natsHost;
+        private readonly ushort natsPort;
+        private readonly string natsUser;
+        private readonly string natsPassword;
 
         private readonly IList<NatsSubscription> subscriptions = new List<NatsSubscription>();
         private readonly IDictionary<int, IList<Action<string, string>>> subscriptionCallbacks =
@@ -68,20 +79,20 @@
         private readonly ILog log;
 
         private ParseState currentParseState = ParseState.AWAITING_CONTROL_LINE;
+        private NatsMessagingStatus status = NatsMessagingStatus.CONNECTING;
 
         public NatsMessagingProvider(ILog log, IConfig config)
         {
             this.log  = log;
-            this.host = config.NatsHost;
-            this.port = config.NatsPort;
+
+            this.natsHost     = config.NatsHost;
+            this.natsPort     = config.NatsPort;
+            this.natsUser     = config.NatsUser;
+            this.natsPassword = config.NatsPassword;
 
             uniqueIdentifier = Guid.NewGuid();
-            log.Debug(Resources.NatsMessagingProvider_Initialized_Fmt, UniqueIdentifier, host, port);
-
-            Status = NatsMessagingStatus.RUNNING;
+            log.Debug(Resources.NatsMessagingProvider_Initialized_Fmt, UniqueIdentifier, natsHost, natsPort);
         }
-
-        public NatsMessagingStatus Status { get; private set; }
 
         public Guid UniqueIdentifier { get { return uniqueIdentifier; } }
 
@@ -121,11 +132,6 @@
 
         public void Subscribe(NatsSubscription subscription, Action<string, string> callback)
         {
-            if (NatsMessagingStatus.RUNNING != Status)
-            {
-                return;
-            }
-
             SendSubscription(subscription);
 
             lock (subscriptions)
@@ -147,7 +153,6 @@
         public bool Start()
         {
             bool rv = false;
-            Status = NatsMessagingStatus.RUNNING;
             if (Connect())
             {
                 pollTask = Task.Factory.StartNew(Poll);
@@ -165,7 +170,7 @@
                 throw new InvalidOperationException(Resources.NatsMessagingProvider_AttemptingStopTwice_Message);
             }
 
-            Status = NatsMessagingStatus.STOPPING;
+            status = NatsMessagingStatus.STOPPING;
             
             shuttingDown = true;
 
@@ -197,7 +202,7 @@
                 }
             }
             log.Debug(Resources.NatsMessagingProvider_Disconnected_Message);
-            Status = NatsMessagingStatus.STOPPED;
+            status = NatsMessagingStatus.STOPPED;
         }
 
         public void Dispose()
@@ -213,7 +218,6 @@
             CloseNetworking();
 
             bool connected = Connect();
-
             if (connected)
             {
                 lock (subscriptions)
@@ -234,23 +238,21 @@
 
         private bool Connect()
         {
-            if (NatsMessagingStatus.RUNNING != Status)
-            {
-                return false;
-            }
+            status = NatsMessagingStatus.CONNECTING;
 
             bool rv = false;
 
-            for (ushort i = 1; NatsMessagingStatus.RUNNING == Status && i <= ConnectionAttemptRetries; ++i)
+            for (ushort i = 1; NatsMessagingStatus.CONNECTING == status && i <= ConnectionAttemptRetries; ++i)
             {
                 try
                 {
-                    tcpClient = new TcpClient(host, port)
+                    tcpClient = new TcpClient(natsHost, natsPort)
                     {
                         LingerState = new LingerOption(true, 0),
                         NoDelay = true
                     };
                     rv = true;
+                    break;
                 }
                 catch (SocketException ex)
                 {
@@ -262,7 +264,7 @@
                     }
                     else
                     {
-                        Status = NatsMessagingStatus.ERROR;
+                        status = NatsMessagingStatus.ERROR;
                         rv = false;
                         break;
                     }
@@ -272,12 +274,14 @@
             if (rv)
             {
                 currentParseState = ParseState.AWAITING_CONTROL_LINE;
-                log.Debug(Resources.NatsMessagingProvider_ConnectSuccess_Fmt, host, port);
+                log.Debug(Resources.NatsMessagingProvider_ConnectSuccess_Fmt, natsHost, natsPort);
+                status = NatsMessagingStatus.RUNNING;
                 SendConnectMessage();
             }
             else
             {
-                log.Fatal(Resources.NatsMessagingProvider_ConnectionFailed_Fmt, host, port);
+                log.Fatal(Resources.NatsMessagingProvider_ConnectionFailed_Fmt, natsHost, natsPort);
+                status = NatsMessagingStatus.ERROR;
             }
 
             return rv;
@@ -288,11 +292,6 @@
             if (Message.RECEIVE_ONLY == subject)
             {
                 throw new InvalidOperationException(Resources.NatsMessagingProvider_PublishReceiveOnlyMessage);
-            }
-
-            if (NatsMessagingStatus.RUNNING != Status)
-            {
-                return;
             }
 
             log.Debug(Resources.NatsMessagingProvider_PublishMessage_Fmt, subject, delay, message);
@@ -333,8 +332,19 @@
 
         private void MessageProcessor()
         {
-            while (NatsMessagingStatus.RUNNING == Status)
+            if (shuttingDown)
             {
+                return;
+            }
+
+            while (false == shuttingDown)
+            {
+                if (NatsMessagingStatus.RUNNING != status && NatsMessagingStatus.CONNECTING != status)
+                {
+                    // Shutting down
+                    break;
+                }
+
                 messageQueuedEvent.WaitOne(Seconds_5);
 
                 ReceivedMessage message = null;
@@ -357,21 +367,18 @@
                         continue;
                     }
 
-                    if (NatsMessagingStatus.RUNNING == Status)
+                    IList<Action<string, string>> callbacks = subscriptionCallbacks[message.SubscriptionID];
+                    if (false == callbacks.IsNullOrEmpty())
                     {
-                        IList<Action<string, string>> callbacks = subscriptionCallbacks[message.SubscriptionID];
-                        if (false == callbacks.IsNullOrEmpty())
+                        foreach (var callback in callbacks)
                         {
-                            foreach (var callback in callbacks)
+                            try
                             {
-                                try
-                                {
-                                    callback(message.Message, message.InboxID);
-                                }
-                                catch (Exception ex)
-                                {
-                                    log.Error(ex, Resources.NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt, message.Subject);
-                                }
+                                callback(message.Message, message.InboxID);
+                            }
+                            catch (Exception ex)
+                            {
+                                log.Error(ex, Resources.NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt, message.Subject);
                             }
                         }
                     }
@@ -395,8 +402,13 @@
             string inboxID = null;
             StringBuilder messageBuffer = null;
 
-            while (NatsMessagingStatus.RUNNING == Status)
+            while (false == shuttingDown)
             {
+                if (NatsMessagingStatus.RUNNING != status && NatsMessagingStatus.CONNECTING != status)
+                {
+                    // Shutting down
+                    break;
+                }
 
             ReceiveMoreData:
 
@@ -432,7 +444,7 @@
                     if (false == Reconnect())
                     {
                         log.Fatal(Resources.NatsMessagingProvider_CouldNotReconnect_Message);
-                        Status = NatsMessagingStatus.ERROR;
+                        status = NatsMessagingStatus.ERROR;
                         break;
                     }
                 }
@@ -443,7 +455,7 @@
                     break;
                 }
 
-                if (NatsMessagingStatus.RUNNING == Status && messageBuffer.Length > 0)
+                if (messageBuffer.Length > 0)
                 {
                     while (null != messageBuffer)
                     {
@@ -594,45 +606,63 @@
 
         private void Write(string message)
         {
-            if (NatsMessagingStatus.RUNNING == Status)
+            switch (status)
             {
-                bool written = false;
-                try
-                {
-                    Byte[] data = ASCIIEncoding.ASCII.GetBytes(message);
-                    tcpClient.Write(data);
-                    /*
-                     * NB: Flush () not necessary
-                     * http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.flush.aspx
-                     */
-                    return;
-                }
-                catch (InvalidOperationException ex)
-                {
-                    log.Error(ex, Resources.NatsMessagingProvider_ExceptionSendingMessage_Fmt, message);
-                }
-                catch (IOException ex)
-                {
-                    log.Error(ex, Resources.NatsMessagingProvider_ExceptionSendingMessage_Fmt, message);
-                }
+                case NatsMessagingStatus.RUNNING :
+                    bool written = false;
+                    try
+                    {
+                        Byte[] data = ASCIIEncoding.ASCII.GetBytes(message);
+                        tcpClient.Write(data);
+                        /*
+                         * NB: Flush () not necessary
+                         * http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.flush.aspx
+                         */
+                        return;
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        log.Error(ex, Resources.NatsMessagingProvider_ExceptionSendingMessage_Fmt, message);
+                    }
+                    catch (IOException ex)
+                    {
+                        log.Error(ex, Resources.NatsMessagingProvider_ExceptionSendingMessage_Fmt, message);
+                    }
 
-                if (false == written)
-                {
-                    log.Error(Resources.NatsMessagingProvider_DisconnectedInWrite_Fmt, message);
+                    if (false == written)
+                    {
+                        log.Error(Resources.NatsMessagingProvider_DisconnectedInWrite_Fmt, message);
+                        messagesPendingWrite.Enqueue(message);
+                    }
+                    break;
+                case NatsMessagingStatus.CONNECTING :
                     messagesPendingWrite.Enqueue(message);
-                }
+                    break;
+                default :
+                    log.Error("Unknown status in Write()");
+                    break;
             }
         }
 
         private void SendConnectMessage()
         {
+            if (NatsMessagingStatus.RUNNING != status)
+            {
+                throw new InvalidOperationException();
+            }
+
             var message = new Connect
             {
                 Verbose  = false,
                 Pedantic = false,
-                User     = String.Empty,
-                Password = String.Empty,
             };
+
+            if (false == natsUser.IsNullOrWhiteSpace())
+            {
+                message.User = natsUser;
+                message.Password = natsPassword ?? String.Empty;
+            }
+
             string msgstr = NatsCommand.FormatConnectMessage(message);
             log.Debug(Resources.NatsMessagingProvider_PublishConnect_Fmt, msgstr);
             Write(msgstr);
