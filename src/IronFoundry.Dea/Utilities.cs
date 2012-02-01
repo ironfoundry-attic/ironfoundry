@@ -3,13 +3,20 @@
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using Microsoft.VisualBasic.Devices;
 
     public static class Utility
     {
+        private static readonly IPAddress[] localAddresses;
+
+        static Utility()
+        {
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            localAddresses = host.AddressList;
+        }
+
         public static int GetEpochTimestamp()
         {
             return (int)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds);
@@ -65,16 +72,29 @@
             return rv;
         }
 
-        public static IPAddress GetLocalAddress()
+        public static bool IsLocalIpAddress(string host)
         {
-            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-            return host.AddressList.Where(a => a.AddressFamily == AddressFamily.InterNetwork).FirstOrDefault();
-        }
+            try
+            {
+                IPAddress[] hostIPs = Dns.GetHostAddresses(host);
+                foreach (IPAddress hostIP in hostIPs)
+                {
+                    if (IPAddress.IsLoopback(hostIP))
+                    {
+                        return true;
+                    }
+                    foreach (IPAddress localIP in localAddresses)
+                    {
+                        if (hostIP.Equals(localIP))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch { }
 
-        public static bool IsLocalhost(string localRoute)
-        {
-            return localRoute.Equals("127.0.0.1", StringComparison.InvariantCultureIgnoreCase) ||
-                localRoute.Equals("localhost", StringComparison.InvariantCultureIgnoreCase);
+            return false;
         }
     }
 }

@@ -119,7 +119,7 @@
         private IPAddress GetLocalIPAddress()
         {
             string localRoute = deaSection.LocalRoute;
-            if (Utility.IsLocalhost(localRoute))
+            if (Utility.IsLocalIpAddress(localRoute))
             {
                 localRoute = deaSection.NatsHost;
             }

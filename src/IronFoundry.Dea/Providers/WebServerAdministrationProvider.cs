@@ -3,11 +3,11 @@
     using System;
     using System.Linq;
     using System.Net;
+    using System.Threading;
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Services;
     using Microsoft.Web.Administration;
-    using System.Threading;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
@@ -65,6 +65,10 @@
             {
                 log.Error(ex);
             }
+            finally
+            {
+                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
+            }
 
             return rv;
         }
@@ -111,6 +115,10 @@
             {
                 log.Error(ex);
             }
+            finally
+            {
+                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
+            }
 
             try
             {
@@ -137,6 +145,10 @@
             catch (Exception ex)
             {
                 log.Error(ex);
+            }
+            finally
+            {
+                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
             }
 
             return rv;
@@ -173,6 +185,10 @@
             catch (Exception ex)
             {
                 log.Error(ex);
+            }
+            finally
+            {
+                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
             }
 
             return rv;

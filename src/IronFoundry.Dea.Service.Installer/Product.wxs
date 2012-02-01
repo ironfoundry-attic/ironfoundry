@@ -190,12 +190,22 @@
                     File="[#IronFoundry.Dea.Service.exe.config]"
                     ElementPath="/configuration/ironFoundryDea/@dropletDir"
                     Value="[DROPLETDIR]"/>
+                <util:XmlFile Id="Config.XmlFile.6" Sequence="6" Action="setValue"
+                    File="[#IronFoundry.Dea.Service.exe.config]"
+                    ElementPath="/configuration/ironFoundryDea/@natsUser"
+                    Value="[NATSUSER]"/>
+                <util:XmlFile Id="Config.XmlFile.7" Sequence="7" Action="setValue"
+                    File="[#IronFoundry.Dea.Service.exe.config]"
+                    ElementPath="/configuration/ironFoundryDea/@natsPassword"
+                    Value="[NATSPASSWORD]"/>
               </Component>
 
               <Component Id="ServiceConfigKeys" Guid="{0FCFE86A-787E-420A-B1E7-13A0F68758E9}" Win64="$(var.WIN64.COMPONENTS)">
                 <RegistryKey Id="ServiceConfigKey" Action="createAndRemoveOnUninstall" Key="$(var.RootRegistryPath)" Root="HKLM">
                   <RegistryValue Id="regNatsHost" Name="NatsHost" Value="[NATSHOST]" Type="string"/>
                   <RegistryValue Id="regNatsPort" Name="NatsPort" Value="[NATSPORT]" Type="string"/>
+                  <RegistryValue Id="regNatsUser" Name="NatsPort" Value="[NATSUSER]" Type="string"/>
+                  <RegistryValue Id="regNatsPassword" Name="NatsPort" Value="[NATSPASSWORD]" Type="string"/>
                   <RegistryValue Id="regLocalRoute" Name="LocalRoute" Value="[LOCALROUTE]" Type="string"/>
                   <RegistryValue Id="regAppDir" Name="AppDir" Value="[APPDIR]" Type="string"/>
                   <RegistryValue Id="regDropletDir" Name="DropletDir" Value="[DROPLETDIR]" Type="string"/>
@@ -274,6 +284,12 @@
     <Property Id="NATSPORT" Secure="yes" Value="4222">
       <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regNatsPort" Name="NatsPort" />
     </Property>
+    <Property Id="NATSUSER" Secure="yes">
+      <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regNatsUser" Name="NatsUser" />
+    </Property>
+    <Property Id="NATSPASSWORD" Secure="yes">
+      <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regNatsPassword" Name="NatsPassword" />
+    </Property>
     <Property Id="LOCALROUTE" Secure="yes">
       <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regLocalRoute" Name="LocalRoute" />
     </Property>
@@ -294,6 +310,8 @@
     <!-- Define variables that the ServiceConfigDlg uses -->
     <WixVariable Id="ServiceConfigNatsHostProperty" Value="NATSHOST"/>
     <WixVariable Id="ServiceConfigNatsPortProperty" Value="NATSPORT"/>
+    <WixVariable Id="ServiceConfigNatsUserProperty" Value="NATSUSER"/>
+    <WixVariable Id="ServiceConfigNatsPasswordProperty" Value="NATSPASSWORD"/>
     <WixVariable Id="ServiceConfigLocalRouteProperty" Value="LOCALROUTE"/>
     <WixVariable Id="ServiceConfigAppDirProperty" Value="APPDIR"/>
     <WixVariable Id="ServiceConfigDropletDirProperty" Value="DROPLETDIR"/>
