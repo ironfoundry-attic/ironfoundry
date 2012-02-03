@@ -62,6 +62,9 @@
         private readonly IDictionary<int, IList<Action<string, string>>> subscriptionCallbacks =
             new Dictionary<int, IList<Action<string, string>>>();
 
+        private readonly TaskFactory callbackRunnerFactory =
+            new TaskFactory(TaskCreationOptions.LongRunning, TaskContinuationOptions.ExecuteSynchronously);
+
         private readonly Guid uniqueIdentifier;
 
         private bool shuttingDown = false;
@@ -287,6 +290,21 @@
             return rv;
         }
 
+        private class MessageTimer : Timer
+        {
+            private readonly string message;
+
+            public MessageTimer(uint delay, string message) : base(delay)
+            {
+                this.message = message;
+            }
+
+            public string Message
+            {
+                get { return message; }
+            }
+        }
+
         private void DoPublish(string subject, Message message, uint delay = 0)
         {
             if (Message.RECEIVE_ONLY == subject)
@@ -304,22 +322,24 @@
             }
             else
             {
-                Timer delayTimer = null;
-                try
-                {
-                    delayTimer = new Timer(delay) { AutoReset = false };
-                    delayTimer.Elapsed += (object sender, ElapsedEventArgs args) => Write(formattedMessage);
-                    delayTimer.Enabled = true;
-                    delayTimer = null;
-                }
-                finally
-                {
-                    if (delayTimer != null)
-                    {
-                        delayTimer.Close();
-                    }
-                }
+                var delayTimer = new MessageTimer(delay, formattedMessage) { AutoReset = false };
+                delayTimer.Elapsed += DelayedPublishElapsedHandler;
+                delayTimer.Enabled = true;
             }
+        }
+
+        private void DelayedPublishElapsedHandler(object sender, ElapsedEventArgs args)
+        {
+            try
+            {
+                var timer = (MessageTimer)sender;
+                timer.Enabled = false;
+                timer.Elapsed -= DelayedPublishElapsedHandler;
+                Write(timer.Message);
+                timer.Close();
+                timer.Dispose();
+            }
+            catch { }
         }
 
         private void SendSubscription(NatsSubscription subscription)
@@ -374,7 +394,11 @@
                         {
                             try
                             {
-                                callback(message.Message, message.InboxID);
+                                if (shuttingDown)
+                                {
+                                    break;
+                                }
+                                callbackRunnerFactory.StartNew(() => callback(message.Message, message.InboxID));
                             }
                             catch (Exception ex)
                             {

@@ -17,9 +17,9 @@
 
     public interface IWebServerAdministrationProvider
     {
-        WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName);
+        WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName, uint memMB);
         void UninstallWebApp(string applicationInstanceName);
-        ApplicationInstanceStatus GetStatus(string applicationInstanceName);
+        ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName);
         bool DoesApplicationExist(string applicationInstanceName);
     }
 }

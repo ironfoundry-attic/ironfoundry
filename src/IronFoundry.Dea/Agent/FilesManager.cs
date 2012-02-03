@@ -45,7 +45,11 @@
 
         public void TakeSnapshot(Snapshot snapshot)
         {
-            File.WriteAllText(SnapshotFile, snapshot.ToJson(), new ASCIIEncoding());
+            try
+            {
+                File.WriteAllText(SnapshotFile, snapshot.ToJson(), new ASCIIEncoding());
+            }
+            catch { }
         }
 
         public Snapshot GetSnapshot()

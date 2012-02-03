@@ -169,7 +169,8 @@
 
             if (filesManager.Stage(droplet, instance))
             {
-                WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(filesManager.GetApplicationPathFor(instance), instance.Staged);
+                WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(
+                    filesManager.GetApplicationPathFor(instance), instance.Staged, instance.MemQuota);
                 if (null == binding)
                 {
                     log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.Staged);
@@ -506,7 +507,7 @@
                 return VcapStates.DELETED;
             }
 
-            ApplicationInstanceStatus status = webServerProvider.GetStatus(name);
+            ApplicationInstanceStatus status = webServerProvider.GetApplicationStatus(name);
 
             string rv;
 

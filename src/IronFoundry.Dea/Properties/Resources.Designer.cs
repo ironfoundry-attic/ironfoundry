@@ -618,5 +618,32 @@ namespace IronFoundry.Dea.Properties {
                 return ResourceManager.GetString("WcfService_StoppingHost_Fmt", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Web application already exists &apos;{0}&apos;.
+        /// </summary>
+        internal static string WebServerAdministrationProvider_AppAlreadyExists_Fmt {
+            get {
+                return ResourceManager.GetString("WebServerAdministrationProvider_AppAlreadyExists_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;appcmd.exe {0}&apos; failed: {1}.
+        /// </summary>
+        internal static string WebServerAdministrationProvider_AppCmdFailed_Fmt {
+            get {
+                return ResourceManager.GetString("WebServerAdministrationProvider_AppCmdFailed_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find appcmd.exe in IIs installation directory {0}.
+        /// </summary>
+        internal static string WebServerAdministrationProvider_AppCmdNotFound_Fmt {
+            get {
+                return ResourceManager.GetString("WebServerAdministrationProvider_AppCmdNotFound_Fmt", resourceCulture);
+            }
+        }
     }
 }

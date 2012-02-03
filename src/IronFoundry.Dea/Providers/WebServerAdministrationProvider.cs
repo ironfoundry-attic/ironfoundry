@@ -1,73 +1,115 @@
 ﻿namespace IronFoundry.Dea.Providers
 {
     using System;
-    using System.Linq;
+    using System.Diagnostics;
+    using System.IO;
     using System.Net;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
+    using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
-    using Microsoft.Web.Administration;
+    using Microsoft.Win32;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
-        private readonly object serverManagerLock = new object();
+        private static readonly TimeSpan twoSeconds = TimeSpan.FromSeconds(2);
+        private static readonly Regex appcmdStateRegex = new Regex(@"state:(\w+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private const string IIsAppPoolObject = "apppool";
+        private const string IIsSiteObject = "site";
+
         private readonly ILog log;
         private readonly IPAddress localIPAddress;
         private readonly IFirewallService firewallService;
-        private const ushort STARTING_PORT = 9000;
+
+        private readonly object appcmdLock = new object();
+        private readonly string appCmdPath;
 
         public WebServerAdministrationProvider(ILog log, IConfig config, IFirewallService firewallService)
         {
             this.log = log;
             this.localIPAddress = config.LocalIPAddress;
             this.firewallService = firewallService;
+            this.appCmdPath = InitAppCmdPath();
         }
 
-        public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
+        public WebServerAdministrationBinding InstallWebApp(
+            string localDirectory, string applicationInstanceName, uint memMB)
         {
             WebServerAdministrationBinding rv = null;
 
             try
             {
-                lock (serverManagerLock)
+                ushort applicationPort = 0;
+
+                bool exists = DoesIIsObjectExist(IIsAppPoolObject, applicationInstanceName);
+                if (exists)
                 {
-                    using (var manager = new ServerManager())
+                    log.Error(Resources.WebServerAdministrationProvider_AppAlreadyExists_Fmt, applicationInstanceName);
+                }
+                else
+                {
+                    // NB: must lock to ensure multiple threads don't grab the same port.
+                    lock (appcmdLock)
                     {
-                        ApplicationPool cloudFoundryPool = GetApplicationPool(manager, applicationInstanceName);
-                        if (null == cloudFoundryPool)
+                        string cmd = String.Format("add apppool /name:{0}", applicationInstanceName);
+                        AppCmdResult rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        if (false == rslt.Success)
                         {
-                            cloudFoundryPool = manager.ApplicationPools.Add(applicationInstanceName);
+                            return null;
                         }
 
-                        ushort applicationPort = FindNextAvailablePort();
+                        uint memKB = memMB * 1024;
+                        cmd = String.Format(
+                            "set apppool {0} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated /recycling.periodicRestart.privateMemory:{1}",
+                            applicationInstanceName, memKB);
+                        rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        if (false == rslt.Success)
+                        {
+                            return null;
+                        }
 
-                        firewallService.Open(applicationPort, applicationInstanceName);
+                        applicationPort = Utility.RandomFreePort();
+                        cmd = String.Format("add site /name:{0} /bindings:http/*:{1}: /physicalPath:{2}",
+                            applicationInstanceName, applicationPort, localDirectory);
+                        rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        if (false == rslt.Success)
+                        {
+                            return null;
+                        }
 
-                        /*
-                         * NB: for now, listen on all local IPs, a specific port, and any domain.
-                         * TODO: should we limit by host header here?
-                         * TODO: use local IP here?
-                         */
-                        manager.Sites.Add(applicationInstanceName, "http", "*:" + applicationPort.ToString() + ":", localDirectory);
+                        cmd = String.Format("set site {0} /[path='/'].applicationPool:{0}", applicationInstanceName);
+                        rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        if (false == rslt.Success)
+                        {
+                            return null;
+                        }
 
-                        manager.Sites[applicationInstanceName].Applications[0].ApplicationPoolName = applicationInstanceName;
+                        cmd = String.Format("start apppool {0}", applicationInstanceName);
+                        rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        if (false == rslt.Success)
+                        {
+                            return null;
+                        }
 
-                        cloudFoundryPool.ManagedRuntimeVersion = "v4.0";
-
-                        manager.CommitChanges();
-
-                        rv = new WebServerAdministrationBinding() { Host = localIPAddress.ToString(), Port = applicationPort };
+                        cmd = String.Format("start site {0}", applicationInstanceName);
+                        rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        if (false == rslt.Success)
+                        {
+                            return null;
+                        }
                     }
+
+                    rv = new WebServerAdministrationBinding { Host = localIPAddress.ToString(), Port = applicationPort };
                 }
+
+                firewallService.Open(applicationPort, applicationInstanceName);
             }
             catch (Exception ex)
             {
                 log.Error(ex);
-            }
-            finally
-            {
-                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
             }
 
             return rv;
@@ -77,47 +119,27 @@
         {
             try
             {
-                lock (serverManagerLock)
+                string cmd = String.Format("stop apppool {0}", applicationInstanceName);
+                ExecAppcmd(cmd, 5, twoSeconds);
+
+                ushort i = 0;
+                ApplicationInstanceStatus status = ApplicationInstanceStatus.Unknown;
+                while (ApplicationInstanceStatus.Stopped != status && i < 5)
                 {
-                    using (var manager = new ServerManager())
-                    {
-                        Site site = GetSite(manager, applicationInstanceName);
-                        if (null != site)
-                        {
-                            manager.Sites.Remove(site);
-                        }
-                        ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
-                        if (null != applicationPool)
-                        {
-                            ObjectState poolState = applicationPool.State;
-                            ushort tries = 0;
-                            do
-                            {
-                                poolState = applicationPool.Stop();
-                                ++tries;
-                                if (ObjectState.Stopped == poolState)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    Thread.Sleep(250);
-                                }
-                            }
-                            while (tries < 5);
-                            manager.ApplicationPools.Remove(applicationPool);
-                        }
-                        manager.CommitChanges();
-                    }
+                    status = GetApplicationStatus(applicationInstanceName);
+                    ++i;
                 }
+
+                cmd = String.Format("delete apppool {0}", applicationInstanceName);
+                ExecAppcmd(cmd, 5, twoSeconds);
+
+                cmd = String.Format("delete site {0}", applicationInstanceName);
+                ExecAppcmd(cmd, 5, twoSeconds);
+
             }
             catch (Exception ex)
             {
                 log.Error(ex);
-            }
-            finally
-            {
-                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
             }
 
             try
@@ -136,77 +158,162 @@
 
             try
             {
-                using (var manager = new ServerManager())
+                /*
+                    C:\>%windir%\system32\inetsrv\appcmd.exe list site "/name:Default Web Site"
+                    SITE "Default Web Site" (id:1,bindings:http/*:80:,net.tcp/808:*,net.pipe/*,net.msmq/localhost,msmq.formatname/localhost,state:Started)
+                 */
+                string poolState = GetIIsObjectState(IIsAppPoolObject, applicationInstanceName);
+                if (false == poolState.IsNullOrWhiteSpace())
                 {
-                    var site = GetSite(manager, applicationInstanceName);
-                    rv = site != null;
+                    string siteState = GetIIsObjectState(IIsSiteObject, applicationInstanceName);
+                    if (false == siteState.IsNullOrWhiteSpace())
+                    {
+                        rv = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 log.Error(ex);
             }
-            finally
-            {
-                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
-            }
 
             return rv;
         }
 
-        public ApplicationInstanceStatus GetStatus(string applicationInstanceName)
+        public ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName)
         {
             ApplicationInstanceStatus rv = ApplicationInstanceStatus.Unknown;
-
             try
             {
-                using (var manager = new ServerManager())
+                /*
+                    C:\>%windir%\system32\inetsrv\appcmd.exe list apppool /name:DefaultAppPool
+                    APPPOOL "DefaultAppPool" (MgdVersion:v4.0,MgdMode:Integrated,state:Started)
+                 */
+                string state = GetIIsObjectState(IIsAppPoolObject, applicationInstanceName);
+                if (false == state.IsNullOrWhiteSpace())
                 {
-                    ApplicationPool applicationPool = GetApplicationPool(manager, applicationInstanceName);
-                    Site applicationSite = GetSite(manager, applicationInstanceName);
-                    if (applicationSite.State == ObjectState.Stopped || applicationPool.State == ObjectState.Stopped)
-                    {
-                        rv = ApplicationInstanceStatus.Stopped;
-                    }
-                    else if (applicationSite.State == ObjectState.Stopping || applicationPool.State == ObjectState.Stopping)
-                    {
-                        rv = ApplicationInstanceStatus.Stopping;
-                    }
-                    else if (applicationSite.State == ObjectState.Starting || applicationPool.State == ObjectState.Starting)
-                    {
-                        rv = ApplicationInstanceStatus.Starting;
-                    }
-                    else if (applicationSite.State == ObjectState.Started || applicationPool.State == ObjectState.Started)
+                    if (state == "started")
                     {
                         rv = ApplicationInstanceStatus.Started;
                     }
+                    else if (state == "starting")
+                    {
+                        rv = ApplicationInstanceStatus.Starting;
+                    }
+                    else if (state == "stopped")
+                    {
+                        rv = ApplicationInstanceStatus.Stopped;
+                    }
+                    else if (state == "stopping")
+                    {
+                        rv = ApplicationInstanceStatus.Stopping;
+                    }
+                    else
+                    {
+                        rv = ApplicationInstanceStatus.Unknown;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 log.Error(ex);
             }
-            finally
+
+            return rv;
+        }
+
+        private bool DoesIIsObjectExist(string objectType, string objectName)
+        {
+            string state = GetIIsObjectState(objectType, objectName);
+            return false == state.IsNullOrWhiteSpace();
+        }
+
+        private string GetIIsObjectState(string objectType, string objectName)
+        {
+            string rv = null;
+
+            AppCmdResult rslt = ExecAppcmd(String.Format(@"list {0} ""/name:{1}""", objectType, objectName), 1, null, true);
+            if (rslt.Success)
             {
-                GC.Collect(); // HACK: ServerManager leaks memory, this helps somewhat.
+                Match m = appcmdStateRegex.Match(rslt.Output);
+                rv = m.Groups[1].Value.ToLowerInvariant();
             }
 
             return rv;
         }
 
-        private static ApplicationPool GetApplicationPool(ServerManager argManager, string argName)
+        private class AppCmdResult
         {
-            return argManager.ApplicationPools.FirstOrDefault(a => a.Name == argName);
+            private readonly bool success = false;
+            private readonly string output = null;
+
+            public AppCmdResult(bool success, string output)
+            {
+                this.success = success;
+                this.output = output;
+            }
+
+            public bool Success { get { return success; } }
+            public string Output { get { return output; } }
         }
 
-        private static Site GetSite(ServerManager argManager, string argName)
+        private AppCmdResult ExecAppcmd(string arguments,
+            ushort numTries = 1, TimeSpan? retrySleepInterval = null, bool expectError = false)
         {
-            return argManager.Sites.FirstOrDefault(s => s.Name == argName);
+            bool success = false;
+            string output = null, errout = null;
+            try
+            {
+                for (ushort i = 0; i < numTries && false == success; ++i)
+                {
+                    lock (appcmdLock)
+                    {
+                        var p = new Process();
+                        p.StartInfo.CreateNoWindow = true;
+                        p.StartInfo.UseShellExecute = false;
+                        p.StartInfo.RedirectStandardOutput = true;
+                        p.StartInfo.RedirectStandardError = true;
+                        p.StartInfo.FileName = appCmdPath;
+                        p.StartInfo.Arguments = arguments;
+                        p.Start();
+                        output = p.StandardOutput.ReadToEnd().TrimEnd('\r', '\n');
+                        errout = p.StandardError.ReadToEnd().TrimEnd('\r', '\n');
+                        p.WaitForExit();
+                        success = 0 == p.ExitCode;
+                    }
+                    if (false == success)
+                    {
+                        if (false == expectError)
+                        {
+                            log.Error(Resources.WebServerAdministrationProvider_AppCmdFailed_Fmt, arguments, errout);
+                        }
+                        if (numTries > 1 && retrySleepInterval.HasValue)
+                        {
+                            Thread.Sleep(retrySleepInterval.Value);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                output = null;
+                log.Error(ex);
+            }
+            return new AppCmdResult(success, output);
         }
 
-        private static ushort FindNextAvailablePort()
+        private static string InitAppCmdPath()
         {
-            return Utility.FindNextAvailablePortAfter(STARTING_PORT);
+            RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default);
+            RegistryKey subKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\InetStp");
+            string iisInstallPath = subKey.GetValue("InstallPath").ToString();
+            string appCmdPath = Path.Combine(iisInstallPath, "appcmd.exe");
+            if (false == File.Exists(appCmdPath))
+            {
+                throw new ArgumentException(String.Format(Resources.WebServerAdministrationProvider_AppCmdNotFound_Fmt, iisInstallPath));
+            }
+            return appCmdPath;
         }
     }
 }

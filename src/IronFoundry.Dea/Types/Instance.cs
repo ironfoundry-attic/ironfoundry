@@ -65,7 +65,7 @@
         public string Version { get; set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public int MemQuota { get; set; }
+        public uint MemQuota { get; set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
         public int DiskQuota { get; set; }

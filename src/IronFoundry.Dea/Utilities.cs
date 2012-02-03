@@ -1,7 +1,6 @@
 ﻿namespace IronFoundry.Dea
 {
     using System;
-    using System.Diagnostics;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
@@ -26,27 +25,6 @@
         {
             var c = new Computer();
             c.FileSystem.CopyDirectory(source.FullName, target.FullName, true);
-        }
-
-        // NB: this allows "break on all exceptions" to be enabled in VS without having the SocketException break
-        [DebuggerStepThrough]
-        public static ushort FindNextAvailablePortAfter(ushort argStartingPort)
-        {
-            for (ushort port = argStartingPort; port < 65535; port++)
-            {
-                try
-                {
-                    var ep = new IPEndPoint(IPAddress.Any, port);
-                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    socket.Bind(ep);
-                    socket.Close();
-                    // Port available
-                    return port;
-                }
-                catch (SocketException) { }
-            }
-
-            return UInt16.MinValue;
         }
 
         public static string GetFileSizeString(long size)
