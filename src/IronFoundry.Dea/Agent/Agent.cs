@@ -16,7 +16,7 @@
     {
         private readonly TimeSpan OneSecondInterval = TimeSpan.FromSeconds(1);
         private readonly TimeSpan TwoSecondsInterval = TimeSpan.FromSeconds(2);
-        private readonly TimeSpan FiveSecondsInterval = TimeSpan.FromSeconds(5);
+        private readonly TimeSpan TenSecondsInterval = TimeSpan.FromSeconds(10);
 
         private readonly ILog log;
         private readonly IConfig config;
@@ -145,7 +145,7 @@
             while (false == shutting_down)
             {
                 SendHeartbeat();
-                Thread.Sleep(FiveSecondsInterval);
+                Thread.Sleep(TenSecondsInterval);
             }
         }
 
@@ -502,17 +502,13 @@
 
         private string GetApplicationState(string name)
         {
-            if (false == webServerProvider.DoesApplicationExist(name))
-            {
-                return VcapStates.DELETED;
-            }
-
             ApplicationInstanceStatus status = webServerProvider.GetApplicationStatus(name);
-
             string rv;
-
             switch (status)
             {
+                case ApplicationInstanceStatus.Deleted:
+                    rv = VcapStates.DELETED;
+                    break;
                 case ApplicationInstanceStatus.Started:
                     rv = VcapStates.RUNNING;
                     break;
@@ -532,7 +528,6 @@
                     rv = VcapStates.CRASHED;
                     break;
             }
-
             return rv;
         }
 

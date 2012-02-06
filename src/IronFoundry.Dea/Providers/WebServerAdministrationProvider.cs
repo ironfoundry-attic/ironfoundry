@@ -152,34 +152,6 @@
             }
         }
 
-        public bool DoesApplicationExist(string applicationInstanceName)
-        {
-            bool rv = false;
-
-            try
-            {
-                /*
-                    C:\>%windir%\system32\inetsrv\appcmd.exe list site "/name:Default Web Site"
-                    SITE "Default Web Site" (id:1,bindings:http/*:80:,net.tcp/808:*,net.pipe/*,net.msmq/localhost,msmq.formatname/localhost,state:Started)
-                 */
-                string poolState = GetIIsObjectState(IIsAppPoolObject, applicationInstanceName);
-                if (false == poolState.IsNullOrWhiteSpace())
-                {
-                    string siteState = GetIIsObjectState(IIsSiteObject, applicationInstanceName);
-                    if (false == siteState.IsNullOrWhiteSpace())
-                    {
-                        rv = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-
-            return rv;
-        }
-
         public ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName)
         {
             ApplicationInstanceStatus rv = ApplicationInstanceStatus.Unknown;
@@ -190,7 +162,11 @@
                     APPPOOL "DefaultAppPool" (MgdVersion:v4.0,MgdMode:Integrated,state:Started)
                  */
                 string state = GetIIsObjectState(IIsAppPoolObject, applicationInstanceName);
-                if (false == state.IsNullOrWhiteSpace())
+                if (state.IsNullOrWhiteSpace())
+                {
+                    rv = ApplicationInstanceStatus.Deleted;
+                }
+                else
                 {
                     if (state == "started")
                     {

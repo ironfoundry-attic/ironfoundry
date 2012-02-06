@@ -2,6 +2,7 @@
 {
     public enum ApplicationInstanceStatus
     {
+        Deleted,
         Started,
         Starting,
         Stopped,
@@ -20,6 +21,5 @@
         WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName, uint memMB);
         void UninstallWebApp(string applicationInstanceName);
         ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName);
-        bool DoesApplicationExist(string applicationInstanceName);
     }
 }
