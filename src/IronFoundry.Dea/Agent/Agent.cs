@@ -246,7 +246,7 @@
                     {
                         delay += 10; // NB: 10 milliseconds delay per app
                     });
-                messagingProvider.Publish(reply, helloMessage, delay);
+                messagingProvider.Publish(reply, helloMessage, Math.Min(delay, 250));
             }
             else
             {

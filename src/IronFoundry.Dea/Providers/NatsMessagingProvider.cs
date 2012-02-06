@@ -251,8 +251,7 @@
                 {
                     tcpClient = new TcpClient(natsHost, natsPort)
                     {
-                        LingerState = new LingerOption(true, 0),
-                        NoDelay = true
+                        NoDelay = true,
                     };
                     rv = true;
                     break;
@@ -392,18 +391,22 @@
                     {
                         foreach (var callback in callbacks)
                         {
-                            try
+                            if (shuttingDown)
                             {
-                                if (shuttingDown)
+                                break;
+                            }
+
+                            callbackRunnerFactory.StartNew(() =>
                                 {
-                                    break;
-                                }
-                                callbackRunnerFactory.StartNew(() => callback(message.Message, message.InboxID));
-                            }
-                            catch (Exception ex)
-                            {
-                                log.Error(ex, Resources.NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt, message.Subject);
-                            }
+                                    try
+                                    {
+                                        callback(message.Message, message.InboxID);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        log.Error(ex, Resources.NatsMessagingProvider_ExceptionInCallbackForSubscription_Fmt, message.Subject);
+                                    }
+                                });
                         }
                     }
                 }
