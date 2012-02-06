@@ -5,7 +5,7 @@ setlocal
 set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
 
 set SLN="%~dp0\IronFoundry.sln"
-set VERSION=1.5.0.0
+set VERSION=1.6.0.0
 
 set NOCLEAN=0
 if /i "%1"=="NOCLEAN" set NOCLEAN=1
