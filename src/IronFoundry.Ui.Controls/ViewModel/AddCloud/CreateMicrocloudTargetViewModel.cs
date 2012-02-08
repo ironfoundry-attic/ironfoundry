@@ -71,7 +71,7 @@
                                                                                                                        GetMicrocloudTargetData))
                                                                                                        {
                                                                                                            cloudUrl.
-                                                                                                               ServerType
+                                                                                                               ServerName
                                                                                                                = name;
                                                                                                            string
                                                                                                                toReplace

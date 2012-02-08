@@ -25,12 +25,13 @@ namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
             dispatcher = Dispatcher.CurrentDispatcher;
             ValidateAccountCommand = new RelayCommand(ValidateAccount, CanValidate);
             RegisterAccountCommand = new RelayCommand(RegisterAccount, CanRegister);
-            ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);
+            // TODO ManageCloudUrlsCommand = new RelayCommand(ManageCloudUrls);
             cloudUrls = provider.CloudUrls;
             SelectedCloudUrl = cloudUrls.SingleOrDefault((i) => i.IsDefault);
         }
 
-        public RelayCommand ManageCloudUrlsCommand { get; private set; }
+        // public RelayCommand ManageCloudUrlsCommand { get; private set; }
+
         public RelayCommand ValidateAccountCommand { get; private set; }
         public RelayCommand RegisterAccountCommand { get; private set; }
 
@@ -156,7 +157,7 @@ namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
 
         private bool CanRegister()
         {
-            return SelectedCloudUrl.ServerType.Equals("Local cloud", StringComparison.InvariantCultureIgnoreCase);
+            return SelectedCloudUrl.ServerName.Equals("Local cloud", StringComparison.InvariantCultureIgnoreCase);
         }
 
         private void ManageCloudUrls()

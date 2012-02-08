@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:u="clr-namespace:IronFoundry.Ui.Controls.Utilities"
         WindowStartupLocation="CenterOwner"
-        Title="Add Cloud..." Height="370" Width="620"
+        Title="Add Cloud..."
         Icon="../Images/CloudFoundrySmall.ico"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize" mc:Ignorable="d" Height="370" Width="620">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -50,7 +50,6 @@
                                 <Label Grid.Row="1" Grid.Column="0" Content="Server Name:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
                                 <TextBox Grid.Row="1" Grid.Column="1" x:Name="ServerNameTextBox" Text="{Binding ServerName, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,3"/>
 
-
                                 <Label Grid.Row="2" Grid.Column="0" Content="Runtime Environment:" Foreground="{StaticResource DarkBlueBrushKey}" />
                                 <ComboBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,3">
                                     <ComboBoxItem Content="Cloud Foundry (Runtime) v1.0" IsSelected="True" />
@@ -73,7 +72,7 @@
                                                 <TextBlock>
                                         <TextBlock.Text>
                                           <MultiBinding StringFormat="{}{0} - {1}">
-                                            <Binding Path="ServerType"/>
+                                            <Binding Path="ServerName"/>
                                             <Binding Path="Url"/>
                                           </MultiBinding>
                                         </TextBlock.Text>
@@ -81,7 +80,6 @@
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
                                     </ComboBox>
-                                    <Button DockPanel.Dock="Right" Height="22" Margin="0" Command="{Binding ManageCloudUrlsCommand}">Manage Cloud...</Button>
                                 </DockPanel>
 
                                 <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="-10,10,0,0" >

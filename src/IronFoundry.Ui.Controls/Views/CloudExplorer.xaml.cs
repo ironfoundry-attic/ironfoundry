@@ -17,8 +17,7 @@
             this.DataContext = new CloudExplorerViewModel();
             this.Unloaded += (s,e) => Messenger.Default.Unregister(this);
             
-            Messenger.Default.Register<NotificationMessageAction<bool>>(
-                this,
+            Messenger.Default.Register<NotificationMessageAction<bool>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.AddCloud))
@@ -31,8 +30,7 @@
                     }
                 });
 
-            Messenger.Default.Register<NotificationMessageAction<bool>>(
-                this,
+            Messenger.Default.Register<NotificationMessageAction<bool>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.PushApp))
@@ -45,8 +43,7 @@
                     }
                 });
 
-            Messenger.Default.Register<NotificationMessageAction<bool>>(
-                this,
+            Messenger.Default.Register<NotificationMessageAction<bool>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.UpdateApp))
@@ -59,8 +56,7 @@
                     }
                 });
 
-            Messenger.Default.Register<NotificationMessageAction<bool>>(
-                this,
+            Messenger.Default.Register<NotificationMessageAction<bool>>(this,
                 message =>
                 {
                     if (message.Notification.Equals(Messages.Progress))
@@ -69,6 +65,19 @@
                         Window parentWindow = Window.GetWindow(this);
                         view.Owner = parentWindow;
                         var result = view.ShowDialog();
+                        message.Execute(result.GetValueOrDefault());
+                    }
+                });
+
+            Messenger.Default.Register<NotificationMessageAction<bool>>(this,
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.Preferences))
+                    {
+                        var view = new ManageClouds();
+                        Window parentWindow = Window.GetWindow(this);
+                        view.Owner = parentWindow;
+                        bool? result = view.ShowDialog();
                         message.Execute(result.GetValueOrDefault());
                     }
                 });

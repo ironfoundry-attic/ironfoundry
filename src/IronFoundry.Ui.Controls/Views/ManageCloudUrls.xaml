@@ -3,11 +3,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:u="clr-namespace:IronFoundry.Ui.Controls.Utilities"
-	x:Class="IronFoundry.Ui.Controls.Views.ManageCloudUrls"
-	WindowStartupLocation="CenterOwner"
-	Title="Manage Cloud Urls..."
+    x:Class="IronFoundry.Ui.Controls.Views.ManageCloudUrls"
+    WindowStartupLocation="CenterOwner"
+    Title="Manage Cloud Urls..."
         Icon="../Images/CloudFoundrySmall.ico"
-	Width="720" Height="295"
+    Width="720" Height="295"
         ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
@@ -30,21 +30,18 @@
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
                         <DockPanel>
-                            <DataGrid DockPanel.Dock="Left" AutoGenerateColumns="False" ItemsSource="{Binding CloudUrls}" 
-                          SelectedItem="{Binding SelectedCloudUrl}"
-                          HeadersVisibility="Column"
-                          Background="{x:Null}"
-                          HorizontalGridLinesBrush="{x:Null}"
-                          Width="600" Height="155"
-                          CanUserAddRows="False" 
-                          SelectionMode="Single" 
-                          SelectionUnit="FullRow" 
-                          IsReadOnly="True">
+                            <DataGrid
+                                DockPanel.Dock="Left" AutoGenerateColumns="False" ItemsSource="{Binding CloudUrls}" 
+                                SelectedItem="{Binding SelectedCloudUrl}" HeadersVisibility="Column"
+                                Background="{x:Null}" HorizontalGridLinesBrush="{x:Null}"
+                                Width="600" Height="155" CanUserAddRows="False" CanUserDeleteRows="False"
+                                CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False"
+                                SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="False">
                                 <DataGrid.VerticalGridLinesBrush>
                                     <SolidColorBrush Color="{DynamicResource BorderBlueColor}"/>
                                 </DataGrid.VerticalGridLinesBrush>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Server Type" Binding="{Binding ServerType}" Width="233" />
+                                    <DataGridTextColumn Header="Server Name" Binding="{Binding ServerName}" Width="233" />
                                     <DataGridTextColumn Header="URL" Binding="{Binding Url}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>

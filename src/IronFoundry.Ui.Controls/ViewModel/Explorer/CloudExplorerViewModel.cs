@@ -9,6 +9,7 @@
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
+    using IronFoundry.Ui.Controls.Views;
     using Model;
     using Mvvm;
     using Push;
@@ -30,6 +31,7 @@
             AddCloudCommand = new RelayCommand(AddCloud);
             PushAppCommand = new RelayCommand(PushApp);
             UpdateAppCommand = new RelayCommand(UpdateApp);
+            PreferencesCommand = new RelayCommand(Preferences);
             if (null != provider)
             {
                 if (null != provider.Clouds)
@@ -47,6 +49,7 @@
         public RelayCommand PushAppCommand { get; set; }
         public RelayCommand UpdateAppCommand { get; set; }
         public RelayCommand RefreshCloudsCommand { get; set; }
+        public RelayCommand PreferencesCommand { get; set; }
 
         public ObservableCollection<CloudTreeViewItemViewModel> Clouds
         {
@@ -164,6 +167,11 @@
                                                                                        Messages.Progress, c => { }));
                                                                            }
                                                                        }));
+        }
+
+        private void Preferences()
+        {
+            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.Preferences, (confirmed) => { }));
         }
 
         private void UpdateApp()

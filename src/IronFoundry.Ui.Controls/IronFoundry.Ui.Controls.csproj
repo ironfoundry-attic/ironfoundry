@@ -111,6 +111,7 @@
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
     <Compile Include="ViewModel\Explorer\FileTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\Explorer\FolderTreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\ManageCloudsViewModel.cs" />
     <Compile Include="ViewModel\ProgressViewModel.cs" />
     <Compile Include="ViewModel\Push\AddApplicationServiceViewModel.cs" />
     <Compile Include="ViewModel\UpdateViewModel.cs" />
@@ -157,6 +158,9 @@
     </Compile>
     <Compile Include="Views\AddApplicationService.xaml.cs">
       <DependentUpon>AddApplicationService.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ManageClouds.xaml.cs">
+      <DependentUpon>ManageClouds.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
@@ -238,6 +242,10 @@
     <Page Include="Views\AddApplicationService.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ManageClouds.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ProgressDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -324,6 +332,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="CloudFoundrySmall.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\gear.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />

@@ -80,5 +80,8 @@
         public const string ProgressDialogResult = "ProgressDialogResult";
         public const string SetProgressData = "SetProgressData";
         public const string SetProgressCancelButtonVisible = "SetProgressCancelButtonVisible";
+
+        public const string Preferences = "Preferences";
+        public const string PreferencesDialogResult = "PreferencesDialogResult";
     }
 }

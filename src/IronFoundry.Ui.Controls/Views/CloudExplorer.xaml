@@ -26,6 +26,9 @@
             <Button ToolTip="Update..." Command="{Binding UpdateAppCommand}">
                 <Image Source="../Images/update.png"/>
             </Button>
+            <Button ToolTip="Preferences..." Command="{Binding PreferencesCommand}">
+                <Image Source="../Images/gear.png"/>
+            </Button>
             <!--<Button ToolTip="Refresh..." HorizontalAlignment="Right" Command="{Binding RefreshCloudsCommand}">
                 <Image Source="../Images/refresh.png"/>
             </Button>-->                        

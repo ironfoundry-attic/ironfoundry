@@ -25,11 +25,14 @@
         public ExplorerViewModel()
         {
             CloseCloudCommand = new RelayCommand<CloudViewModel>(CloseCloud);
+
             Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
                                        Messages.GetCloudFoundryProvider, p => provider = p));
+
             Messenger.Default.Register<NotificationMessage<Types.Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             Messenger.Default.Register<NotificationMessage<string>>(this, ProcessErrorMessage);
+
             provider.CloudsChanged += CloudsCollectionChanged;
         }
 

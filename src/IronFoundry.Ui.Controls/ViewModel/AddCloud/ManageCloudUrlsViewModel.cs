@@ -14,7 +14,8 @@
         private SafeObservableCollection<CloudUrl> cloudUrls;
         private CloudUrl selectedCloudUrl;
 
-        public ManageCloudUrlsViewModel() : base(Messages.ManageCloudUrlsDialogResult)
+        public ManageCloudUrlsViewModel()
+            : base(Messages.ManageCloudUrlsDialogResult)
         {
             AddCommand = new RelayCommand(Add);
             EditCommand = new RelayCommand(Edit, CanEdit);
@@ -111,7 +112,7 @@
                                                                                            var newCloudUrl =
                                                                                                new CloudUrl
                                                                                                {
-                                                                                                   ServerType =
+                                                                                                   ServerName =
                                                                                                        viewModel.Name,
                                                                                                    Url = viewModel.Url,
                                                                                                    IsConfigurable = true,
@@ -136,8 +137,8 @@
                                                                                 {
                                                                                     var newCloudUrl = new CloudUrl
                                                                                     {
-                                                                                        ServerType =
-                                                                                            SelectedCloudUrl.ServerType,
+                                                                                        ServerName =
+                                                                                            SelectedCloudUrl.ServerName,
                                                                                         Url = SelectedCloudUrl.Url,
                                                                                         IsConfigurable = true,
                                                                                         IsRemovable = true

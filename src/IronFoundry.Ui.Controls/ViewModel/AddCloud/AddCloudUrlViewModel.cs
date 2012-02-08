@@ -16,10 +16,10 @@
 
         public string Name
         {
-            get { return cloudUrl.ServerType; }
+            get { return cloudUrl.ServerName; }
             set
             {
-                cloudUrl.ServerType = value;
+                cloudUrl.ServerName = value;
                 RaisePropertyChanged("Name");
             }
         }
