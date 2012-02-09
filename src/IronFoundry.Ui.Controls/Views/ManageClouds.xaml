@@ -1,0 +1,91 @@
+﻿<Window x:Class="IronFoundry.Ui.Controls.Views.ManageClouds"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:u="clr-namespace:IronFoundry.Ui.Controls.Utilities"
+        WindowStartupLocation="CenterOwner"
+        Title="Manage Clouds..." ResizeMode="NoResize"
+        Icon="../Images/CloudFoundrySmall.ico"
+        mc:Ignorable="d" Width="640" Height="480">
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="..\Resources\Resources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button HorizontalAlignment="Center" VerticalAlignment="Center" Width="90" Margin="4" Content="Ok" Command="{Binding ConfirmedCommand}" IsDefault="True" />
+      <Button HorizontalAlignment="Center" VerticalAlignment="Center" Width="90" Margin="4" Content="Cancel" Command="{Binding CancelledCommand}" IsCancel="True" />
+    </StackPanel>
+    <Border BorderThickness="0 0 0 1" BorderBrush="Gray">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.Column="0">
+          <Border DockPanel.Dock="Bottom" BorderThickness="0 1 1 0" BorderBrush="Gray">
+            <StackPanel Orientation="Horizontal">
+              <StackPanel.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                  <GradientStop Color="#FFE2EAF2" Offset="1" />
+                  <GradientStop Color="White" Offset="0" />
+                </LinearGradientBrush>
+              </StackPanel.Background>
+              <Button Height="20" Width="20" Margin="2">
+                <Path Stroke="Green" Data="M0,5 H10 M5,5 V10Z" StrokeThickness="2" Height="10" Width="10" />
+              </Button>
+              <Button Height="20" Width="20" Margin="2">
+                <Path Stroke="Red" Data="M0,5 H10Z" StrokeThickness="2" Height="10" Width="10" />
+              </Button>
+            </StackPanel>
+          </Border>
+          <ListBox ItemsSource="{Binding Clouds}" DisplayMemberPath="ServerName" />
+        </DockPanel>
+        <DockPanel Grid.Column="1" HorizontalAlignment="Stretch">
+          <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Specify cloud settings." />
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Server Name:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="ServerNameTextBox" Text="{Binding ServerName, Mode=TwoWay}" VerticalAlignment="Center" />
+
+            <Label Grid.Row="2" Grid.Column="0" Content="URL:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding EMail, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" />
+
+            <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Credentials" />
+
+            <Label Grid.Row="4" Grid.Column="0" Content="Email:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding EMail, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" />
+
+            <Label Grid.Row="5" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+            <PasswordBox Grid.Row="5" Grid.Column="1" u:PasswordHelper.Attach="True" u:PasswordHelper.Password="{Binding Password, Mode=TwoWay}" VerticalAlignment="Center" />
+
+            <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal">
+              <Button Content="Validate Account" Margin="4" Command="{Binding ValidateAccountCommand}" />
+              <Label Content="Account Valid." Margin="4" Visibility="{Binding IsAccountValid, Converter={StaticResource booleanToVisibilityConverter}}" />
+            </StackPanel>
+          </Grid>
+        </DockPanel>
+      </Grid>
+    </Border>
+  </DockPanel>
+</Window>
