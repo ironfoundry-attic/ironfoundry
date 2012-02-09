@@ -127,6 +127,7 @@
     <Compile Include="ViewModel\ExplorerViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\ManageCloudUrlsViewModel.cs" />
     <Compile Include="Mvvm\TreeViewItemViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="Views\AddCloud.xaml.cs">
       <DependentUpon>AddCloud.xaml</DependentUpon>
     </Compile>

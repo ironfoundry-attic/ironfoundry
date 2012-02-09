@@ -26,7 +26,9 @@
 
             this.Clouds.CollectionChanged += Clouds_CollectionChanged;
             foreach (var cloud in Clouds)
+            {
                 cloud.PropertyChanged += CloudChanged;
+            }
 
             Messenger.Default.Register<NotificationMessageAction<ICloudFoundryProvider>>(this, ProcessCloudFoundryProviderMessage);
         }

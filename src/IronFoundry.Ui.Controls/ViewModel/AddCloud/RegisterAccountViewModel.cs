@@ -80,31 +80,26 @@
 
         protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<Cloud>(Messages.SetRegisterAccountData,
-                                                                        (cloud) =>
-                                                                        {
-                                                                            this.cloud = cloud;
-                                                                            EMail = cloud.Email;
-                                                                            NewPassword = cloud.Password;
-                                                                        }));
+            Messenger.Default.Send(new NotificationMessageAction<Cloud>(
+                Messages.SetRegisterAccountData,
+                (cloud) => {
+                    this.cloud = cloud;
+                    EMail = cloud.Email;
+                    NewPassword = cloud.Password;
+                }));
         }
 
         protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<RegisterAccountViewModel>>(this,
-                                                                                            message =>
-                                                                                            {
-                                                                                                if (
-                                                                                                    message.Notification
-                                                                                                        .Equals(
-                                                                                                            Messages.
-                                                                                                                GetRegisterAccountData))
-                                                                                                {
-                                                                                                    message.Execute(this);
-                                                                                                    Messenger.Default.
-                                                                                                        Unregister(this);
-                                                                                                }
-                                                                                            });
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.GetRegisterAccountData))
+                    {
+                        message.Execute(this);
+                        Messenger.Default.Unregister(this);
+                    }
+                });
         }
     }
 }

@@ -114,40 +114,38 @@ namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
             IsAccountValid = false;
             ProviderResponse<bool> result = provider.ValidateAccount(Cloud);
             if (result.Response)
+            {
                 IsAccountValid = true;
+            }
             else
+            {
                 ErrorMessage = result.Message;
+            }
         }
 
         private void RegisterAccount()
         {
             IsAccountValid = false;
             Messenger.Default.Register<NotificationMessageAction<Cloud>>(this,
-                                                                         message =>
-                                                                         {
-                                                                             if (
-                                                                                 message.Notification.Equals(
-                                                                                     Messages.SetRegisterAccountData))
-                                                                                 message.Execute(Cloud);
-                                                                         });
+                 message =>
+                 {
+                     if (message.Notification.Equals(Messages.SetRegisterAccountData))
+                         message.Execute(Cloud);
+                 });
 
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.RegisterAccount,
-                                                                       (confirmed) =>
-                                                                       {
-                                                                           if (confirmed)
-                                                                           {
-                                                                               Messenger.Default.Send(
-                                                                                   new NotificationMessageAction
-                                                                                       <RegisterAccountViewModel>(
-                                                                                       Messages.GetRegisterAccountData,
-                                                                                       (viewModel) =>
-                                                                                       {
-                                                                                           EMail = viewModel.EMail;
-                                                                                           Password =
-                                                                                               viewModel.NewPassword;
-                                                                                       }));
-                                                                           }
-                                                                       }));
+               (confirmed) =>
+               {
+                   if (confirmed)
+                   {
+                       Messenger.Default.Send(new NotificationMessageAction<RegisterAccountViewModel>(Messages.GetRegisterAccountData,
+                           (viewModel) =>
+                           {
+                               EMail = viewModel.EMail;
+                               Password = viewModel.NewPassword;
+                           }));
+                   }
+               }));
         }
 
         private bool CanValidate()

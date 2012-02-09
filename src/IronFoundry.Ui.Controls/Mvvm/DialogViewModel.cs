@@ -22,11 +22,18 @@
 
         public DialogViewModel(string resultMessageId)
         {
-            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, p => this.provider = p));
+            Messenger.Default.Send<NotificationMessageAction<ICloudFoundryProvider>>(
+                new NotificationMessageAction<ICloudFoundryProvider>(
+                    Messages.GetCloudFoundryProvider, p =>
+                    {
+                        this.provider = p;
+                        OnProviderRetrieved();
+                    })
+                );
+
             this.resultMessageId = resultMessageId;
             this.ConfirmedCommand = new RelayCommand(Confirmed, CanExecuteConfirmed);
             this.CancelledCommand = new RelayCommand(Cancelled, CanExecuteCancelled);
-
             InitializeData();
             RegisterGetData();
         }
@@ -43,6 +50,8 @@
                 Messenger.Default.Send(new NotificationMessage<bool>(this, true, resultMessageId));
             }
         }
+
+        protected virtual void OnProviderRetrieved() { }
 
         protected virtual bool CanExecuteConfirmed()
         {

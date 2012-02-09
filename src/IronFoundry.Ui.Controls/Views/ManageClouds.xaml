@@ -35,15 +35,15 @@
                   <GradientStop Color="White" Offset="0" />
                 </LinearGradientBrush>
               </StackPanel.Background>
-              <Button Height="20" Width="20" Margin="2">
+              <Button Name="AddCloud" Height="20" Width="20" Margin="2" Click="AddCloud_Click">
                 <Path Stroke="Green" Data="M0,5 H10 M5,5 V10Z" StrokeThickness="2" Height="10" Width="10" />
               </Button>
-              <Button Height="20" Width="20" Margin="2">
+              <Button Name="RemoveCloud" Height="20" Width="20" Margin="2" Click="RemoveCloud_Click">
                 <Path Stroke="Red" Data="M0,5 H10Z" StrokeThickness="2" Height="10" Width="10" />
               </Button>
             </StackPanel>
           </Border>
-          <ListBox ItemsSource="{Binding Clouds}" DisplayMemberPath="ServerName" />
+          <ListBox Name="lbClouds" ItemsSource="{Binding CloudData}" DisplayMemberPath="ServerName" SelectedItem="{Binding SelectedCloud}" />
         </DockPanel>
         <DockPanel Grid.Column="1" HorizontalAlignment="Stretch">
           <Grid Margin="10">

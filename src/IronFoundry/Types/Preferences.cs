@@ -25,6 +25,7 @@ namespace IronFoundry.Types
                 }
             }
         }
+
         public SafeObservableCollection<CloudUrl> CloudUrls
         {
             get { return this.cloudUrls; }

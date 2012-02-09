@@ -76,9 +76,13 @@
         private void EditUrl(bool isNew)
         {
             if (!isNew && SelectedCloudUrl.IsMicroCloud)
+            {
                 PrepareMicroCloud();
+            }
             else
+            {
                 AddCloudUrl(isNew);
+            }
         }
 
         private void AddCloudUrl(bool isNew)
@@ -86,91 +90,80 @@
             if (!isNew)
             {
                 Messenger.Default.Register<NotificationMessageAction<CloudUrl>>(this,
-                                                                                message =>
-                                                                                {
-                                                                                    if (
-                                                                                        message.Notification.Equals(
-                                                                                            Messages.SetAddCloudUrlData))
-                                                                                        message.Execute(SelectedCloudUrl);
-                                                                                });
+                    message =>
+                    {
+                        if (message.Notification.Equals(Messages.SetAddCloudUrlData))
+                        {
+                            message.Execute(SelectedCloudUrl);
+                        }
+                    });
             }
 
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloudUrl,
-                                                                       (confirmed) =>
-                                                                       {
-                                                                           if (confirmed)
-                                                                           {
-                                                                               Messenger.Default.Send(
-                                                                                   new NotificationMessageAction
-                                                                                       <AddCloudUrlViewModel>(
-                                                                                       Messages.GetAddCloudUrlData,
-                                                                                       (viewModel) =>
-                                                                                       {
-                                                                                           if (!isNew)
-                                                                                               CloudUrls.Remove(
-                                                                                                   SelectedCloudUrl);
-                                                                                           var newCloudUrl =
-                                                                                               new CloudUrl
-                                                                                               {
-                                                                                                   ServerName =
-                                                                                                       viewModel.Name,
-                                                                                                   Url = viewModel.Url,
-                                                                                                   IsConfigurable = true,
-                                                                                                   IsRemovable = true
-                                                                                               };
-                                                                                           CloudUrls.Add(newCloudUrl);
-                                                                                           SelectedCloudUrl =
-                                                                                               newCloudUrl;
-                                                                                       }));
-                                                                           }
-                                                                       }));
+               (confirmed) =>
+               {
+                   if (confirmed)
+                   {
+                       Messenger.Default.Send(new NotificationMessageAction<AddCloudUrlViewModel>(Messages.GetAddCloudUrlData, (viewModel) =>
+                           {
+                               if (!isNew)
+                               {
+                                   CloudUrls.Remove(SelectedCloudUrl);
+                               }
+                               var newCloudUrl = new CloudUrl
+                                   {
+                                       ServerName     = viewModel.Name,
+                                       Url            = viewModel.Url,
+                                       IsConfigurable = true,
+                                       IsRemovable    = true
+                                   };
+                               CloudUrls.Add(newCloudUrl);
+                               SelectedCloudUrl = newCloudUrl;
+                           }));
+                   }
+               }));
         }
 
         private void PrepareMicroCloud()
         {
             Messenger.Default.Register<NotificationMessageAction<CloudUrl>>(this,
-                                                                            message =>
-                                                                            {
-                                                                                if (
-                                                                                    message.Notification.Equals(
-                                                                                        Messages.SetAddCloudUrlData))
-                                                                                {
-                                                                                    var newCloudUrl = new CloudUrl
-                                                                                    {
-                                                                                        ServerName =
-                                                                                            SelectedCloudUrl.ServerName,
-                                                                                        Url = SelectedCloudUrl.Url,
-                                                                                        IsConfigurable = true,
-                                                                                        IsRemovable = true
-                                                                                    };
-                                                                                    message.Execute(newCloudUrl);
-                                                                                }
-                                                                            });
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.SetAddCloudUrlData))
+                    {
+                        var newCloudUrl = new CloudUrl
+                        {
+                            ServerName     = SelectedCloudUrl.ServerName,
+                            Url            = SelectedCloudUrl.Url,
+                            IsConfigurable = true,
+                            IsRemovable    = true
+                        };
+                        message.Execute(newCloudUrl);
+                    }
+                });
 
             Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.CreateMicrocloudTarget,
-                                                                       (confirmed) =>
-                                                                       {
-                                                                           if (confirmed)
-                                                                           {
-                                                                               Messenger.Default.Send(
-                                                                                   new NotificationMessageAction
-                                                                                       <CreateMicrocloudTargetViewModel>
-                                                                                       (Messages.GetMicrocloudTargetData,
-                                                                                        (viewModel) =>
-                                                                                        {
-                                                                                            CloudUrls.Add(
-                                                                                                viewModel.CloudUrl);
-                                                                                            SelectedCloudUrl =
-                                                                                                viewModel.CloudUrl;
-                                                                                        }));
-                                                                           }
-                                                                       }));
+               (confirmed) =>
+               {
+                   if (confirmed)
+                   {
+                       Messenger.Default.Send(new NotificationMessageAction<CreateMicrocloudTargetViewModel>(
+                           Messages.GetMicrocloudTargetData,
+                            (viewModel) =>
+                            {
+                                CloudUrls.Add(viewModel.CloudUrl);
+                                SelectedCloudUrl = viewModel.CloudUrl;
+                            }));
+                   }
+               }));
         }
 
         private void Remove()
         {
             if (SelectedCloudUrl != null)
+            {
                 CloudUrls.Remove(SelectedCloudUrl);
+            }
         }
     }
 }

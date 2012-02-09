@@ -10,9 +10,7 @@
         private CloudUrl cloudUrl = new CloudUrl();
 
         public AddCloudUrlViewModel()
-            : base(Messages.AddCloudUrlDialogResult)
-        {
-        }
+            : base(Messages.AddCloudUrlDialogResult) { }
 
         public string Name
         {
@@ -36,23 +34,22 @@
 
         protected override void InitializeData()
         {
-            Messenger.Default.Send(new NotificationMessageAction<CloudUrl>(Messages.SetAddCloudUrlData,
-                                                                           (cloudUrl) => { this.cloudUrl = cloudUrl; }));
+            Messenger.Default.Send(
+                new NotificationMessageAction<CloudUrl>(
+                    Messages.SetAddCloudUrlData, (cloudUrl) => { this.cloudUrl = cloudUrl; }));
         }
 
         protected override void RegisterGetData()
         {
             Messenger.Default.Register<NotificationMessageAction<AddCloudUrlViewModel>>(this,
-                                                                                        message =>
-                                                                                        {
-                                                                                            if (
-                                                                                                message.Notification.
-                                                                                                    Equals(
-                                                                                                        Messages.
-                                                                                                            GetAddCloudUrlData))
-                                                                                                message.Execute(this);
-                                                                                            Cleanup();
-                                                                                        });
+                message =>
+                {
+                    if (message.Notification.Equals(Messages.GetAddCloudUrlData))
+                    {
+                        message.Execute(this);
+                    }
+                    Cleanup();
+                });
         }
     }
 }
