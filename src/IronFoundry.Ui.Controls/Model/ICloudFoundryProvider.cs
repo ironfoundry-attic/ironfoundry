@@ -1,17 +1,25 @@
 namespace IronFoundry.Ui.Controls.Model
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using IronFoundry.Types;
     using IronFoundry.Vcap;
 
     public interface ICloudFoundryProvider
     {
-        SafeObservableCollection<Cloud> Clouds { get; }
-        SafeObservableCollection<CloudUrl> CloudUrls { get; }
-        event NotifyCollectionChangedEventHandler CloudsChanged;
+        /// TODO SafeObservableCollection<Cloud> Clouds { get; }
+        // TODO SafeObservableCollection<CloudUrl> CloudUrls { get; }
+        // event NotifyCollectionChangedEventHandler CloudsChanged;
+
+        event EventHandler<CloudEventArgs> CloudAdded;
+        event EventHandler<CloudEventArgs> CloudRemoved;
+        void AddCloud(Cloud cloud);
+        void RemoveCloud(Cloud cloud);
         void SaveChanges();
+        void SaveOrUpdate(CloudUpdate updateData);
+        IEnumerable<Cloud> Clouds { get; }
+
         ProviderResponse<Cloud> Connect(Cloud cloud);        
         Cloud Disconnect(Cloud cloud);
         ProviderResponse<IEnumerable<Instance>> GetInstances(Cloud cloud, Application app);

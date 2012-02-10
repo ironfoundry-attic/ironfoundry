@@ -4,7 +4,7 @@ namespace IronFoundry.Ui.Controls.Model
 
     public interface IPreferencesProvider
     {
-        Preferences Load();
-        void Save(Preferences preferences);
+        PreferencesV2 Load();
+        void Save(PreferencesV2 preferences);
     }
 }

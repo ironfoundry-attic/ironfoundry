@@ -17,6 +17,8 @@
             this.DataContext = new CloudExplorerViewModel();
             this.Unloaded += (s,e) => Messenger.Default.Unregister(this);
             
+            /*
+             * TODO
             Messenger.Default.Register<NotificationMessageAction<bool>>(this,
                 message =>
                 {
@@ -29,6 +31,7 @@
                         message.Execute(result.GetValueOrDefault());                        
                     }
                 });
+             */
 
             Messenger.Default.Register<NotificationMessageAction<bool>>(this,
                 message =>

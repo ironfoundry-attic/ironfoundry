@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using GalaSoft.MvvmLight.Command;
@@ -37,7 +38,8 @@
             }
         }
 
-        public SafeObservableCollection<Types.Cloud> Clouds
+        // public SafeObservableCollection<Types.Cloud> Clouds
+        public IEnumerable<Types.Cloud> Clouds
         {
             get { return provider.Clouds; }
         }

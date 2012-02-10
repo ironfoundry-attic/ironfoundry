@@ -33,7 +33,8 @@
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             Messenger.Default.Register<NotificationMessage<string>>(this, ProcessErrorMessage);
 
-            provider.CloudsChanged += CloudsCollectionChanged;
+            // TODO provider.CloudsChanged += CloudsCollectionChanged;
+            provider.CloudRemoved += provider_CloudRemoved;
         }
 
         public RelayCommand<CloudViewModel> CloseCloudCommand { get; private set; }
@@ -80,23 +81,18 @@
             }
         }
 
-        private void CloudsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void provider_CloudRemoved(object sender, CloudEventArgs e)
         {
-            if (e.Action.Equals(NotifyCollectionChangedAction.Remove))
-            {
-                foreach (object obj in e.OldItems)
-                {
-                    var cloud = obj as Types.Cloud;
-                    CloudViewModel cloudViewItem = clouds.SingleOrDefault((i) => i.Cloud.Equals(cloud));
-                    clouds.Remove(cloudViewItem);
-                }
-            }
+            Types.Cloud cloud = e.Cloud;
+            CloudViewModel cloudViewItem = clouds.SingleOrDefault((i) => i.Cloud.Equals(cloud));
+            clouds.Remove(cloudViewItem);
         }
 
         private void CloseCloud(CloudViewModel cloudView)
         {
             Messenger.Default.Unregister(cloudView);
             Clouds.Remove(cloudView);
+            provider.CloudRemoved -= provider_CloudRemoved;
         }
 
         private void OpenApplication(Application application)

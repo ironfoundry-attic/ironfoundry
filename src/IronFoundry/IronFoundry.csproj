@@ -61,6 +61,7 @@
     <Compile Include="Types\Application.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Types\Preferences.cs" />
     <Compile Include="Types\Crash.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -80,7 +81,7 @@
     <Compile Include="Types\Message.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\Preferences.cs" />
+    <Compile Include="Types\PreferencesV2.cs" />
     <Compile Include="Types\ProvisionedService.cs" />
     <Compile Include="Types\Cloud.cs" />
     <Compile Include="Types\CloudUrl.cs" />

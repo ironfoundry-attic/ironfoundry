@@ -15,6 +15,7 @@
         public const string ChooseDirectory = "ChooseDirectory";
 
         // Dialog Interactions
+        /* TODO
         public const string AddCloud = "AddCloud";
         public const string AddCloudDialogResult = "AddCloudDialogResult";
         public const string GetAddCloudData = "GetAddCloudData";
@@ -24,7 +25,7 @@
         public const string AddCloudUrlDialogResult  = "AddCloudUrlDialogResult";
         public const string GetAddCloudUrlData = "GetAddCloudUrlData";
         public const string SetAddCloudUrlData = "SetAddCloudUrlData";
-        
+         
         public const string CreateMicrocloudTarget = "CreateMicrocloudTarget";
         public const string CreateMicrocloudTargetDialogResult = "CreateMicrocloudTargetDialogResult";
         public const string GetMicrocloudTargetData = "GetMicrocloudTargetData";
@@ -34,6 +35,7 @@
         public const string ManageCloudUrlsDialogResult = "ManageCloudUrlsDialogResult";
         public const string SetManageCloudUrlsData = "SetManageCloudUrlsData";
         public const string GetManageCloudUrlsData = "SetManageCloudUrlsData";
+         */
 
         public const string ManageApplicationUrls = "ManageApplicationUrls";
         public const string ManageApplicationUrlsDialogResult = "ManageApplicationUrlsDialogResult";

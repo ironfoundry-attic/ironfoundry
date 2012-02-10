@@ -87,7 +87,9 @@
     </Compile>
     <Compile Include="Converters\CsvConverter.cs" />
     <Compile Include="Converters\TitleCaseConverter.cs" />
+    <Compile Include="Model\CloudEventArgs.cs" />
     <Compile Include="Model\CloudFoundryProvider.cs" />
+    <Compile Include="Model\CloudUpdate.cs" />
     <Compile Include="Model\ICloudFoundryProvider.cs" />
     <Compile Include="Model\IPreferencesProvider.cs" />
     <Compile Include="Model\PreferencesProvider.cs" />
@@ -104,7 +106,6 @@
     <Compile Include="Utilities\IconUtil.cs" />
     <Compile Include="Utilities\Messages.cs" />
     <Compile Include="Utilities\PasswordHelper.cs" />
-    <Compile Include="ViewModel\AddCloud\AddCloudUrlViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
     <Compile Include="ViewModel\Cloud\CreateServiceViewModel.cs" />
@@ -122,18 +123,11 @@
     <Compile Include="ViewModel\Explorer\CloudTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\Cloud\CloudViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\RegisterAccountViewModel.cs" />
-    <Compile Include="ViewModel\AddCloud\CreateMicrocloudTargetViewModel.cs" />
     <Compile Include="ViewModel\Explorer\InstanceTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\ExplorerViewModel.cs" />
     <Compile Include="ViewModel\AddCloud\ManageCloudUrlsViewModel.cs" />
     <Compile Include="Mvvm\TreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
-    <Compile Include="Views\AddCloud.xaml.cs">
-      <DependentUpon>AddCloud.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AddCloudUrl.xaml.cs">
-      <DependentUpon>AddCloudUrl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ChangePassword.xaml.cs">
       <DependentUpon>ChangePassword.xaml</DependentUpon>
     </Compile>
@@ -187,12 +181,6 @@
     <Compile Include="Views\RegisterAccount.xaml.cs">
       <DependentUpon>RegisterAccount.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CreateMicrocloudTarget.xaml.cs">
-      <DependentUpon>CreateMicrocloudTarget.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ManageCloudUrls.xaml.cs">
-      <DependentUpon>ManageCloudUrls.xaml</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -220,14 +208,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\AddCloud.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\AddCloudUrl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\ChangePassword.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -277,14 +257,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\RegisterAccount.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\CreateMicrocloudTarget.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ManageCloudUrls.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

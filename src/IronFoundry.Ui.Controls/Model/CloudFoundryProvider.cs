@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.ComponentModel;
     using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
@@ -12,68 +11,71 @@
 
     public class CloudFoundryProvider : ICloudFoundryProvider
     {
-        private PreferencesProvider preferencesProvider;
-        public SafeObservableCollection<Cloud> Clouds { get; private set;}
-        public SafeObservableCollection<CloudUrl> CloudUrls { get; private set; }
-        public event NotifyCollectionChangedEventHandler CloudsChanged;
+        private readonly PreferencesProvider preferencesProvider;
+
+        // private readonly ObservableCollection<Cloud> clouds;
+        private readonly IDictionary<string, Cloud> cloudsByUri = new Dictionary<string, Cloud>();
 
         public CloudFoundryProvider(PreferencesProvider preferencesProvider)
         {
             this.preferencesProvider = preferencesProvider;
-            var preferences          = preferencesProvider.Load();
-            this.Clouds              = preferences.Clouds.DeepCopy();            
-            this.CloudUrls           = preferences.CloudUrls.DeepCopy();
+            PreferencesV2 preferences = preferencesProvider.Load();
 
-            this.Clouds.CollectionChanged += Clouds_CollectionChanged;
-            foreach (var cloud in Clouds)
+            // TODO this.clouds                    = new ObservableCollection<Cloud>(preferences.Clouds); // TODO .DeepCopy();            
+            // TODO this.clouds.CollectionChanged += Clouds_CollectionChanged;
+            // TODO this.CloudUrls           = preferences.CloudUrls.DeepCopy();
+
+            if (null != preferences.Clouds)
             {
-                cloud.PropertyChanged += CloudChanged;
+                foreach (Cloud cloud in preferences.Clouds)
+                {
+                    var kvp = new KeyValuePair<string, Cloud>(cloud.Url, cloud);
+                    cloudsByUri.Add(kvp);
+                    cloud.PropertyChanged += CloudChanged;
+                }
             }
 
             Messenger.Default.Register<NotificationMessageAction<ICloudFoundryProvider>>(this, ProcessCloudFoundryProviderMessage);
         }
-        
-        private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<ICloudFoundryProvider> message)
+
+        public IEnumerable<Cloud> Clouds
         {
-            if (message.Notification.Equals(Messages.GetCloudFoundryProvider))
+            get { return cloudsByUri.Values; }
+        }
+
+        public event EventHandler<CloudEventArgs> CloudAdded;
+        public event EventHandler<CloudEventArgs> CloudRemoved;
+
+        public void AddCloud(Cloud cloud)
+        {
+            cloudsByUri.Add(cloud.Url, cloud);
+            if (null != CloudAdded)
             {
-                message.Execute(this);
+                CloudAdded(this, new CloudEventArgs(cloud));
             }
         }
 
-        private void CloudChanged(object sender, PropertyChangedEventArgs e)
+        public void RemoveCloud(Cloud cloud)
         {
-            switch (e.PropertyName)
+            cloudsByUri.Remove(cloud.Url);
+            if (null != CloudRemoved)
             {
-                case "AccessToken":
-                case "Email":
-                case "ServerName":
-                case "Url":
-                case "TimeoutStart":
-                case "TimeoutStop":
-                case "ID":
-                case "Password":
-                case "IsConnected":
-                case "IsDisconnected":
-                    preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
-                    break;
-                default:
-                    break;
+                CloudRemoved(this, new CloudEventArgs(cloud));
             }
         }
 
-        private void Clouds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        // public SafeObservableCollection<Cloud> Clouds { get; private set;}
+        // TODO public SafeObservableCollection<CloudUrl> CloudUrls { get; private set; }
+        // TODO public event NotifyCollectionChangedEventHandler CloudsChanged;
+
+        public void SaveOrUpdate(CloudUpdate updateData)
         {
-            if (this.CloudsChanged != null)
-            {
-                this.CloudsChanged(sender, e);
-            }
-            SaveChanges();
         }
 
         public void SaveChanges()
         {
-            preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
+            // TODO preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
+            preferencesProvider.Save(new PreferencesV2 { Clouds = this.Clouds.ToArrayOrNull() });
         }
 
         public ProviderResponse<Cloud> Connect(Cloud cloud)
@@ -434,5 +436,46 @@
             }
             return response;
         }
+        
+        private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<ICloudFoundryProvider> message)
+        {
+            if (message.Notification.Equals(Messages.GetCloudFoundryProvider))
+            {
+                message.Execute(this);
+            }
+        }
+
+        private void CloudChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "AccessToken":
+                case "Email":
+                case "ServerName":
+                case "Url":
+                case "TimeoutStart":
+                case "TimeoutStop":
+                case "ID":
+                case "Password":
+                case "IsConnected":
+                case "IsDisconnected":
+                    // TODO preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
+                    preferencesProvider.Save(new PreferencesV2 { Clouds = this.Clouds.ToArrayOrNull() });
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /*
+        private void Clouds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (this.CloudsChanged != null)
+            {
+                this.CloudsChanged(sender, e);
+            }
+            SaveChanges();
+        }
+         */
     }
 }

@@ -3,7 +3,8 @@
     using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
-    using IronFoundry.Types;
+    using System.Linq;
+    using IronFoundry.Ui.Controls.Model;
     using IronFoundry.Ui.Controls.Mvvm;
     using IronFoundry.Ui.Controls.Utilities;
 
@@ -39,20 +40,24 @@
 
         protected override void OnConfirmed(CancelEventArgs args)
         {
-            // provider.CloudUrls.Synchronize(CloudUrls.DeepCopy(), new CloudUrlEqualityComparer());
-            // provider.SaveChanges();
+            foreach (ManageCloudsData mcd in CloudData)
+            {
+                var cloudUpdate = new CloudUpdate(mcd.ServerUri, mcd.ServerName, mcd.Email, mcd.Password);
+                provider.SaveOrUpdate(cloudUpdate);
+            }
+            provider.SaveChanges();
         }
 
         protected override void OnProviderRetrieved()
         {
             cloudData.Clear();
-            foreach (CloudUrl cloudUrl in provider.CloudUrls)
+            foreach (Types.Cloud cloud in provider.Clouds)
             {
                 cloudData.Add(new ManageCloudsData
                 {
-                    ServerName = cloudUrl.ServerName,
-                    ServerUrl  = cloudUrl.Url,
-                    Removable  = false == cloudUrl.IsDefault,
+                    ServerName = cloud.ServerName,
+                    ServerUrl  = cloud.Url,
+                    // TODO Removable  = false == cloud.IsDefault,
                 });
             }
         }
@@ -63,7 +68,7 @@
             {
                 int idx = cloudData.IndexOf(SelectedCloud);
                 cloudData.RemoveAt(idx);
-                SelectedCloud = cloudData[Math.Min(idx, (cloudData.Count - 1))];
+                SelectedCloud = cloudData.FirstOrDefault();
             }
         }
     }
@@ -80,6 +85,11 @@
         {
             get { return serverName; }
             set { SetValue(ref serverName, value, "ServerName"); }
+        }
+
+        public Uri ServerUri
+        {
+            get { return new Uri(ServerUrl); }
         }
 
         public string ServerUrl

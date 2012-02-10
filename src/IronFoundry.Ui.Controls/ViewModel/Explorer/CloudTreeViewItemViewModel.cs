@@ -85,7 +85,7 @@
 
         private void RemoveCloud()
         {
-            provider.Clouds.Remove(cloud);
+            provider.RemoveCloud(cloud);
         }
 
         private void Connect()

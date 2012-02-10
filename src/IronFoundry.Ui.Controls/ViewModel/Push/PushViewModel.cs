@@ -10,6 +10,7 @@
     using Mvvm;
     using Types;
     using Utilities;
+    using System.Collections.Generic;
 
     public class PushViewModel : DialogViewModel
     {
@@ -92,7 +93,8 @@
             }
         }
 
-        public SafeObservableCollection<Cloud> Clouds
+        // public SafeObservableCollection<Cloud> Clouds
+        public IEnumerable<Cloud> Clouds
         {
             get { return provider.Clouds; }
         }

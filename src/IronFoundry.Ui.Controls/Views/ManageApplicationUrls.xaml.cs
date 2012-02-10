@@ -41,6 +41,8 @@
                     }
                 });
 
+            /*
+             * TODO
             Messenger.Default.Register<NotificationMessageAction<bool>>(
                this,
                message =>
@@ -54,6 +56,7 @@
                        message.Execute(result.GetValueOrDefault());
                    }
                });
+             */
         }
     }
 }

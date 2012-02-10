@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.Model
 {
     using System;
-    using System.Collections.ObjectModel;
+    using System.Collections.Generic;
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Runtime.Serialization.Formatters.Binary;
@@ -17,13 +17,9 @@
             this.preferencesPath = preferencesPath;            
         }
         
-        public Preferences Load()
+        public PreferencesV2 Load()
         {
-            var preferences = new Preferences()
-            {
-                Clouds = new SafeObservableCollection<Cloud>(),
-                CloudUrls = CloudUrl.DefaultCloudUrls,
-            };
+            var preferences = new PreferencesV2();
 
             try
             {
@@ -34,7 +30,20 @@
                     using (IsolatedStorageFileStream configStream = isoStore.OpenFile(fullPath, FileMode.Open))
                     {
                         var formatter = new BinaryFormatter();
-                        preferences = formatter.Deserialize(configStream) as Preferences;
+                        object tmp = formatter.Deserialize(configStream); // as PreferencesV2;
+                        PreferencesV2 v2prefs = tmp as PreferencesV2;
+                        if (null != v2prefs)
+                        {
+                            preferences = v2prefs;
+                        }
+                        else
+                        {
+                            Preferences v1prefs = tmp as Preferences;
+                            if (null != v1prefs)
+                            {
+                                preferences = convertPreferences(v1prefs);
+                            }
+                        }
                     }
                 }
             }
@@ -42,10 +51,19 @@
             {
                 // If preferences fail to load, swallow the exception.
             }
+
             return preferences;
+        }
+
+        private PreferencesV2 convertPreferences(Preferences v1prefs)
+        {
+            return new PreferencesV2
+            {
+                Clouds = v1prefs.Clouds.ToArrayOrNull()
+            };
         }        
 
-        public void Save(Preferences preferences)
+        public void Save(PreferencesV2 preferences)
         {           
             var isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
             IsolatedStorageFileStream configStream;

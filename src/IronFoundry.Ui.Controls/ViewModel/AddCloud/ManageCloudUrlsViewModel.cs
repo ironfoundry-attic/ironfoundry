@@ -1,4 +1,5 @@
-﻿namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
+﻿#if TODO
+namespace IronFoundry.Ui.Controls.ViewModel.AddCloud
 {
     using System;
     using System.Collections.ObjectModel;
@@ -167,3 +168,4 @@
         }
     }
 }
+#endif
