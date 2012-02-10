@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
@@ -10,6 +11,15 @@
 
     public class ManageCloudsViewModel : DialogViewModel
     {
+        private static readonly Guid ironFoundryID = new Guid("1A78AEF6-68E4-43D7-BE78-94289285A1CA");
+        private static readonly Guid cloudFoundryID = new Guid("6913D1B2-5D6D-4640-B1AA-4E24D5F129CC");
+
+        private static readonly ManageCloudsData[] defaultClouds = new[]
+            {
+                new ManageCloudsData(ironFoundryID) { ServerName = "Iron Foundry", ServerUrl = "http://api.gofoundry.net" },
+                new ManageCloudsData(cloudFoundryID) { ServerName = "Cloud Foundry", ServerUrl = "http://api.cloudfoundry.com" },
+            };
+
         private readonly ObservableCollection<ManageCloudsData> cloudData = new ObservableCollection<ManageCloudsData>();
         private ManageCloudsData selectedCloud;
 
@@ -20,9 +30,35 @@
             get { return cloudData; }
         }
 
+        public IEnumerable<ManageCloudsData> DefaultClouds
+        {
+            get { return defaultClouds; }
+        }
+
+        public void AddDefaultCloud(ManageCloudsData cloud)
+        {
+            AddCloud(cloud);
+        }
+
         public void AddCloud()
         {
-            cloudData.Add(new ManageCloudsData { ServerName = "New Server" });
+            var newCloud = new ManageCloudsData(Guid.NewGuid())
+            {
+                ServerName = "New Server",
+                ServerUrl = "http://api.gofoundry.net",
+                Email = "unknown@unset.com",
+            };
+            AddCloud(newCloud);
+        }
+
+        public void RemoveSelectedCloud()
+        {
+            if (null != SelectedCloud)
+            {
+                int idx = cloudData.IndexOf(SelectedCloud);
+                cloudData.RemoveAt(idx);
+                SelectedCloud = cloudData.FirstOrDefault();
+            }
         }
 
         public ManageCloudsData SelectedCloud
@@ -42,7 +78,7 @@
         {
             foreach (ManageCloudsData mcd in CloudData)
             {
-                var cloudUpdate = new CloudUpdate(mcd.ServerUri, mcd.ServerName, mcd.Email, mcd.Password);
+                var cloudUpdate = new CloudUpdate(mcd.ID, mcd.ServerUrl, mcd.ServerName, mcd.Email, mcd.Password);
                 provider.SaveOrUpdate(cloudUpdate);
             }
             provider.SaveChanges();
@@ -53,55 +89,75 @@
             cloudData.Clear();
             foreach (Types.Cloud cloud in provider.Clouds)
             {
-                cloudData.Add(new ManageCloudsData
+                AddCloud(new ManageCloudsData(cloud.ID)
                 {
                     ServerName = cloud.ServerName,
                     ServerUrl  = cloud.Url,
-                    // TODO Removable  = false == cloud.IsDefault,
+                    Email      = cloud.Email,
+                    Password   = cloud.Password,
                 });
             }
         }
 
-        public void RemoveSelectedCloud()
+        private void AddCloud(ManageCloudsData cloud)
         {
-            if (null != SelectedCloud)
+            if (false == cloudData.Contains(cloud))
             {
-                int idx = cloudData.IndexOf(SelectedCloud);
-                cloudData.RemoveAt(idx);
-                SelectedCloud = cloudData.FirstOrDefault();
+                cloudData.Add(cloud);
             }
         }
     }
 
-    public class ManageCloudsData : ViewModelBaseEx
+    public class ManageCloudsData : ViewModelBaseEx, IEquatable<ManageCloudsData>
     {
+        private readonly Guid id = Guid.Empty;
         private string serverName = null;
         private string serverUrl  = null;
         private string email      = null;
         private string password   = null;
-        private bool removable = false;
+        private bool removable    = false;
+
+        public ManageCloudsData(Guid id)
+        {
+            this.id = id;
+        }
+
+        public Guid ID { get { return id; } }
 
         public string ServerName
         {
             get { return serverName; }
-            set { SetValue(ref serverName, value, "ServerName"); }
-        }
-
-        public Uri ServerUri
-        {
-            get { return new Uri(ServerUrl); }
+            set
+            {
+                if (false == value.IsNullOrWhiteSpace())
+                {
+                    SetValue(ref serverName, value, "ServerName");
+                }
+            }
         }
 
         public string ServerUrl
         {
             get { return serverUrl; }
-            set { SetValue(ref serverUrl, value, "ServerUrl"); }
+            set
+            {
+                if (false == value.IsNullOrWhiteSpace())
+                {
+                    SetValue(ref serverUrl, value, "ServerUrl");
+                }
+            }
         }
 
         public string Email
         {
             get { return email; }
-            set { SetValue(ref email, value, "Email"); }
+            set
+            {
+                if (false == value.IsNullOrWhiteSpace())
+                {
+                    SetValue(ref email, value, "Email");
+                }
+            }
         }
 
         public string Password
@@ -114,6 +170,26 @@
         {
             get { return removable; }
             set { removable = value; }
+        }
+
+        public bool Equals(ManageCloudsData other)
+        {
+            if (null == other)
+            {
+                return false;
+            }
+
+            return this.GetHashCode() == other.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ManageCloudsData);
+        }
+
+        public override int GetHashCode()
+        {
+            return ID.GetHashCode();
         }
     }
 }

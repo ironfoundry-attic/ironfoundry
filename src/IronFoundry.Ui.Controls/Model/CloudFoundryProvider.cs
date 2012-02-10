@@ -12,35 +12,18 @@
     public class CloudFoundryProvider : ICloudFoundryProvider
     {
         private readonly PreferencesProvider preferencesProvider;
-
-        // private readonly ObservableCollection<Cloud> clouds;
-        private readonly IDictionary<string, Cloud> cloudsByUri = new Dictionary<string, Cloud>();
+        private readonly IDictionary<Guid, Cloud> clouds = new Dictionary<Guid, Cloud>();
 
         public CloudFoundryProvider(PreferencesProvider preferencesProvider)
         {
             this.preferencesProvider = preferencesProvider;
-            PreferencesV2 preferences = preferencesProvider.Load();
-
-            // TODO this.clouds                    = new ObservableCollection<Cloud>(preferences.Clouds); // TODO .DeepCopy();            
-            // TODO this.clouds.CollectionChanged += Clouds_CollectionChanged;
-            // TODO this.CloudUrls           = preferences.CloudUrls.DeepCopy();
-
-            if (null != preferences.Clouds)
-            {
-                foreach (Cloud cloud in preferences.Clouds)
-                {
-                    var kvp = new KeyValuePair<string, Cloud>(cloud.Url, cloud);
-                    cloudsByUri.Add(kvp);
-                    cloud.PropertyChanged += CloudChanged;
-                }
-            }
-
+            LoadCloudsFromPreferences();
             Messenger.Default.Register<NotificationMessageAction<ICloudFoundryProvider>>(this, ProcessCloudFoundryProviderMessage);
         }
 
         public IEnumerable<Cloud> Clouds
         {
-            get { return cloudsByUri.Values; }
+            get { return clouds.Values; }
         }
 
         public event EventHandler<CloudEventArgs> CloudAdded;
@@ -48,7 +31,7 @@
 
         public void AddCloud(Cloud cloud)
         {
-            cloudsByUri.Add(cloud.Url, cloud);
+            clouds.Add(cloud.ID, cloud);
             if (null != CloudAdded)
             {
                 CloudAdded(this, new CloudEventArgs(cloud));
@@ -57,24 +40,35 @@
 
         public void RemoveCloud(Cloud cloud)
         {
-            cloudsByUri.Remove(cloud.Url);
+            clouds.Remove(cloud.ID);
             if (null != CloudRemoved)
             {
                 CloudRemoved(this, new CloudEventArgs(cloud));
             }
         }
 
-        // public SafeObservableCollection<Cloud> Clouds { get; private set;}
-        // TODO public SafeObservableCollection<CloudUrl> CloudUrls { get; private set; }
-        // TODO public event NotifyCollectionChangedEventHandler CloudsChanged;
-
         public void SaveOrUpdate(CloudUpdate updateData)
         {
+            bool cloudAdded = false;
+            Cloud cloud;
+            if (false == clouds.TryGetValue(updateData.ID, out cloud))
+            {
+                cloud = new Cloud(updateData.ID);
+                clouds[cloud.ID] = cloud;
+                cloudAdded = true;
+            }
+            cloud.ServerName = updateData.ServerName;
+            cloud.Url        = updateData.ServerUrl;
+            cloud.Email      = updateData.Email;
+            cloud.Password   = updateData.Password;
+            if (cloudAdded)
+            {
+                AddCloud(cloud);
+            }
         }
 
         public void SaveChanges()
         {
-            // TODO preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
             preferencesProvider.Save(new PreferencesV2 { Clouds = this.Clouds.ToArrayOrNull() });
         }
 
@@ -409,7 +403,9 @@
                 IVcapClient client = new VcapClient(cloud);
                 var result = client.Push(name, url, instances, new System.IO.DirectoryInfo(directoryToPushFrom), memory, services);
                 if (!result.Success)
+                {
                     throw new Exception(result.Message);
+                }
                 response.Response = true;
             }
             catch (Exception ex)
@@ -467,15 +463,25 @@
             }
         }
 
-        /*
-        private void Clouds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void LoadCloudsFromPreferences()
         {
-            if (this.CloudsChanged != null)
+            PreferencesV2 preferences = preferencesProvider.Load();
+            if (false == preferences.Clouds.IsNullOrEmpty())
             {
-                this.CloudsChanged(sender, e);
+                foreach (Cloud cloud in preferences.Clouds)
+                {
+                    cloud.PropertyChanged -= CloudChanged;
+                }
+
+                clouds.Clear();
+
+                foreach (Cloud cloud in preferences.Clouds)
+                {
+                    var kvp = new KeyValuePair<Guid, Cloud>(cloud.ID, cloud);
+                    clouds.Add(kvp);
+                    cloud.PropertyChanged += CloudChanged;
+                }
             }
-            SaveChanges();
         }
-         */
     }
 }

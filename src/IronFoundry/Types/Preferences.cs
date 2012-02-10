@@ -3,7 +3,7 @@ namespace IronFoundry.Types
     using System;
     using System.Collections.ObjectModel;
 
-    [Serializable]
+    [Serializable, Obsolete]
     public class Preferences
     {             
         private SafeObservableCollection<Cloud> clouds;

@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.Views
 {
     using System.Windows;
+    using System.Windows.Controls;
     using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Ui.Controls.Utilities;
     using IronFoundry.Ui.Controls.ViewModel;
@@ -35,6 +36,14 @@
         private void RemoveCloud_Click(object sender, RoutedEventArgs e)
         {
             viewModel.RemoveSelectedCloud();
+        }
+
+        private void lbDefaultClouds_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ManageCloudsData item = (ManageCloudsData)e.AddedItems[0];
+            viewModel.AddDefaultCloud(item);
+            viewModel.SelectedCloud = item;
+            btnDefaultClouds.IsOpen = false;
         }
     }
 }

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.Windows;
 
     [Serializable]
@@ -24,16 +23,18 @@
         private SafeObservableCollection<SystemService> availableServices = new SafeObservableCollection<SystemService>();
         private SafeObservableCollection<ProvisionedService> services = new SafeObservableCollection<ProvisionedService>();
 
-        public Cloud()
+        public Cloud() : this(Guid.NewGuid()) { }
+
+        public Cloud(Guid id)
         {
             applications.CollectionChanged += (s, e) => RaisePropertyChanged("Applications");
             services.CollectionChanged += (s, e) => RaisePropertyChanged("Services");
             availableServices.CollectionChanged += (s, e) => RaisePropertyChanged("AvailableServices");
 
-            id = Guid.NewGuid();
-            TimeoutStart = 600;
-            TimeoutStop = 60;
-            IsConnected = false;
+            this.id        = id;
+            TimeoutStart   = 600;
+            TimeoutStop    = 60;
+            IsConnected    = false;
             IsDisconnected = true;
         }        
 

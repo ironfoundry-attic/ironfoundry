@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
-    [Serializable]
+    [Serializable, Obsolete]
     public class CloudUrl : EntityBase, IMergeable<CloudUrl>
     {
         private string serverName;
