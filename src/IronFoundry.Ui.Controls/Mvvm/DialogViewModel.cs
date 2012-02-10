@@ -3,13 +3,13 @@
     using System;
     using System.ComponentModel;
     using System.Threading;
-    using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
+    using IronFoundry.Ui.Controls.ViewModel;
     using Model;
     using Utilities;
 
-    public abstract class DialogViewModel : ViewModelBase
+    public abstract class DialogViewModel : ViewModelBaseEx
     {
         public RelayCommand ConfirmedCommand { get; private set; }
         public RelayCommand CancelledCommand { get; private set; }

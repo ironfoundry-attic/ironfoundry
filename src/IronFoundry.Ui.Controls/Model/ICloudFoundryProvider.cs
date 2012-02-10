@@ -8,10 +8,6 @@ namespace IronFoundry.Ui.Controls.Model
 
     public interface ICloudFoundryProvider
     {
-        /// TODO SafeObservableCollection<Cloud> Clouds { get; }
-        // TODO SafeObservableCollection<CloudUrl> CloudUrls { get; }
-        // event NotifyCollectionChangedEventHandler CloudsChanged;
-
         event EventHandler<CloudEventArgs> CloudAdded;
         event EventHandler<CloudEventArgs> CloudRemoved;
         void AddCloud(Cloud cloud);
@@ -24,6 +20,7 @@ namespace IronFoundry.Ui.Controls.Model
         Cloud Disconnect(Cloud cloud);
         ProviderResponse<IEnumerable<Instance>> GetInstances(Cloud cloud, Application app);
         ProviderResponse<bool> ValidateAccount(Cloud cloud);
+        ProviderResponse<bool> ValidateAccount(string serverUrl, string email, string password);
         ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud);
         ProviderResponse<bool> UpdateApplication(Application app, Cloud cloud);
         ProviderResponse<bool> Start(Application app, Cloud cloud);

@@ -30,7 +30,7 @@
 
         private void AddCloud_Click(object sender, RoutedEventArgs e)
         {
-            viewModel.AddCloud();
+            viewModel.SelectedCloud = viewModel.AddCloud();
         }
 
         private void RemoveCloud_Click(object sender, RoutedEventArgs e)
@@ -44,6 +44,7 @@
             viewModel.AddDefaultCloud(item);
             viewModel.SelectedCloud = item;
             btnDefaultClouds.IsOpen = false;
+            txtEmail.Focus();
         }
     }
 }

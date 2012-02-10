@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel.Push
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using GalaSoft.MvvmLight.Command;
@@ -10,7 +11,6 @@
     using Mvvm;
     using Types;
     using Utilities;
-    using System.Collections.Generic;
 
     public class PushViewModel : DialogViewModel
     {
@@ -47,12 +47,9 @@
                     ProviderResponse<Cloud> local = provider.Connect(selectedCloud);
                     if (local.Response != null)
                     {
-                        selectedCloud.Services.Synchronize(local.Response.Services,
-                                                           new ProvisionedServiceEqualityComparer());
-                        selectedCloud.Applications.Synchronize(local.Response.Applications,
-                                                               new ApplicationEqualityComparer());
-                        selectedCloud.AvailableServices.Synchronize(local.Response.AvailableServices,
-                                                                    new SystemServiceEqualityComparer());
+                        selectedCloud.Services.Synchronize(local.Response.Services, new ProvisionedServiceEqualityComparer());
+                        selectedCloud.Applications.Synchronize(local.Response.Applications, new ApplicationEqualityComparer());
+                        selectedCloud.AvailableServices.Synchronize(local.Response.AvailableServices, new SystemServiceEqualityComparer());
                     }
                     else
                     {

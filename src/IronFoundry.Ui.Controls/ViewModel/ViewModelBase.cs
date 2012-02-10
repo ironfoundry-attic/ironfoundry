@@ -2,13 +2,18 @@
 {
     public abstract class ViewModelBaseEx : GalaSoft.MvvmLight.ViewModelBase
     {
-        protected void SetValue<T>(ref T originalValue, T newValue, string propertyName)
+        protected bool SetValue<T>(ref T originalValue, T newValue, string propertyName)
         {
+            bool changed = false;
+
             if (ValuesAreDifferent(originalValue, newValue))
             {
                 originalValue = newValue;
                 RaisePropertyChanged(propertyName);
+                changed = true;
             }
+
+            return changed;
         }
 
         protected bool ValuesAreDifferent<T>(T originalValue, T newValue)

@@ -32,10 +32,7 @@
         public void AddCloud(Cloud cloud)
         {
             clouds.Add(cloud.ID, cloud);
-            if (null != CloudAdded)
-            {
-                CloudAdded(this, new CloudEventArgs(cloud));
-            }
+            OnCloudAdded(cloud);
         }
 
         public void RemoveCloud(Cloud cloud)
@@ -63,7 +60,7 @@
             cloud.Password   = updateData.Password;
             if (cloudAdded)
             {
-                AddCloud(cloud);
+                OnCloudAdded(cloud);
             }
         }
 
@@ -74,7 +71,7 @@
 
         public ProviderResponse<Cloud> Connect(Cloud cloud)
         {
-            ProviderResponse<Cloud> response = new ProviderResponse<Cloud>();
+            var response = new ProviderResponse<Cloud>();
             Cloud local = cloud.DeepCopy();
             IVcapClient client = new VcapClient(local);
 
@@ -86,7 +83,7 @@
                 local.AccessToken = client.CurrentToken;
                 var applications = client.GetApplications();
                 var provisionedServices = client.GetProvisionedServices();
-                var availableServices = client.GetSystemServices();                
+                var availableServices = client.GetSystemServices();
                 local.Applications.Synchronize(new SafeObservableCollection<Application>(applications), new ApplicationEqualityComparer());
                 local.Services.Synchronize(new SafeObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
                 local.AvailableServices.Synchronize(new SafeObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
@@ -102,8 +99,8 @@
             {
                 response.Message = ex.Message;
             }
-            return response;           
-        }        
+            return response;
+        }
 
         public Cloud Disconnect(Cloud cloud)
         {
@@ -116,23 +113,25 @@
 
         public ProviderResponse<bool> ValidateAccount(Cloud cloud)
         {
-            ProviderResponse<bool> response = new ProviderResponse<bool>();
+            return ValidateAccount(cloud.Url, cloud.Email, cloud.Password);
+        }
+
+        public ProviderResponse<bool> ValidateAccount(string serverUrl, string email, string password)
+        {
+            var response = new ProviderResponse<bool>();
             try
             {
-                IVcapClient client = new VcapClient(cloud);
-                var vcapResponse = client.Login();
-                if (vcapResponse != null && 
-                    !vcapResponse.Success && 
-                    !String.IsNullOrEmpty(vcapResponse.Message))
-                    throw new Exception(vcapResponse.Message);
-                response.Response = true;
+                IVcapClient client = new VcapClient(serverUrl);
+                var vcapResponse = client.Login(email, password);
+                response.Message = vcapResponse.Message;
+                response.Response = vcapResponse.Success;
             }
             catch (Exception ex)
             {
                 response.Message = ex.Message;
             }
             return response;
-        }      
+        }
 
         public ProviderResponse<IEnumerable<Instance>> GetInstances(Cloud cloud, Application app)
         {
@@ -177,7 +176,7 @@
             {
                 response.Message = ex.Message;
             }
-            return response;            
+            return response;
         }
 
         public ProviderResponse<IEnumerable<StatInfo>> GetStats(Application app, Cloud cloud)
@@ -185,8 +184,8 @@
             var response = new ProviderResponse<IEnumerable<StatInfo>>();
             try
             {
-                IVcapClient client = new VcapClient(cloud);                
-                response.Response = client.GetStats(app);                
+                IVcapClient client = new VcapClient(cloud);
+                response.Response = client.GetStats(app);
             }
             catch (Exception ex)
             {
@@ -267,7 +266,7 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                client.Start(app);                
+                client.Start(app);
                 response.Response = true;
             }
             catch (Exception ex)
@@ -306,7 +305,7 @@
             {
                 response.Message = ex.Message;
             }
-            return response;            
+            return response;
         }
 
         public ProviderResponse<bool> Delete(Application app, Cloud cloud)
@@ -340,7 +339,7 @@
             {
                 response.Message = ex.Message;
             }
-            return response;            
+            return response;
         }
 
         public ProviderResponse<bool> ChangePassword(Cloud cloud, string newPassword)
@@ -358,7 +357,7 @@
             {
                 response.Message = ex.Message;
             }
-            return response;   
+            return response;
         }
 
         public ProviderResponse<bool> RegisterAccount(Cloud cloud,string email, string password)
@@ -376,7 +375,7 @@
             {
                 response.Message = ex.Message;
             }
-            return response; 
+            return response;
         }
 
         public ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId)
@@ -432,12 +431,20 @@
             }
             return response;
         }
-        
+
         private void ProcessCloudFoundryProviderMessage(NotificationMessageAction<ICloudFoundryProvider> message)
         {
             if (message.Notification.Equals(Messages.GetCloudFoundryProvider))
             {
                 message.Execute(this);
+            }
+        }
+
+        private void OnCloudAdded(Cloud cloud)
+        {
+            if (null != CloudAdded)
+            {
+                CloudAdded(this, new CloudEventArgs(cloud));
             }
         }
 

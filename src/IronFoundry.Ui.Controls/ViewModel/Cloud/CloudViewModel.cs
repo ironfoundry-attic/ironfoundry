@@ -443,9 +443,13 @@
             {
                 var result = e.Result as ProviderResponse<bool>;
                 if (result.Response)
+                {
                     IsAccountValid = true;
+                }
                 else
+                {
                     OverviewErrorMessage = result.Message;
+                }
             };
             worker.RunWorkerAsync();
         }
