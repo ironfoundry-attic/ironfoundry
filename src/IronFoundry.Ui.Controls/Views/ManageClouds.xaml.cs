@@ -46,5 +46,10 @@
             btnDefaultClouds.IsOpen = false;
             txtEmail.Focus();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            viewModel.Closing();
+        }
     }
 }

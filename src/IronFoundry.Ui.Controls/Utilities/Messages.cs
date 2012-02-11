@@ -62,10 +62,13 @@
         public const string GetAddApplicationServiceData = "GetAddApplicationServiceData";
         public const string SetAddApplicationServiceData = "SetAddApplicationServiceData";
 
+        /*
+         * TODO
         public const string RegisterAccount = "RegisterAccount";
         public const string RegisterAccountDialogResult = "RegisterAccountDialogResult";
         public const string GetRegisterAccountData = "GetRegisterAccountData";
         public const string SetRegisterAccountData = "SetRegisterAccountData";
+         */
       
         public const string PushApp = "PushApp";
         public const string GetPushAppData = "GetPushAppData";

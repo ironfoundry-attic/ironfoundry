@@ -7,7 +7,7 @@
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            var minutes = string.Empty;
+            var minutes = String.Empty;
             if (value != null)
             {
                 TimeSpan ts = TimeSpan.FromSeconds((int)value);

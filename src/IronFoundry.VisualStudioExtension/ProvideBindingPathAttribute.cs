@@ -56,7 +56,7 @@ namespace IronFoundry.VisualStudioExtension
                     keyName.Append(SubPath);
                 }
 
-                childKey.SetValue(keyName.ToString(), string.Empty);
+                childKey.SetValue(keyName.ToString(), String.Empty);
             }
         }
 

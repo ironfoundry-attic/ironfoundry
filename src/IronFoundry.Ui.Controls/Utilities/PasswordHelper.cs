@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Ui.Controls.Utilities
 {
+    using System;
     using System.Windows;
     using System.Windows.Controls;
 
@@ -7,7 +8,7 @@
     {
         public static readonly DependencyProperty PasswordProperty =
             DependencyProperty.RegisterAttached("Password",
-                typeof(string), typeof(PasswordHelper), new FrameworkPropertyMetadata(string.Empty, OnPasswordPropertyChanged));
+                typeof(string), typeof(PasswordHelper), new FrameworkPropertyMetadata(String.Empty, OnPasswordPropertyChanged));
 
         public static readonly DependencyProperty AttachProperty =
             DependencyProperty.RegisterAttached("Attach",

@@ -75,7 +75,7 @@
                 {
                     var worker = new BackgroundWorker();
                     worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
-                    worker.RunWorkerCompleted += (s, e) => ErrorMessage = string.Empty;
+                    worker.RunWorkerCompleted += (s, e) => ErrorMessage = String.Empty;
                     worker.RunWorkerAsync();
                 }
             }

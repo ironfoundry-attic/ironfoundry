@@ -83,7 +83,7 @@
 
         public static string GetGlobalVariable(this Project project, string key)
         {
-            string returnValue = string.Empty;
+            string returnValue = String.Empty;
             if (project.Globals.get_VariableExists(key))
                 returnValue = project.Globals[key] as string;
             return returnValue;

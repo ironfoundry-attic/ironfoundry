@@ -75,15 +75,34 @@
             get { return this.errorMessage; }
             set
             {
-                this.errorMessage = value; RaisePropertyChanged("ErrorMessage");
-                if (!String.IsNullOrWhiteSpace(this.errorMessage))
+                if (errorMessage != value)
                 {
-                    var worker = new BackgroundWorker();
-                    worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
-                    worker.RunWorkerCompleted += (s, e) => this.ErrorMessage = string.Empty;
-                    worker.RunWorkerAsync();
+                    this.errorMessage = value;
+                    RaisePropertyChanged("ErrorMessage");
+                    if (false == this.errorMessage.IsNullOrWhiteSpace())
+                    {
+                        var worker = new BackgroundWorker();
+                        worker.DoWork += worker_DoWork;
+                        worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+                        worker.RunWorkerAsync();
+                    }
                 }
             }
+        }
+
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var worker = (BackgroundWorker)sender;
+            worker.DoWork -= worker_DoWork;
+            Thread.Sleep(TimeSpan.FromSeconds(7));
+            e.Result = true;
+        }
+
+        private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            var worker = (BackgroundWorker)sender;
+            worker.RunWorkerCompleted -= worker_RunWorkerCompleted;
+            this.ErrorMessage = String.Empty;
         }
     }
 }

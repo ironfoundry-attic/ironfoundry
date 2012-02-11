@@ -24,7 +24,7 @@
             }
 
             string appname = unparsed[0];
-            string path = string.Empty;
+            string path = String.Empty;
             if (unparsed.Count == 2)
                 path = unparsed[1];            
 

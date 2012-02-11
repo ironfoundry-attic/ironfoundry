@@ -9,7 +9,7 @@
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
-                return string.Empty;
+                return String.Empty;
 
             var stringValue = value as string;
             stringValue = stringValue.ToLower();

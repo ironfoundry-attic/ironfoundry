@@ -67,7 +67,7 @@
                 {
                     var worker = new BackgroundWorker();
                     worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
-                    worker.RunWorkerCompleted += (s, e) => OverviewErrorMessage = string.Empty;
+                    worker.RunWorkerCompleted += (s, e) => OverviewErrorMessage = String.Empty;
                     worker.RunWorkerAsync();
                 }
             }
@@ -84,7 +84,7 @@
                 {
                     var worker = new BackgroundWorker();
                     worker.DoWork += (s, e) => Thread.Sleep(TimeSpan.FromSeconds(7));
-                    worker.RunWorkerCompleted += (s, e) => ApplicationErrorMessage = string.Empty;
+                    worker.RunWorkerCompleted += (s, e) => ApplicationErrorMessage = String.Empty;
                     worker.RunWorkerAsync();
                 }
             }
@@ -231,7 +231,7 @@
 
         private void SelectedApplicationPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            ApplicationErrorMessage = string.Empty;
+            ApplicationErrorMessage = String.Empty;
             var worker = new BackgroundWorker();
             worker.DoWork += (s, args) =>
             {
@@ -413,7 +413,7 @@
 
         private void Connect()
         {
-            OverviewErrorMessage = string.Empty;
+            OverviewErrorMessage = String.Empty;
             var worker = new BackgroundWorker();
             worker.DoWork += (s, e) => e.Result = provider.Connect(Cloud);
             worker.RunWorkerCompleted += (s, e) =>
@@ -435,7 +435,7 @@
 
         private void ValidateAccount()
         {
-            OverviewErrorMessage = string.Empty;
+            OverviewErrorMessage = String.Empty;
             IsAccountValid = false;
             var worker = new BackgroundWorker();
             worker.DoWork += (s, e) => e.Result = provider.ValidateAccount(Cloud);

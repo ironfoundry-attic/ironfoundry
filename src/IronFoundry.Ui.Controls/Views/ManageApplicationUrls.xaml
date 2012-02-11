@@ -3,11 +3,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:u="clr-namespace:IronFoundry.Ui.Controls.Utilities"
-	x:Class="IronFoundry.Ui.Controls.Views.ManageApplicationUrls"
-	WindowStartupLocation="CenterOwner"
-	Title="Manage Application Urls..."
+  x:Class="IronFoundry.Ui.Controls.Views.ManageApplicationUrls"
+  WindowStartupLocation="CenterOwner"
+  Title="Manage Application Urls..."
         Icon="../Images/CloudFoundrySmall.ico"
-	Width="725" Height="279"
+  Width="725" Height="279"
         ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
@@ -38,11 +38,11 @@
                                         <StackPanel Orientation="Horizontal">
 
                                             <TextBlock Margin="5,0,0,0">
-									<TextBlock.Text>
-										<MultiBinding StringFormat="{}{0}">
-											<Binding Path="."/>
-										</MultiBinding>
-									</TextBlock.Text>
+                  <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0}">
+                      <Binding Path="."/>
+                    </MultiBinding>
+                  </TextBlock.Text>
                                             </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>

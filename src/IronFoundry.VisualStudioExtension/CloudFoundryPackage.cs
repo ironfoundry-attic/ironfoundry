@@ -202,7 +202,7 @@
                     site.PreCompileWeb(dir.DeployFromPath, true);
                 else
                 {
-                    var frameworkPath = (site == null) ? project.GetFrameworkPath() : string.Empty;
+                    var frameworkPath = (site == null) ? project.GetFrameworkPath() : String.Empty;
 
                     string objDir = Path.Combine(dir.ProjectDirectory, "obj");
                     if (Directory.Exists(objDir))

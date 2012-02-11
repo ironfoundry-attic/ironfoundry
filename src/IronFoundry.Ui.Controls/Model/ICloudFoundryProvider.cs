@@ -12,6 +12,7 @@ namespace IronFoundry.Ui.Controls.Model
         event EventHandler<CloudEventArgs> CloudRemoved;
         void AddCloud(Cloud cloud);
         void RemoveCloud(Cloud cloud);
+        void RemoveCloud(Guid guid);
         void SaveChanges();
         void SaveOrUpdate(CloudUpdate updateData);
         IEnumerable<Cloud> Clouds { get; }
@@ -31,7 +32,10 @@ namespace IronFoundry.Ui.Controls.Model
         ProviderResponse<bool> CreateService(Cloud cloud, string serviceName, string provisionedServiceName);
         ProviderResponse<SafeObservableCollection<ProvisionedService>> GetProvisionedServices(Cloud cloud);
         ProviderResponse<bool> ChangePassword(Cloud cloud, string newPassword);
-        ProviderResponse<bool> RegisterAccount(Cloud cloud,string email, string password);
+
+        ProviderResponse<bool> RegisterAccount(Cloud cloud, string email, string password);
+        ProviderResponse<bool> RegisterAccount(string serverUrl, string email, string password);
+
         ProviderResponse<SafeObservableCollection<StatInfo>> GetStats(Cloud cloud, Application application);
         ProviderResponse<VcapFilesResult> GetFiles(Cloud cloud, Application application, string path, ushort instanceId);
         ProviderResponse<bool> Push(Cloud cloud, string name, string url, ushort instances, string directoryToPushFrom, uint memory, string[] services);

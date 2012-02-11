@@ -30,13 +30,23 @@
 
             Cloud = cloud;
             if (Cloud.IsConnected)
+            {
                 foreach (Application application in Cloud.Applications)
+                {
                     Children.Add(new ApplicationTreeViewItemViewModel(application, this));
+                }
+            }
 
             Cloud.Applications.CollectionChanged += Applications_CollectionChanged;
             connector.DoWork += BeginConnect;
             connector.RunWorkerCompleted += EndConnect;
-            connector.RunWorkerAsync();
+            lock (connector)
+            {
+                if (false == connector.IsBusy)
+                {
+                    connector.RunWorkerAsync();
+                }
+            }
         }
 
         public RelayCommand<MouseButtonEventArgs> OpenCloudCommand { get; private set; }
@@ -70,17 +80,24 @@
         {
             var result = args.Result as ProviderResponse<Cloud>;
             if (result.Response != null)
+            {
                 Cloud.Merge(result.Response);
+            }
             else
+            {
                 Messenger.Default.Send(new NotificationMessage<string>(result.Message, Messages.ErrorMessage));
+            }
         }
 
         private void Refresh()
         {
-            var worker = new BackgroundWorker();
-            worker.DoWork += BeginConnect;
-            worker.RunWorkerCompleted += EndConnect;
-            worker.RunWorkerAsync();
+            lock (connector)
+            {
+                if (false == connector.IsBusy)
+                {
+                    connector.RunWorkerAsync();
+                }
+            }
         }
 
         private void RemoveCloud()
@@ -90,7 +107,13 @@
 
         private void Connect()
         {
-            connector.RunWorkerAsync();
+            lock (connector)
+            {
+                if (false == connector.IsBusy)
+                {
+                    connector.RunWorkerAsync();
+                }
+            }
         }
 
         private bool CanExecuteConnect()

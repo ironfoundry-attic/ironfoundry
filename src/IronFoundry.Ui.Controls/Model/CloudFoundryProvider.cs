@@ -8,6 +8,7 @@
     using IronFoundry.Types;
     using IronFoundry.Vcap;
     using Utilities;
+    using IronFoundry.Ui.Controls.Properties;
 
     public class CloudFoundryProvider : ICloudFoundryProvider
     {
@@ -37,10 +38,16 @@
 
         public void RemoveCloud(Cloud cloud)
         {
-            clouds.Remove(cloud.ID);
+            RemoveCloud(cloud.ID);
+        }
+
+        public void RemoveCloud(Guid cloudID)
+        {
+            Cloud toRemove = clouds[cloudID];
+            clouds.Remove(cloudID);
             if (null != CloudRemoved)
             {
-                CloudRemoved(this, new CloudEventArgs(cloud));
+                CloudRemoved(this, new CloudEventArgs(toRemove));
             }
         }
 
@@ -72,39 +79,53 @@
         public ProviderResponse<Cloud> Connect(Cloud cloud)
         {
             var response = new ProviderResponse<Cloud>();
-            Cloud local = cloud.DeepCopy();
-            IVcapClient client = new VcapClient(local);
 
-            try
+            if (cloud.IsDataComplete)
             {
-                VcapClientResult result = client.Login();
-                if (!result.Success)
-                    throw new Exception(result.Message);
-                local.AccessToken = client.CurrentToken;
-                var applications = client.GetApplications();
-                var provisionedServices = client.GetProvisionedServices();
-                var availableServices = client.GetSystemServices();
-                local.Applications.Synchronize(new SafeObservableCollection<Application>(applications), new ApplicationEqualityComparer());
-                local.Services.Synchronize(new SafeObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
-                local.AvailableServices.Synchronize(new SafeObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
-                foreach (Application app in local.Applications)
+                Cloud local = cloud.DeepCopy();
+                IVcapClient client = new VcapClient(local);
+                try
                 {
-                    var instances = GetInstances(local, app);
-                    if (instances.Response != null)
-                        app.InstanceCollection.Synchronize(new SafeObservableCollection<Instance>(instances.Response), new InstanceEqualityComparer());
+                    VcapClientResult result = client.Login();
+                    if (false == result.Success)
+                    {
+                        response.Response = null;
+                        response.Message = result.Message;
+                    }
+                    else
+                    {
+                        local.AccessToken = client.CurrentToken;
+                        var applications = client.GetApplications();
+                        var provisionedServices = client.GetProvisionedServices();
+                        var availableServices = client.GetSystemServices();
+                        local.Applications.Synchronize(new SafeObservableCollection<Application>(applications), new ApplicationEqualityComparer());
+                        local.Services.Synchronize(new SafeObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
+                        local.AvailableServices.Synchronize(new SafeObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
+                        foreach (Application app in local.Applications)
+                        {
+                            var instances = GetInstances(local, app);
+                            if (instances.Response != null)
+                                app.InstanceCollection.Synchronize(new SafeObservableCollection<Instance>(instances.Response), new InstanceEqualityComparer());
+                        }
+                        response.Response = local;
+                    }
                 }
-                response.Response = local;
+                catch (Exception ex)
+                {
+                    response.Message = ex.Message;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                response.Message = ex.Message;
+                response.Message = Resources.CloudFoundryProvider_ConnectIncompleteData_Message;
             }
+
             return response;
         }
 
         public Cloud Disconnect(Cloud cloud)
         {
-            cloud.AccessToken = string.Empty;
+            cloud.AccessToken = String.Empty;
             cloud.Services.Clear();
             cloud.Applications.Clear();
             cloud.AvailableServices.Clear();
@@ -360,19 +381,24 @@
             return response;
         }
 
-        public ProviderResponse<bool> RegisterAccount(Cloud cloud,string email, string password)
+        public ProviderResponse<bool> RegisterAccount(Cloud cloud, string email, string password)
+        {
+            return RegisterAccount(cloud.Url, email, password);
+        }
+
+        public ProviderResponse<bool> RegisterAccount(string serverUrl, string email, string password)
         {
             var response = new ProviderResponse<bool>();
             try
             {
-                IVcapClient client = new VcapClient(cloud);
-                var vcapResult = client.AddUser(email,password);
-                if (!vcapResult.Success)
-                    throw new Exception(vcapResult.Message);
+                IVcapClient client = new VcapClient(serverUrl);
+                var vcapResult = client.AddUser(email, password);
                 response.Response = true;
+                response.Message = vcapResult.Message;
             }
             catch (Exception ex)
             {
+                response.Response = false;
                 response.Message = ex.Message;
             }
             return response;

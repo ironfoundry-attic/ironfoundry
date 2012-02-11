@@ -4,11 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:u="clr-namespace:IronFoundry.Ui.Controls.Utilities"
+        xmlns:uc="clr-namespace:IronFoundry.Ui.Controls.UserControls"
         xmlns:xt="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended" 
         WindowStartupLocation="CenterOwner"
         Title="Manage Clouds..." ResizeMode="NoResize"
         Icon="../Images/CloudFoundrySmall.ico"
-        mc:Ignorable="d" Width="640" Height="480">
+        mc:Ignorable="d"
+        Width="640"
+        Height="480"
+        Closing="Window_Closing">
   <Window.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
@@ -16,11 +20,19 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Window.Resources>
-  <DockPanel>
+  <DockPanel IsEnabled="{Binding Path=IsNotBusy}">
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
       <Button HorizontalAlignment="Center" VerticalAlignment="Center" Width="90" Margin="4" Content="Ok" Command="{Binding ConfirmedCommand}" IsDefault="True" />
       <Button HorizontalAlignment="Center" VerticalAlignment="Center" Width="90" Margin="4" Content="Cancel" Command="{Binding CancelledCommand}" IsCancel="True" />
     </StackPanel>
+    <Border DockPanel.Dock="Top" BorderBrush="#FFBACADB" BorderThickness="2" Height="40" HorizontalAlignment="Stretch" Margin="-2,-2,-2,0" VerticalAlignment="Top" Background="{StaticResource HeaderBackground}">
+      <DockPanel>
+        <Image DockPanel.Dock="Left" Source="../Images/gear.png" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="None" Margin="10,0" />
+        <Label DockPanel.Dock="Left" Content="Manage Clouds" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource DarkBlueBrushKey}" FontWeight="Bold" FontSize="18" Padding="0" />
+        <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Red" FontSize="12" Margin="10,0,0,0" Content="{Binding ErrorMessage}" />
+        <Image DockPanel.Dock="Right" Source="../Images/cloud_foundry_eclipse_icon.png" HorizontalAlignment="Right" />
+      </DockPanel>
+    </Border>
     <Border BorderThickness="0 0 0 1" BorderBrush="Gray">
       <Grid>
         <Grid.ColumnDefinitions>
@@ -71,7 +83,8 @@
               <RowDefinition Height="Auto" />
               <RowDefinition Height="Auto" />
               <RowDefinition Height="Auto" />
-              <RowDefinition Height="*" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Specify cloud settings." />
@@ -92,13 +105,22 @@
 
             <Label Grid.Row="5" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
             <PasswordBox Grid.Row="5" Grid.Column="1" u:PasswordHelper.Attach="True"
-                         u:PasswordHelper.Password="{Binding Path=SelectedCloud.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                         u:PasswordHelper.Password="{Binding Path=SelectedCloud.Password,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
             <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal">
               <Button Content="Validate Account" Margin="4" Command="{Binding ValidateAccountCommand}" />
               <Label Content="Account Valid." Margin="4"
                      Visibility="{Binding Path=IsSelectedCloudAccountValid,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
             </StackPanel>
+            
+            <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal">
+              <Button Content="Register Account" Margin="4" Command="{Binding RegisterAccountCommand}" />
+              <Label Content="Account Registered." Margin="4"
+                     Visibility="{Binding Path=IsSelectedCloudAccountRegistered,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
+            </StackPanel>
+            
+            <uc:ucSpinnerApple Grid.Row="8" Margin="4" HorizontalAlignment="Left"
+                               Visibility="{Binding Path=IsBusy,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
           </Grid>
         </DockPanel>
       </Grid>

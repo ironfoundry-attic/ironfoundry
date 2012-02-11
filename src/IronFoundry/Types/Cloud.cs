@@ -36,7 +36,19 @@
             TimeoutStop    = 60;
             IsConnected    = false;
             IsDisconnected = true;
-        }        
+        }
+
+        public bool IsDataComplete
+        {
+            get
+            {
+                return
+                    false == ServerName.IsNullOrWhiteSpace() &&
+                    false == Url.IsNullOrWhiteSpace() &&
+                    false == Email.IsNullOrWhiteSpace() &&
+                    false == Password.IsNullOrWhiteSpace();
+            }
+        }
 
         public Guid ID
         {

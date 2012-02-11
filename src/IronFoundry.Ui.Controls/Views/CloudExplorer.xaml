@@ -17,20 +17,14 @@
     </UserControl.Resources>
     <DockPanel>
         <ToolBar DockPanel.Dock="Top" Height="28">
-          <!--
-          TODO
-            <Button ToolTip="Add Cloud Connection..." Command="{Binding AddCloudCommand}">
-                <Image Source="../Images/cloud_add.png"/>
+            <Button ToolTip="Manage Clouds..." Command="{Binding PreferencesCommand}">
+                <Image Source="../Images/gear.png"/>
             </Button>
-          -->
             <Button ToolTip="Push..." Command="{Binding PushAppCommand}">
                 <Image Source="../Images/appsadd.png"/>
             </Button>
             <Button ToolTip="Update..." Command="{Binding UpdateAppCommand}">
                 <Image Source="../Images/update.png"/>
-            </Button>
-            <Button ToolTip="Preferences..." Command="{Binding PreferencesCommand}">
-                <Image Source="../Images/gear.png"/>
             </Button>
         </ToolBar>
         <TreeView DockPanel.Dock="Bottom" ItemsSource="{Binding Clouds}" VerticalAlignment="Stretch">

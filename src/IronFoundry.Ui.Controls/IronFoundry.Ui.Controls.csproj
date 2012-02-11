@@ -104,10 +104,12 @@
     <Compile Include="Mvvm\IDropTarget.cs" />
     <Compile Include="Mvvm\ProgressError.cs" />
     <Compile Include="Mvvm\ProgressMessage.cs" />
+    <Compile Include="UserControls\ucSpinnerApple.xaml.cs">
+      <DependentUpon>ucSpinnerApple.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\IconUtil.cs" />
     <Compile Include="Utilities\Messages.cs" />
     <Compile Include="Utilities\PasswordHelper.cs" />
-    <Compile Include="ViewModel\AddCloud\AddCloudViewModel.cs" />
     <Compile Include="ViewModel\Cloud\AddApplicationUrlViewModel.cs" />
     <Compile Include="ViewModel\Cloud\CreateServiceViewModel.cs" />
     <Compile Include="ViewModel\Cloud\ManageApplicationUrlsViewModel.cs" />
@@ -123,10 +125,8 @@
     <Compile Include="ViewModel\Explorer\CloudExplorerViewModel.cs" />
     <Compile Include="ViewModel\Explorer\CloudTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\Cloud\CloudViewModel.cs" />
-    <Compile Include="ViewModel\AddCloud\RegisterAccountViewModel.cs" />
     <Compile Include="ViewModel\Explorer\InstanceTreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\ExplorerViewModel.cs" />
-    <Compile Include="ViewModel\AddCloud\ManageCloudUrlsViewModel.cs" />
     <Compile Include="Mvvm\TreeViewItemViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="Views\ChangePassword.xaml.cs">
@@ -179,11 +179,8 @@
     <Compile Include="Views\ManageApplicationUrls.xaml.cs">
       <DependentUpon>ManageApplicationUrls.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RegisterAccount.xaml.cs">
-      <DependentUpon>RegisterAccount.xaml</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
@@ -209,6 +206,10 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UserControls\ucSpinnerApple.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ChangePassword.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -254,10 +255,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ManageApplicationUrls.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\RegisterAccount.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -313,6 +310,7 @@
   <ItemGroup>
     <Resource Include="Images\add_cloud.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>

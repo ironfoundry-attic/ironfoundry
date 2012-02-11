@@ -1,5 +1,7 @@
 namespace IronFoundry.Ui.Controls.Model
 {
+    using System;
+
     public class ProviderResponse<T>
     {
         public T Response { get; set; }
@@ -8,7 +10,7 @@ namespace IronFoundry.Ui.Controls.Model
         public ProviderResponse()
         {
             Response = default(T);
-            Message = string.Empty;
+            Message = String.Empty;
         }
 
         public ProviderResponse(T response, string message)
