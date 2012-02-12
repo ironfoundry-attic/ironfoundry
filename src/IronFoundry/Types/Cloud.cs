@@ -133,25 +133,33 @@
             get
             {
                 if (this.applications == null)
+                {
                     this.applications = new SafeObservableCollection<Application>();
+                }
                 return this.applications; 
             }            
         }
 
         public SafeObservableCollection<ProvisionedService> Services
         {
-            get {
+            get
+            {
                 if (this.services == null)
+                {
                     this.services = new SafeObservableCollection<ProvisionedService>();
+                }
                 return this.services; 
             }
         }
 
         public SafeObservableCollection<SystemService> AvailableServices
         {
-            get {
+            get
+            {
                 if (this.availableServices == null)
+                {
                     this.availableServices = new SafeObservableCollection<SystemService>();
+                }
                 return this.availableServices; 
             }
         }        
@@ -171,6 +179,24 @@
             this.Applications.Synchronize(c.Applications,new ApplicationEqualityComparer());
             this.Services.Synchronize(c.Services,new ProvisionedServiceEqualityComparer());
             this.AvailableServices.Synchronize(c.AvailableServices, new SystemServiceEqualityComparer());            
+        }
+
+        public string BuildTypicalApplicationUrl(string applicationName)
+        {
+            string rv = String.Empty;
+
+            if (false == Url.IsNullOrWhiteSpace())
+            {
+                var tmp = new Uri(Url);
+                string host = tmp.GetComponents(UriComponents.Host, UriFormat.SafeUnescaped);
+                if (host.Contains("api."))
+                {
+                    string scheme = tmp.GetComponents(UriComponents.Scheme, UriFormat.SafeUnescaped);
+                    rv = scheme + "://" + host.Replace("api", applicationName);
+                }
+            }
+
+            return rv;
         }
 
         public bool Equals(Cloud other)

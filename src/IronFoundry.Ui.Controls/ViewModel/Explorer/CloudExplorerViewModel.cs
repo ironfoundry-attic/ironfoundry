@@ -27,10 +27,11 @@
         {
             Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(Messages.GetCloudFoundryProvider, (p) => provider = p));
             dispatcher = Dispatcher.CurrentDispatcher;
-            // AddCloudCommand = new RelayCommand(AddCloud);
+
             PushAppCommand = new RelayCommand(PushApp);
             UpdateAppCommand = new RelayCommand(UpdateApp);
             PreferencesCommand = new RelayCommand(Preferences);
+
             if (null != provider)
             {
                 if (null != provider.Clouds)
@@ -56,24 +57,14 @@
             clouds.Add(new CloudTreeViewItemViewModel(e.Cloud));
         }
 
-        // TODO public RelayCommand AddCloudCommand { get; set; }
         public RelayCommand PushAppCommand { get; set; }
         public RelayCommand UpdateAppCommand { get; set; }
-        public RelayCommand RefreshCloudsCommand { get; set; }
         public RelayCommand PreferencesCommand { get; set; }
 
         public ObservableCollection<CloudTreeViewItemViewModel> Clouds
         {
             get { return clouds; }
         }
-
-        /*
-         * TODO
-        private void AddCloud()
-        {
-            Messenger.Default.Send(new NotificationMessageAction<bool>(Messages.AddCloud, (confirmed) => { }));
-        }
-         */
 
         private void PushApp()
         {

@@ -10,6 +10,7 @@ namespace IronFoundry.Ui.Controls.Model
     {
         event EventHandler<CloudEventArgs> CloudAdded;
         event EventHandler<CloudEventArgs> CloudRemoved;
+        event EventHandler<CloudEventArgs> CloudChanged;
         void AddCloud(Cloud cloud);
         void RemoveCloud(Cloud cloud);
         void RemoveCloud(Guid guid);

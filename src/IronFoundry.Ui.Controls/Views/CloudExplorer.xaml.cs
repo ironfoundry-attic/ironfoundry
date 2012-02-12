@@ -16,22 +16,6 @@
             InitializeComponent();
             this.DataContext = new CloudExplorerViewModel();
             this.Unloaded += (s,e) => Messenger.Default.Unregister(this);
-            
-            /*
-             * TODO
-            Messenger.Default.Register<NotificationMessageAction<bool>>(this,
-                message =>
-                {
-                    if (message.Notification.Equals(Messages.AddCloud))
-                    {
-                        var view = new Views.AddCloud();
-                        Window parentWindow = Window.GetWindow(this);
-                        view.Owner = parentWindow;
-                        var result = view.ShowDialog();
-                        message.Execute(result.GetValueOrDefault());                        
-                    }
-                });
-             */
 
             Messenger.Default.Register<NotificationMessageAction<bool>>(this,
                 message =>

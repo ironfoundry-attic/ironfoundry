@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Linq;
     using System.Threading;
@@ -33,7 +32,6 @@
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             Messenger.Default.Register<NotificationMessage<string>>(this, ProcessErrorMessage);
 
-            // TODO provider.CloudsChanged += CloudsCollectionChanged;
             provider.CloudRemoved += provider_CloudRemoved;
         }
 

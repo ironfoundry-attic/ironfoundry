@@ -184,11 +184,14 @@
                 });
             }
             SelectedCloud = cloudData.FirstOrDefault();
+            /*
+             * TODO
             if (null == SelectedCloud)
             {
                 AddCloud(ironFoundryDefault);
                 SelectedCloud = ironFoundryDefault;
             }
+             */
         }
 
         private void AddCloud(ManageCloudsData cloud)

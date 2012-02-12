@@ -145,7 +145,7 @@
             }
             catch
             {
-                // TODO Can happen if there's a 404 or something.
+                // Can happen if there's a 404 or something.
             }
 
             return rv;

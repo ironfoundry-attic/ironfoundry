@@ -21,12 +21,18 @@
             : base(null, false)
         {
             Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
-                                       Messages.GetCloudFoundryProvider, p => provider = p));
-            OpenCloudCommand = new RelayCommand<MouseButtonEventArgs>(OpenCloud);
+                Messages.GetCloudFoundryProvider,
+                p =>
+                {
+                    provider = p;
+                    provider.CloudChanged += provider_CloudChanged;
+                }));
+
+            OpenCloudCommand   = new RelayCommand<MouseButtonEventArgs>(OpenCloud);
             RemoveCloudCommand = new RelayCommand(RemoveCloud);
-            ConnectCommand = new RelayCommand(Connect, CanExecuteConnect);
-            DisconnectCommand = new RelayCommand(Disconnect, CanExecuteDisconnect);
-            RefreshCommand = new RelayCommand(Refresh);
+            ConnectCommand     = new RelayCommand(Connect, CanExecuteConnect);
+            DisconnectCommand  = new RelayCommand(Disconnect, CanExecuteDisconnect);
+            RefreshCommand     = new RelayCommand(Refresh);
 
             Cloud = cloud;
             if (Cloud.IsConnected)
@@ -65,6 +71,11 @@
             }
         }
 
+        private void provider_CloudChanged(object sender, CloudEventArgs e)
+        {
+            Refresh(e.Cloud);
+        }
+
         private void OpenCloud(MouseButtonEventArgs e)
         {
             if (e == null || e.ClickCount >= 2)
@@ -89,15 +100,20 @@
             }
         }
 
-        private void Refresh()
+        private void Refresh(Cloud cloud)
         {
             lock (connector)
             {
                 if (false == connector.IsBusy)
                 {
-                    connector.RunWorkerAsync();
+                    connector.RunWorkerAsync(cloud);
                 }
             }
+        }
+
+        private void Refresh()
+        {
+            Refresh(Cloud);
         }
 
         private void RemoveCloud()

@@ -14,29 +14,6 @@
         public const string ErrorMessage = "ErrorMessage";
         public const string ChooseDirectory = "ChooseDirectory";
 
-        // Dialog Interactions
-        /* TODO
-        public const string AddCloud = "AddCloud";
-        public const string AddCloudDialogResult = "AddCloudDialogResult";
-        public const string GetAddCloudData = "GetAddCloudData";
-        public const string SetAddCloudData = "SetAddCloudData";
-
-        public const string AddCloudUrl = "AddCloudUrl";
-        public const string AddCloudUrlDialogResult  = "AddCloudUrlDialogResult";
-        public const string GetAddCloudUrlData = "GetAddCloudUrlData";
-        public const string SetAddCloudUrlData = "SetAddCloudUrlData";
-         
-        public const string CreateMicrocloudTarget = "CreateMicrocloudTarget";
-        public const string CreateMicrocloudTargetDialogResult = "CreateMicrocloudTargetDialogResult";
-        public const string GetMicrocloudTargetData = "GetMicrocloudTargetData";
-        public const string SetMicrocloudTargetData = "SetMicrocloudTargetData";
-
-        public const string ManageCloudUrls = "ManageCloudUrls";
-        public const string ManageCloudUrlsDialogResult = "ManageCloudUrlsDialogResult";
-        public const string SetManageCloudUrlsData = "SetManageCloudUrlsData";
-        public const string GetManageCloudUrlsData = "SetManageCloudUrlsData";
-         */
-
         public const string ManageApplicationUrls = "ManageApplicationUrls";
         public const string ManageApplicationUrlsDialogResult = "ManageApplicationUrlsDialogResult";
         public const string SetManageApplicationUrlsData = "SetManageApplicationUrlsData";
@@ -61,14 +38,6 @@
         public const string AddApplicationServiceDialogResult = "AddApplicationServiceDialogResult";
         public const string GetAddApplicationServiceData = "GetAddApplicationServiceData";
         public const string SetAddApplicationServiceData = "SetAddApplicationServiceData";
-
-        /*
-         * TODO
-        public const string RegisterAccount = "RegisterAccount";
-        public const string RegisterAccountDialogResult = "RegisterAccountDialogResult";
-        public const string GetRegisterAccountData = "GetRegisterAccountData";
-        public const string SetRegisterAccountData = "SetRegisterAccountData";
-         */
       
         public const string PushApp = "PushApp";
         public const string GetPushAppData = "GetPushAppData";

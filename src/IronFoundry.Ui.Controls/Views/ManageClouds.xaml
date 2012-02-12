@@ -119,7 +119,7 @@
                      Visibility="{Binding Path=IsSelectedCloudAccountRegistered,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
             </StackPanel>
             
-            <uc:ucSpinnerApple Grid.Row="8" Margin="4" HorizontalAlignment="Left"
+            <uc:ucSpinnerApple Grid.Row="8" Margin="2" HorizontalAlignment="Left"
                                Visibility="{Binding Path=IsBusy,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
           </Grid>
         </DockPanel>

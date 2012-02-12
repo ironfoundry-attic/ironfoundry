@@ -41,22 +41,22 @@
             get { return selectedCloud; }
             set
             {
-                selectedCloud = value;
-                if (selectedCloud != null)
+                Cloud newCloud = value;
+                if (ValuesAreDifferent(selectedCloud, newCloud) && null != newCloud)
                 {
-                    ProviderResponse<Cloud> local = provider.Connect(selectedCloud);
+                    ProviderResponse<Cloud> local = provider.Connect(newCloud);
                     if (local.Response != null)
                     {
-                        selectedCloud.Services.Synchronize(local.Response.Services, new ProvisionedServiceEqualityComparer());
-                        selectedCloud.Applications.Synchronize(local.Response.Applications, new ApplicationEqualityComparer());
-                        selectedCloud.AvailableServices.Synchronize(local.Response.AvailableServices, new SystemServiceEqualityComparer());
+                        newCloud.Services.Synchronize(local.Response.Services, new ProvisionedServiceEqualityComparer());
+                        newCloud.Applications.Synchronize(local.Response.Applications, new ApplicationEqualityComparer());
+                        newCloud.AvailableServices.Synchronize(local.Response.AvailableServices, new SystemServiceEqualityComparer());
                     }
                     else
                     {
                         ErrorMessage = local.Message;
                     }
                 }
-                RaisePropertyChanged("SelectedCloud");
+                SetValue(ref selectedCloud, newCloud, "SelectedCloud");
             }
         }
 
@@ -65,8 +65,10 @@
             get { return name; }
             set
             {
-                name = value;
-                RaisePropertyChanged("Name");
+                if (SetValue(ref name, value, "Name") && null != SelectedCloud)
+                {
+                    Url = SelectedCloud.BuildTypicalApplicationUrl(name);
+                }
             }
         }
 

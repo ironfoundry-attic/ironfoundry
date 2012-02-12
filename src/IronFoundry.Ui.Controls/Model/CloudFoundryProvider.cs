@@ -6,9 +6,9 @@
     using System.ComponentModel;
     using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
+    using IronFoundry.Ui.Controls.Properties;
     using IronFoundry.Vcap;
     using Utilities;
-    using IronFoundry.Ui.Controls.Properties;
 
     public class CloudFoundryProvider : ICloudFoundryProvider
     {
@@ -29,6 +29,7 @@
 
         public event EventHandler<CloudEventArgs> CloudAdded;
         public event EventHandler<CloudEventArgs> CloudRemoved;
+        public event EventHandler<CloudEventArgs> CloudChanged;
 
         public void AddCloud(Cloud cloud)
         {
@@ -68,6 +69,10 @@
             if (cloudAdded)
             {
                 OnCloudAdded(cloud);
+            }
+            else
+            {
+                OnCloudChanged(cloud);
             }
         }
 
@@ -474,7 +479,15 @@
             }
         }
 
-        private void CloudChanged(object sender, PropertyChangedEventArgs e)
+        private void OnCloudChanged(Cloud cloud)
+        {
+            if (null != CloudChanged)
+            {
+                CloudChanged(this, new CloudEventArgs(cloud));
+            }
+        }
+
+        private void Cloud_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -488,7 +501,6 @@
                 case "Password":
                 case "IsConnected":
                 case "IsDisconnected":
-                    // TODO preferencesProvider.Save(new Preferences() { Clouds = this.Clouds, CloudUrls = this.CloudUrls });
                     preferencesProvider.Save(new PreferencesV2 { Clouds = this.Clouds.ToArrayOrNull() });
                     break;
                 default:
@@ -503,7 +515,7 @@
             {
                 foreach (Cloud cloud in preferences.Clouds)
                 {
-                    cloud.PropertyChanged -= CloudChanged;
+                    cloud.PropertyChanged -= Cloud_PropertyChanged;
                 }
 
                 clouds.Clear();
@@ -512,7 +524,7 @@
                 {
                     var kvp = new KeyValuePair<Guid, Cloud>(cloud.ID, cloud);
                     clouds.Add(kvp);
-                    cloud.PropertyChanged += CloudChanged;
+                    cloud.PropertyChanged += Cloud_PropertyChanged;
                 }
             }
         }
