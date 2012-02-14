@@ -41,9 +41,14 @@
         {
             get
             {
-                Bitmap hBitmap = IconUtil.IconFromExtension("Directory", IconUtil.SystemIconSize.Small).ToBitmap();
-                return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
-                                                             BitmapSizeOptions.FromEmptyOptions());
+                ImageSource rv = null;
+                Icon ico = IconUtil.DirectoryIcon(IconUtil.SystemIconSize.Small);
+                if (null != ico)
+                {
+                    Bitmap hBitmap = ico.ToBitmap();
+                    rv = Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                }
+                return rv;
             }
         }
 

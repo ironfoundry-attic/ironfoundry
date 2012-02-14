@@ -64,13 +64,13 @@
 
             public FilesResultData(string name)
             {
-                Name = name;
+                Name = name.Trim();
             }
 
             public FilesResultData(string name, string size)
             {
-                Name = name;
-                Size = size;
+                Name = name.Trim();
+                Size = size.Trim();
             }
         }
     }

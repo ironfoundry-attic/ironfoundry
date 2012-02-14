@@ -13,8 +13,19 @@
         private readonly VcapCredentialManager credMgr;
         private readonly Cloud cloud;
         private Info info;
-        private static readonly Regex file_re = new Regex(@"^([\w\.]+)\s+([0-9]+(?:\.[0-9]+)?[KBMG])$", RegexOptions.Compiled);
-        private static readonly Regex dir_re = new Regex(@"^([\w.]+)/\s+-$", RegexOptions.Compiled);
+        private static readonly Regex file_re;
+        private static readonly Regex dir_re;
+
+        static VcapClient()
+        {
+            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+            string validFileNameRegexStr = String.Format(@"^([^{0}]+)\s+([0-9]+(?:\.[0-9]+)?[KBMG])$", new String(invalidFileNameChars));
+            file_re = new Regex(validFileNameRegexStr, RegexOptions.Compiled);
+
+            char[] invalidPathChars = Path.GetInvalidPathChars();
+            string validPathRegexStr = String.Format(@"^([^{0}]+)/\s+-$", new String(invalidPathChars));
+            dir_re = new Regex(validPathRegexStr, RegexOptions.Compiled);
+        }
 
         public VcapClient()
         {

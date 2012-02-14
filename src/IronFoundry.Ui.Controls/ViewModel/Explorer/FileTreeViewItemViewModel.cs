@@ -35,7 +35,7 @@
             this.app = app;
             this.path = path;
             this.id = id;
-            fileExtension = Path.GetExtension(name);
+            fileExtension = Path.GetExtension(name).Trim();
             OpenFileCommand = new RelayCommand<MouseButtonEventArgs>(OpenFile);
             OpenFileFromContextCommand = new RelayCommand(OpenFileFromContext);
         }
@@ -52,9 +52,15 @@
         {
             get
             {
-                Bitmap hBitmap = IconUtil.IconFromExtension(fileExtension, IconUtil.SystemIconSize.Small).ToBitmap();
-                return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
-                                                             BitmapSizeOptions.FromEmptyOptions());
+                // TODO: this probably leaks memory
+                ImageSource rv = null;
+                Icon ico = IconUtil.IconFromExtension(fileExtension, IconUtil.SystemIconSize.Small);
+                if (null != ico)
+                {
+                    Bitmap hBitmap = ico.ToBitmap();
+                    rv = Imaging.CreateBitmapSourceFromHBitmap(hBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                }
+                return rv;
             }
         }
 

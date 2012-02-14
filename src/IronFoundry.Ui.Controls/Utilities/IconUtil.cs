@@ -8,6 +8,8 @@
 
     public static class IconUtil
     {               
+        private const string DirectoryExtension = "Directory";
+
         [DllImport("Shell32", CharSet = CharSet.Auto)]
         extern static int ExtractIconEx(
             [MarshalAs(UnmanagedType.LPTStr)] 
@@ -21,67 +23,112 @@
         {
             Large = 0x000000000,
             Small = 0x000000001
-        }        
+        }
+
+        public static Icon DirectoryIcon(SystemIconSize size)
+        {
+            return IconFromExtension(DirectoryExtension, size);
+        }
 
         public static Icon IconFromExtension(string extension, SystemIconSize size)
         {            
-            var className = "Unknown";
-            var classKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\"+extension+@"\OpenWithProgids");
-            if (classKey != null)
-                className = classKey.GetValueNames().First();
-            
-            if (className.EndsWith("Folder"))
-                className = "Folder";
-            if (className.Equals("icofile"))
-                className = "Unknown";
+            Icon rv = null;
 
-            Icon returnIcon = null;
+            string className = "Unknown";
+            RegistryKey classKey = Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + extension + @"\OpenWithProgids");
+            if (null != classKey)
+            {
+                className = classKey.GetValueNames().First();
+            }
+
+            if (className.EndsWith("Folder") || extension == DirectoryExtension)
+            {
+                className = "Folder";
+            }
+
+            if (className.Equals("icofile"))
+            {
+                className = "Unknown";
+            }
+
             try
             {
-                returnIcon = IconFromClassName(size, className);
+                rv = IconFromClassName(size, className);
             }
-            catch
+            catch { }
+
+            if (null == rv)
             {
-                returnIcon = IconFromClassName(size, "Unknown");
+                rv = IconFromClassName(size, "Unknown");
             }
-            return returnIcon;
+
+            return rv;
         }
 
-        [System.Diagnostics.DebuggerStepThrough]
         private static Icon IconFromClassName(SystemIconSize size, string className)
         {
-            var Root = Registry.ClassesRoot;
-            var ApplicationKey = Root.OpenSubKey(className);
-            RegistryKey CurrentVer = null;
-            try
+            Icon rv = null;
+
+            var root = Registry.ClassesRoot;
+            var applicationKey = root.OpenSubKey(className);
+            RegistryKey currentVer = null;
+
+            RegistryKey curVerSubKey = applicationKey.OpenSubKey("CurVer");
+            if (null != curVerSubKey)
             {
-                CurrentVer = Root.OpenSubKey(ApplicationKey.OpenSubKey("CurVer").GetValue("").ToString());
+                object curVerValue = curVerSubKey.GetValue(String.Empty);
+                if (null != curVerValue)
+                {
+                    currentVer = root.OpenSubKey(curVerValue.ToString());
+                }
             }
-            catch (Exception)
+
+            if (null != currentVer)
             {
+                applicationKey = currentVer;
             }
 
-            if (CurrentVer != null)
-                ApplicationKey = CurrentVer;
+            if (null == applicationKey)
+            {
+                applicationKey = root.OpenSubKey("Unknown");
+            }
 
-            if (ApplicationKey == null)
-                ApplicationKey = Root.OpenSubKey("Unknown");
+            RegistryKey appKeySubKey = applicationKey.OpenSubKey("DefaultIcon");
+            string iconLocation = null;
+            if (null != appKeySubKey)
+            {
+                object appKeySubKeyValue = appKeySubKey.GetValue(String.Empty);
+                if (null != appKeySubKeyValue)
+                {
+                    iconLocation = appKeySubKeyValue.ToString();
+                }
+            }
 
-            var IconLocation = ApplicationKey.OpenSubKey("DefaultIcon").GetValue("").ToString();
-            var IconPath = IconLocation.Split(',');
-            IntPtr[] Large = null;
-            IntPtr[] Small = null;
-            var iIconPathNumber = 0;
-            iIconPathNumber = IconPath.Length > 1 ? 1 : 0;
-            if (IconPath[iIconPathNumber] == null) IconPath[iIconPathNumber] = "0";
-            Large = new IntPtr[1];
-            Small = new IntPtr[1];
-            if (iIconPathNumber > 0)
-                ExtractIconEx(IconPath[0], Convert.ToInt16(IconPath[iIconPathNumber]), Large, Small, 1);
-            else
-                ExtractIconEx(IconPath[0], Convert.ToInt16(0), Large, Small, 1);
+            if (null != iconLocation)
+            {
+                string[] iconPath = iconLocation.Split(',');
+                int iIconPathNumber = iconPath.Length > 1 ? 1 : 0;
+                if (null == iconPath[iIconPathNumber])
+                {
+                    iconPath[iIconPathNumber] = "0";
+                }
 
-            return size == SystemIconSize.Large ? Icon.FromHandle(Large[0]) : Icon.FromHandle(Small[0]);
+                IntPtr[] large = new IntPtr[1];
+                IntPtr[] small = new IntPtr[1];
+                if (iIconPathNumber > 0)
+                {
+                    ExtractIconEx(iconPath[0], Convert.ToInt16(iconPath[iIconPathNumber]), large, small, 1);
+                }
+                else
+                {
+                    ExtractIconEx(iconPath[0], Convert.ToInt16(0), large, small, 1);
+                }
+
+                rv = size == SystemIconSize.Large ? Icon.FromHandle(large[0]) : Icon.FromHandle(small[0]);
+            }
+
+            return rv;
         }
     }
 }

@@ -108,7 +108,9 @@
                     SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
 
                     PerformAction("Push Application", project, modelData.SelectedCloud, projectDirectories, (c, d) =>
-                        c.Push(modelData.Name, modelData.Url, Convert.ToUInt16(modelData.Instances), d, Convert.ToUInt32(modelData.SelectedMemory), modelData.ApplicationServices.Select(provisionedService => provisionedService.Name).ToArray()));
+                                c.Push(modelData.Name, modelData.Url, Convert.ToUInt16(modelData.Instances), d,
+                                    Convert.ToUInt32(modelData.SelectedMemory),
+                                    modelData.ApplicationServices.Select(provisionedService => provisionedService.Name).ToArray()));
                 }
             }
         }
@@ -157,7 +159,7 @@
         }
 
         private void PerformAction(string action, Project project, Cloud cloud, ProjectDirectories dir,
-                                   Func<IVcapClient, DirectoryInfo, VcapClientResult> function)
+            Func<IVcapClient, DirectoryInfo, VcapClientResult> function)
         {
             var worker = new BackgroundWorker();
 
@@ -176,10 +178,11 @@
             worker.DoWork += (s, args) =>
             {
                 if (worker.CancellationPending) { args.Cancel = true; return; }
+
                 Messenger.Default.Send(new ProgressMessage(0, "Starting " + action));
-                var site = project.Object as VsWebSite.VSWebSite;
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
+
                 if (!Directory.Exists(dir.StagingPath))
                 {
                     dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Creating Staging Path")))); 
@@ -187,6 +190,7 @@
                 }
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
+
                 if (Directory.Exists(dir.DeployFromPath))
                 {
                     dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(10, "Creating Precompiled Site Path"))));
@@ -194,27 +198,30 @@
                 }
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
-
                 
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(30, "Preparing Compiler"))));
 
+                VsWebSite.VSWebSite site = project.Object as VsWebSite.VSWebSite;
                 if (site != null)
+                {
                     site.PreCompileWeb(dir.DeployFromPath, true);
+                }
                 else
                 {
-                    var frameworkPath = (site == null) ? project.GetFrameworkPath() : String.Empty;
+                    string frameworkPath = (site == null) ? project.GetFrameworkPath() : String.Empty;
 
+                    if (worker.CancellationPending) { args.Cancel = true; return; }
                     string objDir = Path.Combine(dir.ProjectDirectory, "obj");
                     if (Directory.Exists(objDir))
                     {
                         Directory.Delete(objDir, true); // NB: this can cause precompile errors
                     }
+
                     var process = new System.Diagnostics.Process()
                     {
                         StartInfo = new ProcessStartInfo()
                         {
-
-                            FileName = frameworkPath + "\\aspnet_compiler.exe",
+                            FileName = Path.Combine(frameworkPath, "aspnet_compiler.exe"),
                             Arguments = String.Format("-nologo -v / -p \"{0}\" -f -u -c \"{1}\"", dir.ProjectDirectory, dir.DeployFromPath),
                             CreateNoWindow = true,
                             ErrorDialog = false,
@@ -223,9 +230,10 @@
                         }
                     };
 
+                    if (worker.CancellationPending) { args.Cancel = true; return; }
                     dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(40, "Precompiling Site"))));
                     process.Start();
-                    var output = process.StandardOutput.ReadToEnd();
+                    string output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
                     if (false == String.IsNullOrEmpty(output))
                     {
@@ -235,24 +243,24 @@
                 }
 
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(50, "Logging in to Cloud Foundry"))));
+
                 if (worker.CancellationPending) { args.Cancel = true; return; }
-                
 
                 var client = new VcapClient(cloud);
-                var result = client.Login();
-
+                VcapClientResult result = client.Login();
                 if (result.Success == false)
                 {
-                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message))));
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Failure: " + result.Message))));
                     return;
                 }
+
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Sending to " + cloud.Url))));
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                var response = function(client, new DirectoryInfo(dir.DeployFromPath));                
+                result = function(client, new DirectoryInfo(dir.DeployFromPath));                
                 if (result.Success == false)
                 {
-                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Vcap Login Failure: " + result.Message))));
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Failure: " + result.Message))));
                     return;
                 }               
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, action + " complete."))));
@@ -260,7 +268,9 @@
 
             worker.RunWorkerAsync();
             if (!window.ShowDialog().GetValueOrDefault())
+            {
                 worker.CancelAsync();
+            }
         }
 
         private static ProjectDirectories GetProjectDirectories(Project project)

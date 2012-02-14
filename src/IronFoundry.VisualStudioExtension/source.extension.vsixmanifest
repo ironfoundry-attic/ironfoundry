@@ -3,7 +3,7 @@
   <Identifier Id="D11F588D-A83B-40C1-9637-A5F44B65D110">
     <Name>Cloud Foundry for Visual Studio 2010</Name>
     <Author>CloudFoundry</Author>
-    <Version>0.5</Version>
+    <Version>1.6</Version>
     <Description xml:space="preserve">Cloud Foundry Package to push ASP.NET applications into the Cloud!</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://www.ironfoundry.org</MoreInfoUrl>

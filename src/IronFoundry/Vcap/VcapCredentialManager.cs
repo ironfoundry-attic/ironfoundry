@@ -36,14 +36,14 @@
 
             if (argJson.IsNullOrWhiteSpace())
             {
-                parseJson(readTokenFile());
+                ParseJson(ReadTokenFile());
             }
             else
             {
-                parseJson(argJson);
+                ParseJson(argJson);
             }
 
-            currentTarget = readTargetFile();
+            currentTarget = ReadTargetFile();
         }
 
         public VcapCredentialManager() : this((string)null) { }
@@ -72,7 +72,7 @@
             get
             {
                 string rv = null;
-                AccessToken accessToken = getFor(CurrentTarget);
+                AccessToken accessToken = GetFor(CurrentTarget);
                 if (null != accessToken)
                 {
                     rv = accessToken.Token;
@@ -95,7 +95,7 @@
         {
             var accessToken = new AccessToken(CurrentTarget, argToken);
             tokenDict[accessToken.Uri] = accessToken;
-            writeTokenFile();
+            WriteTokenFile();
         }
 
         public bool HasToken
@@ -111,14 +111,14 @@
             }
         }
 
-        private AccessToken getFor(Uri argUri)
+        private AccessToken GetFor(Uri argUri)
         {
             AccessToken rv;
             tokenDict.TryGetValue(argUri, out rv);
             return rv;
         }
 
-        private void parseJson(string argTokenJson, bool argShouldWrite = false)
+        private void ParseJson(string argTokenJson, bool argShouldWrite = false)
         {
             if (false == argTokenJson.IsNullOrWhiteSpace())
             {
@@ -132,13 +132,13 @@
                 }
                 if (argShouldWrite)
                 {
-                    writeTokenFile();
+                    WriteTokenFile();
                 }
             }
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        private string readTokenFile()
+        private string ReadTokenFile()
         {
             string rv = null;
 
@@ -151,7 +151,7 @@
             return rv;
         }
 
-        private void writeTokenFile()
+        private void WriteTokenFile()
         {
             if (shouldWrite)
             {
@@ -168,7 +168,7 @@
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        private Uri readTargetFile()
+        private Uri ReadTargetFile()
         {
             Uri rv = null;
 
