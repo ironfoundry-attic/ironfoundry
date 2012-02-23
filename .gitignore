@@ -5,3 +5,4 @@ packages/
 *.user
 _ReSharper.IronFoundry/
 /_ReSharper.IronFoundry/
+*.Publish.xml

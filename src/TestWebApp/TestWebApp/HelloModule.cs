@@ -16,7 +16,7 @@
     {
         public HelloModule()
         {
-            Get["/"] = parameters => "Hello World";
+            Get["/"] = parameters => "Hello World " + DateTime.Now.ToString();
 
             Get["/hello"] = parameters => "Hello World";
 
