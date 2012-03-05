@@ -254,7 +254,8 @@
                                 Account="LocalSystem"
                                 ErrorControl="ignore"
                                 Interactive="no">
-                  <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="none" RestartServiceDelayInSeconds="60" ResetPeriodInDays="1" />
+                                <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"
+                                  RestartServiceDelayInSeconds="180" ResetPeriodInDays="1" />
                 </ServiceInstall>
                 <ServiceControl Id="IronFoundry.DEA.Service.StartService"
                                 Start="install"
