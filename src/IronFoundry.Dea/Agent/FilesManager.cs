@@ -4,6 +4,8 @@
     using System.Diagnostics;
     using System.IO;
     using System.Net;
+    using System.Security.AccessControl;
+    using System.Security.Principal;
     using System.Text;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
@@ -19,6 +21,8 @@
 
         private readonly string dropletsPath;
         private readonly string applicationPath;
+        private readonly SecurityIdentifier IIS_IUSRS = new SecurityIdentifier("S-1-5-32-568");
+        private readonly SecurityIdentifier USERS = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
 
         public FilesManager(ILog log, IConfig config)
         {
@@ -31,6 +35,8 @@
 
             Directory.CreateDirectory(dropletsPath);
             Directory.CreateDirectory(applicationPath);
+
+            SetDirectoryPermissions();
 
             SnapshotFile = Path.Combine(dropletsPath, "snapshot.json");
         }
@@ -97,6 +103,8 @@
         {
             bool rv = false;
 
+            DirectoryInfo instanceApplicationDirInfo = null;
+
             using (FileData file = GetStagedApplicationFile(droplet.ExecutableUri))
             {
                 if (null != file)
@@ -112,11 +120,24 @@
                         tarArchive.Close();
                     }
 
-                    var instanceApplicationDirInfo =  new DirectoryInfo(paths.BaseAppPath);
+                    instanceApplicationDirInfo = new DirectoryInfo(paths.BaseAppPath);
                     Utility.CopyDirectory(new DirectoryInfo(paths.DropletsPath), instanceApplicationDirInfo);
 
                     rv = true;
                 }
+            }
+
+            if (rv && null != instanceApplicationDirInfo)
+            {
+                DirectorySecurity appDirSecurity = instanceApplicationDirInfo.GetAccessControl();
+                appDirSecurity.AddAccessRule(
+                    new FileSystemAccessRule(
+                        IIS_IUSRS,
+                        FileSystemRights.Write | FileSystemRights.Read | FileSystemRights.Delete | FileSystemRights.Modify,
+                        InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                        PropagationFlags.None,
+                        AccessControlType.Allow));
+                instanceApplicationDirInfo.SetAccessControl(appDirSecurity);
             }
 
             return rv;
@@ -157,6 +178,24 @@
                 dropletsPath: Path.Combine(dropletsPath, instance.Staged),
                 baseAppPath: instance.Dir,
                 fullAppPath: Path.Combine(instance.Dir, "app"));
+        }
+
+        private void SetDirectoryPermissions()
+        {
+            /*
+             * Ensure that the "Users" group has read access.
+             */
+            foreach (string dir in new[] { applicationPath, dropletsPath })
+            {
+                var dirInfo = new DirectoryInfo(dir);
+                DirectorySecurity dirSecurity = dirInfo.GetAccessControl();
+                dirSecurity.AddAccessRule(
+                    new FileSystemAccessRule(
+                        USERS, FileSystemRights.ReadAndExecute,
+                        InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                        PropagationFlags.None, AccessControlType.Allow));
+                dirInfo.SetAccessControl(dirSecurity);
+            }
         }
 
         private class InstancePaths
