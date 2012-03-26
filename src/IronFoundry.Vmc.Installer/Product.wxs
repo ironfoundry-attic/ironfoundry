@@ -24,7 +24,7 @@
   <?define ProductName = 'Vmc Command Line Tool' ?>
   <?define ShortProductName = 'VMC' ?>
   <?define Manufacturer = 'Iron Foundry' ?>
-  <?define UpgradeCode = '{8AC812C3-342A-4055-B08B-E1BC280CFDE0}' ?>
+  <?define UpgradeCode = '{0CBD08EC-785E-4CE1-AF60-E3119E491881}' ?>
   <!-- NEVER CHANGE THIS -->
   <?define RootRegistryPath = "SOFTWARE\Iron Foundry\VMC" ?>
 
