@@ -39,16 +39,19 @@
 
         public void RemoveCloud(Cloud cloud)
         {
-            RemoveCloud(cloud.ID);
+            clouds.Remove(cloud.ID);
+            if (null != CloudRemoved)
+            {
+                CloudRemoved(this, new CloudEventArgs(cloud));
+            }
         }
 
         public void RemoveCloud(Guid cloudID)
         {
-            Cloud toRemove = clouds[cloudID];
-            clouds.Remove(cloudID);
-            if (null != CloudRemoved)
+            Cloud toRemove;
+            if (clouds.TryGetValue(cloudID, out toRemove))
             {
-                CloudRemoved(this, new CloudEventArgs(toRemove));
+                RemoveCloud(toRemove);
             }
         }
 
