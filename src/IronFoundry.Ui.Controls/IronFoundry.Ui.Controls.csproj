@@ -87,6 +87,7 @@
       <Link>Utilities\ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="Converters\CsvConverter.cs" />
+    <Compile Include="Converters\IsNullConverter.cs" />
     <Compile Include="Converters\TitleCaseConverter.cs" />
     <Compile Include="Model\CloudEventArgs.cs" />
     <Compile Include="Model\CloudFoundryProvider.cs" />
