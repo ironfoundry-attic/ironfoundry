@@ -166,6 +166,7 @@
   <converters:MinutesConverter x:Key="minutesConverter" />
   <converters:CsvConverter x:Key="csvConverter" />
   <converters:TitleCaseConverter x:Key="titleCaseConverter" />
+  <converters:IsNullConverter x:Key="isNullConverter" />
   <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
 
 </ResourceDictionary>

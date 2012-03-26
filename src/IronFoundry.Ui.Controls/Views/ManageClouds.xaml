@@ -69,59 +69,60 @@
                    SelectedItem="{Binding SelectedCloud, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
         <DockPanel Grid.Column="1" HorizontalAlignment="Stretch">
-          <Grid Margin="10">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+          <StackPanel>
+              <Grid Margin="10" IsEnabled="{Binding SelectedCloud, Mode=OneWay, Converter={StaticResource isNullConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Specify cloud settings." />
+                <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Specify cloud settings." />
 
-            <Label Grid.Row="1" Grid.Column="0" Content="Server Name:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" x:Name="ServerNameTextBox"
-                     Text="{Binding Path=SelectedCloud.ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                <Label Grid.Row="1" Grid.Column="0" Content="Server Name:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="ServerNameTextBox"
+                    Text="{Binding Path=SelectedCloud.ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
-            <Label Grid.Row="2" Grid.Column="0" Content="URL:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-            <TextBox Grid.Row="2" Grid.Column="2"
-                     Text="{Binding Path=SelectedCloud.ServerUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                <Label Grid.Row="2" Grid.Column="0" Content="URL:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                <TextBox Grid.Row="2" Grid.Column="2"
+                    Text="{Binding Path=SelectedCloud.ServerUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
-            <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Credentials" />
+                <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Credentials" />
 
-            <Label Grid.Row="4" Grid.Column="0" Content="Email:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-            <TextBox Grid.Row="4" Grid.Column="1"
-                     Text="{Binding Path=SelectedCloud.Email, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" Name="txtEmail" />
+                <Label Grid.Row="4" Grid.Column="0" Content="Email:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                <TextBox Grid.Row="4" Grid.Column="1"
+                    Text="{Binding Path=SelectedCloud.Email, Mode=TwoWay, UpdateSourceTrigger=Default}" VerticalAlignment="Center" Name="txtEmail" />
 
-            <Label Grid.Row="5" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
-            <PasswordBox Grid.Row="5" Grid.Column="1" u:PasswordHelper.Attach="True"
-                         u:PasswordHelper.Password="{Binding Path=SelectedCloud.Password,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                <Label Grid.Row="5" Grid.Column="0" Content="Password:" Foreground="{StaticResource DarkBlueBrushKey}" VerticalAlignment="Center" />
+                <PasswordBox Grid.Row="5" Grid.Column="1" u:PasswordHelper.Attach="True"
+                        u:PasswordHelper.Password="{Binding Path=SelectedCloud.Password,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+              </Grid>
 
-            <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal">
-              <Button Content="Validate Account" Margin="4" Command="{Binding ValidateAccountCommand}" />
-              <Label Content="Account Valid." Margin="4"
-                     Visibility="{Binding Path=IsSelectedCloudAccountValid,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
+              <StackPanel Margin="10">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Validate Account" Margin="4" Command="{Binding ValidateAccountCommand}" />
+                    <Label Content="Account Valid." Margin="4"
+                    Visibility="{Binding Path=IsSelectedCloudAccountValid,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Register Account" Margin="4" Command="{Binding RegisterAccountCommand}" />
+                    <Label Content="Account Registered." Margin="4"
+                    Visibility="{Binding Path=IsSelectedCloudAccountRegistered,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
+                </StackPanel>
+
+                <uc:ucSpinnerApple Margin="2" HorizontalAlignment="Left"
+                            Visibility="{Binding Path=IsBusy,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
             </StackPanel>
-            
-            <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal">
-              <Button Content="Register Account" Margin="4" Command="{Binding RegisterAccountCommand}" />
-              <Label Content="Account Registered." Margin="4"
-                     Visibility="{Binding Path=IsSelectedCloudAccountRegistered,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
-            </StackPanel>
-            
-            <uc:ucSpinnerApple Grid.Row="8" Margin="2" HorizontalAlignment="Left"
-                               Visibility="{Binding Path=IsBusy,Mode=OneWay,Converter={StaticResource booleanToVisibilityConverter}}" />
-          </Grid>
+          </StackPanel>
         </DockPanel>
       </Grid>
     </Border>
