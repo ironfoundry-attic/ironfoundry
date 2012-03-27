@@ -25,5 +25,8 @@
         Uri MonitoringServiceUri { get; }
         ServiceCredential MonitoringCredentials { get; }
         string MonitoringServiceHostStr { get; }
+
+        string AppCmdPath { get; }
+        bool HasAppCmd { get; }
     }
 }

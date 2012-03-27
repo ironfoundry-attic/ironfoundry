@@ -168,6 +168,7 @@
     <Compile Include="WinService\IService.cs" />
     <Compile Include="WinService\MultipleServiceManager.cs" />
     <Compile Include="WinService\ServiceStatusUtil.cs" />
+    <Compile Include="WinService\ValidationWinService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="IronFoundry.snk" />

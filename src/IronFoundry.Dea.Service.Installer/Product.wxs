@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix
   xmlns="http://schemas.microsoft.com/wix/2006/wi"
+  xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension"
   xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
   xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
@@ -67,6 +68,8 @@
     <PropertyRef Id="NETFRAMEWORK40FULL"/>
     <PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR"/>
     <PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR64"/>
+    <PropertyRef Id="IISMAJORVERSION"/>
+    <PropertyRef Id="IISMINORVERSION"/>
 
     <Property Id="INSTALLDIR">
       <RegistrySearch
@@ -95,6 +98,10 @@
 
     <Condition Message="[ProductName] requires .NET Framework 4.0 Full. Setup will now exit.">
       <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
+    </Condition>
+    
+    <Condition Message="Install requires IIS 7.5">
+       <![CDATA[Installed OR (IISMAJORVERSION = "#7" AND IISMINORVERSION = "#5")]]>
     </Condition>
 
     <Condition Message="ALLUSERS must be 1. Setup will now exit."><![CDATA[ALLUSERS = 1]]></Condition>

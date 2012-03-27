@@ -304,8 +304,8 @@
   <data name="NatsMessagingProvider_DisconnectedInWrite_Fmt" xml:space="preserve">
     <value>NATS disconnected in Write(), message: {0}</value>
   </data>
-  <data name="WebServerAdministrationProvider_AppCmdNotFound_Fmt" xml:space="preserve">
-    <value>Could not find appcmd.exe in IIs installation directory {0}</value>
+  <data name="ValidationWinService_AppCmdNotFound_Message" xml:space="preserve">
+    <value>Could not find appcmd.exe in IIS installation directory.</value>
   </data>
   <data name="WebServerAdministrationProvider_AppAlreadyExists_Fmt" xml:space="preserve">
     <value>Web application already exists '{0}'</value>

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Diagnostics;
-    using System.IO;
     using System.Net;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -10,7 +9,6 @@
     using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
-    using Microsoft.Win32;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
@@ -32,7 +30,7 @@
             this.log = log;
             this.localIPAddress = config.LocalIPAddress;
             this.firewallService = firewallService;
-            this.appCmdPath = InitAppCmdPath();
+            this.appCmdPath = config.AppCmdPath;
         }
 
         public WebServerAdministrationBinding InstallWebApp(
@@ -277,19 +275,6 @@
                 log.Error(ex);
             }
             return new AppCmdResult(success, output);
-        }
-
-        private static string InitAppCmdPath()
-        {
-            RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default);
-            RegistryKey subKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\InetStp");
-            string iisInstallPath = subKey.GetValue("InstallPath").ToString();
-            string appCmdPath = Path.Combine(iisInstallPath, "appcmd.exe");
-            if (false == File.Exists(appCmdPath))
-            {
-                throw new ArgumentException(String.Format(Resources.WebServerAdministrationProvider_AppCmdNotFound_Fmt, iisInstallPath));
-            }
-            return appCmdPath;
         }
     }
 }
