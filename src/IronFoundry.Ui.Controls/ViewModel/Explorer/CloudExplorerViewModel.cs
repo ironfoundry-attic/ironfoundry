@@ -163,6 +163,11 @@
                        worker.RunWorkerCompleted += (s, e) =>
                        {
                            var result = e.Result as Application;
+                           if (result == null)
+                           {
+                               return;
+                           }
+
                            Cloud cloud = provider.Clouds.SingleOrDefault((c) => c.ID == viewModel.SelectedCloud.ID);
                            if (cloud != null)
                            {
