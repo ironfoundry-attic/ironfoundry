@@ -16,7 +16,7 @@
         
         private static SafeObservableCollection<CloudUrl> defaultCloudUrls = new SafeObservableCollection<CloudUrl>
         {
-            new CloudUrl { ServerName = "Iron Foundry", Url = "http://api.gofoundry.net", IsDefault = true, IsConfigurable = false },
+            new CloudUrl { ServerName = "Iron Foundry", Url = "http://api.ironfoundry.me", IsDefault = true, IsConfigurable = false },
             new CloudUrl { ServerName = "Local cloud", Url = "http://api.vcap.me", IsConfigurable = false},
             new CloudUrl { ServerName = "Microcloud", Url = "http://api.{mycloud}.cloudfoundry.me", IsConfigurable = true, IsMicroCloud = true },
             new CloudUrl { ServerName = "VMWare Cloud Foundry", Url = "https://api.cloudfoundry.com", IsConfigurable = false, IsDefault = false },
