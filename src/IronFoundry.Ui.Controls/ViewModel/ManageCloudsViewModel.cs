@@ -15,7 +15,7 @@
         private static readonly Guid ironFoundryID = new Guid("1A78AEF6-68E4-43D7-BE78-94289285A1CA");
         private static readonly Guid cloudFoundryID = new Guid("6913D1B2-5D6D-4640-B1AA-4E24D5F129CC");
         private static readonly ManageCloudsData ironFoundryDefault =
-            new ManageCloudsData(ironFoundryID) { ServerName = "Iron Foundry", ServerUrl = "http://api.gofoundry.net" };
+            new ManageCloudsData(ironFoundryID) { ServerName = "Iron Foundry", ServerUrl = "http://api.ironfoundry.me" };
 
         private static readonly ManageCloudsData[] defaultClouds = new[]
             {
