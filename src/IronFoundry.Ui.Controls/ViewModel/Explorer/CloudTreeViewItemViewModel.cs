@@ -119,6 +119,7 @@
         private void RemoveCloud()
         {
             provider.RemoveCloud(cloud);
+            provider.SaveChanges();
         }
 
         private void Connect()
