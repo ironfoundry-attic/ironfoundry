@@ -30,6 +30,39 @@
         }
 
         [Fact]
+        public void PHP()
+        {
+            using (var appPath = new PathWithFileNamed("index.php"))
+            {
+                DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
+                Assert.Equal("php", df.Framework);
+                Assert.Equal("php", df.Runtime);
+            }
+        }
+
+        [Fact]
+        public void Node()
+        {
+            using (var appPath = new PathWithFileNamed("app.js"))
+            {
+                DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
+                Assert.Equal("node", df.Framework);
+                Assert.Equal("node", df.Runtime);
+            }
+        }
+
+        [Fact]
+        public void Sinatra()
+        {
+            using (var appPath = new PathWithFileNamed("app.rb", null, "require 'sinatra'"))
+            {
+                DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
+                Assert.Equal("sinatra", df.Framework);
+                Assert.Equal("ruby19", df.Runtime);
+            }
+        }
+
+        [Fact]
         public void Rails()
         {
             using (var appPath = new PathWithFileNamed("environment.rb", "config"))
@@ -37,6 +70,17 @@
                 DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
                 Assert.Equal("rails3", df.Framework);
                 Assert.Equal("ruby19", df.Runtime);
+            }
+        }
+
+        [Fact]
+        public void ASP_NET()
+        {
+            using (var appPath = new PathWithFileNamed("Web.config"))
+            {
+                DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
+                Assert.Equal("aspdotnet", df.Framework);
+                Assert.Equal("aspdotnet40", df.Runtime);
             }
         }
 
@@ -57,6 +101,39 @@
 
                 Assert.Equal("grails", df.Framework);
                 Assert.Equal("java", df.Runtime);
+            }
+        }
+
+        [Fact]
+        public void Django()
+        {
+            using (var appPath = new PathWithFileNamed("manage.py"))
+            {
+                DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
+                Assert.Equal("django", df.Framework);
+                Assert.Equal("python2", df.Runtime);
+            }
+        }
+
+        [Fact]
+        public void WSGI()
+        {
+            using (var appPath = new PathWithFileNamed("wsgi.py"))
+            {
+                DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
+                Assert.Equal("wsgi", df.Framework);
+                Assert.Equal("python2", df.Runtime);
+            }
+        }
+
+        [Fact]
+        public void Erlang()
+        {
+            using (var appPath = new PathWithFileNamed("foo.rel", "releases"))
+            {
+                DetetectedFramework df = FrameworkDetetctor.Detect(appPath.DirectoryPath);
+                Assert.Equal("otp_rebar", df.Framework);
+                Assert.Equal("erlangR14B02", df.Runtime);
             }
         }
 
@@ -84,7 +161,6 @@
                     fileDirectory = Directory.CreateDirectory(Path.Combine(path.FullName, subDirectoryName));
                 }
                 string filePath = System.IO.Path.Combine(fileDirectory.FullName, fileName);
-                // Console.WriteLine("FILE: {0}", filePath);
                 File.WriteAllText(filePath, fileContents);
             }
 

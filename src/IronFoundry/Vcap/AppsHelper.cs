@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Security.Cryptography;
     using System.Threading;
     using ICSharpCode.SharpZipLib.Zip;
@@ -23,7 +24,7 @@
             {
                 app.Start();
                 UpdateApplication(app);
-                isStarted(app.Name);
+                IsStarted(app.Name);
             }
         }
 
@@ -112,7 +113,7 @@
                      * Before creating the app, ensure we can build resource list
                      */
                     var resources = new List<Resource>();
-                    ulong totalSize = addDirectoryToResources(resources, path, path.FullName);
+                    ulong totalSize = AddDirectoryToResources(resources, path, path.FullName);
 
                     var manifest = new AppManifest
                     {
@@ -127,7 +128,7 @@
                     r.AddBody(manifest);
                     RestResponse response = r.Execute();
 
-                    uploadAppBits(name, path);
+                    UploadAppBits(name, path);
 
                     Application app = GetApplication(name);
                     app.Start();
@@ -135,7 +136,7 @@
                     r.AddBody(app);
                     response = r.Execute();
 
-                    bool started = isStarted(app.Name);
+                    bool started = IsStarted(app.Name);
 
                     if (started && false == provisionedServiceNames.IsNullOrEmpty())
                     {
@@ -163,7 +164,7 @@
             }
             else
             {
-                uploadAppBits(name, path);
+                UploadAppBits(name, path);
                 Application app = GetApplication(name);
                 Restart(app);
                 rv = new VcapClientResult();
@@ -184,7 +185,7 @@
             return r.Execute<Crash[]>();
         }
 
-        private bool isStarted(string name)
+        private bool IsStarted(string name)
         {
             bool started = false;
 
@@ -207,25 +208,27 @@
             return started;
         }
 
-        private void uploadAppBits(string name, DirectoryInfo path)
+        private void UploadAppBits(string name, DirectoryInfo path)
         {
             /*
              * Before creating the app, ensure we can build resource list
              */
             string uploadFile = Path.GetTempFileName();
             DirectoryInfo explodeDir = Utility.GetTempDirectory();
-            Utility.CopyDirectory(path, explodeDir);
+
+            ProcessPath(path, explodeDir);
+
             try
             {
                 var resources = new List<Resource>();
-                ulong totalSize = addDirectoryToResources(resources, explodeDir, explodeDir.FullName);
+                ulong totalSize = AddDirectoryToResources(resources, explodeDir, explodeDir.FullName);
 
                 if (false == resources.IsNullOrEmpty())
                 {
                     Resource[] appcloudResources = null;
                     if (totalSize > (64 * 1024))
                     {
-                        appcloudResources = checkResources(resources.ToArray());
+                        appcloudResources = CheckResources(resources.ToArray());
                     }
                     if (appcloudResources.IsNullOrEmpty())
                     {
@@ -265,7 +268,7 @@
             }
         }
 
-        private Resource[] checkResources(Resource[] resourceAry)
+        private Resource[] CheckResources(Resource[] resourceAry)
         {
             /*
                 Send in a resources manifest array to the system to have
@@ -280,7 +283,7 @@
             return JsonConvert.DeserializeObject<Resource[]>(response.Content);
         }
 
-        private static ulong addDirectoryToResources(
+        private static ulong AddDirectoryToResources(
             ICollection<Resource> resources, DirectoryInfo directory, string rootFullName)
         {
             ulong totalSize = 0;
@@ -291,7 +294,7 @@
             {
                 totalSize += (ulong)file.Length;
 
-                string hash     = generateHash(file.FullName);
+                string hash     = GenerateHash(file.FullName);
                 string filename = file.FullName;
                 // The root path should be stripped. This is used
                 // by the server to tar up the file that gets pushed
@@ -304,13 +307,13 @@
 
             foreach (DirectoryInfo subdirectory in directory.GetDirectories())
             {
-                totalSize += addDirectoryToResources(resources, subdirectory, rootFullName);
+                totalSize += AddDirectoryToResources(resources, subdirectory, rootFullName);
             }
 
             return totalSize;
         }
 
-        private static string generateHash(string fileName)
+        private static string GenerateHash(string fileName)
         {
             using (FileStream fs = File.OpenRead(fileName))
             {
@@ -318,6 +321,26 @@
                 {
                     return BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", String.Empty).ToLowerInvariant();
                 }
+            }
+        }
+
+        private static void ProcessPath(DirectoryInfo path, DirectoryInfo explodeDir)
+        {
+            var warFile = Directory.EnumerateFiles(path.FullName, "*.war", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            var zipFile = Directory.EnumerateFiles(path.FullName, "*.zip", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            if (File.Exists(warFile))
+            {
+                var unzip = new FastZip();
+                unzip.ExtractZip(warFile, explodeDir.FullName, null);
+            }
+            else if (File.Exists(zipFile))
+            {
+                var unzip = new FastZip();
+                unzip.ExtractZip(zipFile, explodeDir.FullName, null);
+            }
+            else
+            {
+                Utility.CopyDirectory(path, explodeDir);
             }
         }
     }
