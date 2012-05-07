@@ -49,6 +49,7 @@
     </Compile>
     <Compile Include="AccessTokenManagerTests.cs" />
     <Compile Include="FirewallTests.cs" />
+    <Compile Include="FrameworkDetectorTests.cs" />
     <Compile Include="UtilitiesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,6 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="IronFoundry.Test.xunit">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="testapp.war">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

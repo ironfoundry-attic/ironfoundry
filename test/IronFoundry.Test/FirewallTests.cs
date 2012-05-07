@@ -6,7 +6,7 @@
 
     public class FirewallTests
     {
-        [Fact]
+        [Fact(Skip="Reqires Admin Privileges")]
         public void Create_Rule_In_All_Profiles()
         {
             string name = "IRONFOUNDRY TEST";

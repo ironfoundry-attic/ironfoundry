@@ -79,20 +79,24 @@
             return response.RawBytes;
         }
 
-        public VcapClientResult Push(string name, string deployFQDN, ushort instances,
-            DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames, string framework, string runtime)
+        public VcapClientResult Push(
+            string name, string deployFQDN, ushort instances,
+            DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames)
         {
             VcapClientResult rv;
 
             if (path == null)
             {
-                rv = new VcapClientResult(false, "Application local location is needed");
+                return new VcapClientResult(false, "Application local location is needed");
             }
-            else if (deployFQDN == null)
+
+            if (deployFQDN == null)
             {
-                rv = new VcapClientResult(false, "Please specify the url to deploy as.");
+                return new VcapClientResult(false, "Please specify the url to deploy as.");
             }
-            else if (framework == null)
+
+            DetetectedFramework framework = FrameworkDetetctor.Detect(path);
+            if (framework == null)
             {
                 rv = new VcapClientResult(false, "Please specify application framework");
             }
@@ -113,7 +117,7 @@
                     var manifest = new AppManifest
                     {
                         Name = name,
-                        Staging = new Staging { Framework = framework, Runtime = runtime },
+                        Staging = new Staging { Framework = framework.Framework, Runtime = framework.Runtime },
                         Uris = new string[] { deployFQDN },
                         Instances = instances,
                         Resources = new AppResources { Memory = memoryMB },

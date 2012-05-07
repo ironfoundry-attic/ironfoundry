@@ -119,8 +119,7 @@
         {
             checkLoginStatus();
             var hlpr = new AppsHelper(credMgr);
-            return hlpr.Push(name, deployFQDN, instances, path, memoryMB,
-                provisionedServiceNames, "aspdotnet", "aspdotnet40");
+            return hlpr.Push(name, deployFQDN, instances, path, memoryMB, provisionedServiceNames);
         }
 
         public VcapClientResult Update(string name, DirectoryInfo path)

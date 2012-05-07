@@ -107,6 +107,7 @@
     <Compile Include="Utilities\Utilities.cs" />
     <Compile Include="Vcap\BaseVmcHelper.cs" />
     <Compile Include="Vcap\Constants.cs" />
+    <Compile Include="Vcap\FrameworkDetetctor.cs" />
     <Compile Include="Vcap\MiscHelper.cs" />
     <Compile Include="Vcap\UserHelper.cs" />
     <Compile Include="Vcap\VcapCredentialManager.cs" />
