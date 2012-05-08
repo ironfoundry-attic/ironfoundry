@@ -49,7 +49,16 @@
 
         public IEnumerable<StatInfo> GetStats(Application argApp)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, "stats");
+            return GetStats(null, argApp);
+        }
+
+        public IEnumerable<StatInfo> GetStats(VcapUser user, Application app)
+        {
+            var r = new VcapRequest(credMgr, Constants.APPS_PATH, app.Name, "stats");
+            if (null != user)
+            {
+                r.ProxyUser = user.Email;
+            }
             RestResponse response = r.Execute();
             var tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
 

@@ -41,7 +41,7 @@
             client = BuildClient(useAuthentication, uri);
         }
 
-        public string ProxyUser
+        public string ProxyUser // Should be VcapUser object
         {
             get { return proxy_user; }
             set

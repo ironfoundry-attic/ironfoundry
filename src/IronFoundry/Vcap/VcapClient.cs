@@ -216,7 +216,7 @@
             return apps;
         }
 
-        public IEnumerable<Application> GetApplications(VcapUser user)
+        public IEnumerable<Application> GetApplications(VcapUser user) // TODO way to set proxy user on client for all calls
         {
             checkLoginStatus();
             var hlpr = new AppsHelper(credMgr);
@@ -321,6 +321,13 @@
             checkLoginStatus();
             var info = new InfoHelper(credMgr);
             return info.GetStats(app);
+        }
+
+        public IEnumerable<StatInfo> GetStats(VcapUser user, Application app) // TODO way to set proxy user on client for all calls
+        {
+            checkLoginStatus();
+            var info = new InfoHelper(credMgr);
+            return info.GetStats(user, app);
         }
 
         public IEnumerable<ExternalInstance> GetInstances(Application app)
