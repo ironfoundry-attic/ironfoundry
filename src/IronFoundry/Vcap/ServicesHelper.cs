@@ -10,11 +10,12 @@
 
     internal class ServicesHelper : BaseVmcHelper
     {
-        public ServicesHelper(VcapCredentialManager credMgr) : base(credMgr) { }
+        public ServicesHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
+            : base(proxyUser, credMgr) { }
 
         public IEnumerable<SystemService> GetSystemServices()
         {
-            var r = new VcapRequest(credMgr,  Constants.GLOBAL_SERVICES_PATH);
+            VcapRequest r = base.BuildVcapRequest(Constants.GLOBAL_SERVICES_PATH);
             RestResponse response = r.Execute();
 
             var datastores = new List<SystemService>();
@@ -35,11 +36,7 @@
 
         public IEnumerable<ProvisionedService> GetProvisionedServices(string proxy_user = null)
         {            
-            var r = new VcapRequest(credMgr,  Constants.SERVICES_PATH);
-            if (false == proxy_user.IsNullOrWhiteSpace())
-            {
-                r.ProxyUser = proxy_user;
-            }
+            VcapRequest r = base.BuildVcapRequest(Constants.SERVICES_PATH);
             return r.Execute<ProvisionedService[]>();
         }
 
@@ -70,7 +67,7 @@
                         vendor  = svc.Vendor,
                         version = svc.Version,
                     };
-                    var r = new VcapJsonRequest(credMgr, Method.POST, Constants.SERVICES_PATH);
+                    var r = base.BuildVcapJsonRequest(Method.POST, Constants.SERVICES_PATH);
                     r.AddBody(data);
                     RestResponse response = r.Execute();
                     rv = new VcapClientResult();
@@ -82,19 +79,19 @@
 
         public VcapClientResult DeleteService(string argProvisionedServiceName)
         {
-            var request = new VcapJsonRequest(credMgr, Method.DELETE, Constants.SERVICES_PATH, argProvisionedServiceName);
+            var request = base.BuildVcapJsonRequest(Method.DELETE, Constants.SERVICES_PATH, argProvisionedServiceName);
             request.Execute();
             return new VcapClientResult();
         }
 
         public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
         {
-            var apps = new AppsHelper(credMgr);
+            var apps = new AppsHelper(proxyUser, credMgr);
 
             Application app = apps.GetApplication(argAppName);
             app.Services.Add(argProvisionedServiceName);
 
-            var request = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, app.Name);
+            var request = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, app.Name);
             request.AddBody(app);
             RestResponse response = request.Execute();
 
@@ -109,17 +106,17 @@
 
         public VcapClientResult UnbindService(string argProvisionedServiceName, string argAppName)
         {
-            var apps = new AppsHelper(credMgr);
+            var apps = new AppsHelper(proxyUser, credMgr);
             string appJson = apps.GetApplicationJson(argAppName);
             var appParsed = JObject.Parse(appJson);
             var services = (JArray)appParsed["services"];
             appParsed["services"] = new JArray(services.Where(s => ((string)s) != argProvisionedServiceName));
 
-            var r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, argAppName);
+            var r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, argAppName);
             r.AddBody(appParsed);
             RestResponse response = r.Execute();
 
-            apps = new AppsHelper(credMgr);
+            apps = new AppsHelper(proxyUser, credMgr);
             apps.Restart(argAppName);
 
             return new VcapClientResult();

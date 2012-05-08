@@ -5,11 +5,12 @@
 
     internal class MiscHelper : BaseVmcHelper
     {
-        public MiscHelper(VcapCredentialManager credMgr) : base(credMgr) { }
+        public MiscHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
+            : base(proxyUser, credMgr) { }
 
         public VcapClientResult Info()
         {
-            var r = new VcapRequest(credMgr, Constants.INFO_PATH);
+            VcapRequest r = BuildVcapRequest(Constants.INFO_PATH);
             return new VcapClientResult(true, r.Execute<Info>());
         }
 
@@ -27,7 +28,7 @@
                 // "target" does the same thing as "info", but not logged in
                 // considered valid if name, build, version and support are all non-null
                 // without argument, displays current target
-                var r = new VcapRequest(credMgr, false, argUri, Constants.INFO_PATH);
+                VcapRequest r = base.BuildVcapRequest(false, argUri, Constants.INFO_PATH);
                 Info info = r.Execute<Info>();
 
                 bool success = false;

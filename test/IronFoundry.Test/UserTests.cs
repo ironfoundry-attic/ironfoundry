@@ -1,22 +1,41 @@
 ﻿namespace IronFoundry.Test
 {
+    using System;
+    using IronFoundry.Types;
     using IronFoundry.Vcap;
     using Xunit;
 
     public class UserTests
     {
         [Fact(Skip="MANUAL")]
-        public void Get_All_Users()
+        public void Get_All_Users_And_Apps()
         {
-            var client = new VcapClient("http://foo.com");
-            VcapClientResult rslt = client.Login("email", "password");
+            var client = new VcapClient("http://api.ironfoundry.me");
+            VcapClientResult rslt = client.Login("adminuser@email.com", "password");
             Assert.True(rslt.Success);
             var users = client.GetUsers();
             Assert.NotEmpty(users);
             foreach (var user in users)
             {
-                var apps = client.GetApplications(user);
+                Console.WriteLine("User: {0}", user.Email);
+                client.ProxyAs(user);
+                var apps = client.GetApplications();
+                foreach (var app in apps)
+                {
+                    Console.WriteLine("\t\tApp: {0}", app.Name);
+                }
             }
+        }
+
+        [Fact(Skip="MANUAL")]
+        public void Stop_App_As_User()
+        {
+            IVcapClient client = new VcapClient("http://api.ironfoundry.me");
+            VcapClientResult rslt = client.Login("adminuser@email.com", "password");
+            Assert.True(rslt.Success);
+            VcapUser user = client.GetUser("otheruser");
+            client.ProxyAs(user);
+            VcapClientResult stopRslt = client.Stop("appname");
         }
     }
 }

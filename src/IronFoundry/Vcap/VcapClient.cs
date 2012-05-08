@@ -15,6 +15,7 @@
         private Info info;
         private static readonly Regex file_re;
         private static readonly Regex dir_re;
+        private VcapUser proxyUser;
 
         static VcapClient()
         {
@@ -45,6 +46,11 @@
             this.cloud = cloud;
         }
 
+        public void ProxyAs(VcapUser user)
+        {
+            proxyUser = user;
+        }
+
         public string CurrentUri
         {
             get { return credMgr.CurrentTarget.AbsoluteUriTrimmed(); }
@@ -57,13 +63,13 @@
 
         public VcapClientResult Info()
         {
-            var helper = new MiscHelper(credMgr);
+            var helper = new MiscHelper(proxyUser, credMgr);
             return helper.Info();
         }
 
         public VcapClientResult Target(string uri)
         {
-            var helper = new MiscHelper(credMgr);
+            var helper = new MiscHelper(proxyUser, credMgr);
 
             if (uri.IsNullOrWhiteSpace())
             {
@@ -90,32 +96,38 @@
 
         public VcapClientResult Login(string email, string password)
         {
-            var helper = new UserHelper(credMgr);
+            var helper = new UserHelper(proxyUser, credMgr);
             return helper.Login(email, password);
         }
 
         public VcapClientResult ChangePassword(string newpassword)
         {
-            checkLoginStatus();
-            var hlpr = new UserHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new UserHelper(proxyUser, credMgr);
             return hlpr.ChangePassword(info.User, newpassword);
         }
 
         public VcapClientResult AddUser(string email, string password)
         {
-            var hlpr = new UserHelper(credMgr);
+            var hlpr = new UserHelper(proxyUser, credMgr);
             return hlpr.AddUser(email, password);
         }
 
         public VcapClientResult DeleteUser(string email)
         {
-            var hlpr = new UserHelper(credMgr);
+            var hlpr = new UserHelper(proxyUser, credMgr);
             return hlpr.DeleteUser(email);
+        }
+
+        public VcapUser GetUser(string email)
+        {
+            var hlpr = new UserHelper(proxyUser, credMgr);
+            return hlpr.GetUser(email);
         }
 
         public IEnumerable<VcapUser> GetUsers()
         {
-            var hlpr = new UserHelper(credMgr);
+            var hlpr = new UserHelper(proxyUser, credMgr);
             return hlpr.GetUsers();
         }
 
@@ -123,85 +135,120 @@
             string name, string deployFQDN, ushort instances,
             DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             return hlpr.Push(name, deployFQDN, instances, path, memoryMB, provisionedServiceNames);
         }
 
         public VcapClientResult Update(string name, DirectoryInfo path)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             return hlpr.Update(name, path);
-        }
-
-        public void Delete(string name)
-        {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
-            hlpr.Delete(name);
         }
 
         public VcapClientResult BindService(string provisionedServiceName, string appName)
         {
-            checkLoginStatus();
-            var services = new ServicesHelper(credMgr);
+            CheckLoginStatus();
+            var services = new ServicesHelper(proxyUser, credMgr);
             return services.BindService(provisionedServiceName, appName);
         }
 
         public VcapClientResult UnbindService(string provisionedServiceName, string appName)
         {
-            checkLoginStatus();
-            var services = new ServicesHelper(credMgr);
+            CheckLoginStatus();
+            var services = new ServicesHelper(proxyUser, credMgr);
             return services.UnbindService(provisionedServiceName, appName);
         }
 
         public VcapClientResult CreateService(string serviceName, string provisionedServiceName)
         {
-            checkLoginStatus();
-            var services = new ServicesHelper(credMgr);
+            CheckLoginStatus();
+            var services = new ServicesHelper(proxyUser, credMgr);
             return services.CreateService(serviceName, provisionedServiceName);
         }
 
         public VcapClientResult DeleteService(string provisionedServiceName)
         {
-            checkLoginStatus();
-            var services = new ServicesHelper(credMgr);
+            CheckLoginStatus();
+            var services = new ServicesHelper(proxyUser, credMgr);
             return services.DeleteService(provisionedServiceName);
         }
 
         public IEnumerable<SystemService> GetSystemServices()
         {
-            checkLoginStatus();
-            var services = new ServicesHelper(credMgr);
+            CheckLoginStatus();
+            var services = new ServicesHelper(proxyUser, credMgr);
             return services.GetSystemServices();
         }
 
         public IEnumerable<ProvisionedService> GetProvisionedServices()
         {
-            checkLoginStatus();
-            var services = new ServicesHelper(credMgr);
+            CheckLoginStatus();
+            var services = new ServicesHelper(proxyUser, credMgr);
             return services.GetProvisionedServices();
         }
 
-        public void Start(Application app)
+        public VcapClientResult Start(string appName)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
-            hlpr.Start(app);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Start(appName);
         }
 
-        public void Stop(Application app)
+        public VcapClientResult Start(Application app)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
-            hlpr.Stop(app);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Start(app);
+        }
+
+        public VcapClientResult Stop(string appName)
+        {
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Stop(appName);
+        }
+
+        public VcapClientResult Stop(Application app)
+        {
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Stop(app);
+        }
+
+        public VcapClientResult Restart(string appName)
+        {
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Restart(appName);
+        }
+
+        public VcapClientResult Restart(Application app)
+        {
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Restart(app);
+        }
+
+        public VcapClientResult Delete(string appName)
+        {
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Delete(appName);
+        }
+
+        public VcapClientResult Delete(Application app)
+        {
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
+            return hlpr.Delete(app);
         }
 
         public Application GetApplication(string name)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             Application rv =  hlpr.GetApplication(name);
             rv.Parent = cloud; // TODO not thrilled about this
             return rv;
@@ -209,35 +256,27 @@
 
         public IEnumerable<Application> GetApplications()
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             IEnumerable<Application> apps = hlpr.GetApplications();
             foreach (var a in apps) { a.Parent = cloud; } // TODO not thrilled about this
             return apps;
         }
 
-        public IEnumerable<Application> GetApplications(VcapUser user) // TODO way to set proxy user on client for all calls
-        {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
-            IEnumerable<Application> apps = hlpr.GetApplications(user);
-            return apps;
-        }
-
         public byte[] FilesSimple(string appName, string path, ushort instance)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             return hlpr.Files(appName, path, instance);
         }
 
         public VcapFilesResult Files(string appName, string path, ushort instance)
         {
-            checkLoginStatus();
+            CheckLoginStatus();
 
             VcapFilesResult rv;
 
-            var hlpr = new AppsHelper(credMgr);
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             byte[] content = hlpr.Files(appName, path, instance);
             if (null == content)
             {
@@ -297,65 +336,51 @@
 
         public VcapResponse UpdateApplication(Application app)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             return hlpr.UpdateApplication(app);
-        }
-
-        public void Restart(Application app)
-        {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
-            hlpr.Restart(app);
         }
 
         public string GetLogs(Application app, ushort instanceNumber)
         {
-            checkLoginStatus();
-            var info = new InfoHelper(credMgr);
+            CheckLoginStatus();
+            var info = new InfoHelper(proxyUser, credMgr);
             return info.GetLogs(app, instanceNumber);
         }
 
         public IEnumerable<StatInfo> GetStats(Application app)
         {
-            checkLoginStatus();
-            var info = new InfoHelper(credMgr);
+            CheckLoginStatus();
+            var info = new InfoHelper(proxyUser, credMgr);
             return info.GetStats(app);
-        }
-
-        public IEnumerable<StatInfo> GetStats(VcapUser user, Application app) // TODO way to set proxy user on client for all calls
-        {
-            checkLoginStatus();
-            var info = new InfoHelper(credMgr);
-            return info.GetStats(user, app);
         }
 
         public IEnumerable<ExternalInstance> GetInstances(Application app)
         {
-            checkLoginStatus();
-            var info = new InfoHelper(credMgr);
+            CheckLoginStatus();
+            var info = new InfoHelper(proxyUser, credMgr);
             return info.GetInstances(app);
         }
 
         public IEnumerable<Crash> GetAppCrash(Application app)
         {
-            checkLoginStatus();
-            var hlpr = new AppsHelper(credMgr);
+            CheckLoginStatus();
+            var hlpr = new AppsHelper(proxyUser, credMgr);
             return hlpr.GetAppCrash(app);
         }
 
-        private void checkLoginStatus()
+        private void CheckLoginStatus()
         {
             if (null == info)
             {
-                if (false == loggedIn())
+                if (false == LoggedIn())
                 {
                     throw new VmcAuthException(Resources.Vmc_LoginRequired_Message);
                 }
             }
         }
 
-        private bool loggedIn()
+        private bool LoggedIn()
         {
             bool rv = false;
 

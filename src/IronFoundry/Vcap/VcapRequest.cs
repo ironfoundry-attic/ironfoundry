@@ -26,32 +26,22 @@
 
         protected readonly VcapCredentialManager credentialManager;
         protected readonly RestClient client;
-        protected RestRequest request;
-        protected string proxy_user;
+        protected readonly string proxyUserEmail;
 
-        protected VcapRequestBase(VcapCredentialManager credentialManager)
+        protected RestRequest request;
+
+        protected VcapRequestBase(string proxyUserEmail, VcapCredentialManager credentialManager)
         {
+            this.proxyUserEmail = proxyUserEmail;
             this.credentialManager = credentialManager;
             client = BuildClient();
         }
 
-        protected VcapRequestBase(VcapCredentialManager credentialManager, bool useAuthentication, Uri uri = null)
+        protected VcapRequestBase(string proxyUserEmail,VcapCredentialManager credentialManager, bool useAuthentication, Uri uri = null)
         {
+            this.proxyUserEmail = proxyUserEmail;
             this.credentialManager = credentialManager;
             client = BuildClient(useAuthentication, uri);
-        }
-
-        public string ProxyUser // Should be VcapUser object
-        {
-            get { return proxy_user; }
-            set
-            {
-                proxy_user = value;
-                if (false == proxy_user.IsNullOrWhiteSpace())
-                {
-                    client.AddDefaultHeader("PROXY-USER", proxy_user);
-                }
-            }
         }
 
         public RestResponse Execute()
@@ -116,6 +106,11 @@
             if (useAuth && credentialManager.HasToken)
             {
                 rv.AddDefaultHeader("AUTHORIZATION", credentialManager.CurrentToken);
+            }
+
+            if (false == proxyUserEmail.IsNullOrWhiteSpace())
+            {
+                rv.AddDefaultHeader("PROXY-USER", proxyUserEmail);
             }
 
             return rv;
@@ -190,11 +185,11 @@
 
     public class VcapRequest : VcapRequestBase
     {
-        public VcapRequest(VcapCredentialManager credMgr, params object[] resourceParams)
-            : this(credMgr, true, null, resourceParams) { }
+        public VcapRequest(string proxyUserEmail, VcapCredentialManager credMgr, params object[] resourceParams)
+            : this(proxyUserEmail, credMgr, true, null, resourceParams) { }
 
-        public VcapRequest(VcapCredentialManager credMgr, bool useAuth, Uri uri, params object[] resourceParams)
-            : base(credMgr, useAuth, uri)
+        public VcapRequest(string proxyUserEmail, VcapCredentialManager credMgr,
+            bool useAuth, Uri uri, params object[] resourceParams) : base(proxyUserEmail, credMgr, useAuth, uri)
         {
             request = BuildRequest(Method.GET, resourceParams);
         }
@@ -202,8 +197,8 @@
 
     public class VcapJsonRequest : VcapRequestBase
     {
-        public VcapJsonRequest(VcapCredentialManager credMgr, Method method, params string[] resourceParams)
-            : base(credMgr)
+        public VcapJsonRequest(string proxyUserEmail, VcapCredentialManager credMgr,
+            Method method, params string[] resourceParams) : base(proxyUserEmail, credMgr)
         {
             request = BuildRequest(method, DataFormat.Json, resourceParams);
         }

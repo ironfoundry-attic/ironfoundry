@@ -8,7 +8,8 @@
 
     internal class InfoHelper : BaseVmcHelper
     {
-        public InfoHelper(VcapCredentialManager credMgr) : base(credMgr) { }
+        public InfoHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
+            : base(proxyUser, credMgr) { }
 
         public string GetLogs(Application argApp, ushort argInstance)
         {
@@ -26,19 +27,19 @@
 
         public string GetStdErrLog(Application argApp, ushort argInstance)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stderr.log");
+            var r = base.BuildVcapRequest(Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stderr.log");
             return r.Execute().Content;
         }
 
         public string GetStdOutLog(Application argApp, ushort argInstance)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stdout.log");
+            var r = base.BuildVcapRequest(Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/stdout.log");
             return r.Execute().Content;
         }
 
         public string GetStartupLog(Application argApp, ushort argInstance)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/startup.log");
+            var r = base.BuildVcapRequest(Constants.APPS_PATH, argApp.Name, argInstance, "files/logs/startup.log");
             return r.Execute().Content;
         }
 
@@ -54,11 +55,7 @@
 
         public IEnumerable<StatInfo> GetStats(VcapUser user, Application app)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, app.Name, "stats");
-            if (null != user)
-            {
-                r.ProxyUser = user.Email;
-            }
+            VcapRequest r = base.BuildVcapRequest(Constants.APPS_PATH, app.Name, "stats");
             RestResponse response = r.Execute();
             var tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
 
@@ -74,7 +71,7 @@
 
         public IEnumerable<ExternalInstance> GetInstances(Application argApp)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, argApp.Name, "instances");
+            var r = base.BuildVcapRequest(Constants.APPS_PATH, argApp.Name, "instances");
             var instances = r.Execute<Dictionary<string, ExternalInstance>>();
             return instances.Values.ToArrayOrNull();
         }

@@ -9,6 +9,8 @@
         string CurrentToken { get; }
         string CurrentUri { get; }
 
+        void ProxyAs(VcapUser user);
+
         VcapClientResult Info();
 
         VcapClientResult Target(string uri);
@@ -18,6 +20,7 @@
         VcapClientResult ChangePassword(string newpassword);
         VcapClientResult AddUser(string email, string password);
         VcapClientResult DeleteUser(string email);
+        VcapUser GetUser(string email);
         IEnumerable<VcapUser> GetUsers();
 
         VcapClientResult Push(
@@ -34,21 +37,26 @@
         IEnumerable<SystemService> GetSystemServices();
         IEnumerable<ProvisionedService> GetProvisionedServices();
 
-        void Stop(Application app);
-        void Start(Application app);
-        void Restart(Application app);
-        void Delete(string appName);
+        VcapClientResult Stop(Application app);
+        VcapClientResult Stop(string appName);
+
+        VcapClientResult Start(Application app);
+        VcapClientResult Start(string appName);
+
+        VcapClientResult Restart(Application app);
+        VcapClientResult Restart(string appName);
+
+        VcapClientResult Delete(Application app);
+        VcapClientResult Delete(string appName);
 
         Application GetApplication(string appName);
         IEnumerable<Application> GetApplications();
-        IEnumerable<Application> GetApplications(VcapUser user);
         byte[] FilesSimple(string appName, string path, ushort instance);
         VcapFilesResult Files(string appName, string path, ushort instance);
 
         string GetLogs(Application application, ushort instanceNumber);
 
         IEnumerable<StatInfo> GetStats(Application application);
-        IEnumerable<StatInfo> GetStats(VcapUser user, Application application);
 
         IEnumerable<ExternalInstance> GetInstances(Application application);
 

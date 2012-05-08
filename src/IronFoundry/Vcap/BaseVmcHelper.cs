@@ -4,19 +4,22 @@
     using System.Collections.Generic;
     using IronFoundry.Types;
     using Newtonsoft.Json;
+    using RestSharp;
 
     internal abstract class BaseVmcHelper
     {
         protected readonly VcapCredentialManager credMgr;
+        protected readonly VcapUser proxyUser;
 
-        public BaseVmcHelper(VcapCredentialManager credMgr)
+        public BaseVmcHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
         {
+            this.proxyUser = proxyUser;
             this.credMgr = credMgr;
         }
 
         public string GetApplicationJson(string name)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, name);
+            VcapRequest r = BuildVcapRequest(Constants.APPS_PATH, name);
             return r.Execute().Content;
         }
 
@@ -28,11 +31,7 @@
 
         public IEnumerable<Application> GetApplications(string proxy_user = null)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH);
-            if (false == proxy_user.IsNullOrWhiteSpace())
-            {
-                r.ProxyUser = proxy_user;
-            }
+            VcapRequest r = BuildVcapRequest(Constants.APPS_PATH);
             return r.Execute<Application[]>();
         }
 
@@ -48,6 +47,39 @@
                 rv = false;
             }
             return rv;
+        }
+
+        protected VcapRequest BuildVcapRequest(params object[] resourceParams)
+        {
+            return new VcapRequest(ProxyUserEmail, credMgr, resourceParams);
+        }
+
+        protected VcapRequest BuildVcapRequest(bool useAuth, Uri uri, params object[] resourceParams)
+        {
+            return new VcapRequest(ProxyUserEmail, credMgr, useAuth, uri, resourceParams);
+        }
+
+        protected VcapRequest BuildVcapRequest(Method method, params string[] resourceParams)
+        {
+            return new VcapRequest(ProxyUserEmail, credMgr, method, resourceParams);
+        }
+
+        protected VcapJsonRequest BuildVcapJsonRequest(Method method, params string[] resourceParams)
+        {
+            return new VcapJsonRequest(ProxyUserEmail, credMgr, method, resourceParams);
+        }
+
+        private string ProxyUserEmail
+        {
+            get
+            {
+                string proxyUserEmail = null;
+                if (null != proxyUser)
+                {
+                    proxyUserEmail = proxyUser.Email;
+                }
+                return proxyUserEmail;
+            }
         }
     }
 }

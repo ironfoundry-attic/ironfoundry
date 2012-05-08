@@ -15,67 +15,87 @@
 
     internal class AppsHelper : BaseVmcHelper
     {
-        public AppsHelper(VcapCredentialManager credMgr) : base(credMgr) { }
+        public AppsHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
+            : base(proxyUser, credMgr) { }
 
-        public void Start(string applicationName)
+        public VcapClientResult Start(string applicationName)
         {
+            VcapClientResult rv;
             Application app = GetApplication(applicationName);
-            if (false == app.IsStarted)
+            if (app.IsStarted)
+            {
+                rv = new VcapClientResult(true);
+            }
+            else
             {
                 app.Start();
                 UpdateApplication(app);
-                IsStarted(app.Name);
+                rv = new VcapClientResult(IsStarted(app.Name));
             }
+            return rv;
         }
 
-        public void Start(Application application)
+        public VcapClientResult Start(Application application)
         {
-            Start(application.Name);
+            return Start(application.Name);
         }
 
-        public void Stop(string applicationName)
+        public VcapClientResult Stop(string applicationName)
         {
+            VcapClientResult rv;
             Application app = GetApplication(applicationName);
-            if (false == app.IsStopped)
+            if (app.IsStopped)
+            {
+                rv = new VcapClientResult(true);
+            }
+            else
             {
                 app.Stop();
                 UpdateApplication(app);
+                rv = new VcapClientResult(true);
             }
+            return rv;
         }
 
-        public void Stop(Application application)
+        public VcapClientResult Stop(Application application)
         {
-            Stop(application.Name);
+            return Stop(application.Name);
+        }
+
+        public VcapClientResult Restart(string appName)
+        {
+            Stop(appName);
+            return Start(appName);
+        }
+
+        public VcapClientResult Restart(Application app)
+        {
+            Stop(app);
+            return Start(app);
+        }
+
+        public VcapClientResult Delete(Application app)
+        {
+            return Delete(app.Name);
+        }
+
+        public VcapClientResult Delete(string name)
+        {
+            var r = base.BuildVcapJsonRequest(Method.DELETE, Constants.APPS_PATH, name);
+            r.Execute();
+            return new VcapClientResult();
         }
 
         public VcapResponse UpdateApplication(Application app)
         {
-            var r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, app.Name);
+            var r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, app.Name);
             r.AddBody(app);
             return r.Execute<VcapResponse>();
         }
 
-        public void Delete(string name)
-        {
-            var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.APPS_PATH, name);
-            r.Execute();
-        }
-
-        public void Restart(string appName)
-        {
-            Stop(appName);
-            Start(appName);
-        }
-
-        public void Restart(Application app)
-        {
-            Stop(app);
-            Start(app);
-        }
-
         public byte[] Files(string name, string path, ushort instance)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, name, "instances", instance, "files", path);
+            var r = base.BuildVcapRequest(Constants.APPS_PATH, name, "instances", instance, "files", path);
             RestResponse response = r.Execute();
             return response.RawBytes;
         }
@@ -124,7 +144,7 @@
                         Resources = new AppResources { Memory = memoryMB },
                     };
 
-                    var r = new VcapJsonRequest(credMgr, Method.POST, Constants.APPS_PATH);
+                    var r = base.BuildVcapJsonRequest(Method.POST, Constants.APPS_PATH);
                     r.AddBody(manifest);
                     RestResponse response = r.Execute();
 
@@ -132,7 +152,7 @@
 
                     Application app = GetApplication(name);
                     app.Start();
-                    r = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name);
+                    r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, name);
                     r.AddBody(app);
                     response = r.Execute();
 
@@ -142,7 +162,7 @@
                     {
                         foreach (string svcName in provisionedServiceNames)
                         {
-                            var servicesHelper = new ServicesHelper(credMgr);
+                            var servicesHelper = new ServicesHelper(proxyUser, credMgr);
                             servicesHelper.BindService(svcName, app.Name);
                         }
                     }
@@ -175,13 +195,13 @@
 
         public string GetAppCrash(string name)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, name, "crashes");
+            var r = base.BuildVcapRequest(Constants.APPS_PATH, name, "crashes");
             return r.Execute().Content;
         }
 
         public IEnumerable<Crash> GetAppCrash(Application app)
         {
-            var r = new VcapRequest(credMgr, Constants.APPS_PATH, app.Name, "crashes");
+            var r = base.BuildVcapRequest(Constants.APPS_PATH, app.Name, "crashes");
             return r.Execute<Crash[]>();
         }
 
@@ -260,7 +280,7 @@
 
                     var zipper = new FastZip();
                     zipper.CreateZip(uploadFile, explodeDir.FullName, true, String.Empty);
-                    var request = new VcapJsonRequest(credMgr, Method.PUT, Constants.APPS_PATH, name, "application");
+                    var request = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, name, "application");
                     request.AddFile("application", uploadFile);
                     request.AddParameter("resources", JsonConvert.SerializeObject(appcloudResources.ToArrayOrNull()));
                     RestResponse response = request.Execute();
@@ -282,7 +302,7 @@
                 sent in with the upload if resources were removed.
                 E.g. [{:sha1 => xxx, :size => xxx, :fn => filename}]
              */
-            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.RESOURCES_PATH);
+            var r = base.BuildVcapJsonRequest(Method.POST, Constants.RESOURCES_PATH);
             r.AddBody(resourceAry);
             RestResponse response = r.Execute();
             return JsonConvert.DeserializeObject<Resource[]>(response.Content);

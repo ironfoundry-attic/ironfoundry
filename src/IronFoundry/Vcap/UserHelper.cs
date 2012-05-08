@@ -9,13 +9,14 @@
 
     internal class UserHelper : BaseVmcHelper
     {
-        public UserHelper(VcapCredentialManager credMgr) : base(credMgr) { }
+        public UserHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
+            : base(proxyUser, credMgr) { }
 
         public VcapClientResult Login(string argEmail, string argPassword)
         {
             VcapClientResult rv;
 
-            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.USERS_PATH, argEmail, "tokens");
+            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH, argEmail, "tokens");
             r.AddBody(new { password = argPassword });
             RestResponse response = r.Execute();
             if (response.Content.IsNullOrEmpty())
@@ -35,13 +36,13 @@
 
         public VcapClientResult ChangePassword(string user, string newpassword)
         {
-            var r = new VcapRequest(credMgr, Constants.USERS_PATH, user);
+            VcapRequest r = base.BuildVcapRequest(Constants.USERS_PATH, user);
             RestResponse response = r.Execute();
 
             JObject parsed = JObject.Parse(response.Content);
             parsed["password"] = newpassword;
 
-            var put = new VcapJsonRequest(credMgr, Method.PUT, Constants.USERS_PATH, user);
+            VcapJsonRequest put = base.BuildVcapJsonRequest(Method.PUT, Constants.USERS_PATH, user);
             put.AddBody(parsed);
             response = put.Execute();
 
@@ -50,7 +51,7 @@
 
         public VcapClientResult AddUser(string email, string password)
         {
-            var r = new VcapJsonRequest(credMgr, Method.POST, Constants.USERS_PATH);
+            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH);
             r.AddBody(new { email = email, password = password });
             RestResponse response = r.Execute();
             return new VcapClientResult();
@@ -58,26 +59,32 @@
 
         public VcapClientResult DeleteUser(string email)
         {
-            var appsHelper = new AppsHelper(credMgr);
+            var appsHelper = new AppsHelper(proxyUser, credMgr);
             foreach (Application a in appsHelper.GetApplications(email))
             {
                 appsHelper.Delete(a.Name);
             }
 
-            var servicesHelper = new ServicesHelper(credMgr);
+            var servicesHelper = new ServicesHelper(proxyUser, credMgr);
             foreach (ProvisionedService ps in servicesHelper.GetProvisionedServices(email))
             {
                 servicesHelper.DeleteService(ps.Name);
             }
 
-            var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.USERS_PATH, email);
+            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.DELETE, Constants.USERS_PATH, email);
             RestResponse response = r.Execute();
             return new VcapClientResult();
         }
 
+        public VcapUser GetUser(string email)
+        {
+            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.GET, Constants.USERS_PATH, email);
+            return r.Execute<VcapUser>();
+        }
+
         public IEnumerable<VcapUser> GetUsers()
         {
-            var r = new VcapJsonRequest(credMgr, Method.GET, Constants.USERS_PATH);
+            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.GET, Constants.USERS_PATH);
             return r.Execute<VcapUser[]>();
         }
     }
