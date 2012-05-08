@@ -48,6 +48,7 @@
         string GetLogs(Application application, ushort instanceNumber);
 
         IEnumerable<StatInfo> GetStats(Application application);
+        IEnumerable<StatInfo> GetStats(VcapUser user, Application application);
 
         IEnumerable<ExternalInstance> GetInstances(Application application);
 
