@@ -1,3 +1,0 @@
-﻿namespace IronFoundry.Types
-{
-}

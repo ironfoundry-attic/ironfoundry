@@ -185,6 +185,11 @@
             return r.Execute<Crash[]>();
         }
 
+        public IEnumerable<Application> GetApplications(VcapUser user)
+        {
+            return base.GetApplications(user.Email);
+        }
+
         private bool IsStarted(string name)
         {
             bool started = false;

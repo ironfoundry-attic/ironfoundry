@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Vcap
 {
     using System;
+    using System.Collections.Generic;
     using IronFoundry.Properties;
     using IronFoundry.Types;
     using Newtonsoft.Json.Linq;
@@ -72,6 +73,12 @@
             var r = new VcapJsonRequest(credMgr, Method.DELETE, Constants.USERS_PATH, email);
             RestResponse response = r.Execute();
             return new VcapClientResult();
+        }
+
+        public IEnumerable<VcapUser> GetUsers()
+        {
+            var r = new VcapJsonRequest(credMgr, Method.GET, Constants.USERS_PATH);
+            return r.Execute<VcapUser[]>();
         }
     }
 }

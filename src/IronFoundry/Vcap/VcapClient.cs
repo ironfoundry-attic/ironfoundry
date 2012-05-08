@@ -113,6 +113,12 @@
             return hlpr.DeleteUser(email);
         }
 
+        public IEnumerable<VcapUser> GetUsers()
+        {
+            var hlpr = new UserHelper(credMgr);
+            return hlpr.GetUsers();
+        }
+
         public VcapClientResult Push(
             string name, string deployFQDN, ushort instances,
             DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames)
@@ -207,6 +213,14 @@
             var hlpr = new AppsHelper(credMgr);
             IEnumerable<Application> apps = hlpr.GetApplications();
             foreach (var a in apps) { a.Parent = cloud; } // TODO not thrilled about this
+            return apps;
+        }
+
+        public IEnumerable<Application> GetApplications(VcapUser user)
+        {
+            checkLoginStatus();
+            var hlpr = new AppsHelper(credMgr);
+            IEnumerable<Application> apps = hlpr.GetApplications(user);
             return apps;
         }
 

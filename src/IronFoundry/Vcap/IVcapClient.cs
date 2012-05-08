@@ -18,6 +18,7 @@
         VcapClientResult ChangePassword(string newpassword);
         VcapClientResult AddUser(string email, string password);
         VcapClientResult DeleteUser(string email);
+        IEnumerable<VcapUser> GetUsers();
 
         VcapClientResult Push(
             string name, string deployFQDN, ushort instances, DirectoryInfo path,
@@ -40,6 +41,7 @@
 
         Application GetApplication(string appName);
         IEnumerable<Application> GetApplications();
+        IEnumerable<Application> GetApplications(VcapUser user);
         byte[] FilesSimple(string appName, string path, ushort instance);
         VcapFilesResult Files(string appName, string path, ushort instance);
 
