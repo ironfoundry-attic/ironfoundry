@@ -16,6 +16,7 @@
     {
         private readonly TimeSpan OneSecondInterval = TimeSpan.FromSeconds(1);
         private readonly TimeSpan TwoSecondsInterval = TimeSpan.FromSeconds(2);
+        private readonly TimeSpan FiveSecondsInterval = TimeSpan.FromSeconds(5);
         private readonly TimeSpan TenSecondsInterval = TimeSpan.FromSeconds(10);
 
         private readonly ILog log;
@@ -30,6 +31,7 @@
         private readonly Hello helloMessage;
 
         private readonly Task heartbeatTask;
+        private readonly Task advertiseTask;
         private readonly Task varzTask;
         private readonly Task monitorAppsTask;
 
@@ -59,6 +61,7 @@
             helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
 
             heartbeatTask = new Task(HeartbeatLoop);
+            advertiseTask = new Task(AdvertiseLoop);
             varzTask = new Task(SnapshotVarz);
             monitorAppsTask = new Task(MonitorApps);
 
@@ -100,9 +103,12 @@
 
                 messagingProvider.Publish(helloMessage);
 
+                SendAdvertise();
+
                 RecoverExistingDroplets();
 
                 heartbeatTask.Start();
+                advertiseTask.Start();
                 varzTask.Start();
                 monitorAppsTask.Start();
             }
@@ -146,6 +152,15 @@
             {
                 SendHeartbeat();
                 Thread.Sleep(TenSecondsInterval);
+            }
+        }
+
+        private void AdvertiseLoop()
+        {
+            while (false == shutting_down)
+            {
+                SendAdvertise();
+                Thread.Sleep(FiveSecondsInterval);
             }
         }
 
@@ -497,7 +512,17 @@
                 Droplets = heartbeats.ToArray()
             };
 
-            messagingProvider.Publish( message);
+            messagingProvider.Publish(message);
+        }
+
+        private void SendAdvertise()
+        {
+            if (shutting_down) // || no resources
+            {
+                return;
+            }
+            var message = new Advertise(messagingProvider.UniqueIdentifier, 4096, 0, true); // TODO mem
+            messagingProvider.Publish(message);
         }
 
         private string GetApplicationState(string name)
