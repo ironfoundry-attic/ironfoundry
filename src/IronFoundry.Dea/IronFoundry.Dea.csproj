@@ -123,6 +123,7 @@
     <Compile Include="Providers\IHealthzProvider.cs" />
     <Compile Include="Services\IMonitoringService.cs" />
     <Compile Include="Services\MonitoringService.cs" />
+    <Compile Include="Types\Advertise.cs" />
     <Compile Include="Types\Connect.cs" />
     <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\Discover.cs" />
