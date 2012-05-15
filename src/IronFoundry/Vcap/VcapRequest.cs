@@ -1,4 +1,6 @@
-﻿namespace IronFoundry.Vcap
+﻿using IronFoundry.Properties;
+
+namespace IronFoundry.Vcap
 {
     using System;
     using System.Collections;
@@ -46,10 +48,13 @@
             client = BuildClient(useAuthentication, uri);
         }
 
+        public string ErrorMessage { get; protected set; }
+
         public IRestResponse Execute()
         {
             IRestResponse response = client.Execute(request);
             ProcessResponse(response);
+            ErrorMessage = response.ErrorMessage;
             return response;
         }
 
@@ -57,6 +62,7 @@
         {
             IRestResponse response = client.Execute(request);
             ProcessResponse(response);
+            ErrorMessage = response.ErrorMessage;
             if (response.Content.IsNullOrWhiteSpace())
             {
                 return default(TResponse);
@@ -196,9 +202,9 @@
                     {
                         throw new VmcNotFoundException(errorMessage);
                     }
-                    else
+                    else if (response.StatusCode == HttpStatusCode.Forbidden)
                     {
-                        throw new VmcTargetException(errorMessage);
+                        throw new VmcAuthException(Resources.Vmc_LoginRequired_Message);
                     }
                 }
             }

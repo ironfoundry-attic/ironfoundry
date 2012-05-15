@@ -11,23 +11,23 @@
 
         void ProxyAs(VcapUser user);
 
-        VcapClientResult Info();
+        Info GetInfo();
 
-        VcapClientResult Target(string uri);
+        void Target(string uri);
+        string CurrentTarget { get; }
 
-        VcapClientResult Login();
-        VcapClientResult Login(string email, string password);
-        VcapClientResult ChangePassword(string newpassword);
-        VcapClientResult AddUser(string email, string password);
-        VcapClientResult DeleteUser(string email);
+        void Login();
+        void Login(string email, string password);
+        void ChangePassword(string newPassword);
+        void AddUser(string email, string password);
+        void DeleteUser(string email);
         VcapUser GetUser(string email);
         IEnumerable<VcapUser> GetUsers();
 
-        VcapClientResult Push(
-            string name, string deployFQDN, ushort instances, DirectoryInfo path,
+        void Push(string name, string deployFQDN, ushort instances, DirectoryInfo path,
             uint memoryMB, string[] provisionedServiceNames);
 
-        VcapClientResult Update(string appname, DirectoryInfo di);
+        void Update(string appname, DirectoryInfo di);
 
         VcapClientResult BindService(string appName, string provisionedServiceName);
         VcapClientResult CreateService(string serviceName, string provisionedServiceName);
