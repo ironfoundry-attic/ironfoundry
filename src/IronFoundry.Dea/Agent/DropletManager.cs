@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using IronFoundry.Dea.Types;
 
     public class DropletManager : IDropletManager
@@ -182,6 +183,28 @@
                     }
                 }
             }
+        }
+
+        public void SetProcessInformationFrom(IDictionary<string, int> iisWorkerProcessData)
+        {
+            if (iisWorkerProcessData.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            ForAllInstances((inst) =>
+                {
+                    if (false == inst.WorkerProcessIsRunning)
+                    {
+                        string appPoolName = inst.Staged; // TODO: we have to "know" that this is the app pool name
+                        int tmp;
+                        if (iisWorkerProcessData.TryGetValue(appPoolName, out tmp))
+                        {
+                            Process instanceProcess = Process.GetProcessById(tmp);
+                            inst.SetWorkerProcess(instanceProcess);
+                        }
+                    }
+                });
         }
     }
 }

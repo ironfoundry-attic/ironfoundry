@@ -205,9 +205,9 @@
             return rv;
         }
 
-        public IDictionary<string, uint> GetIIsWorkerProcesses()
+        public IDictionary<string, int> GetIIsWorkerProcesses()
         {
-            IDictionary<string, uint> rv = null;
+            IDictionary<string, int> rv = null;
 
             AppCmdResult rslt = ExecAppcmd("list wp", 1, null, true);
             if (rslt.Success && false == rslt.Output.IsNullOrWhiteSpace())
@@ -215,11 +215,11 @@
                 string[] lines = rslt.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
                 if (false == lines.IsNullOrEmpty())
                 {
-                    rv = new Dictionary<string, uint>();
+                    rv = new Dictionary<string, int>();
                     foreach (string line in lines)
                     {
                         Match m = workerProcessRegex.Match(line);
-                        uint pid = Convert.ToUInt32(m.Groups[1].Value);
+                        int pid = Convert.ToInt32(m.Groups[1].Value);
                         string apppoolName = m.Groups[2].Value;
                         rv.Add(apppoolName, pid);
                     }

@@ -1,12 +1,15 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using JsonConverters;
     using Newtonsoft.Json;
 
     public class Instance : EntityBase
     {
+        private Process instanceWorkerProcess;
+
         private bool isEvacuated = false;
         private string logID;
 
@@ -209,6 +212,21 @@
             else
             {
                 throw new InvalidOperationException();
+            }
+        }
+
+        public void SetWorkerProcess(Process instanceWorkerProcess)
+        {
+            this.instanceWorkerProcess = instanceWorkerProcess;
+            // TODO: job Object?
+        }
+
+        [JsonIgnore]
+        public bool WorkerProcessIsRunning
+        {
+            get
+            {
+                return null != instanceWorkerProcess && false == instanceWorkerProcess.HasExited;
             }
         }
     }

@@ -19,5 +19,7 @@
         void InstanceStopped(Instance argInstance);
 
         bool IsEmpty { get; }
+
+        void SetProcessInformationFrom(IDictionary<string, int> iisWorkerProcesses);
     }
 }
