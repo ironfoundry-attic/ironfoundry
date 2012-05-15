@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Dea.Providers
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Net;
     using System.Text.RegularExpressions;
@@ -13,10 +14,18 @@
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
         private static readonly TimeSpan twoSeconds = TimeSpan.FromSeconds(2);
-        private static readonly Regex appcmdStateRegex = new Regex(@"state:(\w+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /* TODO: refactor into classes of type IIsObject */
+
+        // APPPOOL "testwebapp-1-dd1eeb2c80004b0cb8751feb1f9c7df3" (MgdVersion:v4.0,MgdMode:Integrated,state:Started)
+        private static readonly Regex apppoolStateRegex = new Regex(@"state:(\w+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        // WP "2464" (applicationPool:testwebapp-0-dd79ab1f650b44e3b0d9c09720900853)
+        private static readonly Regex workerProcessRegex = new Regex(@"WP ""(\d+)"" \(applicationPool:([^)]+)\)",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private const string IIsAppPoolObject = "apppool";
-        private const string IIsSiteObject = "site";
+        private const string IIsWorkerProcessObject = "wp";
 
         private readonly ILog log;
         private readonly IPAddress localIPAddress;
@@ -42,7 +51,7 @@
             {
                 ushort applicationPort = 0;
 
-                bool exists = DoesIIsObjectExist(IIsAppPoolObject, applicationInstanceName);
+                bool exists = DoesIIsAppPoolExist(applicationInstanceName);
                 if (exists)
                 {
                     log.Error(Resources.WebServerAdministrationProvider_AppAlreadyExists_Fmt, applicationInstanceName);
@@ -159,7 +168,7 @@
                     C:\>%windir%\system32\inetsrv\appcmd.exe list apppool /name:DefaultAppPool
                     APPPOOL "DefaultAppPool" (MgdVersion:v4.0,MgdMode:Integrated,state:Started)
                  */
-                string state = GetIIsObjectState(IIsAppPoolObject, applicationInstanceName);
+                string state = GetIIsAppPoolState(applicationInstanceName);
                 if (state.IsNullOrWhiteSpace())
                 {
                     rv = ApplicationInstanceStatus.Deleted;
@@ -196,20 +205,44 @@
             return rv;
         }
 
-        private bool DoesIIsObjectExist(string objectType, string objectName)
+        public IDictionary<string, uint> GetIIsWorkerProcesses()
         {
-            string state = GetIIsObjectState(objectType, objectName);
+            IDictionary<string, uint> rv = null;
+
+            AppCmdResult rslt = ExecAppcmd("list wp", 1, null, true);
+            if (rslt.Success && false == rslt.Output.IsNullOrWhiteSpace())
+            {
+                string[] lines = rslt.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                if (false == lines.IsNullOrEmpty())
+                {
+                    rv = new Dictionary<string, uint>();
+                    foreach (string line in lines)
+                    {
+                        Match m = workerProcessRegex.Match(line);
+                        uint pid = Convert.ToUInt32(m.Groups[1].Value);
+                        string apppoolName = m.Groups[2].Value;
+                        rv.Add(apppoolName, pid);
+                    }
+                }
+            }
+
+            return rv;
+        }
+
+        private bool DoesIIsAppPoolExist(string objectName)
+        {
+            string state = GetIIsAppPoolState(objectName);
             return false == state.IsNullOrWhiteSpace();
         }
 
-        private string GetIIsObjectState(string objectType, string objectName)
+        private string GetIIsAppPoolState(string objectName)
         {
             string rv = null;
 
-            AppCmdResult rslt = ExecAppcmd(String.Format(@"list {0} ""/name:{1}""", objectType, objectName), 1, null, true);
+            AppCmdResult rslt = ExecAppcmd(String.Format(@"list {0} ""/name:{1}""", IIsAppPoolObject, objectName), 1, null, true);
             if (rslt.Success)
             {
-                Match m = appcmdStateRegex.Match(rslt.Output);
+                Match m = apppoolStateRegex.Match(rslt.Output);
                 rv = m.Groups[1].Value.ToLowerInvariant();
             }
 

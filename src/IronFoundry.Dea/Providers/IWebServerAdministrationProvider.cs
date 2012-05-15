@@ -1,4 +1,5 @@
-﻿namespace IronFoundry.Dea.Providers
+﻿using System.Collections.Generic;
+namespace IronFoundry.Dea.Providers
 {
     public enum ApplicationInstanceStatus
     {
@@ -21,5 +22,6 @@
         WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName, uint memMB);
         void UninstallWebApp(string applicationInstanceName);
         ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName);
+        IDictionary<string, uint> GetIIsWorkerProcesses();
     }
 }

@@ -30,6 +30,7 @@
 
         private readonly Hello helloMessage;
 
+        private readonly Task processTask;
         private readonly Task heartbeatTask;
         private readonly Task advertiseTask;
         private readonly Task varzTask;
@@ -60,6 +61,7 @@
 
             helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
 
+            processTask = new Task(ProcessLoop);
             heartbeatTask = new Task(HeartbeatLoop);
             advertiseTask = new Task(AdvertiseLoop);
             varzTask = new Task(SnapshotVarz);
@@ -107,6 +109,7 @@
 
                 RecoverExistingDroplets();
 
+                processTask.Start();
                 heartbeatTask.Start();
                 advertiseTask.Start();
                 varzTask.Start();
@@ -144,6 +147,15 @@
             messagingProvider.Dispose();
 
             log.Info(Resources.Agent_Shutdown_Message);
+        }
+
+        private void ProcessLoop()
+        {
+            while (false == shutting_down)
+            {
+                IDictionary<string, uint> iisWorkerProcesses = webServerProvider.GetIIsWorkerProcesses();
+                Thread.Sleep(FiveSecondsInterval);
+            }
         }
 
         private void HeartbeatLoop()
