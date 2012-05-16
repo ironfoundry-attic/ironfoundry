@@ -7,17 +7,19 @@
     {
         public Stats() { }
 
-        public Stats(Instance argInstance, TimeSpan argUptime)
+        public Stats(Instance argInstance)
         {
+            TimeSpan uptimeSpan = DateTime.Now - argInstance.StartDate;
+
             Name      = argInstance.Name;
             Host      = argInstance.Host;
             Port      = argInstance.Port;
-            Uptime    = argUptime.TotalSeconds;
+            Uptime    = uptimeSpan.TotalSeconds;
             Uris      = argInstance.Uris;
             MemQuota  = argInstance.MemQuota;
             DiskQuota = argInstance.DiskQuota;
             FdsQuota  = argInstance.FdsQuota;
-            Cores     = 1; // TODO
+            Cores     = Environment.ProcessorCount; // TODO
             Usage     = new Usage();
             // TODO Usage = 20
         }

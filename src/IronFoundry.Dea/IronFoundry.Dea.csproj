@@ -82,6 +82,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Config\DeaSection.cs" />
     <Compile Include="Agent\DropletManager.cs" />
+    <Compile Include="Extensions\DateTimeExtensionMethods.cs" />
     <Compile Include="Extensions\RegexExtensionMethods.cs" />
     <Compile Include="Extensions\TaskExtensionMethods.cs" />
     <Compile Include="Extensions\TcpClientExtensionMethods.cs" />
@@ -163,6 +164,9 @@
     <Compile Include="WcfInfrastructure\IocServiceHost.cs" />
     <Compile Include="WcfInfrastructure\PerCallServiceHost.cs" />
     <Compile Include="WcfInfrastructure\WcfWinService.cs" />
+    <Compile Include="WindowsJobObjects\JobObject.cs" />
+    <Compile Include="WindowsJobObjects\JobObjectHandle.cs" />
+    <Compile Include="WindowsJobObjects\NativeMethods.cs" />
     <Compile Include="WinService\MonitoringWinService.cs" />
     <Compile Include="WinService\DeaWinService.cs" />
     <Compile Include="WinService\FilesWinService.cs" />
@@ -192,6 +196,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
 </Project>

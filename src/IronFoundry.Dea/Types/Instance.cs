@@ -3,12 +3,20 @@
     using System;
     using System.Diagnostics;
     using System.IO;
+    using IronFoundry.Dea.WindowsJobObjects;
     using JsonConverters;
     using Newtonsoft.Json;
+    using IronFoundry.Dea.Properties;
 
-    public class Instance : EntityBase
+    /*
+     * TODO: should probably separate out this "on the wire" class from one used to track data
+     */
+    public class Instance : EntityBase, IDisposable
     {
+        private DateTime startDate;
+
         private Process instanceWorkerProcess;
+        private JobObject jobObject;
 
         private bool isEvacuated = false;
         private string logID;
@@ -39,8 +47,15 @@
             }
 
             State          = VcapStates.STARTING;
-            Start          = DateTime.Now.ToString(Constants.JsonDateFormat);
+            startDate      = DateTime.Now;
+            Start          = startDate.ToJsonString();
             StateTimestamp = Utility.GetEpochTimestamp();
+        }
+
+        [JsonIgnore]
+        public DateTime StartDate
+        {
+            get { return startDate; }
         }
 
         [JsonProperty(PropertyName = "droplet_id")]
@@ -86,7 +101,7 @@
         public string Framework { get; set; }
 
         [JsonProperty(PropertyName = "start")]
-        public string Start { get; set; }
+        public string Start { get; private set; }
 
         [JsonProperty(PropertyName = "state_timestamp")]
         public int StateTimestamp { get; set; }
@@ -217,8 +232,19 @@
 
         public void SetWorkerProcess(Process instanceWorkerProcess)
         {
+            if (null != this.instanceWorkerProcess)
+            {
+                throw new InvalidOperationException(Resources.Instance_AttemptToSetWorkerProcessTwice_Message);
+            }
+
             this.instanceWorkerProcess = instanceWorkerProcess;
-            // TODO: job Object?
+
+            // TODO add limits, priority class
+            jobObject = new JobObject();
+            jobObject.DieOnUnhandledException = true;
+            jobObject.ActiveProcessesLimit = 10;
+
+            jobObject.AddProcess(instanceWorkerProcess);
         }
 
         [JsonIgnore]
@@ -227,6 +253,31 @@
             get
             {
                 return null != instanceWorkerProcess && false == instanceWorkerProcess.HasExited;
+            }
+        }
+
+        [JsonIgnore]
+        public bool GatherStats
+        {
+            get { return this.IsStarting || this.IsRunning; }
+        }
+
+        public long TotalProcessorTicks { get; set; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.jobObject != null)
+                {
+                    this.jobObject.Dispose();
+                }
             }
         }
     }

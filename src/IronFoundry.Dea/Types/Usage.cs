@@ -1,20 +1,24 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using IronFoundry.Dea.JsonConverters;
     using Newtonsoft.Json;
 
-     public class Usage
-     {
-        [JsonProperty(PropertyName="time")]
-        public DateTime CurrentTime { get; set; }
+    public class Usage
+    {
+        [JsonIgnore]
+        public ulong TotalCpuTicks { get; set; }
+
+        [JsonProperty(PropertyName="time"), JsonConverter(typeof(VcapDateTimeConverter))]
+        public DateTime Time { get; set; }
 
         [JsonProperty(PropertyName="cpu")]
-        public float CpuTime { get; set; }
+        public float Cpu { get; set; }
 
         [JsonProperty(PropertyName="mem")]
-        public float MemoryUsage { get; set; }
+        public ulong MemoryUsageKB { get; set; }
 
         [JsonProperty(PropertyName="disk")]
-        public float DiskUsage { get; set; }
+        public ulong DiskUsageB { get; set; }
     }
 }

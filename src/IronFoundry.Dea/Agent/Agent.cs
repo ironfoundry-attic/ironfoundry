@@ -61,11 +61,11 @@
 
             helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
 
-            processTask = new Task(ProcessLoop);
-            heartbeatTask = new Task(HeartbeatLoop);
-            advertiseTask = new Task(AdvertiseLoop);
-            varzTask = new Task(SnapshotVarz);
-            monitorAppsTask = new Task(MonitorApps);
+            processTask     = new Task(ProcessLoop);
+            heartbeatTask   = new Task(HeartbeatLoop);
+            advertiseTask   = new Task(AdvertiseLoop);
+            varzTask        = new Task(SnapshotVarz);
+            monitorAppsTask = new Task(MonitorLoop);
 
             this.maxMemoryMB = config.MaxMemoryMB;
         }
@@ -384,19 +384,12 @@
                     {
                         if (findDroplet.States.Contains(instance.State))
                         {
-                            var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
-                            var span = DateTime.Now - startDate;
-
-                            var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance, span)
+                            var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance)
                             {
-                                FileUri = String.Format(CultureInfo.InvariantCulture, Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
+                                FileUri = String.Format(CultureInfo.InvariantCulture,
+                                    Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
                                 Credentials = config.FilesCredentials.ToArray(),
                             };
-
-                            if (response.State != VcapStates.RUNNING)
-                            {
-                                response.Stats = null;
-                            }
 
                             messagingProvider.Publish(reply, response);
                         }
@@ -416,14 +409,9 @@
 
             dropletManager.ForAllInstances((instance) =>
             {
-                if (instance.IsStarting || instance.IsRunning)
+                if (instance.GatherStats)
                 {
-                    var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
-                    var span = DateTime.Now - startDate;
-                    var response = new Stats(instance, span)
-                    {
-                        //Usage = 20
-                    };
+                    var response = new Stats(instance); // TODO more statistics
                     messagingProvider.Publish(reply, response);
                 }
             });
@@ -611,7 +599,7 @@
             }
         }
 
-        private void MonitorApps()
+        private void MonitorLoop()
         {
             while (false == shutting_down)
             {
@@ -622,7 +610,7 @@
                 if (dropletManager.IsEmpty)
                 {
                     varzProvider.MemoryUsedMB = 0;
-                    return;
+                    continue;
                 }
 
                 var metrics = new Dictionary<string, IDictionary<string, Metric>>
@@ -637,6 +625,8 @@
                         {
                             return;
                         }
+
+                        long currentTicks = instance.TotalProcessorTicks;
 
                         foreach (KeyValuePair<string, IDictionary<string, Metric>> kvp in metrics)
                         {
