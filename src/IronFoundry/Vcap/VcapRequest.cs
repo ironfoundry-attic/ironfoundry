@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Linq;
     using System.Net;
+    using IronFoundry.Utilities;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RestSharp;
@@ -44,16 +45,16 @@
             client = BuildClient(useAuthentication, uri);
         }
 
-        public RestResponse Execute()
+        public IRestResponse Execute()
         {
-            RestResponse response = client.Execute(request);
+            IRestResponse response = client.Execute(request);
             ProcessResponse(response);
             return response;
         }
 
         public TResponse Execute<TResponse>()
         {
-            RestResponse response = client.Execute(request);
+            IRestResponse response = client.Execute(request);
             ProcessResponse(response);
             if (response.Content.IsNullOrWhiteSpace())
             {
@@ -67,21 +68,25 @@
 
         protected RestRequest BuildRequest(Method method, params object[] args)
         {
-            var rv = new RestRequest
-            {
-                Method = method,
-            };
-            return ProcessRequestArgs(rv, args);
+            return BuildRequest(method, DataFormat.Json, args);
         }
 
         protected RestRequest BuildRequest(Method method, DataFormat format, params object[] args)
         {
+            RestRequest rv = BuildRestRequest(method);
+            rv.RequestFormat = format;
+            return ProcessRequestArgs(rv, args);
+        }
+
+        private RestRequest BuildRestRequest(Method method)
+        {
+            var serializer = new NewtonsoftJsonSerializer();
             var rv = new RestRequest
             {
                 Method = method,
-                RequestFormat = format,
+                JsonSerializer = serializer,
             };
-            return ProcessRequestArgs(rv, args);
+            return rv;
         }
 
         private RestClient BuildClient()
@@ -97,11 +102,14 @@
                 baseUrl = uri.AbsoluteUri;
             }
 
+            var deserializer = new NewtonsoftJsonDeserializer();
             var rv = new RestClient
             {
                 BaseUrl = baseUrl,
                 FollowRedirects = false,
             };
+            rv.RemoveHandler(NewtonsoftJsonDeserializer.JsonContentType);
+            rv.AddHandler(NewtonsoftJsonDeserializer.JsonContentType, deserializer);
 
             if (useAuth && credentialManager.HasToken)
             {
@@ -129,7 +137,7 @@
             return request;
         }
 
-        private static void ProcessResponse(RestResponse response)
+        private static void ProcessResponse(IRestResponse response)
         {
             if (VMC_HTTP_ERROR_CODES.Contains((ushort)response.StatusCode))
             {

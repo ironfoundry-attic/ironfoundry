@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using IronFoundry.Types;
     using Newtonsoft.Json;
 
@@ -27,20 +28,21 @@
         private readonly IDictionary<Uri, AccessToken> tokenDict = new Dictionary<Uri, AccessToken>();
 
         private Uri currentTarget;
+        private IPAddress currentTargetIP;
 
-        private VcapCredentialManager(string argJson)
+        private VcapCredentialManager(string json)
         {
             string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             tokenFile = Path.Combine(userProfilePath, TOKEN_FILE);
             targetFile = Path.Combine(userProfilePath, TARGET_FILE);
 
-            if (argJson.IsNullOrWhiteSpace())
+            if (json.IsNullOrWhiteSpace())
             {
                 ParseJson(ReadTokenFile());
             }
             else
             {
-                ParseJson(argJson);
+                ParseJson(json);
             }
 
             currentTarget = ReadTargetFile();
@@ -48,18 +50,31 @@
 
         public VcapCredentialManager() : this((string)null) { }
 
-        public VcapCredentialManager(Uri argCurrentTarget) : this((string)null)
+        public VcapCredentialManager(Uri currentTarget) : this((string)null)
         {
-            if (null == argCurrentTarget)
+            if (null == currentTarget)
             {
-                throw new ArgumentNullException("argCurrentTarget");
+                throw new ArgumentNullException("currentTarget");
             }
-            SetTarget(argCurrentTarget);
+            SetTarget(currentTarget);
         }
 
-        public VcapCredentialManager(string argTokenJson, bool argShouldWrite) : this(argTokenJson)
+        public VcapCredentialManager(Uri currentTarget, IPAddress currentTargetIP) : this((string)null)
         {
-            shouldWrite = argShouldWrite;
+            if (null == currentTarget)
+            {
+                throw new ArgumentNullException("currentTarget");
+            }
+            if (null == currentTargetIP)
+            {
+                throw new ArgumentNullException("currentTargetIP");
+            }
+            SetTarget(currentTarget, currentTargetIP);
+        }
+
+        internal VcapCredentialManager(string tokenJson, bool shouldWrite) : this(tokenJson)
+        {
+            this.shouldWrite = shouldWrite;
         }
 
         public Uri CurrentTarget
@@ -81,19 +96,25 @@
             }
         }
 
-        public void SetTarget(Uri argUri)
+        public void SetTarget(Uri uri)
         {
-            currentTarget = argUri;
+            currentTarget = uri;
         }
 
-        public void SetTarget(string argUri)
+        public void SetTarget(Uri uri, IPAddress ip)
         {
-            currentTarget = new Uri(argUri);
+            currentTarget = uri;
+            currentTargetIP = ip;
         }
 
-        public void RegisterToken(string argToken)
+        public void SetTarget(string uri)
         {
-            var accessToken = new AccessToken(CurrentTarget, argToken);
+            currentTarget = new Uri(uri);
+        }
+
+        public void RegisterToken(string token)
+        {
+            var accessToken = new AccessToken(CurrentTarget, token);
             tokenDict[accessToken.Uri] = accessToken;
             WriteTokenFile();
         }
@@ -111,18 +132,18 @@
             }
         }
 
-        private AccessToken GetFor(Uri argUri)
+        private AccessToken GetFor(Uri uri)
         {
             AccessToken rv;
-            tokenDict.TryGetValue(argUri, out rv);
+            tokenDict.TryGetValue(uri, out rv);
             return rv;
         }
 
-        private void ParseJson(string argTokenJson, bool argShouldWrite = false)
+        private void ParseJson(string tokenJson, bool shouldWrite = false)
         {
-            if (false == argTokenJson.IsNullOrWhiteSpace())
+            if (false == tokenJson.IsNullOrWhiteSpace())
             {
-                Dictionary<string, string> allTokens = JsonConvert.DeserializeObject<Dictionary<string, string>>(argTokenJson);
+                Dictionary<string, string> allTokens = JsonConvert.DeserializeObject<Dictionary<string, string>>(tokenJson);
                 foreach (KeyValuePair<string, string> kvp in allTokens)
                 {
                     string uriStr = kvp.Key;
@@ -130,7 +151,7 @@
                     var accessToken = new AccessToken(uriStr, token);
                     tokenDict[accessToken.Uri] = accessToken;
                 }
-                if (argShouldWrite)
+                if (shouldWrite)
                 {
                     WriteTokenFile();
                 }
@@ -187,5 +208,7 @@
 
             return rv;
         }
+
+        public object CurrentTargetIP { get; set; }
     }
 }

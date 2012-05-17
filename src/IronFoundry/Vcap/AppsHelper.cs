@@ -96,7 +96,7 @@
         public byte[] Files(string name, string path, ushort instance)
         {
             var r = base.BuildVcapRequest(Constants.APPS_PATH, name, "instances", instance, "files", path);
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
             return response.RawBytes;
         }
 
@@ -146,7 +146,7 @@
 
                     var r = base.BuildVcapJsonRequest(Method.POST, Constants.APPS_PATH);
                     r.AddBody(manifest);
-                    RestResponse response = r.Execute();
+                    IRestResponse response = r.Execute();
 
                     UploadAppBits(name, path);
 
@@ -283,7 +283,7 @@
                     var request = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, name, "application");
                     request.AddFile("application", uploadFile);
                     request.AddParameter("resources", JsonConvert.SerializeObject(appcloudResources.ToArrayOrNull()));
-                    RestResponse response = request.Execute();
+                    IRestResponse response = request.Execute();
                 }
             }
             finally
@@ -304,7 +304,7 @@
              */
             var r = base.BuildVcapJsonRequest(Method.POST, Constants.RESOURCES_PATH);
             r.AddBody(resourceAry);
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
             return JsonConvert.DeserializeObject<Resource[]>(response.Content);
         }
 

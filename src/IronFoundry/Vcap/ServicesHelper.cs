@@ -16,7 +16,7 @@
         public IEnumerable<SystemService> GetSystemServices()
         {
             VcapRequest r = base.BuildVcapRequest(Constants.GLOBAL_SERVICES_PATH);
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
 
             var datastores = new List<SystemService>();
             var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemService>>>>(response.Content);
@@ -69,7 +69,7 @@
                     };
                     var r = base.BuildVcapJsonRequest(Method.POST, Constants.SERVICES_PATH);
                     r.AddBody(data);
-                    RestResponse response = r.Execute();
+                    IRestResponse response = r.Execute();
                     rv = new VcapClientResult();
                 }
             }
@@ -93,7 +93,7 @@
 
             var request = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, app.Name);
             request.AddBody(app);
-            RestResponse response = request.Execute();
+            IRestResponse response = request.Execute();
 
             // Ruby code re-gets info
             app = apps.GetApplication(argAppName);
@@ -114,7 +114,7 @@
 
             var r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, argAppName);
             r.AddBody(appParsed);
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
 
             apps = new AppsHelper(proxyUser, credMgr);
             apps.Restart(argAppName);

@@ -34,6 +34,12 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>IronFoundry.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,7 +53,7 @@
     <Compile Include="..\..\src\shared\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AccessTokenManagerTests.cs" />
+    <Compile Include="CredentialManagerTests.cs" />
     <Compile Include="FirewallTests.cs" />
     <Compile Include="FrameworkDetectorTests.cs" />
     <Compile Include="UserTests.cs" />
@@ -68,6 +74,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="IronFoundry.snk" />
     <None Include="IronFoundry.Test.xunit">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

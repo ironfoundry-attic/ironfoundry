@@ -18,7 +18,7 @@
 
             VcapJsonRequest r = base.BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH, argEmail, "tokens");
             r.AddBody(new { password = argPassword });
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
             if (response.Content.IsNullOrEmpty())
             {
                 rv = new VcapClientResult(false, Resources.Vmc_NoContentReturned_Text);
@@ -37,7 +37,7 @@
         public VcapClientResult ChangePassword(string user, string newpassword)
         {
             VcapRequest r = base.BuildVcapRequest(Constants.USERS_PATH, user);
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
 
             JObject parsed = JObject.Parse(response.Content);
             parsed["password"] = newpassword;
@@ -53,7 +53,7 @@
         {
             VcapJsonRequest r = base.BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH);
             r.AddBody(new { email = email, password = password });
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
             return new VcapClientResult();
         }
 
@@ -72,7 +72,7 @@
             }
 
             VcapJsonRequest r = base.BuildVcapJsonRequest(Method.DELETE, Constants.USERS_PATH, email);
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
             return new VcapClientResult();
         }
 
