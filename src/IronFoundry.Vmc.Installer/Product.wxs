@@ -187,9 +187,9 @@
                 <File Id="IronFoundry.pdb"
                                           Name="IronFoundry.pdb"
                                           Source="$(var.BUILDDIR)IronFoundry.pdb" />
-                <File Id="Newtonsoft.Json.pdb"
-                                          Name="Newtonsoft.Json.pdb"
-                                          Source="$(var.BUILDDIR)Newtonsoft.Json.pdb" />
+                <File Id="RestSharp.pdb"
+                                          Name="RestSharp.pdb"
+                                          Source="$(var.BUILDDIR)RestSharp.pdb" />
                 <File Id="Vmc.pdb"
                                           Name="Vmc.pdb"
                                           Source="$(var.BUILDDIR)Vmc.pdb" />

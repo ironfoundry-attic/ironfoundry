@@ -240,9 +240,9 @@
                 <File Id="IronFoundry.Ui.Controls.pdb"
                                           Name="IronFoundry.Ui.Controls.pdb"
                                           Source="$(var.BUILDDIR)IronFoundry.Ui.Controls.pdb" />
-                <File Id="Newtonsoft.Json.pdb"
-                                          Name="Newtonsoft.Json.pdb"
-                                          Source="$(var.BUILDDIR)Newtonsoft.Json.pdb" />
+                <File Id="RestSharp.pdb"
+                                          Name="RestSharp.pdb"
+                                          Source="$(var.BUILDDIR)RestSharp.pdb" />
                 <?endif?>
               </Component>
             </Directory>

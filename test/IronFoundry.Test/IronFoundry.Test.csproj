@@ -34,7 +34,16 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>IronFoundry.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RestSharp, Version=103.1.0.0, Culture=neutral, PublicKeyToken=aed551a8db69a9bd, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\RestSharp\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,12 +56,13 @@
     <Compile Include="..\..\src\shared\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AccessTokenManagerTests.cs" />
+    <Compile Include="CredentialManagerTests.cs" />
     <Compile Include="FirewallTests.cs" />
     <Compile Include="FrameworkDetectorTests.cs" />
     <Compile Include="UserTests.cs" />
     <Compile Include="UtilitiesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VcapClientTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\IronFoundry.Dea\IronFoundry.Dea.csproj">
@@ -68,6 +78,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="IronFoundry.snk" />
     <None Include="IronFoundry.Test.xunit">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

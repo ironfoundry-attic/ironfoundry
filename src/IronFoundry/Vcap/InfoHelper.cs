@@ -56,7 +56,7 @@
         public IEnumerable<StatInfo> GetStats(VcapUser user, Application app)
         {
             VcapRequest r = base.BuildVcapRequest(Constants.APPS_PATH, app.Name, "stats");
-            RestResponse response = r.Execute();
+            IRestResponse response = r.Execute();
             var tmp = JsonConvert.DeserializeObject<SortedDictionary<int, StatInfo>>(response.Content);
 
             var rv = new List<StatInfo>();

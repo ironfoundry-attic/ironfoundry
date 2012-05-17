@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Linq;
     using System.Net;
+    using IronFoundry.Utilities;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RestSharp;
@@ -24,10 +25,11 @@
             (ushort)HttpStatusCode.HttpVersionNotSupported, // 505
         };
 
-        protected readonly VcapCredentialManager credentialManager;
-        protected readonly RestClient client;
-        protected readonly string proxyUserEmail;
+        private readonly VcapCredentialManager credentialManager;
+        private readonly RestClient client;
+        private readonly string proxyUserEmail;
 
+        private string requestHostHeader;
         protected RestRequest request;
 
         protected VcapRequestBase(string proxyUserEmail, VcapCredentialManager credentialManager)
@@ -44,16 +46,16 @@
             client = BuildClient(useAuthentication, uri);
         }
 
-        public RestResponse Execute()
+        public IRestResponse Execute()
         {
-            RestResponse response = client.Execute(request);
+            IRestResponse response = client.Execute(request);
             ProcessResponse(response);
             return response;
         }
 
         public TResponse Execute<TResponse>()
         {
-            RestResponse response = client.Execute(request);
+            IRestResponse response = client.Execute(request);
             ProcessResponse(response);
             if (response.Content.IsNullOrWhiteSpace())
             {
@@ -67,21 +69,31 @@
 
         protected RestRequest BuildRequest(Method method, params object[] args)
         {
-            var rv = new RestRequest
-            {
-                Method = method,
-            };
-            return ProcessRequestArgs(rv, args);
+            return BuildRequest(method, DataFormat.Json, args);
         }
 
         protected RestRequest BuildRequest(Method method, DataFormat format, params object[] args)
         {
+            RestRequest rv = BuildRestRequest(method);
+            rv.RequestFormat = format;
+            return ProcessRequestArgs(rv, args);
+        }
+
+        private RestRequest BuildRestRequest(Method method)
+        {
+            var serializer = new NewtonsoftJsonSerializer();
             var rv = new RestRequest
             {
                 Method = method,
-                RequestFormat = format,
+                JsonSerializer = serializer,
             };
-            return ProcessRequestArgs(rv, args);
+
+            if (null != requestHostHeader)
+            {
+                rv.AddHeader("Host", requestHostHeader);
+            }
+
+            return rv;
         }
 
         private RestClient BuildClient()
@@ -91,17 +103,27 @@
 
         private RestClient BuildClient(bool useAuth, Uri uri = null)
         {
-            string baseUrl = credentialManager.CurrentTarget.AbsoluteUri;
-            if (null != uri)
+            Uri currentTargetUri = uri;
+            if (null == currentTargetUri)
             {
-                baseUrl = uri.AbsoluteUri;
+                currentTargetUri = credentialManager.CurrentTarget;
             }
 
+            string baseUrl = currentTargetUri.AbsoluteUri;
+            if (null != credentialManager.CurrentTargetIP)
+            {
+                baseUrl = String.Format("{0}://{1}", Uri.UriSchemeHttp, credentialManager.CurrentTargetIP.ToString());
+                requestHostHeader = currentTargetUri.Host;
+            }
+
+            var deserializer = new NewtonsoftJsonDeserializer();
             var rv = new RestClient
             {
                 BaseUrl = baseUrl,
                 FollowRedirects = false,
             };
+            rv.RemoveHandler(NewtonsoftJsonDeserializer.JsonContentType);
+            rv.AddHandler(NewtonsoftJsonDeserializer.JsonContentType, deserializer);
 
             if (useAuth && credentialManager.HasToken)
             {
@@ -129,7 +151,7 @@
             return request;
         }
 
-        private static void ProcessResponse(RestResponse response)
+        private static void ProcessResponse(IRestResponse response)
         {
             if (VMC_HTTP_ERROR_CODES.Contains((ushort)response.StatusCode))
             {
@@ -180,6 +202,21 @@
                     }
                 }
             }
+        }
+
+        internal RestClient Client
+        {
+            get { return client; }
+        }
+
+        internal RestRequest Request
+        {
+            get { return request; }
+        }
+
+        internal string RequestHostHeader
+        {
+            get { return requestHostHeader; }
         }
     }
 

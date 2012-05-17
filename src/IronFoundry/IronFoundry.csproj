@@ -102,6 +102,8 @@
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\CustomSerializationBinder.cs" />
     <Compile Include="Extensions\SafeObservableCollection.cs" />
+    <Compile Include="Utilities\NewtonsoftJsonDeserializer.cs" />
+    <Compile Include="Utilities\NewtonsoftJsonSerializer.cs" />
     <Compile Include="Utilities\Utilities.cs" />
     <Compile Include="Vcap\BaseVmcHelper.cs" />
     <Compile Include="Vcap\Constants.cs" />
@@ -115,7 +117,6 @@
     <Compile Include="Vcap\VcapRequest.cs" />
     <Compile Include="Vcap\VcapClientResult.cs" />
     <Compile Include="Vcap\InfoHelper.cs" />
-    <Compile Include="Vcap\VmcAdministration.cs" />
     <Compile Include="Vcap\AppsHelper.cs" />
     <Compile Include="Vcap\VcapClient.cs" />
     <Compile Include="Vcap\ServicesHelper.cs" />
@@ -132,13 +133,12 @@
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.4.5.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.5\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp, Version=102.0.0.0, Culture=neutral, PublicKeyToken=aed551a8db69a9bd, processorArchitecture=MSIL">
+    <Reference Include="RestSharp, Version=103.1.0.0, Culture=neutral, PublicKeyToken=aed551a8db69a9bd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\RestSharp.dll</HintPath>
+      <HintPath>..\..\lib\RestSharp\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="WindowsBase" />
