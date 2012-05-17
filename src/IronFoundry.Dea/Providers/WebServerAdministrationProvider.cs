@@ -43,7 +43,7 @@
         }
 
         public WebServerAdministrationBinding InstallWebApp(
-            string localDirectory, string applicationInstanceName, uint memMB)
+            string localDirectory, string applicationInstanceName, uint memQuotaBytes)
         {
             WebServerAdministrationBinding rv = null;
 
@@ -68,7 +68,7 @@
                             return null;
                         }
 
-                        uint memKB = memMB * 1024;
+                        uint memKB = memQuotaBytes / 1024;
                         cmd = String.Format(
                             "set apppool {0} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated /recycling.periodicRestart.privateMemory:{1}",
                             applicationInstanceName, memKB);

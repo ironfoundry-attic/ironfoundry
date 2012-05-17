@@ -16,7 +16,6 @@
             State          = argInstance.State;
             StateTimestamp = argInstance.StateTimestamp;
             Staged         = argInstance.Staged;
-            Stats          = new Stats(argInstance);
 
             if (this.State != VcapStates.RUNNING)
             {

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -102,6 +103,7 @@
                 messagingProvider.Subscribe(NatsSubscription.GetDeaInstanceStartFor(messagingProvider.UniqueIdentifier), ProcessDeaStart);
                 messagingProvider.Subscribe(NatsSubscription.RouterStart, ProcessRouterStart);
                 messagingProvider.Subscribe(NatsSubscription.HealthManagerStart, ProcessHealthManagerStart);
+                messagingProvider.Subscribe(NatsSubscription.DeaLocate, ProcessDeaLocate);
 
                 messagingProvider.Publish(helloMessage);
 
@@ -198,7 +200,7 @@
             if (filesManager.Stage(droplet, instance))
             {
                 WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(
-                    filesManager.GetApplicationPathFor(instance), instance.Staged, instance.MemQuota);
+                    filesManager.GetApplicationPathFor(instance), instance.Staged, instance.MemQuotaBytes);
                 if (null == binding)
                 {
                     log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.Staged);
@@ -255,6 +257,15 @@
                 });
 
             TakeSnapshot();
+        }
+
+        private void ProcessDeaLocate(string message, string reply)
+        {
+            if (shutting_down)
+            {
+                return;
+            }
+            SendAdvertise();
         }
 
         private void ProcessDeaDiscover(string message, string reply)
@@ -376,24 +387,28 @@
 
             FindDroplet findDroplet = Message.FromJson<FindDroplet>(message);
 
-            dropletManager.ForAllInstances((instance) =>
+            dropletManager.ForAllInstances(findDroplet.DropletID, (instance) =>
             {
-                if (instance.DropletID == findDroplet.DropletID)
-                {
-                    if (instance.Version == findDroplet.Version)
-                    {
-                        if (findDroplet.States.Contains(instance.State))
-                        {
-                            var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance)
-                            {
-                                FileUri = String.Format(CultureInfo.InvariantCulture,
-                                    Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
-                                Credentials = config.FilesCredentials.ToArray(),
-                            };
+                bool versionMatched = findDroplet.Version.IsNullOrWhiteSpace() || instance.Version == findDroplet.Version;
+                bool instanceMatched = null == findDroplet.InstanceIds || findDroplet.InstanceIds.Contains(instance.InstanceID);
+                bool indexMatched = null == findDroplet.Indices || findDroplet.Indices.Contains(instance.InstanceIndex);
+                bool stateMatched = null == findDroplet.States || findDroplet.States.Contains(instance.State);
 
-                            messagingProvider.Publish(reply, response);
-                        }
+                if (versionMatched && instanceMatched && indexMatched && stateMatched)
+                {
+                    var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance)
+                    {
+                        FileUri = String.Format(CultureInfo.InvariantCulture,
+                            Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
+                        Credentials = config.FilesCredentials.ToArray(),
+                    };
+
+                    if (findDroplet.IncludeStats && instance.IsRunning)
+                    {
+                        response.Stats = new Stats(instance);
                     }
+
+                    messagingProvider.Publish(reply, response);
                 }
             });
         }
@@ -636,10 +651,16 @@
 
                         long tickTimespan = (currentTicksTimestamp - instance.StartDate).Ticks;
 
-                        float cpu = tickTimespan != 0 ? ((float)ticksDelta / tickTimespan) * 100 : 0;
-                        cpu = cpu.Truncate(1);
+                        float cpu = 0;
+                        if (tickTimespan != 0)
+                        {
+                            cpu = (((float)ticksDelta / tickTimespan) * 100).Truncate(1);
+                        }
 
                         long memBytes = instance.WorkingSetMemory;
+                        long diskBytes = GetDiskUsage(instance.Dir);
+                        
+                        instance.AddUsage(memBytes, cpu, diskBytes, currentTicks);
 
                         foreach (KeyValuePair<string, IDictionary<string, Metric>> kvp in metrics)
                         {
@@ -678,6 +699,23 @@
                 varzProvider.FrameworkMetrics = metrics["framework"];
                 varzProvider.RuntimeMetrics = metrics["runtime"];
             }
+        }
+
+        private static long GetDiskUsage(string path)
+        {
+            long rv = 0;
+
+            try
+            {
+                var di = new DirectoryInfo(path);
+                if (di.Exists)
+                {
+                    rv = di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length);
+                }
+            }
+            catch { }
+
+            return rv;
         }
     }
 }

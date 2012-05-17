@@ -19,7 +19,8 @@ namespace IronFoundry.Dea.Providers
 
     public interface IWebServerAdministrationProvider
     {
-        WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName, uint memMB);
+        WebServerAdministrationBinding InstallWebApp(
+            string localDirectory, string applicationInstanceName, uint memQuotaBytes);
         void UninstallWebApp(string applicationInstanceName);
         ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName);
         IDictionary<string, int> GetIIsWorkerProcesses();

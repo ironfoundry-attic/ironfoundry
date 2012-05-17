@@ -6,17 +6,17 @@
 
     public interface IDropletManager
     {
-        void Add(uint argDropletID, Instance argInstance);
-        void Add(uint argDropletID, IEnumerable<Instance> argInstances);
+        void Add(uint dropletID, Instance instance);
+        void Add(uint dropletID, IEnumerable<Instance> instances);
 
-        void ForAllInstances(Action<Instance> argInstanceAction);
-        void ForAllInstances(Action<uint> argDropletAction, Action<Instance> argInstanceAction);
-        void ForAllInstances(uint argDropletID, Action<Instance> argInstanceAction);
+        void ForAllInstances(Action<Instance> instanceAction);
+        void ForAllInstances(Action<uint> dropletAction, Action<Instance> instanceAction);
+        void ForAllInstances(uint dropletID, Action<Instance> instanceAction);
 
-        void FromSnapshot(Snapshot argSnapshot);
+        void FromSnapshot(Snapshot snapshot);
         Snapshot GetSnapshot();
 
-        void InstanceStopped(Instance argInstance);
+        void InstanceStopped(Instance instance);
 
         bool IsEmpty { get; }
 

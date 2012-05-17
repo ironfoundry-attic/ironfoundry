@@ -14,6 +14,7 @@
      */
     public class Instance : EntityBase, IDisposable
     {
+        private const int MaxUsageSamples = 30;
         private readonly LinkedList<Usage> usageHistory = new LinkedList<Usage>();
         private readonly DateTime startDate;
 
@@ -29,23 +30,23 @@
         {
             if (null != droplet)
             {
-                DropletID     = droplet.ID;
-                InstanceID    = Guid.NewGuid();
-                InstanceIndex = droplet.InstanceIndex;
-                Name          = droplet.Name;
-                Uris          = droplet.Uris;
-                Users         = droplet.Users;
-                Version       = droplet.Version;
-                MemQuota      = droplet.Limits.Mem * (1024 * 1024);
-                DiskQuota     = droplet.Limits.Disk * (1024 * 1024);
-                FdsQuota      = droplet.Limits.FDs;
-                Runtime       = droplet.Runtime;
-                Framework     = droplet.Framework;
-                Staged        = droplet.Name;
-                Sha1          = droplet.Sha1;
-                logID         = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
-                Staged        = String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID);
-                Dir           = Path.Combine(appDir, Staged);
+                DropletID      = droplet.ID;
+                InstanceID     = Guid.NewGuid();
+                InstanceIndex  = droplet.InstanceIndex;
+                Name           = droplet.Name;
+                Uris           = droplet.Uris;
+                Users          = droplet.Users;
+                Version        = droplet.Version;
+                MemQuotaBytes  = droplet.Limits.MemoryMB * (1024*1024);
+                DiskQuotaBytes = droplet.Limits.DiskMB * (1024*1024);
+                FdsQuota       = droplet.Limits.FDs;
+                Runtime        = droplet.Runtime;
+                Framework      = droplet.Framework;
+                Staged         = droplet.Name;
+                Sha1           = droplet.Sha1;
+                logID          = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
+                Staged         = String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID);
+                Dir            = Path.Combine(appDir, Staged);
             }
 
             State          = VcapStates.STARTING;
@@ -85,13 +86,13 @@
         public string Version { get; set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public uint MemQuota { get; set; }
+        public uint MemQuotaBytes { get; set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
-        public int DiskQuota { get; set; }
+        public uint DiskQuotaBytes { get; set; }
 
         [JsonProperty(PropertyName = "fds_quota")]
-        public int FdsQuota { get; set; }
+        public uint FdsQuota { get; set; }
 
         [JsonProperty(PropertyName = "state")]
         public string State { get; set; }
@@ -278,6 +279,7 @@
             }
         }
 
+        [JsonIgnore]
         public long MostRecentProcessorTicks
         {
             get
@@ -292,7 +294,50 @@
             }
         }
 
-        public long WorkingSetMemory { get; set; } // TODO
+        [JsonIgnore]
+        public long WorkingSetMemory
+        {
+            get
+            {
+                long rv = 0;
+                if (null != jobObject)
+                {
+                    rv = jobObject.WorkingSetMemory;
+                }
+                return rv;
+            }
+        }
+
+        [JsonIgnore]
+        public Usage MostRecentUsage
+        {
+            get
+            {
+                Usage rv = null;
+                if (usageHistory.Count > 0)
+                {
+                    rv = usageHistory.First.Value;
+                }
+                return rv;
+            }
+        }
+
+        public void AddUsage(long memBytes, float cpu, long diskBytes, long currentTicks)
+        {
+            var newUsage = new Usage();
+            newUsage.Time = DateTime.Now;
+            newUsage.Cpu = cpu;
+            newUsage.MemoryUsageKB = memBytes / 1024;
+            newUsage.DiskUsageBytes = diskBytes;
+            newUsage.TotalCpuTicks = currentTicks;
+
+            usageHistory.AddFirst(newUsage);
+
+            if (usageHistory.Count > MaxUsageSamples)
+            {
+                usageHistory.RemoveLast();
+            }
+        }
 
         public void Dispose()
         {
