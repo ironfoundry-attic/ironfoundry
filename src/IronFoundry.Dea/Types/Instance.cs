@@ -1,19 +1,21 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.WindowsJobObjects;
     using JsonConverters;
     using Newtonsoft.Json;
-    using IronFoundry.Dea.Properties;
 
     /*
      * TODO: should probably separate out this "on the wire" class from one used to track data
      */
     public class Instance : EntityBase, IDisposable
     {
-        private DateTime startDate;
+        private readonly LinkedList<Usage> usageHistory = new LinkedList<Usage>();
+        private readonly DateTime startDate;
 
         private Process instanceWorkerProcess;
         private JobObject jobObject;
@@ -257,12 +259,40 @@
         }
 
         [JsonIgnore]
-        public bool GatherStats
+        public bool CanGatherStats
         {
             get { return this.IsStarting || this.IsRunning; }
         }
 
-        public long TotalProcessorTicks { get; set; }
+        [JsonIgnore]
+        public long TotalProcessorTicks
+        {
+            get
+            {
+                long rv = 0;
+                if (null != jobObject)
+                {
+                    rv = jobObject.TotalProcessorTime.Ticks;
+                }
+                return rv;
+            }
+        }
+
+        public long MostRecentProcessorTicks
+        {
+            get
+            {
+                long rv = 0;
+                if (usageHistory.Count > 0)
+                {
+                    Usage mostRecent = usageHistory.First.Value;
+                    rv = mostRecent.TotalCpuTicks;
+                }
+                return rv;
+            }
+        }
+
+        public long WorkingSetMemory { get; set; } // TODO
 
         public void Dispose()
         {

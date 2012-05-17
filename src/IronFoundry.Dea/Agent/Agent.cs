@@ -409,7 +409,7 @@
 
             dropletManager.ForAllInstances((instance) =>
             {
-                if (instance.GatherStats)
+                if (instance.CanGatherStats)
                 {
                     var response = new Stats(instance); // TODO more statistics
                     messagingProvider.Publish(reply, response);
@@ -619,6 +619,9 @@
                     { "runtime", new Dictionary<string, Metric>() }
                 };
 
+                // TODO long memoryUsageKbytes = 0;
+                DateTime monitorPassStart = DateTime.Now;
+
                 dropletManager.ForAllInstances((instance) =>
                     {
                         if (false == instance.IsRunning)
@@ -627,6 +630,16 @@
                         }
 
                         long currentTicks = instance.TotalProcessorTicks;
+                        DateTime currentTicksTimestamp = DateTime.Now;
+                        long mostRecentTicks = instance.MostRecentProcessorTicks;
+                        long ticksDelta = currentTicks - mostRecentTicks;
+
+                        long tickTimespan = (currentTicksTimestamp - instance.StartDate).Ticks;
+
+                        float cpu = tickTimespan != 0 ? ((float)ticksDelta / tickTimespan) * 100 : 0;
+                        cpu = cpu.Truncate(1);
+
+                        long memBytes = instance.WorkingSetMemory;
 
                         foreach (KeyValuePair<string, IDictionary<string, Metric>> kvp in metrics)
                         {
@@ -643,17 +656,17 @@
 
                             if (kvp.Key == "runtime")
                             {
-                                if (!metrics.ContainsKey(instance.Runtime))
+                                if (false == metrics.ContainsKey(instance.Runtime))
                                 {
                                     kvp.Value[instance.Runtime] = metric;
                                 }
                                 metric = kvp.Value[instance.Runtime];
                             }
 
-                            metric.UsedMemory = 0; // TODO KB
-                            metric.ReservedMemory = 0; // TODO KB
-                            metric.UsedDisk = 0; // TODO BYTES
-                            metric.UsedCpu = 0; // TODO
+                            metric.UsedMemory += 0; // TODO KB
+                            metric.ReservedMemory += 0; // TODO KB
+                            metric.UsedDisk += 0; // TODO BYTES
+                            metric.UsedCpu += 0; // TODO
                         }
 
                         string instanceJson = instance.ToJson();

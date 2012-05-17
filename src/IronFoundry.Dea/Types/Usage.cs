@@ -7,7 +7,7 @@
     public class Usage
     {
         [JsonIgnore]
-        public ulong TotalCpuTicks { get; set; }
+        public long TotalCpuTicks { get; set; }
 
         [JsonProperty(PropertyName="time"), JsonConverter(typeof(VcapDateTimeConverter))]
         public DateTime Time { get; set; }
@@ -16,9 +16,9 @@
         public float Cpu { get; set; }
 
         [JsonProperty(PropertyName="mem")]
-        public ulong MemoryUsageKB { get; set; }
+        public long MemoryUsageKB { get; set; }
 
         [JsonProperty(PropertyName="disk")]
-        public ulong DiskUsageB { get; set; }
+        public long DiskUsageBytes { get; set; }
     }
 }

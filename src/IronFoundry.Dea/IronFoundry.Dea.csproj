@@ -83,6 +83,7 @@
     <Compile Include="Config\DeaSection.cs" />
     <Compile Include="Agent\DropletManager.cs" />
     <Compile Include="Extensions\DateTimeExtensionMethods.cs" />
+    <Compile Include="Extensions\FloatExtensionMethods.cs" />
     <Compile Include="Extensions\RegexExtensionMethods.cs" />
     <Compile Include="Extensions\TaskExtensionMethods.cs" />
     <Compile Include="Extensions\TcpClientExtensionMethods.cs" />
