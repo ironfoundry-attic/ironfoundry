@@ -14,6 +14,11 @@
             return new VcapClientResult(true, r.Execute<Info>());
         }
 
+        internal VcapRequest BuildInfoRequest()
+        {
+            return BuildVcapRequest(Constants.INFO_PATH);
+        }
+
         public VcapClientResult Target(Uri argUri = null)
         {
             VcapClientResult rv;

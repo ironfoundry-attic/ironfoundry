@@ -35,7 +35,6 @@
         {
             string ipStr = "10.0.0.1";
             Uri uri = new Uri("http://api.vcap-test.me");
-
             IPAddress ip;
             IPAddress.TryParse(ipStr, out ip);
 
@@ -49,6 +48,55 @@
             credentialManager.SetTarget("http://api.foo.com");
             Assert.Equal(newTargetUri, credentialManager.CurrentTarget);
             Assert.Null(credentialManager.CurrentTargetIP);
+        }
+
+        [Fact]
+        public void Host_And_IP_Both_Required()
+        {
+            string ipStr = "10.0.0.1";
+            Uri uri = new Uri("http://api.vcap-test.me");
+            IPAddress ip;
+            IPAddress.TryParse(ipStr, out ip);
+
+            VcapCredentialManager credentialManager = null;
+            try
+            {
+                credentialManager = new VcapCredentialManager((Uri)null, (IPAddress)null);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsType<ArgumentNullException>(ex);
+            }
+
+            try
+            {
+                credentialManager = new VcapCredentialManager(uri, (IPAddress)null);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsType<ArgumentNullException>(ex);
+            }
+
+            credentialManager = new VcapCredentialManager(uri);
+            Assert.Equal(uri, credentialManager.CurrentTarget);
+            Assert.Null(credentialManager.CurrentTargetIP);
+
+            try
+            {
+                credentialManager.SetTarget((Uri)null, (IPAddress)null);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsType<ArgumentNullException>(ex);
+            }
+            try
+            {
+                credentialManager.SetTarget(uri, (IPAddress)null);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsType<ArgumentNullException>(ex);
+            }
         }
     }
 }

@@ -82,6 +82,11 @@
             get { return currentTarget ?? Constants.DEFAULT_LOCAL_TARGET; }
         }
 
+        public IPAddress CurrentTargetIP
+        {
+            get { return currentTargetIP; }
+        }
+
         public string CurrentToken
         {
             get
@@ -96,20 +101,29 @@
             }
         }
 
+        public void SetTarget(string uri)
+        {
+            SetTarget(new Uri(uri));
+        }
+
         public void SetTarget(Uri uri)
         {
             currentTarget = uri;
+            currentTargetIP = null;
         }
 
         public void SetTarget(Uri uri, IPAddress ip)
         {
+            if (null == uri)
+            {
+                throw new ArgumentNullException("uri");
+            }
+            if (null == ip)
+            {
+                throw new ArgumentNullException("ip");
+            }
             currentTarget = uri;
             currentTargetIP = ip;
-        }
-
-        public void SetTarget(string uri)
-        {
-            currentTarget = new Uri(uri);
         }
 
         public void RegisterToken(string token)
@@ -208,7 +222,5 @@
 
             return rv;
         }
-
-        public object CurrentTargetIP { get; set; }
     }
 }

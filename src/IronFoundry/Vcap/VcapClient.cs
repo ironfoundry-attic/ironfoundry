@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Net;
     using System.Text;
     using System.Text.RegularExpressions;
     using IronFoundry.Properties;
@@ -46,6 +47,11 @@
             this.cloud = cloud;
         }
 
+        public VcapClient(Uri uri, IPAddress ipAddress)
+        {
+            credMgr = new VcapCredentialManager(uri, ipAddress);
+        }
+
         public void ProxyAs(VcapUser user)
         {
             proxyUser = user;
@@ -65,6 +71,12 @@
         {
             var helper = new MiscHelper(proxyUser, credMgr);
             return helper.Info();
+        }
+
+        internal VcapRequest GetRequestForTesting()
+        {
+            var helper = new MiscHelper(proxyUser, credMgr);
+            return helper.BuildInfoRequest();
         }
 
         public VcapClientResult Target(string uri)

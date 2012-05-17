@@ -25,10 +25,11 @@
             (ushort)HttpStatusCode.HttpVersionNotSupported, // 505
         };
 
-        protected readonly VcapCredentialManager credentialManager;
-        protected readonly RestClient client;
-        protected readonly string proxyUserEmail;
+        private readonly VcapCredentialManager credentialManager;
+        private readonly RestClient client;
+        private readonly string proxyUserEmail;
 
+        private string requestHostHeader;
         protected RestRequest request;
 
         protected VcapRequestBase(string proxyUserEmail, VcapCredentialManager credentialManager)
@@ -86,6 +87,12 @@
                 Method = method,
                 JsonSerializer = serializer,
             };
+
+            if (null != requestHostHeader)
+            {
+                rv.AddHeader("Host", requestHostHeader);
+            }
+
             return rv;
         }
 
@@ -96,10 +103,17 @@
 
         private RestClient BuildClient(bool useAuth, Uri uri = null)
         {
-            string baseUrl = credentialManager.CurrentTarget.AbsoluteUri;
-            if (null != uri)
+            Uri currentTargetUri = uri;
+            if (null == currentTargetUri)
             {
-                baseUrl = uri.AbsoluteUri;
+                currentTargetUri = credentialManager.CurrentTarget;
+            }
+
+            string baseUrl = currentTargetUri.AbsoluteUri;
+            if (null != credentialManager.CurrentTargetIP)
+            {
+                baseUrl = String.Format("{0}://{1}", Uri.UriSchemeHttp, credentialManager.CurrentTargetIP.ToString());
+                requestHostHeader = currentTargetUri.Host;
             }
 
             var deserializer = new NewtonsoftJsonDeserializer();
@@ -188,6 +202,21 @@
                     }
                 }
             }
+        }
+
+        internal RestClient Client
+        {
+            get { return client; }
+        }
+
+        internal RestRequest Request
+        {
+            get { return request; }
+        }
+
+        internal string RequestHostHeader
+        {
+            get { return requestHostHeader; }
         }
     }
 
