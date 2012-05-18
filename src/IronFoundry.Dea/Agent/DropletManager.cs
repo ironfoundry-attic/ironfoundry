@@ -185,7 +185,7 @@
             }
         }
 
-        public void SetProcessInformationFrom(IDictionary<string, int> iisWorkerProcessData)
+        public void SetProcessInformationFrom(IDictionary<string, IList<int>> iisWorkerProcessData)
         {
             if (iisWorkerProcessData.IsNullOrEmpty())
             {
@@ -194,15 +194,24 @@
 
             ForAllInstances((inst) =>
                 {
-                    if (false == inst.WorkerProcessIsRunning)
+                    string appPoolName = inst.Staged; // TODO: we have to "know" that this is the app pool name
+                    IList<int> tmp;
+                    if (iisWorkerProcessData.TryGetValue(appPoolName, out tmp))
                     {
-                        string appPoolName = inst.Staged; // TODO: we have to "know" that this is the app pool name
-                        int tmp;
-                        if (iisWorkerProcessData.TryGetValue(appPoolName, out tmp))
+                        Process instanceProcess = null;
+                        foreach (int pid in tmp)
                         {
-                            Process instanceProcess = Process.GetProcessById(tmp);
-                            inst.SetWorkerProcess(instanceProcess);
+                            try
+                            {
+                                instanceProcess = Process.GetProcessById(pid);
+                                if (false == instanceProcess.HasExited)
+                                {
+                                    break;
+                                }
+                            }
+                            catch { }
                         }
+                        inst.SetWorkerProcess(instanceProcess);
                     }
                 });
         }

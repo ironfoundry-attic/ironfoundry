@@ -313,7 +313,4 @@
   <data name="WebServerAdministrationProvider_AppCmdFailed_Fmt" xml:space="preserve">
     <value>'appcmd.exe {0}' failed: {1}</value>
   </data>
-  <data name="Instance_AttemptToSetWorkerProcessTwice_Message" xml:space="preserve">
-    <value>Invalid attempt to set worker process data twice on the same Instance!</value>
-  </data>
 </root>

@@ -23,6 +23,6 @@ namespace IronFoundry.Dea.Providers
             string localDirectory, string applicationInstanceName, uint memQuotaBytes);
         void UninstallWebApp(string applicationInstanceName);
         ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName);
-        IDictionary<string, int> GetIIsWorkerProcesses();
+        IDictionary<string, IList<int>> GetIIsWorkerProcesses();
     }
 }

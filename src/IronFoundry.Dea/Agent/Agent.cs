@@ -155,7 +155,7 @@
         {
             while (false == shutting_down)
             {
-                IDictionary<string, int> iisWorkerProcesses = webServerProvider.GetIIsWorkerProcesses();
+                var iisWorkerProcesses = webServerProvider.GetIIsWorkerProcesses();
                 dropletManager.SetProcessInformationFrom(iisWorkerProcesses);
                 Thread.Sleep(FiveSecondsInterval);
             }

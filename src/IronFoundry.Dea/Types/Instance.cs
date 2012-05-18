@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.WindowsJobObjects;
     using JsonConverters;
     using Newtonsoft.Json;
@@ -18,15 +17,18 @@
         private readonly LinkedList<Usage> usageHistory = new LinkedList<Usage>();
         private readonly DateTime startDate;
 
-        private Process instanceWorkerProcess;
-        private JobObject jobObject;
+        private readonly JobObject jobObject = new JobObject();
 
         private bool isEvacuated = false;
         private string logID;
 
-        public Instance() { }
+        public Instance()
+        {
+            this.jobObject.DieOnUnhandledException = true;
+            this.jobObject.ActiveProcessesLimit = 10;
+        }
 
-        public Instance(string appDir, Droplet droplet)
+        public Instance(string appDir, Droplet droplet) : this()
         {
             if (null != droplet)
             {
@@ -235,27 +237,12 @@
 
         public void SetWorkerProcess(Process instanceWorkerProcess)
         {
-            if (null != this.instanceWorkerProcess)
+            if (null != instanceWorkerProcess &&
+                false == instanceWorkerProcess.HasExited &&
+                false == jobObject.HasProcess(instanceWorkerProcess))
             {
-                throw new InvalidOperationException(Resources.Instance_AttemptToSetWorkerProcessTwice_Message);
-            }
-
-            this.instanceWorkerProcess = instanceWorkerProcess;
-
-            // TODO add limits, priority class
-            jobObject = new JobObject();
-            jobObject.DieOnUnhandledException = true;
-            jobObject.ActiveProcessesLimit = 10;
-
-            jobObject.AddProcess(instanceWorkerProcess);
-        }
-
-        [JsonIgnore]
-        public bool WorkerProcessIsRunning
-        {
-            get
-            {
-                return null != instanceWorkerProcess && false == instanceWorkerProcess.HasExited;
+                // TODO add limits, priority class
+                jobObject.AddProcess(instanceWorkerProcess);
             }
         }
 

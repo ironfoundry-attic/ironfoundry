@@ -20,6 +20,6 @@
 
         bool IsEmpty { get; }
 
-        void SetProcessInformationFrom(IDictionary<string, int> iisWorkerProcesses);
+        void SetProcessInformationFrom(IDictionary<string, IList<int>> iisWorkerProcesses);
     }
 }

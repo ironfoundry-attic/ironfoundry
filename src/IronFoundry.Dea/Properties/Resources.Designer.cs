@@ -295,15 +295,6 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid attempt to set worker process data twice on the same Instance!.
-        /// </summary>
-        internal static string Instance_AttemptToSetWorkerProcessTwice_Message {
-            get {
-                return ResourceManager.GetString("Instance_AttemptToSetWorkerProcessTwice_Message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Error setting up Event Log logger!.
         /// </summary>
         internal static string InternalLog_ErrorInSettingUpEventLogger_Message {
