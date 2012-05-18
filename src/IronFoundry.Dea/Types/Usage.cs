@@ -4,7 +4,7 @@
     using IronFoundry.Dea.JsonConverters;
     using Newtonsoft.Json;
 
-    public class Usage
+    public class Usage : EntityBase
     {
         [JsonIgnore]
         public long TotalCpuTicks { get; set; }

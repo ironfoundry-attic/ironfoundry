@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using IronFoundry.Dea.WindowsJobObjects;
     using JsonConverters;
     using Newtonsoft.Json;
@@ -15,17 +16,20 @@
     {
         private const int MaxUsageSamples = 30;
         private readonly LinkedList<Usage> usageHistory = new LinkedList<Usage>();
-        private readonly DateTime startDate;
+
+        private readonly DateTime instanceStartDate;
 
         private readonly JobObject jobObject = new JobObject();
 
+        private readonly string logID;
+
+        private DateTime? workerProcessStartDate = null;
         private bool isEvacuated = false;
-        private string logID;
 
         public Instance()
         {
-            this.jobObject.DieOnUnhandledException = true;
-            this.jobObject.ActiveProcessesLimit = 10;
+            jobObject.DieOnUnhandledException = true;
+            jobObject.ActiveProcessesLimit = 10;
         }
 
         public Instance(string appDir, Droplet droplet) : this()
@@ -51,16 +55,26 @@
                 Dir            = Path.Combine(appDir, Staged);
             }
 
-            State          = VcapStates.STARTING;
-            startDate      = DateTime.Now;
-            Start          = startDate.ToJsonString();
-            StateTimestamp = Utility.GetEpochTimestamp();
+            State             = VcapStates.STARTING;
+            instanceStartDate = DateTime.Now;
+            Start             = instanceStartDate.ToJsonString();
+            StateTimestamp    = Utility.GetEpochTimestamp();
+
+            if (MemQuotaBytes > 0)
+            {
+                /*
+                 * TODO: if the user pushes an ASP.NET app with 64MB allocation, this will almost
+                 * always kill it due to the fact that the default working set size is 64MB or maybe a bit more
+                 * when a worker process is spun up.
+                jobObject.JobMemoryLimit = MemQuotaBytes;
+                 */
+            }
         }
 
         [JsonIgnore]
         public DateTime StartDate
         {
-            get { return startDate; }
+            get { return instanceStartDate; }
         }
 
         [JsonProperty(PropertyName = "droplet_id")]
@@ -235,14 +249,16 @@
             }
         }
 
-        public void SetWorkerProcess(Process instanceWorkerProcess)
+        public void AddWorkerProcess(Process newInstanceWorkerProcess)
         {
-            if (null != instanceWorkerProcess &&
-                false == instanceWorkerProcess.HasExited &&
-                false == jobObject.HasProcess(instanceWorkerProcess))
+            if (false == newInstanceWorkerProcess.HasExited &&
+                false == jobObject.HasProcess(newInstanceWorkerProcess))
             {
-                // TODO add limits, priority class
-                jobObject.AddProcess(instanceWorkerProcess);
+                jobObject.AddProcess(newInstanceWorkerProcess);
+                if (false == workerProcessStartDate.HasValue)
+                {
+                    workerProcessStartDate = DateTime.Now;
+                }
             }
         }
 
@@ -250,49 +266,6 @@
         public bool CanGatherStats
         {
             get { return this.IsStarting || this.IsRunning; }
-        }
-
-        [JsonIgnore]
-        public long TotalProcessorTicks
-        {
-            get
-            {
-                long rv = 0;
-                if (null != jobObject)
-                {
-                    rv = jobObject.TotalProcessorTime.Ticks;
-                }
-                return rv;
-            }
-        }
-
-        [JsonIgnore]
-        public long MostRecentProcessorTicks
-        {
-            get
-            {
-                long rv = 0;
-                if (usageHistory.Count > 0)
-                {
-                    Usage mostRecent = usageHistory.First.Value;
-                    rv = mostRecent.TotalCpuTicks;
-                }
-                return rv;
-            }
-        }
-
-        [JsonIgnore]
-        public long WorkingSetMemory
-        {
-            get
-            {
-                long rv = 0;
-                if (null != jobObject)
-                {
-                    rv = jobObject.WorkingSetMemory;
-                }
-                return rv;
-            }
         }
 
         [JsonIgnore]
@@ -309,14 +282,51 @@
             }
         }
 
-        public void AddUsage(long memBytes, float cpu, long diskBytes, long currentTicks)
+        [JsonIgnore]
+        private long MostRecentCpuTicks
         {
+            get
+            {
+                long rv = 0;
+                Usage mostRecent = MostRecentUsage;
+                if (null != mostRecent)
+                {
+                    rv = mostRecent.TotalCpuTicks;
+                }
+                return rv;
+            }
+        }
+
+        public void CalculateUsage()
+        {
+            /*
+             * NB: some of this code is from this file, MonitorApps() method
+             * https://raw.github.com/UhuruSoftware/vcap-dotnet/master/src/Uhuru.CloudFoundry.DEA/Agent.cs
+             * Copyright (c) 2011 Uhuru Software, Inc., All Rights Reserved
+             */
             var newUsage = new Usage();
-            newUsage.Time = DateTime.Now;
+
+            newUsage.DiskUsageBytes = GetDiskUsage(this.Dir);
+
+            newUsage.MemoryUsageKB = jobObject.WorkingSetMemory / 1024;
+
+            long currentTicks = newUsage.TotalCpuTicks = jobObject.TotalProcessorTime.Ticks;
+            DateTime currentTicksTimestamp = newUsage.Time = DateTime.Now;
+
+            long lastTicks = MostRecentCpuTicks;
+            
+            long ticksDelta = currentTicks - lastTicks;
+
+            DateTime startDate = workerProcessStartDate ?? instanceStartDate;
+            long tickTimespan = (currentTicksTimestamp - startDate).Ticks;
+
+            float cpu = 0;
+            if (tickTimespan > 0)
+            {
+                cpu = (((float)ticksDelta / tickTimespan) * 100).Truncate(1);
+            }
+
             newUsage.Cpu = cpu;
-            newUsage.MemoryUsageKB = memBytes / 1024;
-            newUsage.DiskUsageBytes = diskBytes;
-            newUsage.TotalCpuTicks = currentTicks;
 
             usageHistory.AddFirst(newUsage);
 
@@ -336,11 +346,28 @@
         {
             if (disposing)
             {
-                if (this.jobObject != null)
+                if (jobObject != null)
                 {
-                    this.jobObject.Dispose();
+                    jobObject.Dispose();
                 }
             }
+        }
+
+        private static long GetDiskUsage(string path)
+        {
+            long rv = 0;
+
+            try
+            {
+                var di = new DirectoryInfo(path);
+                if (di.Exists)
+                {
+                    rv = di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length);
+                }
+            }
+            catch { }
+
+            return rv;
         }
     }
 }

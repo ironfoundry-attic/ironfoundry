@@ -42,8 +42,7 @@
             this.appCmdPath = config.AppCmdPath;
         }
 
-        public WebServerAdministrationBinding InstallWebApp(
-            string localDirectory, string applicationInstanceName, uint memQuotaBytes)
+        public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
         {
             WebServerAdministrationBinding rv = null;
 
@@ -68,10 +67,9 @@
                             return null;
                         }
 
-                        uint memKB = memQuotaBytes / 1024;
                         cmd = String.Format(
-                            "set apppool {0} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated /recycling.periodicRestart.privateMemory:{1}",
-                            applicationInstanceName, memKB);
+                            "set apppool {0} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated",
+                            applicationInstanceName);
                         rslt = ExecAppcmd(cmd, 5, twoSeconds);
                         if (false == rslt.Success)
                         {

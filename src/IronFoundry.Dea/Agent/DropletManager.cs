@@ -7,7 +7,6 @@
 
     public class DropletManager : IDropletManager
     {
-        // TODO check this out: http://geekswithblogs.net/BlackRabbitCoder/archive/2011/02/17/c.net-little-wonders-the-concurrentdictionary.aspx
         private readonly IDictionary<uint, IDictionary<Guid, Instance>> droplets = new Dictionary<uint, IDictionary<Guid, Instance>>();
 
         public void Add(uint dropletID, IEnumerable<Instance> instances)
@@ -198,20 +197,14 @@
                     IList<int> tmp;
                     if (iisWorkerProcessData.TryGetValue(appPoolName, out tmp))
                     {
-                        Process instanceProcess = null;
                         foreach (int pid in tmp)
                         {
                             try
                             {
-                                instanceProcess = Process.GetProcessById(pid);
-                                if (false == instanceProcess.HasExited)
-                                {
-                                    break;
-                                }
+                                inst.AddWorkerProcess(Process.GetProcessById(pid));
                             }
                             catch { }
                         }
-                        inst.SetWorkerProcess(instanceProcess);
                     }
                 });
         }

@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -200,7 +199,7 @@
             if (filesManager.Stage(droplet, instance))
             {
                 WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(
-                    filesManager.GetApplicationPathFor(instance), instance.Staged, instance.MemQuotaBytes);
+                    filesManager.GetApplicationPathFor(instance), instance.Staged);
                 if (null == binding)
                 {
                     log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.Staged);
@@ -634,7 +633,6 @@
                     { "runtime", new Dictionary<string, Metric>() }
                 };
 
-                // TODO long memoryUsageKbytes = 0;
                 DateTime monitorPassStart = DateTime.Now;
 
                 dropletManager.ForAllInstances((instance) =>
@@ -644,23 +642,7 @@
                             return;
                         }
 
-                        long currentTicks = instance.TotalProcessorTicks;
-                        DateTime currentTicksTimestamp = DateTime.Now;
-                        long mostRecentTicks = instance.MostRecentProcessorTicks;
-                        long ticksDelta = currentTicks - mostRecentTicks;
-
-                        long tickTimespan = (currentTicksTimestamp - instance.StartDate).Ticks;
-
-                        float cpu = 0;
-                        if (tickTimespan != 0)
-                        {
-                            cpu = (((float)ticksDelta / tickTimespan) * 100).Truncate(1);
-                        }
-
-                        long memBytes = instance.WorkingSetMemory;
-                        long diskBytes = GetDiskUsage(instance.Dir);
-                        
-                        instance.AddUsage(memBytes, cpu, diskBytes, currentTicks);
+                        instance.CalculateUsage();
 
                         foreach (KeyValuePair<string, IDictionary<string, Metric>> kvp in metrics)
                         {
@@ -699,23 +681,6 @@
                 varzProvider.FrameworkMetrics = metrics["framework"];
                 varzProvider.RuntimeMetrics = metrics["runtime"];
             }
-        }
-
-        private static long GetDiskUsage(string path)
-        {
-            long rv = 0;
-
-            try
-            {
-                var di = new DirectoryInfo(path);
-                if (di.Exists)
-                {
-                    rv = di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length);
-                }
-            }
-            catch { }
-
-            return rv;
         }
     }
 }
