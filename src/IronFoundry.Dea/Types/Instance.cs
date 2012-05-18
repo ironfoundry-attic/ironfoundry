@@ -1,43 +1,80 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
+    using System.Linq;
+    using IronFoundry.Dea.WindowsJobObjects;
     using JsonConverters;
     using Newtonsoft.Json;
 
-    public class Instance : EntityBase
+    /*
+     * TODO: should probably separate out this "on the wire" class from one used to track data
+     */
+    public class Instance : EntityBase, IDisposable
     {
+        private const int MaxUsageSamples = 30;
+        private readonly LinkedList<Usage> usageHistory = new LinkedList<Usage>();
+
+        private readonly DateTime instanceStartDate;
+
+        private readonly JobObject jobObject = new JobObject();
+
+        private readonly string logID;
+
+        private DateTime? workerProcessStartDate = null;
         private bool isEvacuated = false;
-        private string logID;
 
-        public Instance() { }
+        public Instance()
+        {
+            jobObject.DieOnUnhandledException = true;
+            jobObject.ActiveProcessesLimit = 10;
+        }
 
-        public Instance(string appDir, Droplet droplet)
+        public Instance(string appDir, Droplet droplet) : this()
         {
             if (null != droplet)
             {
-                DropletID     = droplet.ID;
-                InstanceID    = Guid.NewGuid();
-                InstanceIndex = droplet.InstanceIndex;
-                Name          = droplet.Name;
-                Uris          = droplet.Uris;
-                Users         = droplet.Users;
-                Version       = droplet.Version;
-                MemQuota      = droplet.Limits.Mem * (1024 * 1024);
-                DiskQuota     = droplet.Limits.Disk * (1024 * 1024);
-                FdsQuota      = droplet.Limits.FDs;
-                Runtime       = droplet.Runtime;
-                Framework     = droplet.Framework;
-                Staged        = droplet.Name;
-                Sha1          = droplet.Sha1;
-                logID         = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
-                Staged        = String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID);
-                Dir           = Path.Combine(appDir, Staged);
+                DropletID      = droplet.ID;
+                InstanceID     = Guid.NewGuid();
+                InstanceIndex  = droplet.InstanceIndex;
+                Name           = droplet.Name;
+                Uris           = droplet.Uris;
+                Users          = droplet.Users;
+                Version        = droplet.Version;
+                MemQuotaBytes  = droplet.Limits.MemoryMB * (1024*1024);
+                DiskQuotaBytes = droplet.Limits.DiskMB * (1024*1024);
+                FdsQuota       = droplet.Limits.FDs;
+                Runtime        = droplet.Runtime;
+                Framework      = droplet.Framework;
+                Staged         = droplet.Name;
+                Sha1           = droplet.Sha1;
+                logID          = String.Format("(name={0} app_id={1} instance={2:N} index={3})", Name, DropletID, InstanceID, InstanceIndex);
+                Staged         = String.Format("{0}-{1}-{2:N}", Name, InstanceIndex, InstanceID);
+                Dir            = Path.Combine(appDir, Staged);
             }
 
-            State          = VcapStates.STARTING;
-            Start          = DateTime.Now.ToString(Constants.JsonDateFormat);
-            StateTimestamp = Utility.GetEpochTimestamp();
+            State             = VcapStates.STARTING;
+            instanceStartDate = DateTime.Now;
+            Start             = instanceStartDate.ToJsonString();
+            StateTimestamp    = Utility.GetEpochTimestamp();
+
+            if (MemQuotaBytes > 0)
+            {
+                /*
+                 * TODO: if the user pushes an ASP.NET app with 64MB allocation, this will almost
+                 * always kill it due to the fact that the default working set size is 64MB or maybe a bit more
+                 * when a worker process is spun up.
+                jobObject.JobMemoryLimit = MemQuotaBytes;
+                 */
+            }
+        }
+
+        [JsonIgnore]
+        public DateTime StartDate
+        {
+            get { return instanceStartDate; }
         }
 
         [JsonProperty(PropertyName = "droplet_id")]
@@ -65,13 +102,13 @@
         public string Version { get; set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public uint MemQuota { get; set; }
+        public uint MemQuotaBytes { get; set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
-        public int DiskQuota { get; set; }
+        public uint DiskQuotaBytes { get; set; }
 
         [JsonProperty(PropertyName = "fds_quota")]
-        public int FdsQuota { get; set; }
+        public uint FdsQuota { get; set; }
 
         [JsonProperty(PropertyName = "state")]
         public string State { get; set; }
@@ -83,7 +120,7 @@
         public string Framework { get; set; }
 
         [JsonProperty(PropertyName = "start")]
-        public string Start { get; set; }
+        public string Start { get; private set; }
 
         [JsonProperty(PropertyName = "state_timestamp")]
         public int StateTimestamp { get; set; }
@@ -210,6 +247,127 @@
             {
                 throw new InvalidOperationException();
             }
+        }
+
+        public void AddWorkerProcess(Process newInstanceWorkerProcess)
+        {
+            if (false == newInstanceWorkerProcess.HasExited &&
+                false == jobObject.HasProcess(newInstanceWorkerProcess))
+            {
+                jobObject.AddProcess(newInstanceWorkerProcess);
+                if (false == workerProcessStartDate.HasValue)
+                {
+                    workerProcessStartDate = DateTime.Now;
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public bool CanGatherStats
+        {
+            get { return this.IsStarting || this.IsRunning; }
+        }
+
+        [JsonIgnore]
+        public Usage MostRecentUsage
+        {
+            get
+            {
+                Usage rv = null;
+                if (usageHistory.Count > 0)
+                {
+                    rv = usageHistory.First.Value;
+                }
+                return rv;
+            }
+        }
+
+        [JsonIgnore]
+        private long MostRecentCpuTicks
+        {
+            get
+            {
+                long rv = 0;
+                Usage mostRecent = MostRecentUsage;
+                if (null != mostRecent)
+                {
+                    rv = mostRecent.TotalCpuTicks;
+                }
+                return rv;
+            }
+        }
+
+        public void CalculateUsage()
+        {
+            /*
+             * NB: some of this code is from this file, MonitorApps() method
+             * https://raw.github.com/UhuruSoftware/vcap-dotnet/master/src/Uhuru.CloudFoundry.DEA/Agent.cs
+             * Copyright (c) 2011 Uhuru Software, Inc., All Rights Reserved
+             */
+            var newUsage = new Usage();
+
+            newUsage.DiskUsageBytes = GetDiskUsage(this.Dir);
+
+            newUsage.MemoryUsageKB = jobObject.WorkingSetMemory / 1024;
+
+            long currentTicks = newUsage.TotalCpuTicks = jobObject.TotalProcessorTime.Ticks;
+            DateTime currentTicksTimestamp = newUsage.Time = DateTime.Now;
+
+            long lastTicks = MostRecentCpuTicks;
+            
+            long ticksDelta = currentTicks - lastTicks;
+
+            DateTime startDate = workerProcessStartDate ?? instanceStartDate;
+            long tickTimespan = (currentTicksTimestamp - startDate).Ticks;
+
+            float cpu = 0;
+            if (tickTimespan > 0)
+            {
+                cpu = (((float)ticksDelta / tickTimespan) * 100).Truncate(1);
+            }
+
+            newUsage.Cpu = cpu;
+
+            usageHistory.AddFirst(newUsage);
+
+            if (usageHistory.Count > MaxUsageSamples)
+            {
+                usageHistory.RemoveLast();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (jobObject != null)
+                {
+                    jobObject.Dispose();
+                }
+            }
+        }
+
+        private static long GetDiskUsage(string path)
+        {
+            long rv = 0;
+
+            try
+            {
+                var di = new DirectoryInfo(path);
+                if (di.Exists)
+                {
+                    rv = di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length);
+                }
+            }
+            catch { }
+
+            return rv;
         }
     }
 }

@@ -10,8 +10,6 @@
         public const string SupportedFramework = "aspdotnet";
         public const string SupportedRuntime = "aspdotnet40";
 
-        public const string JsonDateFormat = "yyyy-MM-dd HH:mm:ss zz00";
-
         public static readonly IPAddress LocalhostIP;
 
         public static int[] MemoryLimits = new int[6] { 64, 128, 256, 512, 1024, 2048 };
