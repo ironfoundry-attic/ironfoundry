@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Types
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
     public class Framework :EntityBase
@@ -12,6 +13,9 @@
 
         [JsonProperty(PropertyName="appservers")]
         public AppServer[] AppServers { get; private set; }
+
+        [JsonProperty(PropertyName="detection")]
+        public Dictionary<string, bool>[] Detection { get; private set; }
     }
 
     public class Runtime : EntityBase

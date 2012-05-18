@@ -20,13 +20,19 @@
         [JsonProperty(PropertyName = "description")]
         public string Description { get; private set; }
 
+        [JsonProperty(PropertyName = "allow_debug")]
+        public bool AllowDebug { get; private set; }
+
+        [JsonProperty(PropertyName = "authorization_endpoint")]
+        public string AuthorizationEndpoint { get; private set; }
+
         [JsonProperty(PropertyName = "user")]
         public string User { get; private set; }
 
         [JsonProperty(PropertyName = "limits")]
         public InfoLimits Limits { get; private set; }
 
-        [JsonProperty(PropertyName = "useage")]
+        [JsonProperty(PropertyName = "usage")]
         public InfoUsage Usage { get; private set; }
 
         [JsonProperty(PropertyName = "frameworks")]
