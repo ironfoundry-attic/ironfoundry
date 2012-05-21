@@ -274,7 +274,7 @@
             get
             {
                 Usage rv = null;
-                if (usageHistory.Count > 0)
+                if (false == usageHistory.IsNullOrEmpty())
                 {
                     rv = usageHistory.First.Value;
                 }
@@ -282,48 +282,30 @@
             }
         }
 
-        [JsonIgnore]
-        private long MostRecentCpuTicks
-        {
-            get
-            {
-                long rv = 0;
-                Usage mostRecent = MostRecentUsage;
-                if (null != mostRecent)
-                {
-                    rv = mostRecent.TotalCpuTicks;
-                }
-                return rv;
-            }
-        }
-
         public void CalculateUsage()
         {
-            /*
-             * NB: some of this code is from this file, MonitorApps() method
-             * https://raw.github.com/UhuruSoftware/vcap-dotnet/master/src/Uhuru.CloudFoundry.DEA/Agent.cs
-             * Copyright (c) 2011 Uhuru Software, Inc., All Rights Reserved
-             */
             var newUsage = new Usage();
 
             newUsage.DiskUsageBytes = GetDiskUsage(this.Dir);
 
             newUsage.MemoryUsageKB = jobObject.WorkingSetMemory / 1024;
 
-            long currentTicks = newUsage.TotalCpuTicks = jobObject.TotalProcessorTime.Ticks;
+            long currentTotalCpuTicks = newUsage.TotalCpuTicks = jobObject.TotalProcessorTime.Ticks;
             DateTime currentTicksTimestamp = newUsage.Time = DateTime.Now;
 
-            long lastTicks = MostRecentCpuTicks;
-            
-            long ticksDelta = currentTicks - lastTicks;
-
-            DateTime startDate = workerProcessStartDate ?? instanceStartDate;
-            long tickTimespan = (currentTicksTimestamp - startDate).Ticks;
-
+            Usage lastUsage = MostRecentUsage;
             float cpu = 0;
-            if (tickTimespan > 0)
+            if (null != lastUsage)
             {
-                cpu = (((float)ticksDelta / tickTimespan) * 100).Truncate(1);
+                long intervalTicks = (currentTicksTimestamp - lastUsage.Time).Ticks;
+                long ticksDelta = currentTotalCpuTicks - lastUsage.TotalCpuTicks;
+
+                int procs = Environment.ProcessorCount;
+                if (intervalTicks > 0)
+                {
+                    cpu = (((float)ticksDelta / intervalTicks) * 100) / procs;
+                    cpu = cpu.Truncate(1);
+                }
             }
 
             newUsage.Cpu = cpu;
