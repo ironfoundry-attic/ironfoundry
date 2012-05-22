@@ -5,12 +5,12 @@
     public class Limits : EntityBase
     {
         [JsonProperty(PropertyName = "mem")]
-        public uint Mem { get; set; }
+        public uint MemoryMB { get; set; }
 
         [JsonProperty(PropertyName = "disk")]
-        public int Disk { get; set; }
+        public uint DiskMB { get; set; }
 
         [JsonProperty(PropertyName = "fds")]
-        public int FDs { get; set; }
+        public uint FDs { get; set; }
     }
 }

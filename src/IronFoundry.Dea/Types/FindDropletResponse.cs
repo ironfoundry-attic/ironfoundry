@@ -6,7 +6,7 @@
 
     public class FindDropletResponse : Message
     {
-        public FindDropletResponse(Guid argID, Instance argInstance, TimeSpan argUptime)
+        public FindDropletResponse(Guid argID, Instance argInstance)
         {
             Dea            = argID;
             Version        = argInstance.Version;
@@ -16,7 +16,11 @@
             State          = argInstance.State;
             StateTimestamp = argInstance.StateTimestamp;
             Staged         = argInstance.Staged;
-            Stats          = new Stats(argInstance, argUptime);
+
+            if (this.State != VcapStates.RUNNING)
+            {
+                this.Stats = null;
+            }
         }
 
         [JsonIgnore]
