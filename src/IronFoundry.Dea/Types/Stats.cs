@@ -7,19 +7,20 @@
     {
         public Stats() { }
 
-        public Stats(Instance argInstance, TimeSpan argUptime)
+        public Stats(Instance instance)
         {
-            Name      = argInstance.Name;
-            Host      = argInstance.Host;
-            Port      = argInstance.Port;
-            Uptime    = argUptime.TotalSeconds;
-            Uris      = argInstance.Uris;
-            MemQuota  = argInstance.MemQuota;
-            DiskQuota = argInstance.DiskQuota;
-            FdsQuota  = argInstance.FdsQuota;
-            Cores     = 1; // TODO
-            Usage     = new Usage();
-            // TODO Usage = 20
+            TimeSpan uptimeSpan = DateTime.Now - instance.StartDate;
+
+            Name      = instance.Name;
+            Host      = instance.Host;
+            Port      = instance.Port;
+            Uptime    = uptimeSpan.TotalSeconds;
+            Uris      = instance.Uris;
+            MemQuotaBytes  = instance.MemQuotaBytes;
+            DiskQuotaBytes = instance.DiskQuotaBytes;
+            FdsQuota  = instance.FdsQuota;
+            Cores     = (uint)Environment.ProcessorCount; // TODO
+            Usage     = instance.MostRecentUsage;
         }
 
         [JsonProperty(PropertyName = "name")]
@@ -38,16 +39,16 @@
         public string[] Uris { get; set; }
 
         [JsonProperty(PropertyName = "mem_quota")]
-        public long MemQuota { get; set; }
+        public uint MemQuotaBytes { get; set; }
 
         [JsonProperty(PropertyName = "disk_quota")]
-        public long DiskQuota { get; set; }
+        public uint DiskQuotaBytes { get; set; }
 
         [JsonProperty(PropertyName = "fds_quota")]
-        public long FdsQuota { get; set; }
+        public uint FdsQuota { get; set; }
 
         [JsonProperty(PropertyName = "cores")]
-        public int Cores { get; set; }
+        public uint Cores { get; set; }
 
         [JsonProperty(PropertyName = "usage")]
         public Usage Usage { get; set; }

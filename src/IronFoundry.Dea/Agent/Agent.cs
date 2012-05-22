@@ -30,6 +30,7 @@
 
         private readonly Hello helloMessage;
 
+        private readonly Task processTask;
         private readonly Task heartbeatTask;
         private readonly Task advertiseTask;
         private readonly Task varzTask;
@@ -60,10 +61,11 @@
 
             helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
 
-            heartbeatTask = new Task(HeartbeatLoop);
-            advertiseTask = new Task(AdvertiseLoop);
-            varzTask = new Task(SnapshotVarz);
-            monitorAppsTask = new Task(MonitorApps);
+            processTask     = new Task(ProcessLoop);
+            heartbeatTask   = new Task(HeartbeatLoop);
+            advertiseTask   = new Task(AdvertiseLoop);
+            varzTask        = new Task(SnapshotVarz);
+            monitorAppsTask = new Task(MonitorLoop);
 
             this.maxMemoryMB = config.MaxMemoryMB;
         }
@@ -100,6 +102,7 @@
                 messagingProvider.Subscribe(NatsSubscription.GetDeaInstanceStartFor(messagingProvider.UniqueIdentifier), ProcessDeaStart);
                 messagingProvider.Subscribe(NatsSubscription.RouterStart, ProcessRouterStart);
                 messagingProvider.Subscribe(NatsSubscription.HealthManagerStart, ProcessHealthManagerStart);
+                messagingProvider.Subscribe(NatsSubscription.DeaLocate, ProcessDeaLocate);
 
                 messagingProvider.Publish(helloMessage);
 
@@ -107,6 +110,7 @@
 
                 RecoverExistingDroplets();
 
+                processTask.Start();
                 heartbeatTask.Start();
                 advertiseTask.Start();
                 varzTask.Start();
@@ -144,6 +148,16 @@
             messagingProvider.Dispose();
 
             log.Info(Resources.Agent_Shutdown_Message);
+        }
+
+        private void ProcessLoop()
+        {
+            while (false == shutting_down)
+            {
+                var iisWorkerProcesses = webServerProvider.GetIIsWorkerProcesses();
+                dropletManager.SetProcessInformationFrom(iisWorkerProcesses);
+                Thread.Sleep(FiveSecondsInterval);
+            }
         }
 
         private void HeartbeatLoop()
@@ -185,7 +199,7 @@
             if (filesManager.Stage(droplet, instance))
             {
                 WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(
-                    filesManager.GetApplicationPathFor(instance), instance.Staged, instance.MemQuota);
+                    filesManager.GetApplicationPathFor(instance), instance.Staged);
                 if (null == binding)
                 {
                     log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.Staged);
@@ -242,6 +256,15 @@
                 });
 
             TakeSnapshot();
+        }
+
+        private void ProcessDeaLocate(string message, string reply)
+        {
+            if (shutting_down)
+            {
+                return;
+            }
+            SendAdvertise();
         }
 
         private void ProcessDeaDiscover(string message, string reply)
@@ -363,31 +386,28 @@
 
             FindDroplet findDroplet = Message.FromJson<FindDroplet>(message);
 
-            dropletManager.ForAllInstances((instance) =>
+            dropletManager.ForAllInstances(findDroplet.DropletID, (instance) =>
             {
-                if (instance.DropletID == findDroplet.DropletID)
+                bool versionMatched = findDroplet.Version.IsNullOrWhiteSpace() || instance.Version == findDroplet.Version;
+                bool instanceMatched = null == findDroplet.InstanceIds || findDroplet.InstanceIds.Contains(instance.InstanceID);
+                bool indexMatched = null == findDroplet.Indices || findDroplet.Indices.Contains(instance.InstanceIndex);
+                bool stateMatched = null == findDroplet.States || findDroplet.States.Contains(instance.State);
+
+                if (versionMatched && instanceMatched && indexMatched && stateMatched)
                 {
-                    if (instance.Version == findDroplet.Version)
+                    var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance)
                     {
-                        if (findDroplet.States.Contains(instance.State))
-                        {
-                            var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
-                            var span = DateTime.Now - startDate;
+                        FileUri = String.Format(CultureInfo.InvariantCulture,
+                            Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
+                        Credentials = config.FilesCredentials.ToArray(),
+                    };
 
-                            var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance, span)
-                            {
-                                FileUri = String.Format(CultureInfo.InvariantCulture, Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
-                                Credentials = config.FilesCredentials.ToArray(),
-                            };
-
-                            if (response.State != VcapStates.RUNNING)
-                            {
-                                response.Stats = null;
-                            }
-
-                            messagingProvider.Publish(reply, response);
-                        }
+                    if (findDroplet.IncludeStats && instance.IsRunning)
+                    {
+                        response.Stats = new Stats(instance);
                     }
+
+                    messagingProvider.Publish(reply, response);
                 }
             });
         }
@@ -403,14 +423,9 @@
 
             dropletManager.ForAllInstances((instance) =>
             {
-                if (instance.IsStarting || instance.IsRunning)
+                if (instance.CanGatherStats)
                 {
-                    var startDate = DateTime.ParseExact(instance.Start, Constants.JsonDateFormat, CultureInfo.InvariantCulture);
-                    var span = DateTime.Now - startDate;
-                    var response = new Stats(instance, span)
-                    {
-                        //Usage = 20
-                    };
+                    var response = new Stats(instance); // TODO more statistics
                     messagingProvider.Publish(reply, response);
                 }
             });
@@ -598,7 +613,7 @@
             }
         }
 
-        private void MonitorApps()
+        private void MonitorLoop()
         {
             while (false == shutting_down)
             {
@@ -609,7 +624,7 @@
                 if (dropletManager.IsEmpty)
                 {
                     varzProvider.MemoryUsedMB = 0;
-                    return;
+                    continue;
                 }
 
                 var metrics = new Dictionary<string, IDictionary<string, Metric>>
@@ -618,12 +633,16 @@
                     { "runtime", new Dictionary<string, Metric>() }
                 };
 
+                DateTime monitorPassStart = DateTime.Now;
+
                 dropletManager.ForAllInstances((instance) =>
                     {
                         if (false == instance.IsRunning)
                         {
                             return;
                         }
+
+                        instance.CalculateUsage();
 
                         foreach (KeyValuePair<string, IDictionary<string, Metric>> kvp in metrics)
                         {
@@ -640,17 +659,17 @@
 
                             if (kvp.Key == "runtime")
                             {
-                                if (!metrics.ContainsKey(instance.Runtime))
+                                if (false == metrics.ContainsKey(instance.Runtime))
                                 {
                                     kvp.Value[instance.Runtime] = metric;
                                 }
                                 metric = kvp.Value[instance.Runtime];
                             }
 
-                            metric.UsedMemory = 0; // TODO KB
-                            metric.ReservedMemory = 0; // TODO KB
-                            metric.UsedDisk = 0; // TODO BYTES
-                            metric.UsedCpu = 0; // TODO
+                            metric.UsedMemory += 0; // TODO KB
+                            metric.ReservedMemory += 0; // TODO KB
+                            metric.UsedDisk += 0; // TODO BYTES
+                            metric.UsedCpu += 0; // TODO
                         }
 
                         string instanceJson = instance.ToJson();

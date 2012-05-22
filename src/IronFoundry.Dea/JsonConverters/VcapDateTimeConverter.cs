@@ -6,7 +6,7 @@
 
     public class VcapDateTimeConverter : JsonConverter
     {
-        private const string dateFormat = "yyyy-MM-dd HH:mm:ss zz00";
+        private const string dateFormat = "yyyy-MM-dd HH:mm:ss zzz";
         private static readonly Type convertableType = typeof(DateTime);
 
         public override bool CanConvert(Type objectType)

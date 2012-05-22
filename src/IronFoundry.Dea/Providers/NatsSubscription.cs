@@ -10,26 +10,28 @@
 
         private static class Subscriptions
         {
-            public const string deaInstanceStart      = "dea.{0:N}.start"; // NB: argument is VCAP GUID
-            public const string deaStop               = "dea.stop";
-            public const string deaStatus             = "dea.status";
-            public const string dropletStatus         = "droplet.status";
             public const string deaDiscover           = "dea.discover";
             public const string deaFindDroplet        = "dea.find.droplet";
+            public const string deaLocate             = "dea.locate";
+            public const string deaInstanceStart      = "dea.{0:N}.start"; // NB: argument is VCAP GUID
+            public const string deaStatus             = "dea.status";
+            public const string deaStop               = "dea.stop";
             public const string deaUpdate             = "dea.update";
-            public const string routerStart           = "router.start";
+            public const string dropletStatus         = "droplet.status";
             public const string healthManagerStart    = "healthmanager.start";
+            public const string routerStart           = "router.start";
             public const string vcapComponentDiscover = "vcap.component.discover";
         }
 
-        public static readonly NatsSubscription DeaStop               = new DeaStopSubscription();
-        public static readonly NatsSubscription DeaStatus             = new DeaStatusSubscription();
-        public static readonly NatsSubscription DropletStatus         = new DropletStatusSubscription();
         public static readonly NatsSubscription DeaDiscover           = new DeaDiscoverSubscription();
         public static readonly NatsSubscription DeaFindDroplet        = new DeaFindDropletSubscription();
+        public static readonly NatsSubscription DeaLocate             = new DeaLocateSubscription();
+        public static readonly NatsSubscription DeaStatus             = new DeaStatusSubscription();
+        public static readonly NatsSubscription DeaStop               = new DeaStopSubscription();
         public static readonly NatsSubscription DeaUpdate             = new DeaUpdateSubscription();
-        public static readonly NatsSubscription RouterStart           = new RouterStartSubscription();
+        public static readonly NatsSubscription DropletStatus         = new DropletStatusSubscription();
         public static readonly NatsSubscription HealthManagerStart    = new HealthManagerStartSubscription();
+        public static readonly NatsSubscription RouterStart           = new RouterStartSubscription();
         public static readonly NatsSubscription VcapComponentDiscover = new VcapComponentDiscoverSubscription();
 
         public static NatsSubscription GetDeaInstanceStartFor(Guid argUuid)
@@ -132,6 +134,14 @@
             protected override string Subscription
             {
                 get { return Subscriptions.deaFindDroplet; }
+            }
+        }
+
+        private class DeaLocateSubscription : NatsSubscription
+        {
+            protected override string Subscription
+            {
+                get { return Subscriptions.deaLocate; }
             }
         }
 
