@@ -271,7 +271,11 @@
             CheckLoginStatus();
             var hlpr = new AppsHelper(proxyUser, credMgr);
             IEnumerable<Application> apps = hlpr.GetApplications();
-            foreach (var a in apps) { a.Parent = cloud; } // TODO not thrilled about this
+            foreach (var app in apps) // TODO not thrilled about this
+            {
+                app.Parent = cloud;
+                app.User = proxyUser;
+            } 
             return apps;
         }
 

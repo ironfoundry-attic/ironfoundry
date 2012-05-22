@@ -129,6 +129,9 @@
         public Cloud Parent { get; set; }
 
         [JsonIgnore]
+        public VcapUser User { get; set; }
+
+        [JsonIgnore]
         public bool IsStarted
         {
             get { return State == VcapStates.STARTED; }
