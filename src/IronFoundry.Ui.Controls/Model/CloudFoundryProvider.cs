@@ -270,9 +270,7 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var vcapResponse = client.UpdateApplication(app);
-                if (vcapResponse != null && !String.IsNullOrEmpty(vcapResponse.Description))
-                    throw new Exception(vcapResponse.Description);
+                client.UpdateApplication(app);
                 response.Response = true;
             }
             catch (Exception ex)
@@ -352,9 +350,7 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var vcapResult = client.CreateService(serviceName, provisionedServiceName);
-                if (!vcapResult.Success)
-                    throw new Exception(vcapResult.Message);
+                client.CreateService(serviceName, provisionedServiceName);
                 response.Response = true;
             }
             catch (Exception ex)

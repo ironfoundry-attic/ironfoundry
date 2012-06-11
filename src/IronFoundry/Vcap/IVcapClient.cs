@@ -29,25 +29,25 @@
 
         void Update(string appname, DirectoryInfo di);
 
-        VcapClientResult BindService(string appName, string provisionedServiceName);
-        VcapClientResult CreateService(string serviceName, string provisionedServiceName);
-        VcapClientResult DeleteService(string provisionedServiceName);
-        VcapClientResult UnbindService(string provisionedServiceName, string appName);
+        void BindService(string appName, string provisionedServiceName);
+        void CreateService(string serviceName, string provisionedServiceName);
+        void DeleteService(string provisionedServiceName);
+        void UnbindService(string provisionedServiceName, string appName);
 
         IEnumerable<SystemService> GetSystemServices();
         IEnumerable<ProvisionedService> GetProvisionedServices();
 
-        VcapClientResult Stop(Application app);
-        VcapClientResult Stop(string appName);
+        void Stop(Application app);
+        void Stop(string appName);
 
-        VcapClientResult Start(Application app);
-        VcapClientResult Start(string appName);
+        void Start(Application app);
+        void Start(string appName);
 
-        VcapClientResult Restart(Application app);
-        VcapClientResult Restart(string appName);
+        void Restart(Application app);
+        void Restart(string appName);
 
-        VcapClientResult Delete(Application app);
-        VcapClientResult Delete(string appName);
+        void Delete(Application app);
+        void Delete(string appName);
 
         Application GetApplication(string appName);
         IEnumerable<Application> GetApplications();
@@ -62,6 +62,6 @@
 
         IEnumerable<Crash> GetAppCrash(Application application);
 
-        VcapResponse UpdateApplication(Application application);
+        void UpdateApplication(Application application);
     }
 }

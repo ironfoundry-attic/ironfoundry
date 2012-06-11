@@ -18,79 +18,68 @@
         public AppsHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
             : base(proxyUser, credMgr) { }
 
-        public VcapClientResult Start(string applicationName)
+        public void Start(string applicationName)
         {
-            VcapClientResult rv;
-            Application app = GetApplication(applicationName);
-            if (app.IsStarted)
+            var application = GetApplication(applicationName);
+            Start(application);
+        }
+
+        public void Start(Application application)
+        {
+            application.Start();
+            UpdateApplication(application);
+            if (!IsStarted(application.Name))
             {
-                rv = new VcapClientResult(true);
+                throw new VmcException("Failed to start application.");
             }
-            else
-            {
-                app.Start();
-                UpdateApplication(app);
-                rv = new VcapClientResult(IsStarted(app.Name));
-            }
-            return rv;
         }
 
-        public VcapClientResult Start(Application application)
+        public void Stop(string applicationName)
         {
-            return Start(application.Name);
+            var application = GetApplication(applicationName);
+            Stop(application);
         }
 
-        public VcapClientResult Stop(string applicationName)
+        public void Stop(Application application)
         {
-            VcapClientResult rv;
-            Application app = GetApplication(applicationName);
-            if (app.IsStopped)
-            {
-                rv = new VcapClientResult(true);
-            }
-            else
-            {
-                app.Stop();
-                UpdateApplication(app);
-                rv = new VcapClientResult(true);
-            }
-            return rv;
+            application.Stop();
+            UpdateApplication(application);
         }
 
-        public VcapClientResult Stop(Application application)
+        public void Restart(string applicationName)
         {
-            return Stop(application.Name);
+            Stop(applicationName);
+            Start(applicationName);
         }
 
-        public VcapClientResult Restart(string appName)
+        public void Restart(Application applicationName)
         {
-            Stop(appName);
-            return Start(appName);
+            Stop(applicationName);
+            Start(applicationName);
         }
 
-        public VcapClientResult Restart(Application app)
+        public void Delete(string applicationName)
         {
-            Stop(app);
-            return Start(app);
+            var application = GetApplication(applicationName);
+            Delete(application);
         }
 
-        public VcapClientResult Delete(Application app)
+        public void Delete(Application application)
         {
-            return Delete(app.Name);
-        }
-
-        public VcapClientResult Delete(string name)
-        {
-            var r = base.BuildVcapJsonRequest(Method.DELETE, Constants.APPS_PATH, name);
+            var r = BuildVcapJsonRequest(Method.DELETE, Constants.APPS_PATH, application.Name);
             r.Execute();
-            return new VcapClientResult();
         }
 
-        public VcapResponse UpdateApplication(Application app)
+        public void UpdateApplication(Application application)
         {
-            var r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, app.Name);
-            r.AddBody(app);
-            return r.Execute<VcapResponse>();
+            var r = BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, application.Name);
+            r.AddBody(application);
+            var response = r.Execute<VcapResponse>();
+
+            if (response != null && !string.IsNullOrEmpty(response.Description))
+            {
+                throw new VmcException(response.Description);
+            }
         }
 
         public byte[] Files(string name, string path, ushort instance)

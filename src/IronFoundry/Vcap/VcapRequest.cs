@@ -193,7 +193,7 @@ namespace IronFoundry.Vcap
                 {
                     errorMessage = String.Format("Error parsing (HTTP {0}):{1}{2}{3}{4}",
                         response.StatusCode, Environment.NewLine, response.Content, Environment.NewLine, parseException.Message);
-                    throw new VmcTargetException(errorMessage, parseException);
+                    throw new VmcException(errorMessage, parseException);
                 }
                 else
                 {
@@ -202,9 +202,9 @@ namespace IronFoundry.Vcap
                     {
                         throw new VmcNotFoundException(errorMessage);
                     }
-                    else if (response.StatusCode == HttpStatusCode.Forbidden)
+                    else
                     {
-                        throw new VmcAuthException(Resources.Vmc_LoginRequired_Message);
+                        throw new VmcException(errorMessage);
                     }
                 }
             }

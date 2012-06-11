@@ -158,28 +158,28 @@
             helper.Update(name, path);
         }
 
-        public VcapClientResult BindService(string provisionedServiceName, string appName)
+        public void BindService(string provisionedServiceName, string appName)
         {
             var services = new ServicesHelper(proxyUser, credMgr);
-            return services.BindService(provisionedServiceName, appName);
+            services.BindService(provisionedServiceName, appName);
         }
 
-        public VcapClientResult UnbindService(string provisionedServiceName, string appName)
+        public void UnbindService(string provisionedServiceName, string appName)
         {
             var services = new ServicesHelper(proxyUser, credMgr);
-            return services.UnbindService(provisionedServiceName, appName);
+            services.UnbindService(provisionedServiceName, appName);
         }
 
-        public VcapClientResult CreateService(string serviceName, string provisionedServiceName)
+        public void CreateService(string serviceName, string provisionedServiceName)
         {
             var services = new ServicesHelper(proxyUser, credMgr);
-            return services.CreateService(serviceName, provisionedServiceName);
+            services.CreateService(serviceName, provisionedServiceName);
         }
 
-        public VcapClientResult DeleteService(string provisionedServiceName)
+        public void DeleteService(string provisionedServiceName)
         {
             var services = new ServicesHelper(proxyUser, credMgr);
-            return services.DeleteService(provisionedServiceName);
+            services.DeleteService(provisionedServiceName);
         }
 
         public IEnumerable<SystemService> GetSystemServices()
@@ -194,52 +194,52 @@
             return services.GetProvisionedServices();
         }
 
-        public VcapClientResult Start(string appName)
+        public void Start(string appName)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Start(appName);
+            helper.Start(appName);
         }
 
-        public VcapClientResult Start(Application app)
+        public void Start(Application app)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Start(app);
+            helper.Start(app);
         }
 
-        public VcapClientResult Stop(string appName)
+        public void Stop(string appName)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Stop(appName);
+            helper.Stop(appName);
         }
 
-        public VcapClientResult Stop(Application app)
+        public void Stop(Application app)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Stop(app);
+            helper.Stop(app);
         }
 
-        public VcapClientResult Restart(string appName)
+        public void Restart(string appName)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Restart(appName);
+            helper.Restart(appName);
         }
 
-        public VcapClientResult Restart(Application app)
+        public void Restart(Application app)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Restart(app);
+            helper.Restart(app);
         }
 
-        public VcapClientResult Delete(string appName)
+        public void Delete(string appName)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Delete(appName);
+            helper.Delete(appName);
         }
 
-        public VcapClientResult Delete(Application app)
+        public void Delete(Application app)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.Delete(app);
+            helper.Delete(app);
         }
 
         public Application GetApplication(string name)
@@ -330,10 +330,10 @@
             return rv;
         }
 
-        public VcapResponse UpdateApplication(Application app)
+        public void UpdateApplication(Application app)
         {
             var helper = new AppsHelper(proxyUser, credMgr);
-            return helper.UpdateApplication(app);
+            helper.UpdateApplication(app);
         }
 
         public string GetLogs(Application app, ushort instanceNumber)

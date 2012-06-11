@@ -62,7 +62,7 @@
             }
 
             var servicesHelper = new ServicesHelper(proxyUser, credMgr);
-            foreach (ProvisionedService ps in servicesHelper.GetProvisionedServices(email))
+            foreach (ProvisionedService ps in servicesHelper.GetProvisionedServices())
             {
                 servicesHelper.DeleteService(ps.Name);
             }

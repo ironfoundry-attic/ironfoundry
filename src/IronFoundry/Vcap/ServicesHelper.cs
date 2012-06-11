@@ -15,111 +15,85 @@
 
         public IEnumerable<SystemService> GetSystemServices()
         {
-            VcapRequest r = base.BuildVcapRequest(Constants.GLOBAL_SERVICES_PATH);
+            VcapRequest r = BuildVcapRequest(Constants.GLOBAL_SERVICES_PATH);
             IRestResponse response = r.Execute();
 
-            var datastores = new List<SystemService>();
             var list = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, SystemService>>>>(response.Content);
-            foreach (var val in list.Values)
-            {
-                foreach (var val1 in val.Values)
-                {
-                    foreach (var val2 in val1.Values)
-                    {
-                        datastores.Add(val2);
-                    }
-                }
-            }
 
-            return datastores.ToArrayOrNull(); 
+            var dataStores = from val in list.Values
+                             from val1 in val.Values
+                             from val2 in val1.Values
+                             select val2;
+            
+            return dataStores.ToList(); 
         }
 
-        public IEnumerable<ProvisionedService> GetProvisionedServices(string proxy_user = null)
+        public IEnumerable<ProvisionedService> GetProvisionedServices()
         {            
-            VcapRequest r = base.BuildVcapRequest(Constants.SERVICES_PATH);
+            VcapRequest r = BuildVcapRequest(Constants.SERVICES_PATH);
             return r.Execute<ProvisionedService[]>();
         }
 
-        public VcapClientResult CreateService(string argServiceName, string argProvisionedServiceName)
+        public void CreateService(string serviceName, string provisionedServiceName)
         {
-            VcapClientResult rv;
-
-            IEnumerable<SystemService> services = GetSystemServices();
-            if (services.IsNullOrEmpty())
+            var services = GetSystemServices();
+            var service = services.FirstOrDefault(s => s.Vendor == serviceName);
+            if (service != null)
             {
-                rv = new VcapClientResult(false);
-            }
-            else
-            {
-                SystemService svc = services.FirstOrDefault(s => s.Vendor == argServiceName);
-                if (null == svc)
+                // from vmc client.rb
+                var data = new
                 {
-                    rv = new VcapClientResult(false);
-                }
-                else
-                {
-                    // from vmc client.rb
-                    var data = new
-                    {
-                        name    = argProvisionedServiceName,
-                        type    = svc.Type,
-                        tier    = "free",
-                        vendor  = svc.Vendor,
-                        version = svc.Version,
-                    };
-                    var r = base.BuildVcapJsonRequest(Method.POST, Constants.SERVICES_PATH);
-                    r.AddBody(data);
-                    IRestResponse response = r.Execute();
-                    rv = new VcapClientResult();
-                }
+                    name    = provisionedServiceName,
+                    type    = service.Type,
+                    tier    = "free",
+                    vendor  = service.Vendor,
+                    version = service.Version,
+                };
+                var r = BuildVcapJsonRequest(Method.POST, Constants.SERVICES_PATH);
+                r.AddBody(data);
+                r.Execute();
             }
-
-            return rv;
         }
 
-        public VcapClientResult DeleteService(string argProvisionedServiceName)
+        public void DeleteService(string provisionedServiceName)
         {
-            var request = base.BuildVcapJsonRequest(Method.DELETE, Constants.SERVICES_PATH, argProvisionedServiceName);
+            var request = BuildVcapJsonRequest(Method.DELETE, Constants.SERVICES_PATH, provisionedServiceName);
             request.Execute();
-            return new VcapClientResult();
         }
 
-        public VcapClientResult BindService(string argProvisionedServiceName, string argAppName)
+        public void BindService(string provisionedServiceName, string appName)
         {
             var apps = new AppsHelper(proxyUser, credMgr);
 
-            Application app = apps.GetApplication(argAppName);
-            app.Services.Add(argProvisionedServiceName);
+            Application app = apps.GetApplication(appName);
+            app.Services.Add(provisionedServiceName);
 
-            var request = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, app.Name);
+            var request = BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, app.Name);
             request.AddBody(app);
-            IRestResponse response = request.Execute();
+            request.Execute();
 
             // Ruby code re-gets info
-            app = apps.GetApplication(argAppName);
+            app = apps.GetApplication(appName);
             if (app.IsStarted)
             {
                 apps.Restart(app);
             }
-            return new VcapClientResult();
         }
 
-        public VcapClientResult UnbindService(string argProvisionedServiceName, string argAppName)
+        public void UnbindService(string provisionedServiceName, string appName)
         {
             var apps = new AppsHelper(proxyUser, credMgr);
-            string appJson = apps.GetApplicationJson(argAppName);
+            string appJson = apps.GetApplicationJson(appName);
             var appParsed = JObject.Parse(appJson);
             var services = (JArray)appParsed["services"];
-            appParsed["services"] = new JArray(services.Where(s => ((string)s) != argProvisionedServiceName));
+            appParsed["services"] = new JArray(services.Where(s => ((string)s) != provisionedServiceName));
 
-            var r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, argAppName);
+            var r = BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, appName);
             r.AddBody(appParsed);
-            IRestResponse response = r.Execute();
+            r.Execute();
 
             apps = new AppsHelper(proxyUser, credMgr);
-            apps.Restart(argAppName);
-
-            return new VcapClientResult();
+            apps.Restart(appName);
         }
     }
 }
