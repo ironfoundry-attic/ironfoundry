@@ -1,8 +1,0 @@
-Cloud Foundry Droplet Execution Agent (Dea) for ASP.NET 4.0
-
-Current Dependency Projects:
-* Uses Nuget to manage Package Dependencies for NLog & SharpZipLib (http://nuget.org/)
-* Uses NLog (http://nlog-project.org/)
-* Uses SharpZipLib (http://www.icsharpcode.net/opensource/sharpziplib/)
-* Uses Microsoft.Web.Administration for IIS7/7.5 administration (http://msdn.microsoft.com/en-us/library/microsoft.web.administration(v=vs.90).aspx)
-

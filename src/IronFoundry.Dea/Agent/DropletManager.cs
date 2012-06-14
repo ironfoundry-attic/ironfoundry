@@ -2,11 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using IronFoundry.Dea.Types;
 
     public class DropletManager : IDropletManager
     {
-        // TODO check this out: http://geekswithblogs.net/BlackRabbitCoder/archive/2011/02/17/c.net-little-wonders-the-concurrentdictionary.aspx
         private readonly IDictionary<uint, IDictionary<Guid, Instance>> droplets = new Dictionary<uint, IDictionary<Guid, Instance>>();
 
         public void Add(uint dropletID, IEnumerable<Instance> instances)
@@ -182,6 +182,31 @@
                     }
                 }
             }
+        }
+
+        public void SetProcessInformationFrom(IDictionary<string, IList<int>> iisWorkerProcessData)
+        {
+            if (iisWorkerProcessData.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            ForAllInstances((inst) =>
+                {
+                    string appPoolName = inst.Staged; // TODO: we have to "know" that this is the app pool name
+                    IList<int> tmp;
+                    if (iisWorkerProcessData.TryGetValue(appPoolName, out tmp))
+                    {
+                        foreach (int pid in tmp)
+                        {
+                            try
+                            {
+                                inst.AddWorkerProcess(Process.GetProcessById(pid));
+                            }
+                            catch { }
+                        }
+                    }
+                });
         }
     }
 }

@@ -12,53 +12,49 @@
         public UserHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
             : base(proxyUser, credMgr) { }
 
-        public VcapClientResult Login(string argEmail, string argPassword)
+        public void Login(string email, string password)
         {
-            VcapClientResult rv;
+            VcapJsonRequest r = BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH, email, "tokens");
+            r.AddBody(new { password });
 
-            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH, argEmail, "tokens");
-            r.AddBody(new { password = argPassword });
-            IRestResponse response = r.Execute();
-            if (response.Content.IsNullOrEmpty())
+            try
             {
-                rv = new VcapClientResult(false, Resources.Vmc_NoContentReturned_Text);
-            }
-            else
-            {
+                IRestResponse response = r.Execute();
                 var parsed = JObject.Parse(response.Content);
                 string token = parsed.Value<string>("token");
                 credMgr.RegisterToken(token);
-                rv = new VcapClientResult();
             }
-
-            return rv;
+            catch (VcapAuthException)
+            {
+                throw new VcapAuthException(string.Format(Resources.Vmc_LoginFail_Fmt, credMgr.CurrentTarget));
+            }
         }
 
-        public VcapClientResult ChangePassword(string user, string newpassword)
+        public void ChangePassword(string user, string newPassword)
         {
-            VcapRequest r = base.BuildVcapRequest(Constants.USERS_PATH, user);
-            IRestResponse response = r.Execute();
+            VcapRequest request = BuildVcapRequest(Constants.USERS_PATH, user);
+            IRestResponse response = request.Execute();
 
             JObject parsed = JObject.Parse(response.Content);
-            parsed["password"] = newpassword;
+            parsed["password"] = newPassword;
 
-            VcapJsonRequest put = base.BuildVcapJsonRequest(Method.PUT, Constants.USERS_PATH, user);
+            VcapJsonRequest put = BuildVcapJsonRequest(Method.PUT, Constants.USERS_PATH, user);
             put.AddBody(parsed);
-            response = put.Execute();
-
-            return new VcapClientResult();
+            put.Execute();
         }
 
-        public VcapClientResult AddUser(string email, string password)
+        public void AddUser(string email, string password)
         {
-            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH);
-            r.AddBody(new { email = email, password = password });
-            IRestResponse response = r.Execute();
-            return new VcapClientResult();
+            VcapJsonRequest r = BuildVcapJsonRequest(Method.POST, Constants.USERS_PATH);
+            r.AddBody(new { email, password });
+            r.Execute();
         }
 
-        public VcapClientResult DeleteUser(string email)
+        public void DeleteUser(string email)
         {
+            // TODO: doing this causes a "not logged in" failure when the user
+            // doesn't exist, which is kind of misleading.
+
             var appsHelper = new AppsHelper(proxyUser, credMgr);
             foreach (Application a in appsHelper.GetApplications(email))
             {
@@ -66,25 +62,24 @@
             }
 
             var servicesHelper = new ServicesHelper(proxyUser, credMgr);
-            foreach (ProvisionedService ps in servicesHelper.GetProvisionedServices(email))
+            foreach (ProvisionedService ps in servicesHelper.GetProvisionedServices())
             {
                 servicesHelper.DeleteService(ps.Name);
             }
 
-            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.DELETE, Constants.USERS_PATH, email);
-            IRestResponse response = r.Execute();
-            return new VcapClientResult();
+            VcapJsonRequest r = BuildVcapJsonRequest(Method.DELETE, Constants.USERS_PATH, email);
+            r.Execute();
         }
 
         public VcapUser GetUser(string email)
         {
-            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.GET, Constants.USERS_PATH, email);
+            VcapJsonRequest r = BuildVcapJsonRequest(Method.GET, Constants.USERS_PATH, email);
             return r.Execute<VcapUser>();
         }
 
         public IEnumerable<VcapUser> GetUsers()
         {
-            VcapJsonRequest r = base.BuildVcapJsonRequest(Method.GET, Constants.USERS_PATH);
+            VcapJsonRequest r = BuildVcapJsonRequest(Method.GET, Constants.USERS_PATH);
             return r.Execute<VcapUser[]>();
         }
     }

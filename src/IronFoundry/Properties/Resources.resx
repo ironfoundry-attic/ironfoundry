@@ -143,13 +143,13 @@ Client:   v{4}</value>
     <value>Problem with login to [{0}] Exception:{1}</value>
   </data>
   <data name="Vmc_LoginFail_Fmt" xml:space="preserve">
-    <value>Problem with login to [{0}] invalid account or password.</value>
+    <value>Failed to log in to [{0}], invalid account or password.</value>
   </data>
   <data name="Vmc_LoginRequired_Message" xml:space="preserve">
-    <value>Login Required</value>
+    <value>Login required.</value>
   </data>
   <data name="Vmc_LoginSuccess_Fmt" xml:space="preserve">
-    <value>Successfully logged into [{0}]</value>
+    <value>Successfully logged in to [{0}].</value>
   </data>
   <data name="Vmc_NeedEmailPrompt_Text" xml:space="preserve">
     <value>Need a valid email.</value>
@@ -167,7 +167,7 @@ Client:   v{4}</value>
     <value>Please set a target.</value>
   </data>
   <data name="Vmc_TargetDisplay_Fmt" xml:space="preserve">
-    <value>Succesfully targeted [{0}]</value>
+    <value>Succesfully targeted [{0}].</value>
   </data>
   <data name="Vmc_TargetNoSuccessDisplay_Fmt" xml:space="preserve">
     <value>[{0}]</value>
