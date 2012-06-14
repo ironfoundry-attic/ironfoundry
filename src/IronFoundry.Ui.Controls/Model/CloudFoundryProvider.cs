@@ -94,32 +94,25 @@
                 IVcapClient client = new VcapClient(local);
                 try
                 {
-                    VcapClientResult result = client.Login();
-                    if (false == result.Success)
+                    client.Login();
+                    local.AccessToken = client.CurrentToken;
+                    var applications = client.GetApplications();
+                    var provisionedServices = client.GetProvisionedServices();
+                    var availableServices = client.GetSystemServices();
+                    local.Applications.Synchronize(new SafeObservableCollection<Application>(applications), new ApplicationEqualityComparer());
+                    local.Services.Synchronize(new SafeObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
+                    local.AvailableServices.Synchronize(new SafeObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
+                    foreach (Application app in local.Applications)
                     {
-                        response.Response = null;
-                        response.Message = result.Message;
+                        var instances = GetInstances(local, app);
+                        if (instances.Response != null)
+                            app.InstanceCollection.Synchronize(new SafeObservableCollection<Instance>(instances.Response), new InstanceEqualityComparer());
                     }
-                    else
-                    {
-                        local.AccessToken = client.CurrentToken;
-                        var applications = client.GetApplications();
-                        var provisionedServices = client.GetProvisionedServices();
-                        var availableServices = client.GetSystemServices();
-                        local.Applications.Synchronize(new SafeObservableCollection<Application>(applications), new ApplicationEqualityComparer());
-                        local.Services.Synchronize(new SafeObservableCollection<ProvisionedService>(provisionedServices), new ProvisionedServiceEqualityComparer());
-                        local.AvailableServices.Synchronize(new SafeObservableCollection<SystemService>(availableServices), new SystemServiceEqualityComparer());
-                        foreach (Application app in local.Applications)
-                        {
-                            var instances = GetInstances(local, app);
-                            if (instances.Response != null)
-                                app.InstanceCollection.Synchronize(new SafeObservableCollection<Instance>(instances.Response), new InstanceEqualityComparer());
-                        }
-                        response.Response = local;
-                    }
+                    response.Response = local;
                 }
                 catch (Exception ex)
                 {
+                    response.Response = null;
                     response.Message = ex.Message;
                 }
             }
@@ -151,12 +144,12 @@
             try
             {
                 IVcapClient client = new VcapClient(serverUrl);
-                var vcapResponse = client.Login(email, password);
-                response.Message = vcapResponse.Message;
-                response.Response = vcapResponse.Success;
+                client.Login(email, password);
+                response.Response = true;
             }
             catch (Exception ex)
             {
+                response.Response = false;
                 response.Message = ex.Message;
             }
             return response;
@@ -277,9 +270,7 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var vcapResponse = client.UpdateApplication(app);
-                if (vcapResponse != null && !String.IsNullOrEmpty(vcapResponse.Description))
-                    throw new Exception(vcapResponse.Description);
+                client.UpdateApplication(app);
                 response.Response = true;
             }
             catch (Exception ex)
@@ -359,9 +350,7 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var vcapResult = client.CreateService(serviceName, provisionedServiceName);
-                if (!vcapResult.Success)
-                    throw new Exception(vcapResult.Message);
+                client.CreateService(serviceName, provisionedServiceName);
                 response.Response = true;
             }
             catch (Exception ex)
@@ -377,9 +366,7 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var vcapResult = client.ChangePassword(newPassword);
-                if (!vcapResult.Success)
-                    throw new Exception(vcapResult.Message);
+                client.ChangePassword(newPassword);
                 response.Response = true;
             }
             catch (Exception ex)
@@ -400,9 +387,8 @@
             try
             {
                 IVcapClient client = new VcapClient(serverUrl);
-                var vcapResult = client.AddUser(email, password);
+                client.AddUser(email, password);
                 response.Response = true;
-                response.Message = vcapResult.Message;
             }
             catch (Exception ex)
             {
@@ -434,15 +420,12 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var result = client.Push(name, url, instances, new System.IO.DirectoryInfo(directoryToPushFrom), memory, services);
-                if (!result.Success)
-                {
-                    throw new Exception(result.Message);
-                }
+                client.Push(name, url, instances, new System.IO.DirectoryInfo(directoryToPushFrom), memory, services);
                 response.Response = true;
             }
             catch (Exception ex)
             {
+                response.Response = false;
                 response.Message = ex.Message;
             }
             return response;
@@ -454,9 +437,7 @@
             try
             {
                 IVcapClient client = new VcapClient(cloud);
-                var result = client.Update(app.Name, new System.IO.DirectoryInfo(directoryToPushFrom));
-                if (!result.Success)
-                    throw new Exception(result.Message);
+                client.Update(app.Name, new System.IO.DirectoryInfo(directoryToPushFrom));
                 response.Response = true;
             }
             catch (Exception ex)

@@ -41,8 +41,7 @@
             IPAddress ip;
             IPAddress.TryParse(ipStr, out ip);
             var client = new VcapClient(uri, ip);
-            VcapClientResult rslt = client.Login("user@foo.com", "Password");
-            Assert.True(rslt.Success);
+            client.Login("user@foo.com", "Password");
         }
     }
 }
