@@ -1,4 +1,6 @@
-﻿namespace IronFoundry.Vcap
+﻿using IronFoundry.Properties;
+
+namespace IronFoundry.Vcap
 {
     using System;
     using System.Collections;
@@ -46,10 +48,13 @@
             client = BuildClient(useAuthentication, uri);
         }
 
+        public string ErrorMessage { get; protected set; }
+
         public IRestResponse Execute()
         {
             IRestResponse response = client.Execute(request);
             ProcessResponse(response);
+            ErrorMessage = response.ErrorMessage;
             return response;
         }
 
@@ -57,6 +62,7 @@
         {
             IRestResponse response = client.Execute(request);
             ProcessResponse(response);
+            ErrorMessage = response.ErrorMessage;
             if (response.Content.IsNullOrWhiteSpace())
             {
                 return default(TResponse);
@@ -187,18 +193,18 @@
                 {
                     errorMessage = String.Format("Error parsing (HTTP {0}):{1}{2}{3}{4}",
                         response.StatusCode, Environment.NewLine, response.Content, Environment.NewLine, parseException.Message);
-                    throw new VmcTargetException(errorMessage, parseException);
+                    throw new VcapException(errorMessage, parseException);
                 }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest ||
                         response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        throw new VmcNotFoundException(errorMessage);
+                        throw new VcapNotFoundException(errorMessage);
                     }
                     else
                     {
-                        throw new VmcTargetException(errorMessage);
+                        throw new VcapException(errorMessage);
                     }
                 }
             }

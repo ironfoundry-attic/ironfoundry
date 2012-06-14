@@ -8,10 +8,10 @@
         public MiscHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
             : base(proxyUser, credMgr) { }
 
-        public VcapClientResult Info()
+        public Info GetInfo()
         {
             VcapRequest r = BuildVcapRequest(Constants.INFO_PATH);
-            return new VcapClientResult(true, r.Execute<Info>());
+            return r.Execute<Info>();
         }
 
         internal VcapRequest BuildInfoRequest()
@@ -19,42 +19,28 @@
             return BuildVcapRequest(Constants.INFO_PATH);
         }
 
-        public VcapClientResult Target(Uri argUri = null)
+        public void Target(Uri uri)
         {
-            VcapClientResult rv;
+            // "target" does the same thing as "info", but not logged in
+            // considered valid if name, build, version and support are all non-null
+            VcapRequest request = BuildVcapRequest(false, uri, Constants.INFO_PATH);
+            Info info = request.Execute<Info>();
 
-            if (null == argUri)
+            var success = info != null &&
+                !info.Name.IsNullOrWhiteSpace() &&
+                !info.Build.IsNullOrWhiteSpace() &&
+                !info.Version.IsNullOrWhiteSpace() &&
+                !info.Support.IsNullOrWhiteSpace();
+
+            if (success)
             {
-                // Just return current target
-                rv = new VcapClientResult(false, credMgr.CurrentTarget.AbsoluteUriTrimmed());
+                credMgr.SetTarget(uri);
+                credMgr.StoreTarget();
             }
             else
             {
-                // "target" does the same thing as "info", but not logged in
-                // considered valid if name, build, version and support are all non-null
-                // without argument, displays current target
-                VcapRequest r = base.BuildVcapRequest(false, argUri, Constants.INFO_PATH);
-                Info info = r.Execute<Info>();
-
-                bool success = false;
-                if (null != info)
-                {
-                    success = false == info.Name.IsNullOrWhiteSpace() &&
-                              false == info.Build.IsNullOrWhiteSpace() &&
-                              false == info.Version.IsNullOrWhiteSpace() &&
-                              false == info.Support.IsNullOrWhiteSpace();
-                }
-
-                if (success)
-                {
-                    credMgr.SetTarget(argUri);
-                    credMgr.StoreTarget();
-                }
-
-                rv = new VcapClientResult(success, credMgr.CurrentTarget.AbsoluteUriTrimmed());
+                throw new VcapTargetException(request.ErrorMessage);
             }
-
-            return rv;
         }
     }
 }

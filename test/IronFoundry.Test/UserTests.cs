@@ -11,8 +11,7 @@
         public void Get_All_Users_And_Apps()
         {
             var client = new VcapClient("http://api.ironfoundry.me");
-            VcapClientResult rslt = client.Login("adminuser@email.com", "password");
-            Assert.True(rslt.Success);
+            client.Login("adminuser@email.com", "password");
             var users = client.GetUsers();
             Assert.NotEmpty(users);
             foreach (var user in users)
@@ -31,11 +30,10 @@
         public void Stop_App_As_User()
         {
             IVcapClient client = new VcapClient("http://api.ironfoundry.me");
-            VcapClientResult rslt = client.Login("adminuser@email.com", "password");
-            Assert.True(rslt.Success);
+            client.Login("adminuser@email.com", "password");
             VcapUser user = client.GetUser("otheruser");
             client.ProxyAs(user);
-            VcapClientResult stopRslt = client.Stop("appname");
+            client.Stop("appname");
         }
     }
 }

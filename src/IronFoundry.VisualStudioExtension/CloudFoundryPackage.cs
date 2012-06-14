@@ -151,15 +151,13 @@
             SetCurrentCloudGuid(project, modelData.SelectedCloud.ID);
             PerformAction("Update Application", project, modelData.SelectedCloud, projectDirectories, (c, d) =>
             {
-                var updateResult = c.Update(modelData.SelectedApplication.Name, d);
-                if (updateResult.Success)
-                    c.Restart(new Application() {Name = modelData.SelectedApplication.Name});
-                return updateResult;
+                c.Update(modelData.SelectedApplication.Name, d);
+                c.Restart(new Application {Name = modelData.SelectedApplication.Name});
             });
         }
 
-        private void PerformAction(string action, Project project, Cloud cloud, ProjectDirectories dir,
-            Func<IVcapClient, DirectoryInfo, VcapClientResult> function)
+        private void PerformAction(string actionName, Project project, Cloud cloud, ProjectDirectories dir,
+            Action<IVcapClient, DirectoryInfo> action)
         {
             var worker = new BackgroundWorker();
 
@@ -167,7 +165,7 @@
                 message =>
                 {
                     if (message.Notification.Equals(Messages.SetProgressData))
-                        message.Execute(action);
+                        message.Execute(actionName);
                 });
 
             var window = new ProgressDialog();
@@ -179,7 +177,7 @@
             {
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                Messenger.Default.Send(new ProgressMessage(0, "Starting " + action));
+                Messenger.Default.Send(new ProgressMessage(0, "Starting " + actionName));
 
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
@@ -247,23 +245,29 @@
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
                 var client = new VcapClient(cloud);
-                VcapClientResult result = client.Login();
-                if (result.Success == false)
+                try
                 {
-                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Failure: " + result.Message))));
+                    client.Login();
+                }
+                catch (Exception e)
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Failure: " + e.Message))));
                     return;
                 }
 
                 dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(75, "Sending to " + cloud.Url))));
                 if (worker.CancellationPending) { args.Cancel = true; return; }
 
-                result = function(client, new DirectoryInfo(dir.DeployFromPath));                
-                if (result.Success == false)
+                try
                 {
-                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Failure: " + result.Message))));
+                    action(client, new DirectoryInfo(dir.DeployFromPath));
+                }
+                catch (Exception e)
+                {
+                    dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Failure: " + e.Message))));
                     return;
-                }               
-                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, action + " complete."))));
+                }
+                dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressMessage(100, actionName + " complete."))));
             };
 
             worker.RunWorkerAsync();
