@@ -30,7 +30,7 @@
             UpdateApplication(application);
             if (!IsStarted(application.Name))
             {
-                throw new VmcException("Failed to start application.");
+                throw new VcapException("Failed to start application.");
             }
         }
 
@@ -78,7 +78,7 @@
 
             if (response != null && !string.IsNullOrEmpty(response.Description))
             {
-                throw new VmcException(response.Description);
+                throw new VcapException(response.Description);
             }
         }
 
@@ -111,7 +111,7 @@
             {
                 if (AppExists(name))
                 {
-                    throw new VmcException(String.Format(Resources.AppsHelper_PushApplicationExists_Fmt, name));
+                    throw new VcapException(String.Format(Resources.AppsHelper_PushApplicationExists_Fmt, name));
                 }
                 else
                 {

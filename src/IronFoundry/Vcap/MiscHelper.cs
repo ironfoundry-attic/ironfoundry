@@ -39,7 +39,7 @@
             }
             else
             {
-                throw new VmcTargetException(request.ErrorMessage);
+                throw new VcapTargetException(request.ErrorMessage);
             }
         }
     }

@@ -24,9 +24,9 @@
                 string token = parsed.Value<string>("token");
                 credMgr.RegisterToken(token);
             }
-            catch (VmcAuthException)
+            catch (VcapAuthException)
             {
-                throw new VmcAuthException(string.Format(Resources.Vmc_LoginFail_Fmt, credMgr.CurrentTarget));
+                throw new VcapAuthException(string.Format(Resources.Vmc_LoginFail_Fmt, credMgr.CurrentTarget));
             }
         }
 

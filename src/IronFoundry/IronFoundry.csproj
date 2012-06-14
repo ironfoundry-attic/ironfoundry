@@ -113,7 +113,7 @@
     <Compile Include="Vcap\VcapCredentialManager.cs" />
     <Compile Include="Vcap\VcapFilesResult.cs" />
     <Compile Include="Types\VcapUser.cs" />
-    <Compile Include="Vcap\VmcExceptions.cs" />
+    <Compile Include="Vcap\VcapExceptions.cs" />
     <Compile Include="Vcap\VcapRequest.cs" />
     <Compile Include="Vcap\VcapClientResult.cs" />
     <Compile Include="Vcap\InfoHelper.cs" />

@@ -193,18 +193,18 @@ namespace IronFoundry.Vcap
                 {
                     errorMessage = String.Format("Error parsing (HTTP {0}):{1}{2}{3}{4}",
                         response.StatusCode, Environment.NewLine, response.Content, Environment.NewLine, parseException.Message);
-                    throw new VmcException(errorMessage, parseException);
+                    throw new VcapException(errorMessage, parseException);
                 }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest ||
                         response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        throw new VmcNotFoundException(errorMessage);
+                        throw new VcapNotFoundException(errorMessage);
                     }
                     else
                     {
-                        throw new VmcException(errorMessage);
+                        throw new VcapException(errorMessage);
                     }
                 }
             }
