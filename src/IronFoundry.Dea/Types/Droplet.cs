@@ -1,6 +1,5 @@
 ﻿namespace IronFoundry.Dea.Types
 {
-    using System;
     using Newtonsoft.Json;
 
     public class Droplet : EntityBase
@@ -50,7 +49,13 @@
         [JsonIgnore]
         public bool FrameworkSupported
         {
-            get { return false == String.IsNullOrWhiteSpace(Framework) && Framework == Constants.SupportedFramework; }
+            get { return Constants.IsSupportedFramework(Framework); }
+        }
+
+        [JsonIgnore]
+        public bool IsAspNet
+        {
+            get { return Constants.IsAspNet(Framework); }
         }
     }
 }

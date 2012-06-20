@@ -97,15 +97,6 @@ namespace IronFoundry.Dea.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This DEA does not support non-ASP.NET frameworks!.
-        /// </summary>
-        internal static string Agent_NonAspDotNet_Message {
-            get {
-                return ResourceManager.GetString("Agent_NonAspDotNet_Message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ProcessDeaDiscover Msg: {0} Reply: {1}.
         /// </summary>
         internal static string Agent_ProcessDeaDiscover_Fmt {
@@ -246,6 +237,15 @@ namespace IronFoundry.Dea.Properties {
         internal static string Agent_TasksCompletedInStop_Message {
             get {
                 return ResourceManager.GetString("Agent_TasksCompletedInStop_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This DEA does not support the &apos;{0}&apos; framework..
+        /// </summary>
+        internal static string Agent_UnsupportedFramework_Fmt {
+            get {
+                return ResourceManager.GetString("Agent_UnsupportedFramework_Fmt", resourceCulture);
             }
         }
         

@@ -104,7 +104,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Providers\ApplicationInstanceStatus.cs" />
     <Compile Include="Providers\HealthzProvider.cs" />
+    <Compile Include="Providers\IStandaloneProvider.cs" />
     <Compile Include="Providers\IVarzProvider.cs" />
     <Compile Include="Providers\IMessagingProvider.cs" />
     <Compile Include="Providers\IWebOperationContextProvider.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Providers\NatsCommand.cs" />
     <Compile Include="Providers\NatsMessagingProvider.cs" />
     <Compile Include="Providers\NatsSubscription.cs" />
+    <Compile Include="Providers\StandaloneProvider.cs" />
     <Compile Include="Providers\VarzProvider.cs" />
     <Compile Include="Providers\WebOperationContextProvider.cs" />
     <Compile Include="Providers\WebServerAdministrationProvider.cs" />

@@ -228,8 +228,8 @@
   <data name="Agent_DEAComponentType" xml:space="preserve">
     <value>DEA</value>
   </data>
-  <data name="Agent_NonAspDotNet_Message" xml:space="preserve">
-    <value>This DEA does not support non-ASP.NET frameworks!</value>
+  <data name="Agent_UnsupportedFramework_Fmt" xml:space="preserve">
+    <value>This DEA does not support the '{0}' framework.</value>
   </data>
   <data name="Agent_InstanceExited_Fmt" xml:space="preserve">
     <value>Instance exited: {0}</value>

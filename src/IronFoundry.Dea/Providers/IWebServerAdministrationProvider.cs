@@ -1,15 +1,7 @@
-﻿using System.Collections.Generic;
-namespace IronFoundry.Dea.Providers
+﻿namespace IronFoundry.Dea.Providers
 {
-    public enum ApplicationInstanceStatus
-    {
-        Deleted,
-        Started,
-        Starting,
-        Stopped,
-        Stopping,
-        Unknown
-    }
+    using System.Collections.Generic;
+    using IronFoundry.Dea.Types;
 
     public class WebServerAdministrationBinding
     {
@@ -20,8 +12,8 @@ namespace IronFoundry.Dea.Providers
     public interface IWebServerAdministrationProvider
     {
         WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName);
-        void UninstallWebApp(string applicationInstanceName);
-        ApplicationInstanceStatus GetApplicationStatus(string applicationInstanceName);
+        void UninstallWebApp(Instance applicationInstance);
+        ApplicationInstanceStatus GetApplicationStatus(Instance applicationInstance);
         IDictionary<string, IList<int>> GetIIsWorkerProcesses();
     }
 }
