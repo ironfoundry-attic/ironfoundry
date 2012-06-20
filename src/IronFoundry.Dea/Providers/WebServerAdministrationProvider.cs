@@ -14,13 +14,10 @@
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
         private static readonly TimeSpan twoSeconds = TimeSpan.FromSeconds(2);
+        private static bool loggingUnlocked = false;
 
-        /* TODO: refactor into classes of type IIsObject */
-
-        // APPPOOL "testwebapp-1-dd1eeb2c80004b0cb8751feb1f9c7df3" (MgdVersion:v4.0,MgdMode:Integrated,state:Started)
         private static readonly Regex apppoolStateRegex = new Regex(@"state:(\w+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        // WP "2464" (applicationPool:testwebapp-0-dd79ab1f650b44e3b0d9c09720900853)
         private static readonly Regex workerProcessRegex = new Regex(@"WP ""(\d+)"" \(applicationPool:([^)]+)\)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -40,6 +37,7 @@
             this.localIPAddress = config.LocalIPAddress;
             this.firewallService = firewallService;
             this.appCmdPath = config.AppCmdPath;
+            UnlockLogging();
         }
 
         public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
@@ -86,6 +84,13 @@
                         }
 
                         cmd = String.Format("set site {0} /[path='/'].applicationPool:{0}", applicationInstanceName);
+                        rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        if (false == rslt.Success)
+                        {
+                            return null;
+                        }
+
+                        cmd = String.Format("set config {0} /section:system.webServer/httpLogging /dontLog:True", applicationInstanceName);
                         rslt = ExecAppcmd(cmd, 5, twoSeconds);
                         if (false == rslt.Success)
                         {
@@ -162,10 +167,6 @@
             ApplicationInstanceStatus rv = ApplicationInstanceStatus.Unknown;
             try
             {
-                /*
-                    C:\>%windir%\system32\inetsrv\appcmd.exe list apppool /name:DefaultAppPool
-                    APPPOOL "DefaultAppPool" (MgdVersion:v4.0,MgdMode:Integrated,state:Started)
-                 */
                 string state = GetIIsAppPoolState(applicationInstanceName);
                 if (state.IsNullOrWhiteSpace())
                 {
@@ -253,6 +254,15 @@
             }
 
             return rv;
+        }
+
+        private void UnlockLogging()
+        {
+            if (false == loggingUnlocked)
+            {
+                ExecAppcmd("unlock config /section:system.webserver/httpLogging");
+                loggingUnlocked = true;
+            }
         }
 
         private class AppCmdResult
