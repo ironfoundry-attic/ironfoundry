@@ -35,8 +35,10 @@
             ServiceEndpoint endpoint = serviceHost.AddServiceEndpoint(typeof(IFilesService), webHttpBinding, baseAddress);
             endpoint.Behaviors.Add(new WebHttpBehavior());
             ServiceCredential filesCredentials = config.FilesCredentials;
+#if DEBUG
             log.Debug("FilesWinService baseAddress: {0} credentials: {1}:{2}",
                 baseAddress, filesCredentials.Username, filesCredentials.Password);
+#endif
             serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new CustomUserNamePasswordValidator(filesCredentials);
             serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom; 
         }

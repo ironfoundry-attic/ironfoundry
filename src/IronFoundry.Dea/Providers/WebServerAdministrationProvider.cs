@@ -66,7 +66,7 @@
                         }
 
                         cmd = String.Format(
-                            "set apppool {0} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated",
+                            "set apppool {0} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated /processModel.loadUserProfile:true",
                             applicationInstanceName);
                         rslt = ExecAppcmd(cmd, 5, twoSeconds);
                         if (false == rslt.Success)
