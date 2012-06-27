@@ -40,7 +40,7 @@
             {
                 if (File.Exists(path))
                 {
-                    using (var fileStream = File.OpenRead(path))
+                    using (var fileStream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         var memoryStream = new MemoryStream((int)Math.Max(fileStream.Length, 10485760));
                         fileStream.CopyTo(memoryStream, memoryStream.Capacity);
