@@ -120,6 +120,9 @@
   <data name="AppsHelper_PushApplicationExists_Fmt" xml:space="preserve">
     <value>Application '{0}' already exists.</value>
   </data>
+  <data name="VcapRequest_RestException_Fmt" xml:space="preserve">
+    <value>Error in REST request to '{0}/{1}'</value>
+  </data>
   <data name="Vmc_EmailPrompt_Text" xml:space="preserve">
     <value>Email: </value>
   </data>
