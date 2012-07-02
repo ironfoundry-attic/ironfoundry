@@ -21,6 +21,7 @@ NATS.on_error { |err| puts "Server Error: #{err}"; exit! }
 
 NATS.start(:uri => $nats_server) do
   NATS.subscribe('dea.*') { |msg, reply, sub| print_message(msg, reply, sub) }
+  NATS.subscribe('dea.*.start') { |msg, reply, sub| print_message(msg, reply, sub) }
   NATS.subscribe('droplet.*') { |msg, reply, sub| print_message(msg, reply, sub) }
   NATS.subscribe('router.*') { |msg, reply, sub| print_message(msg, reply, sub) }
   NATS.subscribe('healthmanager.*') { |msg, reply, sub| print_message(msg, reply, sub) }
