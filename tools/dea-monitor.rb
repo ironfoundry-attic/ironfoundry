@@ -14,7 +14,7 @@ end
 ["TERM", "INT"].each { |sig| trap(sig) { NATS.stop } }
 
 def print_message(msg, reply, sub)
-  puts "\n--------------------------------------------------\n\nSub '#{sub}' received message:\n#{msg}\n"
+  puts "\n--------------------------------------------------\n\nSub '#{sub}' received message:\n#{msg}\nReply: #{reply}\n"
 end
 
 NATS.on_error { |err| puts "Server Error: #{err}"; exit! }
