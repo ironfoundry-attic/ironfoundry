@@ -14,5 +14,8 @@
         void Info(string fmt, params object[] args);
         void Trace(string fmt, params object[] args);
         void Warn(string fmt, params object[] args);
+
+        void EnableDebug();
+        void DisableDebug();
     }
 }

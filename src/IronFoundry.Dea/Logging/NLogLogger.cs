@@ -2,7 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using NLog;
+    using NLog.Config;
+    using NLog.Targets;
 
     public class NLogLogger : ILog
     {
@@ -21,6 +24,16 @@
         public NLogLogger(string name)
         {
             logger = LogManager.GetLogger(name);
+        }
+
+        public void EnableDebug()
+        {
+            modifyFileLoggingRules(lr => lr.EnableLoggingForLevel(LogLevel.Debug));
+        }
+
+        public void DisableDebug()
+        {
+            modifyFileLoggingRules(lr => lr.DisableLoggingForLevel(LogLevel.Debug));
         }
 
         public void Debug(string fmt, params object[] args)
@@ -113,6 +126,17 @@
             lei.Properties["EventID"] = eventIDMap[lei.Level];
             // log the message
             logger.Log(typeof(NLogLogger), lei);
+        }
+
+        private static void modifyFileLoggingRules(Action<LoggingRule> fileLoggingRuleAction)
+        {
+            LoggingConfiguration config = LogManager.Configuration;
+            Target fileTarget = config.FindTargetByName("file");
+            foreach (LoggingRule fileLoggingRule in config.LoggingRules.Where(lr => lr.Targets.Contains(fileTarget)))
+            {
+                fileLoggingRuleAction(fileLoggingRule);
+            }
+            LogManager.ReconfigExistingLoggers();
         }
     }
 }
