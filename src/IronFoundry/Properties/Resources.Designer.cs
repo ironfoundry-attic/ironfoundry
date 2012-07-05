@@ -70,6 +70,15 @@ namespace IronFoundry.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error in REST request to &apos;{0}/{1}&apos;.
+        /// </summary>
+        public static string VcapRequest_RestException_Fmt {
+            get {
+                return ResourceManager.GetString("VcapRequest_RestException_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email: .
         /// </summary>
         public static string Vmc_EmailPrompt_Text {

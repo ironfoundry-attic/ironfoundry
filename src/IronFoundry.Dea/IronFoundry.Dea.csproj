@@ -170,6 +170,7 @@
     <Compile Include="WindowsJobObjects\JobObject.cs" />
     <Compile Include="WindowsJobObjects\JobObjectHandle.cs" />
     <Compile Include="WindowsJobObjects\NativeMethods.cs" />
+    <Compile Include="WinService\CustomCommands.cs" />
     <Compile Include="WinService\MonitoringWinService.cs" />
     <Compile Include="WinService\DeaWinService.cs" />
     <Compile Include="WinService\FilesWinService.cs" />

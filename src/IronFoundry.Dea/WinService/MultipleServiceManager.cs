@@ -37,6 +37,22 @@
             this.OnStop();
         }
 
+        protected override void OnCustomCommand(int command)
+        {
+            switch (command)
+            {
+                case (int)CustomCommands.File_Logging_Enable_Debug :
+                    log.EnableDebug();
+                    break;
+                case (int)CustomCommands.File_Logging_Disable_Debug :
+                    log.DisableDebug();
+                    break;
+                default :
+                    log.Debug("Unrecognized custom command: {0}", command);
+                    break;
+            }
+        }
+
         protected override void OnStart(string[] args)
         {
             bool errorExit = false;
