@@ -150,6 +150,12 @@
                   <RegistryValue Name="INSTALLDIR" Value="[INSTALLDIR]" Type="string" KeyPath="yes"/>
                 </RegistryKey>
               </Component>
+
+              <Component Id="ProductCodeRegKey" Guid="{E15E3268-2C61-4F20-A394-493665E8C210}" Win64="$(var.WIN64.COMPONENTS)">
+                <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
+                  <RegistryValue Name="ProductCode" Value="[ProductCode]" Type="string" KeyPath="yes"/>
+                </RegistryKey>
+              </Component>
               <!-- END (Install Registry)-->
 
               <!-- START (StartMenu Shortcuts) -->
@@ -385,6 +391,7 @@
       <ComponentRef Id="IronFoundry.Dea.Service.exe.config" Primary="yes"/>
       <ComponentRef Id="ServiceConfigKeys" Primary="yes"/>
       <ComponentRef Id="UninstallShortcut" Primary="yes"/>
+      <ComponentRef Id="ProductCodeRegKey" Primary="yes"/>
     </ComponentGroup>
 
     <InstallUISequence>
