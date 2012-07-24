@@ -1,8 +1,9 @@
 ﻿namespace IronFoundry.Dea.Providers
 {
     using System;
+    using IronFoundry.Nats.Client;
 
-    public abstract class NatsSubscription : IEquatable<NatsSubscription>
+    public abstract class NatsSubscription : INatsSubscription
     {
         private static object sync = new object();
         private static int staticSubscriptionID = 0;
@@ -65,7 +66,7 @@
             return Subscription.GetHashCode();
         }
 
-        public bool Equals(NatsSubscription other)
+        public bool Equals(INatsSubscription other)
         {
             bool rv = false;
 
@@ -79,7 +80,7 @@
 
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as NatsSubscription);
+            return this.Equals(obj as INatsSubscription);
         }
 
         public class DeaInstanceStartSubscription : NatsSubscription

@@ -1,9 +1,8 @@
-﻿namespace IronFoundry.Dea.Providers
+﻿namespace IronFoundry.Nats.Client
 {
     using System;
     using System.Globalization;
     using System.Text;
-    using IronFoundry.Dea.Types;
 
     public abstract class NatsCommand
     {
@@ -54,18 +53,18 @@
 
         public abstract string Command { get; }
 
-        public static string FormatSubscribeMessage(NatsSubscription subscription, int Sequence)
+        public static string FormatSubscribeMessage(INatsSubscription subscription, int Sequence)
         {
             return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.SubscribeFmt, subscription, Sequence);
         }
 
-        public static string FormatPublishMessage(string subject, Message message)
+        public static string FormatPublishMessage(string subject, INatsMessage message)
         {
             string messageJson = message.ToJson();
             return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.PublishFmt, subject, Encoding.ASCII.GetBytes(messageJson).Length, messageJson);
         }
 
-        public static string FormatConnectMessage(Connect message)
+        public static string FormatConnectMessage(INatsMessage message)
         {
             string messageJson = message.ToJson();
             return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.ConnectFmt, message);

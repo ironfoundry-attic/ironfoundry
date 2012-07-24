@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea.Config
+﻿namespace IronFoundry.Misc.Configuration
 {
     using System;
     using System.Net;
