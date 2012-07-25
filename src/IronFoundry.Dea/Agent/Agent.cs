@@ -6,10 +6,12 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
+    using IronFoundry.Misc;
+    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Nats.Client;
     using Providers;
 
     public sealed class Agent : IAgent
@@ -21,7 +23,7 @@
 
         private readonly ILog log;
         private readonly IConfig config;
-        private readonly IMessagingProvider messagingProvider;
+        private readonly INatsClient natsClient;
         private readonly IFilesManager filesManager;
         private readonly IConfigManager configManager;
         private readonly IDropletManager dropletManager;
@@ -43,7 +45,7 @@
         private VcapComponentDiscover discoverMessage;
 
         public Agent(ILog log, IConfig config,
-            IMessagingProvider messagingProvider,
+            INatsClient natsClient,
             IFilesManager filesManager,
             IConfigManager configManager,
             IDropletManager dropletManager,
@@ -52,14 +54,14 @@
         {
             this.log               = log;
             this.config            = config;
-            this.messagingProvider = messagingProvider;
+            this.natsClient        = natsClient;
             this.filesManager      = filesManager;
             this.configManager     = configManager;
             this.dropletManager    = dropletManager;
             this.webServerProvider = webServerAdministrationProvider;
             this.varzProvider      = varzProvider;
 
-            helloMessage = new Hello(messagingProvider.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
+            helloMessage = new Hello(natsClient.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
 
             processTask     = new Task(ProcessLoop);
             heartbeatTask   = new Task(HeartbeatLoop);
@@ -74,37 +76,37 @@
 
         public void Start()
         {
-            if (messagingProvider.Start())
+            if (natsClient.Start())
             {
                 discoverMessage = new VcapComponentDiscover(
                     type: Resources.Agent_DEAComponentType,
-                    uuid: messagingProvider.UniqueIdentifier,
+                    uuid: natsClient.UniqueIdentifier,
                     host: config.MonitoringServiceHostStr,
                     credentials: config.MonitoringCredentials);
 
                 varzProvider.Discover = discoverMessage;
 
-                messagingProvider.Subscribe(NatsSubscription.VcapComponentDiscover,
+                natsClient.Subscribe(NatsSubscription.VcapComponentDiscover,
                     (msg, reply) =>
                     {
                         discoverMessage.UpdateUptime();
-                        messagingProvider.Publish(reply, discoverMessage);
+                        natsClient.Publish(reply, discoverMessage);
                     });
 
-                messagingProvider.Publish(new VcapComponentAnnounce(discoverMessage));
+                natsClient.Publish(new VcapComponentAnnounce(discoverMessage));
 
-                messagingProvider.Subscribe(NatsSubscription.DeaStatus, ProcessDeaStatus);
-                messagingProvider.Subscribe(NatsSubscription.DropletStatus, ProcessDropletStatus);
-                messagingProvider.Subscribe(NatsSubscription.DeaDiscover, ProcessDeaDiscover);
-                messagingProvider.Subscribe(NatsSubscription.DeaFindDroplet, ProcessDeaFindDroplet);
-                messagingProvider.Subscribe(NatsSubscription.DeaUpdate, ProcessDeaUpdate);
-                messagingProvider.Subscribe(NatsSubscription.DeaStop, ProcessDeaStop);
-                messagingProvider.Subscribe(NatsSubscription.GetDeaInstanceStartFor(messagingProvider.UniqueIdentifier), ProcessDeaStart);
-                messagingProvider.Subscribe(NatsSubscription.RouterStart, ProcessRouterStart);
-                messagingProvider.Subscribe(NatsSubscription.HealthManagerStart, ProcessHealthManagerStart);
-                messagingProvider.Subscribe(NatsSubscription.DeaLocate, ProcessDeaLocate);
+                natsClient.Subscribe(NatsSubscription.DeaStatus, ProcessDeaStatus);
+                natsClient.Subscribe(NatsSubscription.DropletStatus, ProcessDropletStatus);
+                natsClient.Subscribe(NatsSubscription.DeaDiscover, ProcessDeaDiscover);
+                natsClient.Subscribe(NatsSubscription.DeaFindDroplet, ProcessDeaFindDroplet);
+                natsClient.Subscribe(NatsSubscription.DeaUpdate, ProcessDeaUpdate);
+                natsClient.Subscribe(NatsSubscription.DeaStop, ProcessDeaStop);
+                natsClient.Subscribe(NatsSubscription.GetDeaInstanceStartFor(natsClient.UniqueIdentifier), ProcessDeaStart);
+                natsClient.Subscribe(NatsSubscription.RouterStart, ProcessRouterStart);
+                natsClient.Subscribe(NatsSubscription.HealthManagerStart, ProcessHealthManagerStart);
+                natsClient.Subscribe(NatsSubscription.DeaLocate, ProcessDeaLocate);
 
-                messagingProvider.Publish(helloMessage);
+                natsClient.Publish(helloMessage);
 
                 SendAdvertise();
 
@@ -145,7 +147,7 @@
 
             TakeSnapshot();
 
-            messagingProvider.Dispose();
+            natsClient.Dispose();
 
             log.Info(Resources.Agent_Shutdown_Message);
         }
@@ -284,7 +286,7 @@
                     {
                         delay += 10; // NB: 10 milliseconds delay per app
                     });
-                messagingProvider.Publish(reply, helloMessage, Math.Min(delay, 250));
+                natsClient.Publish(reply, helloMessage, Math.Min(delay, 250));
             }
             else
             {
@@ -372,7 +374,7 @@
                 ReservedMemory = 0,
                 NumClients     = 20
             };
-            messagingProvider.Publish(reply, statusMessage);
+            natsClient.Publish(reply, statusMessage);
         }
 
         private void ProcessDeaFindDroplet(string message, string reply)
@@ -395,7 +397,7 @@
 
                 if (versionMatched && instanceMatched && indexMatched && stateMatched)
                 {
-                    var response = new FindDropletResponse(messagingProvider.UniqueIdentifier, instance)
+                    var response = new FindDropletResponse(natsClient.UniqueIdentifier, instance)
                     {
                         FileUri = String.Format(CultureInfo.InvariantCulture,
                             Resources.Agent_Droplets_Fmt, config.LocalIPAddress, config.FilesServicePort),
@@ -407,7 +409,7 @@
                         response.Stats = new Stats(instance);
                     }
 
-                    messagingProvider.Publish(reply, response);
+                    natsClient.Publish(reply, response);
                 }
             });
         }
@@ -426,7 +428,7 @@
                 if (instance.CanGatherStats)
                 {
                     var response = new Stats(instance); // TODO more statistics
-                    messagingProvider.Publish(reply, response);
+                    natsClient.Publish(reply, response);
                 }
             });
         }
@@ -464,14 +466,14 @@
 
             var routerRegister = new RouterRegister
             {
-                Dea  = messagingProvider.UniqueIdentifier,
+                Dea  = natsClient.UniqueIdentifier,
                 Host = instance.Host,
                 Port = instance.Port,
                 Uris = uris ?? instance.Uris,
                 Tag  = new Tag { Framework = instance.Framework, Runtime = instance.Runtime }
             };
 
-            messagingProvider.Publish(routerRegister);
+            natsClient.Publish(routerRegister);
         }
 
         private void UnregisterWithRouter(Instance instance)
@@ -488,20 +490,20 @@
 
             var routerUnregister = new RouterUnregister
             {
-                Dea  = messagingProvider.UniqueIdentifier,
+                Dea  = natsClient.UniqueIdentifier,
                 Host = instance.Host,
                 Port = instance.Port,
                 Uris = uris ?? instance.Uris,
             };
 
-            messagingProvider.Publish(routerUnregister);
+            natsClient.Publish(routerUnregister);
         }
 
         private void SendExitedNotification(Instance instance)
         {
             if (false == instance.IsEvacuated)
             {
-                messagingProvider.Publish(new InstanceExited(instance));
+                natsClient.Publish(new InstanceExited(instance));
                 log.Debug(Resources.Agent_InstanceExited_Fmt, instance.LogID);
             }
         }
@@ -527,7 +529,7 @@
                 Droplets = heartbeats.ToArray()
             };
 
-            messagingProvider.Publish(message);
+            natsClient.Publish(message);
         }
 
         private void SendAdvertise()
@@ -536,8 +538,8 @@
             {
                 return;
             }
-            var message = new Advertise(messagingProvider.UniqueIdentifier, 4096, 0, true); // TODO mem
-            messagingProvider.Publish(message);
+            var message = new Advertise(natsClient.UniqueIdentifier, 4096, 0, true); // TODO mem
+            natsClient.Publish(message);
         }
 
         private string GetApplicationState(string name)
@@ -594,7 +596,7 @@
             {
                 Droplets = new[] { heartbeat }
             };
-            messagingProvider.Publish(message);
+            natsClient.Publish(message);
         }
 
         private void SnapshotVarz()

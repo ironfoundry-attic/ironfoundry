@@ -4,11 +4,11 @@
     using System.ServiceModel;
     using System.ServiceModel.Description;
     using System.ServiceModel.Security;
-    using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
     using IronFoundry.Dea.WcfInfrastructure;
+    using IronFoundry.Misc.Configuration;
 
     /// <summary>
     /// TODO: duplicated code with MonitoringWinService

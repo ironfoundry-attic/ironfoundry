@@ -15,6 +15,12 @@
         }
 
         [JsonIgnore]
+        public bool IsReceiveOnly
+        {
+            get { return PublishSubject == RECEIVE_ONLY; } // TODO 201207
+        }
+
+        [JsonIgnore]
         public string RawJson { get; set; }
 
         public virtual bool CanPublishWithSubject(string subject)

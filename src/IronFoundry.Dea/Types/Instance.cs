@@ -6,6 +6,7 @@
     using System.IO;
     using System.Linq;
     using IronFoundry.Dea.WindowsJobObjects;
+    using IronFoundry.Misc;
     using JsonConverters;
     using Newtonsoft.Json;
 

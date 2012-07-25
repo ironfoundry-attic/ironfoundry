@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Test
 {
-    using Dea;
     using Xunit;
+    using IronFoundry.Misc;
 
     public class UtiltiesTest
     {

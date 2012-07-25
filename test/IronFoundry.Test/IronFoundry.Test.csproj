@@ -69,6 +69,10 @@
       <Project>{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA}</Project>
       <Name>IronFoundry.Dea</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\IronFoundry.Misc\IronFoundry.Misc.csproj">
+      <Project>{E2B80FE5-34A9-4FAF-B638-8C6B744F9F1F}</Project>
+      <Name>IronFoundry.Misc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\IronFoundry\IronFoundry.csproj">
       <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
       <Name>IronFoundry</Name>
