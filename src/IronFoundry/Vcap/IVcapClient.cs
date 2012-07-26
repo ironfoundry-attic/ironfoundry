@@ -1,4 +1,6 @@
-﻿namespace IronFoundry.Vcap
+﻿using System.Net;
+
+namespace IronFoundry.Vcap
 {
     using System.Collections.Generic;
     using System.IO;
@@ -14,6 +16,7 @@
         Info GetInfo();
 
         void Target(string uri);
+        void Target(string uri, IPAddress ipAddress);
         string CurrentTarget { get; }
 
         void Login();
