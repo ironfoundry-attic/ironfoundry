@@ -42,7 +42,7 @@
             {
                 string appJson = GetApplicationJson(name);
             }
-            catch (VmcNotFoundException)
+            catch (VcapNotFoundException)
             {
                 rv = false;
             }

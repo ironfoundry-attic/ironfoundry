@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace IronFoundry.Types
 {
+    [Serializable]
     public class VcapUser
     {
         [JsonProperty(PropertyName = "email")]

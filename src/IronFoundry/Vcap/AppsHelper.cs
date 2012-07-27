@@ -18,79 +18,68 @@
         public AppsHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
             : base(proxyUser, credMgr) { }
 
-        public VcapClientResult Start(string applicationName)
+        public void Start(string applicationName)
         {
-            VcapClientResult rv;
-            Application app = GetApplication(applicationName);
-            if (app.IsStarted)
+            var application = GetApplication(applicationName);
+            Start(application);
+        }
+
+        public void Start(Application application)
+        {
+            application.Start();
+            UpdateApplication(application);
+            if (!IsStarted(application.Name))
             {
-                rv = new VcapClientResult(true);
+                throw new VcapException("Failed to start application.");
             }
-            else
-            {
-                app.Start();
-                UpdateApplication(app);
-                rv = new VcapClientResult(IsStarted(app.Name));
-            }
-            return rv;
         }
 
-        public VcapClientResult Start(Application application)
+        public void Stop(string applicationName)
         {
-            return Start(application.Name);
+            var application = GetApplication(applicationName);
+            Stop(application);
         }
 
-        public VcapClientResult Stop(string applicationName)
+        public void Stop(Application application)
         {
-            VcapClientResult rv;
-            Application app = GetApplication(applicationName);
-            if (app.IsStopped)
-            {
-                rv = new VcapClientResult(true);
-            }
-            else
-            {
-                app.Stop();
-                UpdateApplication(app);
-                rv = new VcapClientResult(true);
-            }
-            return rv;
+            application.Stop();
+            UpdateApplication(application);
         }
 
-        public VcapClientResult Stop(Application application)
+        public void Restart(string applicationName)
         {
-            return Stop(application.Name);
+            Stop(applicationName);
+            Start(applicationName);
         }
 
-        public VcapClientResult Restart(string appName)
+        public void Restart(Application applicationName)
         {
-            Stop(appName);
-            return Start(appName);
+            Stop(applicationName);
+            Start(applicationName);
         }
 
-        public VcapClientResult Restart(Application app)
+        public void Delete(string applicationName)
         {
-            Stop(app);
-            return Start(app);
+            var application = GetApplication(applicationName);
+            Delete(application);
         }
 
-        public VcapClientResult Delete(Application app)
+        public void Delete(Application application)
         {
-            return Delete(app.Name);
-        }
-
-        public VcapClientResult Delete(string name)
-        {
-            var r = base.BuildVcapJsonRequest(Method.DELETE, Constants.APPS_PATH, name);
+            var r = BuildVcapJsonRequest(Method.DELETE, Constants.APPS_PATH, application.Name);
             r.Execute();
-            return new VcapClientResult();
         }
 
-        public VcapResponse UpdateApplication(Application app)
+        public void UpdateApplication(Application application)
         {
-            var r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, app.Name);
-            r.AddBody(app);
-            return r.Execute<VcapResponse>();
+            var r = BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, application.Name);
+            r.AddBody(application);
+            var response = r.Execute<VcapResponse>();
+
+            if (response != null && !string.IsNullOrEmpty(response.Description))
+            {
+                throw new VcapException(response.Description);
+            }
         }
 
         public byte[] Files(string name, string path, ushort instance)
@@ -100,32 +89,29 @@
             return response.RawBytes;
         }
 
-        public VcapClientResult Push(
-            string name, string deployFQDN, ushort instances,
+        public void Push(string name, string deployFQDN, ushort instances,
             DirectoryInfo path, uint memoryMB, string[] provisionedServiceNames)
         {
-            VcapClientResult rv;
-
             if (path == null)
             {
-                return new VcapClientResult(false, "Application local location is needed");
+                throw new ArgumentException("Application local location is needed");
             }
 
             if (deployFQDN == null)
             {
-                return new VcapClientResult(false, "Please specify the url to deploy as.");
+                throw new ArgumentException("Please specify the url to deploy as.");
             }
 
             DetetectedFramework framework = FrameworkDetetctor.Detect(path);
             if (framework == null)
             {
-                rv = new VcapClientResult(false, "Please specify application framework");
+                throw new InvalidOperationException("Please specify application framework");
             }
             else
             {
                 if (AppExists(name))
                 {
-                    rv = new VcapClientResult(false, String.Format(Resources.AppsHelper_PushApplicationExists_Fmt, name));
+                    throw new VcapException(String.Format(Resources.AppsHelper_PushApplicationExists_Fmt, name));
                 }
                 else
                 {
@@ -133,64 +119,55 @@
                      * Before creating the app, ensure we can build resource list
                      */
                     var resources = new List<Resource>();
-                    ulong totalSize = AddDirectoryToResources(resources, path, path.FullName);
+                    AddDirectoryToResources(resources, path, path.FullName);
 
                     var manifest = new AppManifest
                     {
                         Name = name,
                         Staging = new Staging { Framework = framework.Framework, Runtime = framework.Runtime },
-                        Uris = new string[] { deployFQDN },
+                        Uris = new [] { deployFQDN },
                         Instances = instances,
                         Resources = new AppResources { Memory = memoryMB },
                     };
 
-                    var r = base.BuildVcapJsonRequest(Method.POST, Constants.APPS_PATH);
+                    var r = BuildVcapJsonRequest(Method.POST, Constants.APPS_PATH);
                     r.AddBody(manifest);
-                    IRestResponse response = r.Execute();
+                    r.Execute();
 
                     UploadAppBits(name, path);
 
                     Application app = GetApplication(name);
                     app.Start();
-                    r = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, name);
+                    r = BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, name);
                     r.AddBody(app);
-                    response = r.Execute();
+                    r.Execute();
 
                     bool started = IsStarted(app.Name);
 
-                    if (started && false == provisionedServiceNames.IsNullOrEmpty())
+                    if (started && !provisionedServiceNames.IsNullOrEmpty())
                     {
-                        foreach (string svcName in provisionedServiceNames)
+                        foreach (string serviceName in provisionedServiceNames)
                         {
                             var servicesHelper = new ServicesHelper(proxyUser, credMgr);
-                            servicesHelper.BindService(svcName, app.Name);
+                            servicesHelper.BindService(serviceName, app.Name);
                         }
                     }
-
-                    rv = new VcapClientResult(started);
                 }
             }
-
-            return rv;
         }
 
-        public VcapClientResult Update(string name, DirectoryInfo path)
+        public void Update(string name, DirectoryInfo path)
         {
-            VcapClientResult rv;
-
             if (path == null)
             {
-                rv = new VcapClientResult(false, "Application local location is needed");
+                throw new ArgumentNullException("path");
             }
             else
             {
                 UploadAppBits(name, path);
                 Application app = GetApplication(name);
                 Restart(app);
-                rv = new VcapClientResult();
             }
-
-            return rv;
         }
 
         public string GetAppCrash(string name)

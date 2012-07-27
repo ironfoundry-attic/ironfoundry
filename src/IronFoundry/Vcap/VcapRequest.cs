@@ -1,4 +1,6 @@
-﻿namespace IronFoundry.Vcap
+﻿using IronFoundry.Properties;
+
+namespace IronFoundry.Vcap
 {
     using System;
     using System.Collections;
@@ -39,17 +41,20 @@
             client = BuildClient();
         }
 
-        protected VcapRequestBase(string proxyUserEmail,VcapCredentialManager credentialManager, bool useAuthentication, Uri uri = null)
+        protected VcapRequestBase(string proxyUserEmail, VcapCredentialManager credentialManager, bool useAuthentication, Uri uri = null)
         {
             this.proxyUserEmail = proxyUserEmail;
             this.credentialManager = credentialManager;
             client = BuildClient(useAuthentication, uri);
         }
 
+        public string ErrorMessage { get; protected set; }
+
         public IRestResponse Execute()
         {
             IRestResponse response = client.Execute(request);
             ProcessResponse(response);
+            ErrorMessage = response.ErrorMessage;
             return response;
         }
 
@@ -57,6 +62,7 @@
         {
             IRestResponse response = client.Execute(request);
             ProcessResponse(response);
+            ErrorMessage = response.ErrorMessage;
             if (response.Content.IsNullOrWhiteSpace())
             {
                 return default(TResponse);
@@ -138,21 +144,15 @@
             return rv;
         }
 
-        private static RestRequest ProcessRequestArgs(RestRequest request, params object[] args)
+        private void ProcessResponse(IRestResponse response)
         {
-            if (null == request)
+            if (response.ErrorException != null)
             {
-                throw new ArgumentNullException("request");
+                throw new VcapException(
+                    String.Format(Resources.VcapRequest_RestException_Fmt, client.BaseUrl, request.Resource),
+                    response.ErrorException);
             }
-            if (false == args.IsNullOrEmpty())
-            {
-                request.Resource = String.Join("/", args).Replace("//", "/");
-            }
-            return request;
-        }
 
-        private static void ProcessResponse(IRestResponse response)
-        {
             if (VMC_HTTP_ERROR_CODES.Contains((ushort)response.StatusCode))
             {
                 Exception parseException = null;
@@ -187,21 +187,34 @@
                 {
                     errorMessage = String.Format("Error parsing (HTTP {0}):{1}{2}{3}{4}",
                         response.StatusCode, Environment.NewLine, response.Content, Environment.NewLine, parseException.Message);
-                    throw new VmcTargetException(errorMessage, parseException);
+                    throw new VcapException(errorMessage, parseException);
                 }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest ||
                         response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        throw new VmcNotFoundException(errorMessage);
+                        throw new VcapNotFoundException(errorMessage);
                     }
                     else
                     {
-                        throw new VmcTargetException(errorMessage);
+                        throw new VcapException(errorMessage);
                     }
                 }
             }
+        }
+
+        private static RestRequest ProcessRequestArgs(RestRequest request, params object[] args)
+        {
+            if (null == request)
+            {
+                throw new ArgumentNullException("request");
+            }
+            if (false == args.IsNullOrEmpty())
+            {
+                request.Resource = String.Join("/", args).Replace("//", "/");
+            }
+            return request;
         }
 
         internal RestClient Client
