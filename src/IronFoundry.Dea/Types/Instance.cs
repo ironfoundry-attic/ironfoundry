@@ -246,22 +246,25 @@
 
         public void AddWorkerProcess(Process newInstanceWorkerProcess)
         {
-            if (false == newInstanceWorkerProcess.HasExited &&
-                false == workerProcesses.Contains(newInstanceWorkerProcess))
+            if (false == newInstanceWorkerProcess.HasExited)
             {
-                workerProcesses.Add(newInstanceWorkerProcess);
-                if (false == workerProcessStartDate.HasValue)
+                lock (workerProcesses)
                 {
-                    workerProcessStartDate = DateTime.Now;
+                    Process existingInstanceProcess = workerProcesses.SingleOrDefault(wp => wp.Id == newInstanceWorkerProcess.Id);
+                    if (null != existingInstanceProcess)
+                    {
+                        workerProcesses.Remove(existingInstanceProcess);
+                    }
+
+                    workerProcesses.Add(newInstanceWorkerProcess);
+                    if (false == workerProcessStartDate.HasValue)
+                    {
+                        workerProcessStartDate = DateTime.Now;
+                    }
                 }
             }
 
-            var exitedProcesses = new List<Process>();
-            exitedProcesses.AddRange(workerProcesses.Where(wp => wp.HasExited));
-            foreach (var exited in exitedProcesses)
-            {
-                workerProcesses.Remove(exited);
-            }
+            CleanupExitedWorkerProcesses();
         }
 
         [JsonIgnore]
@@ -286,6 +289,8 @@
 
         public void CalculateUsage()
         {
+            CleanupExitedWorkerProcesses();
+
             var newUsage = new Usage();
 
             newUsage.DiskUsageBytes = GetDiskUsage(this.Dir);
@@ -327,6 +332,19 @@
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        private void CleanupExitedWorkerProcesses()
+        {
+            lock (workerProcesses)
+            {
+                var exitedProcesses = new List<Process>();
+                exitedProcesses.AddRange(workerProcesses.Where(wp => wp.HasExited));
+                foreach (Process exited in exitedProcesses)
+                {
+                    workerProcesses.Remove(exited);
+                }
+            }
         }
 
         private void Dispose(bool disposing)
