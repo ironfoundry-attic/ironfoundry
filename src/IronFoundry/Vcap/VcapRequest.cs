@@ -183,7 +183,7 @@ namespace IronFoundry.Vcap
                     }
                 }
 
-                if (null != parseException)
+                if (parseException != null)
                 {
                     errorMessage = String.Format("Error parsing (HTTP {0}):{1}{2}{3}{4}",
                         response.StatusCode, Environment.NewLine, response.Content, Environment.NewLine, parseException.Message);
@@ -191,10 +191,13 @@ namespace IronFoundry.Vcap
                 }
                 else
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest ||
-                        response.StatusCode == HttpStatusCode.NotFound)
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.NotFound)
                     {
                         throw new VcapNotFoundException(errorMessage);
+                    }
+                    else if (response.StatusCode == HttpStatusCode.Forbidden)
+                    {
+                        throw new VcapAuthException(errorMessage);
                     }
                     else
                     {
