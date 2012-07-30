@@ -6,12 +6,11 @@
     using System.Net;
     using System.Text;
     using System.Text.RegularExpressions;
-    using IronFoundry.Properties;
     using IronFoundry.Types;
 
     public class VcapClient : IVcapClient
     {
-        private readonly VcapCredentialManager credMgr;
+        private VcapCredentialManager credMgr;
         private readonly Cloud cloud;
         private static readonly Regex file_re;
         private static readonly Regex dir_re;
@@ -35,14 +34,12 @@
 
         public VcapClient(string uri)
         {
-            credMgr = new VcapCredentialManager();
-            credMgr.SetTarget(uri);
+            Target(uri);
         }
 
         public VcapClient(Cloud cloud)
         {
-            credMgr = new VcapCredentialManager();
-            credMgr.SetTarget(cloud.Url);
+            Target(cloud.Url);
             this.cloud = cloud;
         }
 
@@ -80,22 +77,23 @@
 
         public void Target(string uri)
         {
+            Target(uri, null);
+        }
+
+        public void Target(string uri, IPAddress ipAddress)
+        {
             if (uri.IsNullOrWhiteSpace())
             {
                 throw new ArgumentException("uri");
             }
 
-            var helper = new MiscHelper(proxyUser, credMgr);
+            Uri validatedUri;
+            if (!Uri.TryCreate(uri, UriKind.Absolute, out validatedUri))
+            {
+                validatedUri = new Uri("http://" + uri);
+            }
 
-            Uri tmp;
-            if (Uri.TryCreate(uri, UriKind.Absolute, out tmp))
-            {
-                helper.Target(tmp);
-            }
-            else
-            {
-                helper.Target(new Uri("http://" + uri));
-            }
+            credMgr = ipAddress == null ? new VcapCredentialManager(validatedUri) : new VcapCredentialManager(validatedUri, ipAddress);
         }
 
         public string CurrentTarget
