@@ -1,9 +1,9 @@
 ﻿namespace IronFoundry.Dea.WinService
 {
     using System;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Misc.Configuration;
+    using IronFoundry.Misc.Logging;
 
     [System.ComponentModel.DesignerCategory(@"Code")]
     public class ValidationWinService : IService

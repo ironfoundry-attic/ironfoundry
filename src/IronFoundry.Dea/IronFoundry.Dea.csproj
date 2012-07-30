@@ -90,8 +90,6 @@
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
     <Compile Include="JsonConverters\VcapGuidArrayConverter.cs" />
     <Compile Include="JsonConverters\VcapGuidConverter.cs" />
-    <Compile Include="Logging\ILog.cs" />
-    <Compile Include="Logging\NLogLogger.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

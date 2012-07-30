@@ -6,11 +6,11 @@
     using System.Net;
     using System.Text.RegularExpressions;
     using System.Threading;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
     using IronFoundry.Misc;
     using IronFoundry.Misc.Configuration;
+    using IronFoundry.Misc.Logging;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {

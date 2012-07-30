@@ -2,12 +2,11 @@
 {
     using System;
     using System.Reflection;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Providers;
+    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Misc.Logging;
     using StructureMap.Configuration.DSL;
     using WinService;
-    using IronFoundry.Nats.Client;
-    using IronFoundry.Misc.Configuration;
 
     public class ServiceRegistry : Registry
     {

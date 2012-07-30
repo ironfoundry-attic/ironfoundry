@@ -3,11 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using IronFoundry.Dea.Logging;
+    using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
+    using IronFoundry.Misc.Logging;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using IronFoundry.Dea.Properties;
 
     public class VarzProvider : IVarzProvider
     {

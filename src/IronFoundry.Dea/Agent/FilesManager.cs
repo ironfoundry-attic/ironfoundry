@@ -9,10 +9,10 @@
     using System.Text;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Types;
     using IronFoundry.Misc;
     using IronFoundry.Misc.Configuration;
+    using IronFoundry.Misc.Logging;
 
     public class FilesManager : IFilesManager
     {

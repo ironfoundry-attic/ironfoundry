@@ -6,11 +6,11 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
     using IronFoundry.Misc;
     using IronFoundry.Misc.Configuration;
+    using IronFoundry.Misc.Logging;
     using IronFoundry.Nats.Client;
     using Providers;
 

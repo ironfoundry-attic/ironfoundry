@@ -2,7 +2,7 @@
 {
     using System;
     using System.Runtime.InteropServices;
-    using IronFoundry.Dea.Logging;
+    using IronFoundry.Misc.Logging;
 
     internal static class ServiceStatusUtil
     {

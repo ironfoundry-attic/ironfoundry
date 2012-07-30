@@ -19,8 +19,10 @@
             return ToJson();
         }
 
+        [JsonIgnore]
         public abstract string PublishSubject { get; }
 
+        [JsonIgnore]
         public bool IsReceiveOnly
         {
             get { return false; }

@@ -1,8 +1,8 @@
 ﻿namespace IronFoundry.Dea.Services
 {
     using System.ServiceModel.Channels;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Providers;
+    using IronFoundry.Misc.Logging;
     
     public class MonitoringService : IMonitoringService
     {

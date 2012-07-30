@@ -6,10 +6,10 @@
     using System.Net;
     using System.ServiceModel.Channels;
     using System.ServiceModel.Security;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Providers;
     using IronFoundry.Misc;
     using IronFoundry.Misc.Configuration;
+    using IronFoundry.Misc.Logging;
 
     public class FilesService : IFilesService
     {
