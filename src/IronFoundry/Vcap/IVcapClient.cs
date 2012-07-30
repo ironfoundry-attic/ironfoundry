@@ -1,9 +1,8 @@
-﻿using System.Net;
-
-namespace IronFoundry.Vcap
+﻿namespace IronFoundry.Vcap
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Net;
     using IronFoundry.Types;
 
     public interface IVcapClient
