@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using IronFoundry.Dea.WindowsJobObjects;
     using IronFoundry.Misc;
     using JsonConverters;
     using Newtonsoft.Json;
@@ -20,18 +19,14 @@
 
         private readonly DateTime instanceStartDate;
 
-        private readonly JobObject jobObject = new JobObject();
+        private readonly IList<Process> workerProcesses = new List<Process>();
 
         private readonly string logID;
 
         private DateTime? workerProcessStartDate = null;
         private bool isEvacuated = false;
 
-        public Instance()
-        {
-            jobObject.DieOnUnhandledException = true;
-            jobObject.ActiveProcessesLimit = 10;
-        }
+        public Instance() { }
 
         public Instance(string appDir, Droplet droplet) : this()
         {
@@ -252,15 +247,25 @@
 
         public void AddWorkerProcess(Process newInstanceWorkerProcess)
         {
-            if (false == newInstanceWorkerProcess.HasExited &&
-                false == jobObject.HasProcess(newInstanceWorkerProcess))
+            if (false == newInstanceWorkerProcess.HasExited)
             {
-                jobObject.AddProcess(newInstanceWorkerProcess);
-                if (false == workerProcessStartDate.HasValue)
+                lock (workerProcesses)
                 {
-                    workerProcessStartDate = DateTime.Now;
+                    Process existingInstanceProcess = workerProcesses.SingleOrDefault(wp => wp.Id == newInstanceWorkerProcess.Id);
+                    if (null != existingInstanceProcess)
+                    {
+                        workerProcesses.Remove(existingInstanceProcess);
+                    }
+
+                    workerProcesses.Add(newInstanceWorkerProcess);
+                    if (false == workerProcessStartDate.HasValue)
+                    {
+                        workerProcessStartDate = DateTime.Now;
+                    }
                 }
             }
+
+            CleanupExitedWorkerProcesses();
         }
 
         [JsonIgnore]
@@ -285,13 +290,18 @@
 
         public void CalculateUsage()
         {
+            CleanupExitedWorkerProcesses();
+
             var newUsage = new Usage();
 
             newUsage.DiskUsageBytes = GetDiskUsage(this.Dir);
 
-            newUsage.MemoryUsageKB = jobObject.WorkingSetMemory / 1024;
+            long totalWorkerWorkingSet = workerProcesses.Sum(wp => wp.WorkingSet64);
+            long totalWorkerProcessorTime = workerProcesses.Sum(wp => wp.TotalProcessorTime.Ticks);
 
-            long currentTotalCpuTicks = newUsage.TotalCpuTicks = jobObject.TotalProcessorTime.Ticks;
+            newUsage.MemoryUsageKB = totalWorkerWorkingSet / 1024;
+
+            long currentTotalCpuTicks = newUsage.TotalCpuTicks = totalWorkerProcessorTime;
             DateTime currentTicksTimestamp = newUsage.Time = DateTime.Now;
 
             Usage lastUsage = MostRecentUsage;
@@ -325,13 +335,26 @@
             GC.SuppressFinalize(this);
         }
 
+        private void CleanupExitedWorkerProcesses()
+        {
+            lock (workerProcesses)
+            {
+                var exitedProcesses = new List<Process>();
+                exitedProcesses.AddRange(workerProcesses.Where(wp => wp.HasExited));
+                foreach (Process exited in exitedProcesses)
+                {
+                    workerProcesses.Remove(exited);
+                }
+            }
+        }
+
         private void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (jobObject != null)
+                foreach (var process in workerProcesses)
                 {
-                    jobObject.Dispose();
+                    process.Dispose();
                 }
             }
         }
