@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea.IoC
+﻿namespace IronFoundry.Misc.IoC
 {
     using System;
     using System.ServiceProcess;

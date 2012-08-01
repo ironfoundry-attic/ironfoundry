@@ -48,6 +48,13 @@
       <Project>{3E576C47-730B-4F05-BD03-3C9BAD7C45BA}</Project>
       <Name>IronFoundry.Bosh</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IronFoundry.Misc\IronFoundry.Misc.csproj">
+      <Project>{E2B80FE5-34A9-4FAF-B638-8C6B744F9F1F}</Project>
+      <Name>IronFoundry.Misc</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ServiceProcess" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

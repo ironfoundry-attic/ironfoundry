@@ -54,6 +54,7 @@
     <Compile Include="WinService\CustomCommands.cs" />
     <Compile Include="WinService\IService.cs" />
     <Compile Include="WinService\MultipleServiceManager.cs" />
+    <Compile Include="WinService\ServiceMain.cs" />
     <Compile Include="WinService\ServiceStatusUtil.cs" />
   </ItemGroup>
   <ItemGroup />
