@@ -185,11 +185,11 @@
 
                 <util:XmlFile Id="Config.XmlFile.1" Sequence="1" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
-                    ElementPath="/configuration/ironFoundryDea/@natsHost"
+                    ElementPath="/configuration/nats/@host"
                     Value="[NATSHOST]"/>
                 <util:XmlFile Id="Config.XmlFile.2" Sequence="2" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
-                    ElementPath="/configuration/ironFoundryDea/@natsPort"
+                    ElementPath="/configuration/nats/@port"
                     Value="[NATSPORT]"/>
                 <util:XmlFile Id="Config.XmlFile.3" Sequence="3" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
@@ -205,11 +205,11 @@
                     Value="[DROPLETDIR]"/>
                 <util:XmlFile Id="Config.XmlFile.6" Sequence="6" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
-                    ElementPath="/configuration/ironFoundryDea/@natsUser"
+                    ElementPath="/configuration/nats/@user"
                     Value="[NATSUSER]"/>
                 <util:XmlFile Id="Config.XmlFile.7" Sequence="7" Action="setValue"
                     File="[#IronFoundry.Dea.Service.exe.config]"
-                    ElementPath="/configuration/ironFoundryDea/@natsPassword"
+                    ElementPath="/configuration/nats/@password"
                     Value="[NATSPASSWORD]"/>
               </Component>
 

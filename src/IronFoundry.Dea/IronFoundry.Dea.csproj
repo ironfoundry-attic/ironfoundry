@@ -74,6 +74,10 @@
     <Compile Include="Agent\ConfigManager.cs" />
     <Compile Include="Agent\IConfigManager.cs" />
     <Compile Include="Agent\IDropletManager.cs" />
+    <Compile Include="Configuration\DeaConfig.cs" />
+    <Compile Include="Configuration\DeaSection.cs" />
+    <Compile Include="Configuration\IDeaConfig.cs" />
+    <Compile Include="Configuration\ServiceCredential.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Agent\DropletManager.cs" />
     <Compile Include="Extensions\DateTimeExtensionMethods.cs" />
@@ -84,8 +88,7 @@
     <Compile Include="Agent\FilesManager.cs" />
     <Compile Include="Agent\IAgent.cs" />
     <Compile Include="Agent\IFilesManager.cs" />
-    <Compile Include="IoC\Bootstrapper.cs" />
-    <Compile Include="IoC\ServiceRegistry.cs" />
+    <Compile Include="IoC\DeaRegistry.cs" />
     <Compile Include="JsonConverters\IPAddressConverter.cs" />
     <Compile Include="JsonConverters\VcapDateTimeConverter.cs" />
     <Compile Include="JsonConverters\VcapGuidArrayConverter.cs" />
@@ -150,13 +153,9 @@
     <Compile Include="WcfInfrastructure\IocServiceHost.cs" />
     <Compile Include="WcfInfrastructure\PerCallServiceHost.cs" />
     <Compile Include="WcfInfrastructure\WcfWinService.cs" />
-    <Compile Include="WinService\CustomCommands.cs" />
     <Compile Include="WinService\MonitoringWinService.cs" />
     <Compile Include="WinService\DeaWinService.cs" />
     <Compile Include="WinService\FilesWinService.cs" />
-    <Compile Include="WinService\IService.cs" />
-    <Compile Include="WinService\MultipleServiceManager.cs" />
-    <Compile Include="WinService\ServiceStatusUtil.cs" />
     <Compile Include="WinService\ValidationWinService.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -11,13 +11,13 @@
     using ICSharpCode.SharpZipLib.Tar;
     using IronFoundry.Dea.Types;
     using IronFoundry.Misc;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Misc.Logging;
 
     public class FilesManager : IFilesManager
     {
         private readonly ILog log;
-        private readonly IConfig config;
+        private readonly IDeaConfig config;
         private readonly bool disableDirCleanup = false;
 
         private readonly string dropletsPath;
@@ -25,7 +25,7 @@
         private readonly SecurityIdentifier IIS_IUSRS = new SecurityIdentifier("S-1-5-32-568");
         private readonly SecurityIdentifier USERS = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
 
-        public FilesManager(ILog log, IConfig config)
+        public FilesManager(ILog log, IDeaConfig config)
         {
             this.log = log;
             this.config = config;

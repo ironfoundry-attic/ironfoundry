@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea.WinService
+﻿namespace IronFoundry.Misc.WinService
 {
     using System;
 

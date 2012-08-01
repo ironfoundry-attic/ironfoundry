@@ -9,7 +9,7 @@
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
     using IronFoundry.Misc;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Misc.Logging;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
@@ -32,7 +32,7 @@
         private readonly object appcmdLock = new object();
         private readonly string appCmdPath;
 
-        public WebServerAdministrationProvider(ILog log, IConfig config, IFirewallService firewallService)
+        public WebServerAdministrationProvider(ILog log, IDeaConfig config, IFirewallService firewallService)
         {
             this.log = log;
             this.localIPAddress = config.LocalIPAddress;

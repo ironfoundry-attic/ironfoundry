@@ -1,19 +1,14 @@
-﻿namespace IronFoundry.Misc.Configuration
+﻿namespace IronFoundry.Dea.Configuration
 {
     using System;
     using System.Net;
 
-    public interface IConfig
+    public interface IDeaConfig
     {
         ushort MaxMemoryMB { get; }
         bool DisableDirCleanup { get; }
         string DropletDir { get; }
         string AppDir { get; }
-
-        string NatsHost { get; }
-        ushort NatsPort { get; }
-        string NatsUser { get; }
-        string NatsPassword { get; }
 
         IPAddress LocalIPAddress { get; }
 

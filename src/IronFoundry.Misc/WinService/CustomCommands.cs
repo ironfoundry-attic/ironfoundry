@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea.WinService
+﻿namespace IronFoundry.Misc.WinService
 {
     // Must be int between 128 and 255
     public enum CustomCommands : int

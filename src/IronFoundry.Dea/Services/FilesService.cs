@@ -8,16 +8,16 @@
     using System.ServiceModel.Security;
     using IronFoundry.Dea.Providers;
     using IronFoundry.Misc;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Misc.Logging;
 
     public class FilesService : IFilesService
     {
         private readonly ILog log;
-        private readonly IConfig config;
+        private readonly IDeaConfig config;
         private readonly IWebOperationContextProvider webContext;
 
-        public FilesService(ILog log, IConfig config, IWebOperationContextProvider webContext)
+        public FilesService(ILog log, IDeaConfig config, IWebOperationContextProvider webContext)
         {
             this.log = log;
             this.config = config;

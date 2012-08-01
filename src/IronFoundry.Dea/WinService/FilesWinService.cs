@@ -4,21 +4,22 @@
     using System.ServiceModel;
     using System.ServiceModel.Description;
     using System.ServiceModel.Security;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
     using IronFoundry.Dea.WcfInfrastructure;
-    using IronFoundry.Misc.Configuration;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Misc.WinService;
 
     /// <summary>
     /// TODO: duplicated code with MonitoringWinService
     /// </summary>
     public class FilesWinService : WcfWinService
     {
-        private readonly IConfig config;
+        private readonly IDeaConfig config;
         private readonly IFirewallService firewallService;
 
-        public FilesWinService(ILog log, IConfig config, IFirewallService firewallService) : base(log, true)
+        public FilesWinService(ILog log, IDeaConfig config, IFirewallService firewallService) : base(log, true)
         {
             this.config = config;
             this.firewallService = firewallService;

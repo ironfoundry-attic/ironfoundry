@@ -54,6 +54,10 @@
     <Compile Include="Client\NatsCommand.cs" />
     <Compile Include="Client\NatsClient.cs" />
     <Compile Include="Client\NatsMessage.cs" />
+    <Compile Include="Configuration\NatsConfig.cs" />
+    <Compile Include="Configuration\NatsSection.cs" />
+    <Compile Include="Configuration\INatsConfig.cs" />
+    <Compile Include="IoC\NatsRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -65,7 +69,11 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="StructureMap">
+      <HintPath>..\..\packages\structuremap.2.6.3\lib\StructureMap.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

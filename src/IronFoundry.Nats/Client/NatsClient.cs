@@ -10,8 +10,8 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Timers;
-    using IronFoundry.Misc.Configuration;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Nats.Configuration;
     using IronFoundry.Nats.Properties;
     using Timer = System.Timers.Timer;
 
@@ -83,14 +83,14 @@
         private ParseState currentParseState = ParseState.AWAITING_CONTROL_LINE;
         private NatsMessagingStatus status = NatsMessagingStatus.CONNECTING;
 
-        public NatsClient(ILog log, IConfig config)
+        public NatsClient(ILog log, INatsConfig config)
         {
             this.log  = log;
 
-            this.natsHost     = config.NatsHost;
-            this.natsPort     = config.NatsPort;
-            this.natsUser     = config.NatsUser;
-            this.natsPassword = config.NatsPassword;
+            this.natsHost     = config.Host;
+            this.natsPort     = config.Port;
+            this.natsUser     = config.User;
+            this.natsPassword = config.Password;
 
             uniqueIdentifier = Guid.NewGuid();
             log.Debug(Resources.NatsClient_Initialized_Fmt, UniqueIdentifier, natsHost, natsPort);

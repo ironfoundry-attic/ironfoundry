@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Misc.Configuration
+﻿namespace IronFoundry.Dea.Configuration
 {
     using System;
     using System.Configuration;
@@ -6,9 +6,11 @@
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
+    using IronFoundry.Misc;
+    using IronFoundry.Nats.Configuration;
     using Microsoft.Win32;
 
-    public class Config : IConfig
+    public class DeaConfig : IDeaConfig
     {
         private readonly DeaSection deaSection;
         private readonly IPAddress localIPAddress;
@@ -25,10 +27,10 @@
         private readonly string appCmdPath = null;
         private readonly bool hasAppCmd = false;
 
-        public Config()
+        public DeaConfig(INatsConfig natsConfig)
         {
             this.deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
-            this.localIPAddress = GetLocalIPAddress();
+            this.localIPAddress = GetLocalIPAddress(natsConfig.Host);
 
             this.filesServiceUri = new Uri(String.Format("http://localhost:{0}", FilesServicePort));
 
@@ -83,26 +85,6 @@
             get { return deaSection.AppDir; }
         }
 
-        public string NatsHost
-        {
-            get { return deaSection.NatsHost; }
-        }
-
-        public ushort NatsPort
-        {
-            get { return deaSection.NatsPort; }
-        }
-
-        public string NatsUser
-        {
-            get { return deaSection.NatsUser; }
-        }
-
-        public string NatsPassword
-        {
-            get { return deaSection.NatsPassword; }
-        }
-
         public ushort FilesServicePort
         {
             get { return deaSection.FilesServicePort; }
@@ -153,12 +135,12 @@
             get { return hasAppCmd; }
         }
 
-        private IPAddress GetLocalIPAddress()
+        private IPAddress GetLocalIPAddress(string natsHost)
         {
             string localRoute = deaSection.LocalRoute;
             if (Utility.IsLocalIpAddress(localRoute))
             {
-                localRoute = deaSection.NatsHost;
+                localRoute = natsHost;
             }
             using (var udpClient = new UdpClient())
             {

@@ -7,14 +7,14 @@
     using System.IO;
     using System.Linq;
     using IronFoundry.Dea.Types;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
     using Newtonsoft.Json;
 
     public class ConfigManager : IConfigManager
     {
-        private readonly IConfig config;
+        private readonly IDeaConfig config;
 
-        public ConfigManager(IConfig config)
+        public ConfigManager(IDeaConfig config)
         {
             this.config = config;
         }

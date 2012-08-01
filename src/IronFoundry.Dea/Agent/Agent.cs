@@ -9,7 +9,7 @@
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
     using IronFoundry.Misc;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Nats.Client;
     using Providers;
@@ -22,7 +22,7 @@
         private readonly TimeSpan TenSecondsInterval = TimeSpan.FromSeconds(10);
 
         private readonly ILog log;
-        private readonly IConfig config;
+        private readonly IDeaConfig config;
         private readonly INatsClient natsClient;
         private readonly IFilesManager filesManager;
         private readonly IConfigManager configManager;
@@ -44,7 +44,7 @@
 
         private VcapComponentDiscover discoverMessage;
 
-        public Agent(ILog log, IConfig config,
+        public Agent(ILog log, IDeaConfig config,
             INatsClient natsClient,
             IFilesManager filesManager,
             IConfigManager configManager,

@@ -2,16 +2,17 @@
 {
     using System;
     using IronFoundry.Dea.Properties;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Misc.WinService;
 
     [System.ComponentModel.DesignerCategory(@"Code")]
     public class ValidationWinService : IService
     {
         private readonly ILog log;
-        private readonly IConfig config;
+        private readonly IDeaConfig config;
 
-        public ValidationWinService(ILog log, IConfig config)
+        public ValidationWinService(ILog log, IDeaConfig config)
         {
             this.log = log;
             this.config = config;

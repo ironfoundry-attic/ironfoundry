@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Misc.Configuration
+﻿namespace IronFoundry.Dea.Configuration
 {
     using System;
     using System.Configuration;
@@ -6,58 +6,6 @@
     public class DeaSection : ConfigurationSection
     {
         public const string SectionName = "ironFoundryDea";
-
-        [ConfigurationProperty("natsHost", DefaultValue = "api.vcap.me", IsRequired = true)]
-        public string NatsHost
-        {
-            get
-            {
-                return (string)this["natsHost"];
-            }
-            set
-            {
-                this["natsHost"] = value;
-            }
-        }
-
-        [ConfigurationProperty("natsPort", DefaultValue = "4222", IsRequired = true)]
-        public ushort NatsPort
-        {
-            get
-            {
-                return Convert.ToUInt16(this["natsPort"]);
-            }
-            set
-            {
-                this["natsPort"] = value;
-            }
-        }
-
-        [ConfigurationProperty("natsUser", IsRequired = false)]
-        public string NatsUser
-        {
-            get
-            {
-                return (string)this["natsUser"];
-            }
-            set
-            {
-                this["natsUser"] = value;
-            }
-        }
-
-        [ConfigurationProperty("natsPassword", IsRequired = false)]
-        public string NatsPassword
-        {
-            get
-            {
-                return (string)this["natsPassword"];
-            }
-            set
-            {
-                this["natsPassword"] = value;
-            }
-        }
 
         [ConfigurationProperty("localRoute", DefaultValue = "127.0.0.1", IsRequired = false)]
         public string LocalRoute

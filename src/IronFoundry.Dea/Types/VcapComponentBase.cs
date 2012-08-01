@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
     using JsonConverters;
     using Newtonsoft.Json;
 

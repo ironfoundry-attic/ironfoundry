@@ -5,6 +5,7 @@
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.WinService;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Misc.WinService;
 
     public abstract class WcfWinService : IService
     {

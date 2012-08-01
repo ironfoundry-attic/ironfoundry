@@ -1,16 +1,14 @@
-﻿namespace IronFoundry.Dea.IoC
+﻿namespace IronFoundry.Misc.IoC
 {
     using System;
     using System.Reflection;
-    using IronFoundry.Dea.Providers;
-    using IronFoundry.Misc.Configuration;
     using IronFoundry.Misc.Logging;
     using StructureMap.Configuration.DSL;
     using WinService;
 
     public class ServiceRegistry : Registry
     {
-        private const string defaultLoggerName = "IronFoundry.Dea.Service";
+        private const string defaultLoggerName = "IronFoundry";
 
         private readonly Predicate<Assembly> skipStructureMap =
             (assm) => false == assm.FullName.StartsWith("StructureMap", StringComparison.InvariantCultureIgnoreCase);
@@ -25,10 +23,6 @@
                 s.LookForRegistries();
                 s.AddAllTypesOf<IService>();
             });
-
-            For<IConfig>().Singleton().Use<Config>();
-            For<IHealthzProvider>().Singleton().Use<HealthzProvider>();
-            For<IVarzProvider>().Singleton().Use<VarzProvider>();
 
             For<ILog>().AlwaysUnique().Use(f =>
                 {

@@ -4,8 +4,8 @@
     using System.IO;
     using System.ServiceProcess;
     using IronFoundry.Dea.IoC;
-    using IronFoundry.Dea.WinService;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Misc.WinService;
 
     static class Program
     {

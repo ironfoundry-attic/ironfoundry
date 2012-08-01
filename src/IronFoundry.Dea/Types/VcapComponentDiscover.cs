@@ -3,7 +3,7 @@
     using System;
     using System.Globalization;
     using Newtonsoft.Json;
-    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Dea.Configuration;
 
     public class VcapComponentDiscover : VcapComponentBase
     {

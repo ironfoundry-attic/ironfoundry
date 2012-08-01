@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using IronFoundry.Dea.Agent;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Misc.WinService;
 
     [System.ComponentModel.DesignerCategory(@"Code")]
     public class DeaWinService : IService
