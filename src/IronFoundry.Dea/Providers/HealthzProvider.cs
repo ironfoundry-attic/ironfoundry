@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Dea.Providers
 {
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
+    using IronFoundry.Misc.Logging;
 
     public class HealthzProvider : IHealthzProvider
     {

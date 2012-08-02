@@ -2,9 +2,9 @@
 {
     using System;
     using System.Reflection;
-    using IronFoundry.Dea.Config;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Providers;
+    using IronFoundry.Misc.Configuration;
+    using IronFoundry.Misc.Logging;
     using StructureMap.Configuration.DSL;
     using WinService;
 
@@ -29,8 +29,6 @@
             For<IConfig>().Singleton().Use<Config>();
             For<IHealthzProvider>().Singleton().Use<HealthzProvider>();
             For<IVarzProvider>().Singleton().Use<VarzProvider>();
-
-            For<IMessagingProvider>().Use<NatsMessagingProvider>();
 
             For<ILog>().AlwaysUnique().Use(f =>
                 {

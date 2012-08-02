@@ -2,8 +2,8 @@
 {
     using System;
     using System.ServiceProcess;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.WinService;
+    using IronFoundry.Misc.Logging;
     using StructureMap;
 
     public static class Bootstrapper

@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using IronFoundry.Misc;
     using JsonConverters;
     using Newtonsoft.Json;
 

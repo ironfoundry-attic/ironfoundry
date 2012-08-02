@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Dea.Logging
+﻿namespace IronFoundry.Misc.Logging
 {
     using System;
 

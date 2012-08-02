@@ -3,7 +3,7 @@
     using System;
     using System.Linq;
     using System.ServiceProcess;
-    using IronFoundry.Dea.Logging;
+    using IronFoundry.Misc.Logging;
 
     public interface IMultipleServiceManager
     {

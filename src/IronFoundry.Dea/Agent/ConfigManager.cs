@@ -6,8 +6,8 @@
     using System.Data.SqlClient;
     using System.IO;
     using System.Linq;
-    using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Types;
+    using IronFoundry.Misc.Configuration;
     using Newtonsoft.Json;
 
     public class ConfigManager : IConfigManager

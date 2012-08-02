@@ -2,8 +2,8 @@
 {
     using System;
     using System.Globalization;
-    using IronFoundry.Dea.Config;
     using Newtonsoft.Json;
+    using IronFoundry.Misc.Configuration;
 
     public class VcapComponentDiscover : VcapComponentBase
     {

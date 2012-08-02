@@ -2,9 +2,9 @@
 {
     using System;
     using System.ServiceModel;
-    using IronFoundry.Dea.Logging;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.WinService;
+    using IronFoundry.Misc.Logging;
 
     public abstract class WcfWinService : IService
     {

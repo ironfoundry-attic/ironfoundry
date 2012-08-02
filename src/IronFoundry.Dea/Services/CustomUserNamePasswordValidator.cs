@@ -3,8 +3,8 @@
     using System;
     using System.IdentityModel.Selectors;
     using System.ServiceModel;
-    using IronFoundry.Dea.Config;
     using IronFoundry.Dea.Properties;
+    using IronFoundry.Misc.Configuration;
 
     public class CustomUserNamePasswordValidator : UserNamePasswordValidator
     {
