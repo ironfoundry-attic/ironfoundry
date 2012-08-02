@@ -233,9 +233,14 @@
                     process.Start();
                     string output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
-                    if (false == String.IsNullOrEmpty(output))
+                    if (process.ExitCode != 0)
                     {
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output))));
+                        string message = "Asp Compile Error";
+                        if (false == String.IsNullOrEmpty(output))
+                        {
+                            message += ": " + output;
+                        }
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(message))));
                         return;
                     }
                 }
