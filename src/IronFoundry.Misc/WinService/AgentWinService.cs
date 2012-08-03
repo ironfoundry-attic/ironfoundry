@@ -1,14 +1,13 @@
-﻿namespace IronFoundry.Dea.WinService
+﻿namespace IronFoundry.Misc.WinService
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Dea.Agent;
+    using IronFoundry.Misc.Agent;
     using IronFoundry.Misc.Logging;
-    using IronFoundry.Misc.WinService;
 
     [System.ComponentModel.DesignerCategory(@"Code")]
-    public class DeaWinService : IService
+    public class AgentWinService : IService
     {
         private static readonly TimeSpan ThirtySecondInterval = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan FiveSecondInterval = TimeSpan.FromSeconds(5);
@@ -18,7 +17,7 @@
         private readonly Task agentTask;
         private readonly Timer agentMonitorTimer;
 
-        public DeaWinService(ILog log, IAgent agent)
+        public AgentWinService(ILog log, IAgent agent)
         {
             this.log = log;
             this.agent = agent;
@@ -29,7 +28,7 @@
 
         public string ServiceName
         {
-            get { return "IronFoundry.Dea.Service"; }
+            get { return "IronFoundry." + agent.Name + ".Service"; }
         }
 
         public ushort StartIndex

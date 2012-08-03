@@ -33,6 +33,9 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>CloudFoundrySmall.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\shared\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
@@ -55,6 +58,11 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CloudFoundrySmall.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

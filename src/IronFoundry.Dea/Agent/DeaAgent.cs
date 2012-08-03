@@ -6,15 +6,16 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Types;
     using IronFoundry.Misc;
-    using IronFoundry.Dea.Configuration;
+    using IronFoundry.Misc.Agent;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Nats.Client;
     using Providers;
 
-    public sealed class Agent : IAgent
+    public sealed class DeaAgent : IAgent
     {
         private readonly TimeSpan OneSecondInterval = TimeSpan.FromSeconds(1);
         private readonly TimeSpan TwoSecondsInterval = TimeSpan.FromSeconds(2);
@@ -44,7 +45,7 @@
 
         private VcapComponentDiscover discoverMessage;
 
-        public Agent(ILog log, IDeaConfig config,
+        public DeaAgent(ILog log, IDeaConfig config,
             INatsClient natsClient,
             IFilesManager filesManager,
             IConfigManager configManager,
@@ -71,6 +72,8 @@
 
             this.maxMemoryMB = config.MaxMemoryMB;
         }
+
+        public string Name { get { return "Dea"; } }
 
         public bool Error { get; private set; }
 

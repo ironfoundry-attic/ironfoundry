@@ -45,6 +45,7 @@
     <Compile Include="..\shared\ExtensionMethods.cs">
       <Link>ExtensionMethods.cs</Link>
     </Compile>
+    <Compile Include="Agent\IAgent.cs" />
     <Compile Include="IoC\Bootstrapper.cs" />
     <Compile Include="IoC\ServiceRegistry.cs" />
     <Compile Include="Logging\ILog.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WinService\CustomCommands.cs" />
+    <Compile Include="WinService\AgentWinService.cs" />
     <Compile Include="WinService\IService.cs" />
     <Compile Include="WinService\MultipleServiceManager.cs" />
     <Compile Include="WinService\ServiceMain.cs" />

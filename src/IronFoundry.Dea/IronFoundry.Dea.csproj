@@ -70,7 +70,7 @@
     <Compile Include="..\shared\ExtensionMethods.cs">
       <Link>Extensions\ExtensionMethods.cs</Link>
     </Compile>
-    <Compile Include="Agent\Agent.cs" />
+    <Compile Include="Agent\DeaAgent.cs" />
     <Compile Include="Agent\ConfigManager.cs" />
     <Compile Include="Agent\IConfigManager.cs" />
     <Compile Include="Agent\IDropletManager.cs" />
@@ -83,10 +83,8 @@
     <Compile Include="Extensions\DateTimeExtensionMethods.cs" />
     <Compile Include="Extensions\FloatExtensionMethods.cs" />
     <Compile Include="Extensions\TaskExtensionMethods.cs" />
-    <Compile Include="Extensions\TimerExtensionMethods.cs" />
     <Compile Include="Agent\FileData.cs" />
     <Compile Include="Agent\FilesManager.cs" />
-    <Compile Include="Agent\IAgent.cs" />
     <Compile Include="Agent\IFilesManager.cs" />
     <Compile Include="IoC\DeaRegistry.cs" />
     <Compile Include="JsonConverters\IPAddressConverter.cs" />
@@ -154,7 +152,6 @@
     <Compile Include="WcfInfrastructure\PerCallServiceHost.cs" />
     <Compile Include="WcfInfrastructure\WcfWinService.cs" />
     <Compile Include="WinService\MonitoringWinService.cs" />
-    <Compile Include="WinService\DeaWinService.cs" />
     <Compile Include="WinService\FilesWinService.cs" />
     <Compile Include="WinService\ValidationWinService.cs" />
   </ItemGroup>
