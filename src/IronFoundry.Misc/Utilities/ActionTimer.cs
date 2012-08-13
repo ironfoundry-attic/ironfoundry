@@ -11,12 +11,12 @@
         private readonly CallbackTimer callbackTimer;
 
         /// <summary>
-        /// Schedules a one-time callback.
+        /// Schedules an immediate one-time callback.
         /// </summary>
         public ActionTimer(ILog log, TimeSpan interval, Action callback)
-            : this(log, interval, callback, true) { }
+            : this(log, interval, callback, true, true) { }
 
-        public ActionTimer(ILog log, TimeSpan interval, Action callback, bool oneTime)
+        public ActionTimer(ILog log, TimeSpan interval, Action callback, bool oneTime, bool startImmediately)
         {
             this.log = log;
             
@@ -27,6 +27,27 @@
             else
             {
                 this.callbackTimer = SchedulePeriodicAction(interval, callback);
+            }
+
+            if (startImmediately)
+            {
+                this.callbackTimer.SetEnabled();
+            }
+        }
+
+        public void Start()
+        {
+            if (null != callbackTimer)
+            {
+                this.callbackTimer.SetEnabled();
+            }
+        }
+
+        public void Stop()
+        {
+            if (null != callbackTimer)
+            {
+                this.callbackTimer.SetDisabled();
             }
         }
 
@@ -43,7 +64,6 @@
         {
             var ct = new CallbackTimer(interval, callback) { AutoReset = false };
             ct.Elapsed += oneTimeTimerElapsed;
-            ct.SetEnabled();
             return ct;
         }
 
@@ -79,7 +99,6 @@
             var ct = new CallbackTimer(interval, callback) { AutoReset = false };
             ct.Disposed += periodicTimerDisposed;
             ct.Elapsed += periodicTimerElapsed;
-            ct.SetEnabled();
             return ct;
         }
 

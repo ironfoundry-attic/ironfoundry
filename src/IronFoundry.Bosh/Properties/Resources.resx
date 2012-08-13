@@ -120,4 +120,7 @@
   <data name="BoshAgent_UnableToConnectAfterRetries_Fmt" xml:space="preserve">
     <value>Unable to reconnect to NATS after {0} retries, exiting...</value>
   </data>
+  <data name="Heartbeat_RequiresAgentID_Message" xml:space="preserve">
+    <value>Heartbeat requires agentID.</value>
+  </data>
 </root>

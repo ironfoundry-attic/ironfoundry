@@ -41,8 +41,9 @@
       <Link>Extensions\ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="Agent\BoshAgent.cs" />
+    <Compile Include="Agent\BoshAgentSubscription.cs" />
     <Compile Include="Agent\EjectMedia.cs" />
-    <Compile Include="Agent\Heartbeat.cs" />
+    <Compile Include="Messages\Heartbeat.cs" />
     <Compile Include="Agent\HeartbeatProcessor.cs" />
     <Compile Include="IoC\BoshRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,9 +91,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Messages\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

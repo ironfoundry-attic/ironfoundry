@@ -21,6 +21,8 @@
         private readonly INatsClient natsClient;
 
         private string settingsJsonStr;
+        private string agentID;
+        private string natsUriStr;
 
         public BoshAgent(ILog log, INatsClient natsClient)
         {
@@ -48,6 +50,13 @@
              * Starts the Handler
              */
             BoshAgentInfrastructureVsphereSettings_LoadSettings();
+
+            JObject settings = JObject.Parse(settingsJsonStr);
+            agentID = (string)settings["agent_id"];
+            natsUriStr = (string)settings["mbus"];
+
+            // TODO string baseDir = @"C:\BOSH";
+
             StartHandler();
         }
 
@@ -55,14 +64,9 @@
         {
             // agent/lib/agent/handler.rb
 
-            JObject settings = JObject.Parse(settingsJsonStr);
-            string agentID = (string)settings["agent_id"];
-            string natsUri = (string)settings["mbus"];
-            // TODO string baseDir = @"C:\BOSH";
-
             // find_message_processors
 
-            var config = new BoshAgentNatsConfig(natsUri);
+            var config = new BoshAgentNatsConfig(natsUriStr);
             natsClient.UseConfig(config);
 
             ushort natsFailCount = 0;
@@ -82,6 +86,8 @@
                 }
             }
 
+            SetupSubscriptions();
+
             SetupHeartbeats();
             SetupSshdMonitor();
             /*
@@ -95,6 +101,16 @@
               end
             end
              */
+        }
+
+        private void SetupSubscriptions()
+        {
+            var agentSubscription = new BoshAgentSubscription(agentID);
+            natsClient.Subscribe(agentSubscription, ProcessAgentMessage);
+        }
+
+        private void ProcessAgentMessage(string message, string reply)
+        {
         }
 
         public void Stop()

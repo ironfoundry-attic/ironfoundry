@@ -4,7 +4,7 @@
 
     public interface INatsSubscription : IEquatable<INatsSubscription>
     {
-        int SubscriptionID { get; }
+        int SubscriptionID { get; } // TODO this should be part of the NATS client!
         string ToString();
     }
 }

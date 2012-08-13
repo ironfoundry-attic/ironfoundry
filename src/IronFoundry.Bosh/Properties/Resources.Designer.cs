@@ -68,5 +68,14 @@ namespace IronFoundry.Bosh.Properties {
                 return ResourceManager.GetString("BoshAgent_UnableToConnectAfterRetries_Fmt", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Heartbeat requires agentID..
+        /// </summary>
+        internal static string Heartbeat_RequiresAgentID_Message {
+            get {
+                return ResourceManager.GetString("Heartbeat_RequiresAgentID_Message", resourceCulture);
+            }
+        }
     }
 }

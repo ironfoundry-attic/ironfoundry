@@ -59,6 +59,7 @@
     <Compile Include="CredentialManagerTests.cs" />
     <Compile Include="FirewallTests.cs" />
     <Compile Include="FrameworkDetectorTests.cs" />
+    <Compile Include="TimerTests.cs" />
     <Compile Include="UserTests.cs" />
     <Compile Include="UtilitiesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
