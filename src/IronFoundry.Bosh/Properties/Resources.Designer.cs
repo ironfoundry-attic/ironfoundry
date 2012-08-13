@@ -61,6 +61,24 @@ namespace IronFoundry.Bosh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Message: {0}.
+        /// </summary>
+        internal static string BoshAgent_AgentMessage_Fmt {
+            get {
+                return ResourceManager.GetString("BoshAgent_AgentMessage_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing reply_to in: {0}.
+        /// </summary>
+        internal static string BoshAgent_MissingReplyTo_Fmt {
+            get {
+                return ResourceManager.GetString("BoshAgent_MissingReplyTo_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to reconnect to NATS after {0} retries, exiting....
         /// </summary>
         internal static string BoshAgent_UnableToConnectAfterRetries_Fmt {

@@ -23,12 +23,12 @@
             this.actionTimer = new ActionTimer(log, heartbeatInterval, this.Beat, false, false);
         }
 
-        public void Enable()
+        public void Start()
         {
             actionTimer.Start();
         }
 
-        public void Disable()
+        public void Stop()
         {
             actionTimer.Stop();
         }

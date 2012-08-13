@@ -4,12 +4,14 @@
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using IronFoundry.Bosh.Agent.Handlers;
     using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Agent;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Nats.Client;
     using IronFoundry.Nats.Configuration;
     using Newtonsoft.Json.Linq;
+    using StructureMap;
 
     public sealed class BoshAgent : IAgent
     {
@@ -17,6 +19,7 @@
         private readonly TimeSpan NatsReconnectSleep = TimeSpan.FromSeconds(1);
         private readonly TimeSpan HeartbeatInterval = TimeSpan.FromSeconds(60);
 
+        private readonly IContainer ioc;
         private readonly ILog log;
         private readonly INatsClient natsClient;
 
@@ -24,8 +27,11 @@
         private string agentID;
         private string natsUriStr;
 
-        public BoshAgent(ILog log, INatsClient natsClient)
+        private HeartbeatProcessor heartbeatProcessor;
+
+        public BoshAgent(IContainer ioc, ILog log, INatsClient natsClient)
         {
+            this.ioc = ioc;
             this.log = log;
             this.natsClient = natsClient;
         }
@@ -57,11 +63,6 @@
 
             // TODO string baseDir = @"C:\BOSH";
 
-            StartHandler();
-        }
-
-        private void StartHandler()
-        {
             // agent/lib/agent/handler.rb
 
             // find_message_processors
@@ -88,7 +89,10 @@
 
             SetupSubscriptions();
 
-            SetupHeartbeats();
+            // setup heartbeats
+            heartbeatProcessor = new HeartbeatProcessor(log, natsClient, agentID, TimeSpan.FromSeconds(1));
+            heartbeatProcessor.Start();
+
             SetupSshdMonitor();
             /*
             if @process_alerts
@@ -106,15 +110,114 @@
         private void SetupSubscriptions()
         {
             var agentSubscription = new BoshAgentSubscription(agentID);
-            natsClient.Subscribe(agentSubscription, ProcessAgentMessage);
+            natsClient.Subscribe(agentSubscription, HandleAgentMessage);
         }
 
-        private void ProcessAgentMessage(string message, string reply)
+        private void ReplyToAgentMessage(string replyTo, object payload)
         {
+            log.Info("reply_to: {0}, payload: {1}", replyTo, payload);
+
+            // encryption code if @credentials
+
+            /*
+    # TODO once we upgrade to nats 0.4.22 we can use
+    # NATS.server_info[:max_payload] instead of NATS_MAX_PAYLOAD_SIZE
+    NATS_MAX_PAYLOAD_SIZE = 1024 * 1024
+      json = Yajl::Encoder.encode(payload)
+
+      # TODO figure out if we want to try to scale down the message instead
+      # of generating an exception
+      if json.bytesize < NATS_MAX_PAYLOAD_SIZE
+        EM.next_tick do
+          @nats.publish(reply_to, json, blk)
+        end
+      else
+        msg = "message > NATS_MAX_PAYLOAD, stored in blobstore"
+        original = @credentials ? payload : unencrypted
+        exception = RemoteException.new(msg, nil, original)
+        @logger.fatal(msg)
+        EM.next_tick do
+          @nats.publish(reply_to, exception.to_hash, blk)
+        end
+      end
+             */
+        }
+
+        private void HandleAgentMessage(string message, string reply)
+        {
+            JObject j = JObject.Parse(message);
+
+            string replyTo = (string)j["reply_to"];
+            if (replyTo.IsNullOrWhiteSpace())
+            {
+                log.Info(Resources.BoshAgent_MissingReplyTo_Fmt, message);
+            }
+
+            log.Info(Resources.BoshAgent_AgentMessage_Fmt, message);
+
+            // encryption code here
+
+            string method = (string)j["method"];
+            if (method == "get_state")
+            {
+                method = "state";
+            }
+
+            IMessageHandler handler = ioc.GetInstance<IMessageHandler>(method);
+            HandlerResponse response = handler.Handle(j);
+
+            /*
+             * agent/lib/agent/message/*
+             * methods:
+             * get_state
+             * prepare_network_change -> return true
+             * compile_package
+             * drain
+             * get_task
+             * stop -> is long_running?, Monit.stop_services, returns "stopped"
+             * apply (HUGE)
+             * start -> Monit.start_services, then returns "started"
+             * ping -> returns "pong"
+             * migrate_disk
+             * list_disk
+             * mount_disk
+             * unmount_disk
+             * noop -> returns "nope"
+             */
+
+            /*
+             * NB: long running tasks get a task ID that is sent to the director,
+    def process_long_running(reply_to, processor, args)
+      agent_task_id = generate_agent_task_id
+
+      @long_running_agent_task = [agent_task_id]
+
+      payload = {:value => {:state => "running", :agent_task_id => agent_task_id}}
+      publish(reply_to, payload)
+
+      result = process(processor, args)
+      @results << [Time.now.to_i, agent_task_id, result]
+      @long_running_agent_task = []
+    end
+             */
+
+            /*
+      processor = lookup(method)
+      if processor
+        Thread.new { process_in_thread(processor, reply_to, method, args) }
+      elsif method == "get_task"
+        handle_get_task(reply_to, args.first)
+      elsif method == "shutdown"
+        handle_shutdown(reply_to)
+      else
+        re = RemoteException.new("unknown message #{msg.inspect}")
+        publish(reply_to, re.to_hash)
+             */
         }
 
         public void Stop()
         {
+            heartbeatProcessor.Stop();
             natsClient.Stop();
         }
 
@@ -154,7 +257,6 @@
 
         private void SetupHeartbeats()
         {
-            throw new NotImplementedException();
         }
 
         private void SetupSshdMonitor()

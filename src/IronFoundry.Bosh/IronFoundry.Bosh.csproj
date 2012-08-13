@@ -43,6 +43,13 @@
     <Compile Include="Agent\BoshAgent.cs" />
     <Compile Include="Agent\BoshAgentSubscription.cs" />
     <Compile Include="Agent\EjectMedia.cs" />
+    <Compile Include="Agent\Handlers\BaseMessageHandler.cs" />
+    <Compile Include="Agent\Handlers\Shutdown.cs" />
+    <Compile Include="Agent\Handlers\GetTask.cs" />
+    <Compile Include="Agent\Handlers\HandlerResponse.cs" />
+    <Compile Include="Agent\Handlers\Ping.cs" />
+    <Compile Include="Agent\Handlers\IMessageHandler.cs" />
+    <Compile Include="Agent\Handlers\Noop.cs" />
     <Compile Include="Messages\Heartbeat.cs" />
     <Compile Include="Agent\HeartbeatProcessor.cs" />
     <Compile Include="IoC\BoshRegistry.cs" />
