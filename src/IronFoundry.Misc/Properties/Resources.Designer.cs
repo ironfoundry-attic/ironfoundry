@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace IronFoundry.Bosh.Properties {
+namespace IronFoundry.Misc.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace IronFoundry.Bosh.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IronFoundry.Bosh.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IronFoundry.Misc.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,11 @@ namespace IronFoundry.Bosh.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to reconnect to NATS after {0} retries, exiting....
+        ///   Looks up a localized string similar to Unhandled Exception in timer callback! Exiting!.
         /// </summary>
-        internal static string BoshAgent_UnableToConnectAfterRetries_Fmt {
+        internal static string ActionTimer_UnhandledException_Message {
             get {
-                return ResourceManager.GetString("BoshAgent_UnableToConnectAfterRetries_Fmt", resourceCulture);
+                return ResourceManager.GetString("ActionTimer_UnhandledException_Message", resourceCulture);
             }
         }
     }

@@ -52,10 +52,10 @@
         private const string CRLF = "\r\n";
         private static readonly int CRLFLen = CRLF.Length;
 
-        private readonly string natsHost;
-        private readonly ushort natsPort;
-        private readonly string natsUser;
-        private readonly string natsPassword;
+        private string natsHost;
+        private ushort natsPort;
+        private string natsUser;
+        private string natsPassword;
 
         private readonly IList<INatsSubscription> subscriptions = new List<INatsSubscription>();
         private readonly IDictionary<int, IList<Action<string, string>>> subscriptionCallbacks =
@@ -66,6 +66,7 @@
 
         private readonly Guid uniqueIdentifier;
 
+        private bool startAttempted = false;
         private bool shuttingDown = false;
 
         private TcpClient tcpClient;
@@ -83,20 +84,35 @@
         private ParseState currentParseState = ParseState.AWAITING_CONTROL_LINE;
         private NatsMessagingStatus status = NatsMessagingStatus.CONNECTING;
 
-        public NatsClient(ILog log, INatsConfig config)
+        public NatsClient(ILog log, INatsConfig natsConfig)
         {
             this.log  = log;
 
-            this.natsHost     = config.Host;
-            this.natsPort     = config.Port;
-            this.natsUser     = config.User;
-            this.natsPassword = config.Password;
+            this.natsHost     = natsConfig.Host;
+            this.natsPort     = natsConfig.Port;
+            this.natsUser     = natsConfig.User;
+            this.natsPassword = natsConfig.Password;
 
             uniqueIdentifier = Guid.NewGuid();
             log.Debug(Resources.NatsClient_Initialized_Fmt, UniqueIdentifier, natsHost, natsPort);
         }
 
         public Guid UniqueIdentifier { get { return uniqueIdentifier; } }
+
+        public void UseConfig(INatsConfig natsConfig)
+        {
+            if (startAttempted)
+            {
+                throw new InvalidOperationException(Resources.NatsClient_CantChangeConfigAfterStart_Message);
+            }
+            else
+            {
+                this.natsHost     = natsConfig.Host;
+                this.natsPort     = natsConfig.Port;
+                this.natsUser     = natsConfig.User;
+                this.natsPassword = natsConfig.Password;
+            }
+        }
 
         public void Publish(string subject, INatsMessage message)
         {
@@ -154,7 +170,10 @@
 
         public bool Start()
         {
+            startAttempted = true;
+
             bool rv = false;
+
             if (Connect())
             {
                 pollTask = Task.Factory.StartNew(Poll);

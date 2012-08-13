@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Nats.Client
 {
     using System;
+using IronFoundry.Nats.Configuration;
 
     public interface INatsClient : IDisposable
     {
@@ -13,6 +14,7 @@
 
         void Subscribe(INatsSubscription argSubscription, Action<string, string> argCallback);
 
+        void UseConfig(INatsConfig natsConfig);
         bool Start();
         void Stop();
     }

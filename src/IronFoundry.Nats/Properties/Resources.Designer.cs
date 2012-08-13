@@ -88,6 +88,15 @@ namespace IronFoundry.Nats.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t change NATS configuration after calling Start().
+        /// </summary>
+        internal static string NatsClient_CantChangeConfigAfterStart_Message {
+            get {
+                return ResourceManager.GetString("NatsClient_CantChangeConfigAfterStart_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connection attempt {0} of {1} failed. Retrying..
         /// </summary>
         internal static string NatsClient_ConnectFailed_Fmt {

@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BoshAgent_UnableToConnectAfterRetries_Fmt" xml:space="preserve">
-    <value>Unable to reconnect to NATS after {0} retries, exiting...</value>
+  <data name="ActionTimer_UnhandledException_Message" xml:space="preserve">
+    <value>Unhandled Exception in timer callback! Exiting!</value>
   </data>
 </root>

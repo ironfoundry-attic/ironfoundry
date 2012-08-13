@@ -204,4 +204,7 @@
   <data name="NatsClient_WaitingForTasks_Message" xml:space="preserve">
     <value>NATS provider waiting for tasks to complete.</value>
   </data>
+  <data name="NatsClient_CantChangeConfigAfterStart_Message" xml:space="preserve">
+    <value>Can't change NATS configuration after calling Start()</value>
+  </data>
 </root>
