@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using IronFoundry.Bosh.Agent.Handlers;
     using IronFoundry.Bosh.Properties;
@@ -93,7 +94,7 @@
             heartbeatProcessor = new HeartbeatProcessor(log, natsClient, agentID, TimeSpan.FromSeconds(1));
             heartbeatProcessor.Start();
 
-            SetupSshdMonitor();
+            // SetupSshdMonitor();
             /*
             if @process_alerts
               if (@smtp_port.nil? || @smtp_user.nil? || @smtp_password.nil?)
@@ -150,10 +151,11 @@
             string replyTo = (string)j["reply_to"];
             if (replyTo.IsNullOrWhiteSpace())
             {
-                log.Info(Resources.BoshAgent_MissingReplyTo_Fmt, message);
+                log.Error(Resources.BoshAgent_MissingReplyTo_Fmt, message);
+                return;
             }
 
-            log.Info(Resources.BoshAgent_AgentMessage_Fmt, message);
+            log.Debug(Resources.BoshAgent_AgentMessage_Fmt, message);
 
             // encryption code here
 
@@ -163,30 +165,28 @@
                 method = "state";
             }
 
-            IMessageHandler handler = ioc.GetInstance<IMessageHandler>(method);
-            HandlerResponse response = handler.Handle(j);
-
-            /*
-             * agent/lib/agent/message/*
-             * methods:
-             * get_state
-             * prepare_network_change -> return true
-             * compile_package
-             * drain
-             * get_task
-             * stop -> is long_running?, Monit.stop_services, returns "stopped"
-             * apply (HUGE)
-             * start -> Monit.start_services, then returns "started"
-             * ping -> returns "pong"
-             * migrate_disk
-             * list_disk
-             * mount_disk
-             * unmount_disk
-             * noop -> returns "nope"
-             */
+            IMessageHandler handler;
+            try
+            {
+                handler = ioc.GetInstance<IMessageHandler>(method);
+            }
+            catch (StructureMapException ex)
+            {
+                log.Error(ex, Resources.BoshAgent_MissingHandlerForMethod_Fmt, method);
+                return;
+            }
 
             /*
              * NB: long running tasks get a task ID that is sent to the director,
+      if processor
+        Thread.new { process_in_thread(processor, reply_to, method, args) }
+      elsif method == "get_task"
+        handle_get_task(reply_to, args.first)
+      elsif method == "shutdown"
+        handle_shutdown(reply_to)
+      else
+        re = RemoteException.new("unknown message #{msg.inspect}")
+        publish(reply_to, re.to_hash)
     def process_long_running(reply_to, processor, args)
       agent_task_id = generate_agent_task_id
 
@@ -201,17 +201,59 @@
     end
              */
 
+            HandlerResponse response;
+            try
+            {
+                response = handler.Handle(j);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, Resources.BoshAgent_ExceptionHandlingMethod_Fmt, method);
+                return;
+            }
+
+            Publish(replyTo, response);
+            handler.OnPostReply();
+        }
+
+        private void Publish(string replyTo, HandlerResponse response)
+        {
+            const uint NATS_MAX_PAYLOAD_SIZE = 1024 * 1024;
+
+            // TODO encrypt?
+
+            string responseJsonStr = response.ToJson();
+            int responseJsonSize = Encoding.ASCII.GetByteCount(responseJsonStr);
+
+            log.Debug(Resources.BoshAgent_ResponseDebug_Fmt, replyTo, responseJsonStr);
+
             /*
-      processor = lookup(method)
-      if processor
-        Thread.new { process_in_thread(processor, reply_to, method, args) }
-      elsif method == "get_task"
-        handle_get_task(reply_to, args.first)
-      elsif method == "shutdown"
-        handle_shutdown(reply_to)
+              TODO figure out if we want to try to scale down the message instead of generating an exception
+             */
+            if (responseJsonSize < NATS_MAX_PAYLOAD_SIZE)
+            {
+                natsClient.PublishReply(replyTo, response, 0);
+            }
+            else
+            {
+                // TODO OOPS
+                log.Error(Resources.BoshAgent_ResponseJsonTooLarge_Fmt, responseJsonSize, NATS_MAX_PAYLOAD_SIZE);
+            }
+            /*
+      if json.bytesize < NATS_MAX_PAYLOAD_SIZE
+        EM.next_tick do
+          @nats.publish(reply_to, json, blk)
+        end
       else
-        re = RemoteException.new("unknown message #{msg.inspect}")
-        publish(reply_to, re.to_hash)
+        msg = "message > NATS_MAX_PAYLOAD, stored in blobstore"
+        original = @credentials ? payload : unencrypted
+        exception = RemoteException.new(msg, nil, original)
+        @logger.fatal(msg)
+        EM.next_tick do
+          @nats.publish(reply_to, exception.to_hash, blk)
+        end
+      end
+    end
              */
         }
 
@@ -253,15 +295,6 @@
             {
                 throw new Exception(); // Should be LoadSettingsException
             }
-        }
-
-        private void SetupHeartbeats()
-        {
-        }
-
-        private void SetupSshdMonitor()
-        {
-            // TODO: how could we do this on Windows?
         }
 
         private class BoshAgentNatsConfig : INatsConfig

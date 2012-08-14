@@ -126,15 +126,15 @@
             }
         }
 
-        public void Publish(string subject, INatsMessage message, uint delay)
+        public void PublishReply(string replyTo, INatsMessage message, uint delay)
         {
-            if (message.CanPublishWithSubject(subject))
+            if (message.CanPublishWithSubject(replyTo))
             {
-                DoPublish(subject, message, delay);
+                DoPublish(replyTo, message, delay);
             }
             else
             {
-                throw new InvalidOperationException(String.Format(Resources.NatsClient_InvalidPublishAttempt_Fmt, message.GetType().Name, subject));
+                throw new InvalidOperationException(String.Format(Resources.NatsClient_InvalidPublishAttempt_Fmt, message.GetType().Name, replyTo));
             }
         }
 

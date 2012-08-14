@@ -1,12 +1,12 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
     using System;
-    using Newtonsoft.Json;
+    using IronFoundry.Nats.Client;
 
-    public class HandlerResponse
+    public class HandlerResponse : NatsMessage
     {
         private readonly object value;
-
+        
         public HandlerResponse(object value)
         {
             if (null == value)
@@ -16,7 +16,11 @@
             this.value = value;
         }
 
-        [JsonProperty("value")]
         public object Value { get { return value; } }
+
+        public override string PublishSubject
+        {
+            get { return String.Empty; } // TODO Unused and ugly
+        }
     }
 }

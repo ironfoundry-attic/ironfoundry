@@ -9,7 +9,7 @@
             return new HandlerResponse("shutdown");
         }
 
-        public override void OnPostPublish()
+        public override void OnPostReply()
         {
             // TODO do shutdown steps here
         }

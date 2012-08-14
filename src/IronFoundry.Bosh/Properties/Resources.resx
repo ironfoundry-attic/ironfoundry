@@ -120,8 +120,20 @@
   <data name="BoshAgent_AgentMessage_Fmt" xml:space="preserve">
     <value>Message: {0}</value>
   </data>
+  <data name="BoshAgent_ExceptionHandlingMethod_Fmt" xml:space="preserve">
+    <value>Exception handling method '{0}'!</value>
+  </data>
+  <data name="BoshAgent_MissingHandlerForMethod_Fmt" xml:space="preserve">
+    <value>Missing handler for method '{0}'!</value>
+  </data>
   <data name="BoshAgent_MissingReplyTo_Fmt" xml:space="preserve">
     <value>Missing reply_to in: {0}</value>
+  </data>
+  <data name="BoshAgent_ResponseDebug_Fmt" xml:space="preserve">
+    <value>reply_to: {0}: payload: {1}</value>
+  </data>
+  <data name="BoshAgent_ResponseJsonTooLarge_Fmt" xml:space="preserve">
+    <value>message size {0} &gt; NATS_MAX_PAYLOAD_SIZE {1}</value>
   </data>
   <data name="BoshAgent_UnableToConnectAfterRetries_Fmt" xml:space="preserve">
     <value>Unable to reconnect to NATS after {0} retries, exiting...</value>

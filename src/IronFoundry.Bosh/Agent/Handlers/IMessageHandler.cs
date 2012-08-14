@@ -5,6 +5,6 @@
     public interface IMessageHandler
     {
         HandlerResponse Handle(JObject parsed);
-        void OnPostPublish();
+        void OnPostReply();
     }
 }

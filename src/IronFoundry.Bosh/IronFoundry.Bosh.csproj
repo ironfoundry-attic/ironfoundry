@@ -44,6 +44,7 @@
     <Compile Include="Agent\BoshAgentSubscription.cs" />
     <Compile Include="Agent\EjectMedia.cs" />
     <Compile Include="Agent\Handlers\BaseMessageHandler.cs" />
+    <Compile Include="Agent\Handlers\Stop.cs" />
     <Compile Include="Agent\Handlers\Shutdown.cs" />
     <Compile Include="Agent\Handlers\GetTask.cs" />
     <Compile Include="Agent\Handlers\HandlerResponse.cs" />

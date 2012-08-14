@@ -4,9 +4,10 @@
 
     public abstract class NatsMessage : INatsMessage
     {
+        // TODO is this really useful?
         public virtual bool CanPublishWithSubject(string subject)
         {
-            return false;
+            return true;
         }
 
         public string ToJson()

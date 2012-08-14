@@ -289,7 +289,7 @@
                     {
                         delay += 10; // NB: 10 milliseconds delay per app
                     });
-                natsClient.Publish(reply, helloMessage, Math.Min(delay, 250));
+                natsClient.PublishReply(reply, helloMessage, Math.Min(delay, 250));
             }
             else
             {

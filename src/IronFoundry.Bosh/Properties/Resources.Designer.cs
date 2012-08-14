@@ -70,11 +70,47 @@ namespace IronFoundry.Bosh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exception handling method &apos;{0}&apos;!.
+        /// </summary>
+        internal static string BoshAgent_ExceptionHandlingMethod_Fmt {
+            get {
+                return ResourceManager.GetString("BoshAgent_ExceptionHandlingMethod_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing handler for method &apos;{0}&apos;!.
+        /// </summary>
+        internal static string BoshAgent_MissingHandlerForMethod_Fmt {
+            get {
+                return ResourceManager.GetString("BoshAgent_MissingHandlerForMethod_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Missing reply_to in: {0}.
         /// </summary>
         internal static string BoshAgent_MissingReplyTo_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_MissingReplyTo_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to reply_to: {0}: payload: {1}.
+        /// </summary>
+        internal static string BoshAgent_ResponseDebug_Fmt {
+            get {
+                return ResourceManager.GetString("BoshAgent_ResponseDebug_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to message size {0} &gt; NATS_MAX_PAYLOAD_SIZE {1}.
+        /// </summary>
+        internal static string BoshAgent_ResponseJsonTooLarge_Fmt {
+            get {
+                return ResourceManager.GetString("BoshAgent_ResponseJsonTooLarge_Fmt", resourceCulture);
             }
         }
         
