@@ -259,8 +259,14 @@
 
         public void Stop()
         {
-            heartbeatProcessor.Stop();
-            natsClient.Stop();
+            if (null != heartbeatProcessor)
+            {
+                heartbeatProcessor.Stop();
+            }
+            if (null != natsClient)
+            {
+                natsClient.Stop();
+            }
         }
 
         private void BoshAgentInfrastructureVsphereSettings_LoadSettings()
@@ -286,7 +292,7 @@
                 }
                 if (false == found)
                 {
-                    log.Warn("No CD rom drives ready. Waiting...");
+                    log.Warn("No CD rom drives ready. Waiting 5 seconds...");
                     Thread.Sleep(TimeSpan.FromSeconds(5));
                 }
             }
