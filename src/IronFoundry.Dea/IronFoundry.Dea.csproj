@@ -114,7 +114,6 @@
     <Compile Include="Services\IMonitoringService.cs" />
     <Compile Include="Services\MonitoringService.cs" />
     <Compile Include="Types\Advertise.cs" />
-    <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\Discover.cs" />
     <Compile Include="Types\Droplet.cs" />
     <Compile Include="Types\DropletEntry.cs" />

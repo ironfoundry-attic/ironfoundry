@@ -41,6 +41,9 @@
     <AssemblyOriginatorKeyFile>IronFoundry.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="RestSharp, Version=103.1.0.0, Culture=neutral, PublicKeyToken=aed551a8db69a9bd, processorArchitecture=MSIL">
       <HintPath>..\..\lib\RestSharp\RestSharp.dll</HintPath>
     </Reference>
@@ -60,6 +63,7 @@
     <Compile Include="FirewallTests.cs" />
     <Compile Include="FrameworkDetectorTests.cs" />
     <Compile Include="TimerTests.cs" />
+    <Compile Include="JsonTests.cs" />
     <Compile Include="UserTests.cs" />
     <Compile Include="UtilitiesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -87,6 +91,7 @@
     <None Include="IronFoundry.Test.xunit">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
     <None Include="testapp.war">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

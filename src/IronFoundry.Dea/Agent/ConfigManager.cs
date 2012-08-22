@@ -35,6 +35,8 @@
                         {
                             if (null != svc.Credentials)
                             {
+                                var creds = new Credentials(svc.Credentials);
+
                                 SqlConnectionStringBuilder builder;
                                 ConnectionStringSettings defaultConnectionStringSettings = connectionStringsSection.ConnectionStrings["Default"];
                                 if (null == defaultConnectionStringSettings)
@@ -46,23 +48,23 @@
                                     builder = new SqlConnectionStringBuilder(defaultConnectionStringSettings.ConnectionString);
                                 }
 
-                                builder.DataSource = svc.Credentials.Host;
+                                builder.DataSource = creds.Host;
                                 builder.ConnectTimeout = 30;
 
-                                if (svc.Credentials.Password.IsNullOrWhiteSpace() || svc.Credentials.Username.IsNullOrWhiteSpace())
+                                if (creds.Password.IsNullOrWhiteSpace() || creds.Username.IsNullOrWhiteSpace())
                                 {
                                     builder.IntegratedSecurity = true;
                                 }
                                 else
                                 {
                                     builder.IntegratedSecurity = false;
-                                    builder.UserID = svc.Credentials.Username;
-                                    builder.Password = svc.Credentials.Password;
+                                    builder.UserID = creds.Username;
+                                    builder.Password = creds.Password;
                                 }
 
-                                if (false == svc.Credentials.Name.IsNullOrWhiteSpace())
+                                if (false == creds.Name.IsNullOrWhiteSpace())
                                 {
-                                    builder.InitialCatalog = svc.Credentials.Name;
+                                    builder.InitialCatalog = creds.Name;
                                 }
 
                                 if (null == defaultConnectionStringSettings)
@@ -144,6 +146,66 @@
         {
             appSettings.Remove(key);
             appSettings.Add(key, value);
+        }
+
+        private class Credentials
+        {
+            private const string Unknown = "unknown";
+
+            private readonly string name;
+            private readonly string hostname;
+            private readonly string host;
+            private readonly ushort port;
+            private readonly string username;
+            private readonly string user;
+            private readonly string password;
+
+            public Credentials(IDictionary<string, string> creds)
+            {
+                if (false == creds.TryGetValue("name", out name))
+                {
+                    name = Unknown;
+                }
+                if (false == creds.TryGetValue("hostname", out hostname))
+                {
+                    hostname = Unknown;
+                }
+                if (false == creds.TryGetValue("host", out host))
+                {
+                    host = Unknown;
+                }
+                string portStr;
+                if (false == creds.TryGetValue("port", out portStr))
+                {
+                    UInt16.TryParse(portStr, out port);
+                }
+                if (false == creds.TryGetValue("username", out username))
+                {
+                    username = Unknown;
+                }
+                if (false == creds.TryGetValue("user", out user))
+                {
+                    user = Unknown;
+                }
+                if (false == creds.TryGetValue("password", out password))
+                {
+                    password = Unknown;
+                }
+            }
+
+            public string Name { get { return name; } }
+
+            public string Hostname { get { return hostname; } }
+
+            public string Host { get { return host; } }
+
+            public ushort Port { get { return port; } }
+
+            public string Username { get { return username; } }
+
+            public string User { get { return user; } }
+
+            public string Password { get { return password; } }
         }
     }
 }

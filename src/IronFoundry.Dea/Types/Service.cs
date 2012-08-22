@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Dea.Types
 {
     using System;
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
     public class Service : EntityBase
@@ -30,7 +31,7 @@
         public string PlanOption { get; set; }
 
         [JsonProperty(PropertyName = "credentials")]
-        public Credentials Credentials { get; set; }
+        public IDictionary<string, string> Credentials { get; set; }
 
         [JsonIgnore]
         public bool IsMSSqlServer
