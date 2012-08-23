@@ -1,22 +1,22 @@
-﻿using System;
-using System.Runtime.InteropServices;
-
-namespace IronFoundry.Bosh.Agent
+﻿namespace IronFoundry.Bosh.Agent
 {
+    using System;
+    using System.Runtime.InteropServices;
+    using System.Text.RegularExpressions;
+
     public static class EjectMedia
     {
-        // Constants used in DLL methods
-        const uint GENERICREAD = 0x80000000;
-        const uint OPENEXISTING = 3;
+        const uint GENERIC_READ              = 0x80000000;
+        const uint GENERIC_WRITE             = 0x40000000;
+        const uint OPEN_EXISTING             = 3;
         const uint IOCTL_STORAGE_EJECT_MEDIA = 2967560;
-        const int INVALID_HANDLE = -1;
+        const int  INVALID_HANDLE            = -1;
 
-        // File Handle
+        private static readonly Regex driveLetterRe = new Regex(@"^[A-Z]:$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private static IntPtr fileHandle;
         private static uint returnedBytes;
 
-        // Use Kernel32 via interop to access required methods
-        // Get a File Handle
         [DllImport("kernel32", SetLastError = true)]
         static extern IntPtr CreateFile(string fileName, uint desiredAccess, uint shareMode, IntPtr attributes,
             uint creationDisposition, uint flagsAndAttributes, IntPtr templateFile); 
@@ -30,25 +30,32 @@ namespace IronFoundry.Bosh.Agent
 
         public static void Eject(string driveLetter)
         {
-            try
+            if (driveLetterRe.IsMatch(driveLetter))
             {
-                // Create an handle to the drive
-                fileHandle = CreateFile(driveLetter, GENERICREAD, 0, IntPtr.Zero, OPENEXISTING, 0, IntPtr.Zero);
-                if ((int)fileHandle != INVALID_HANDLE)
+                try
                 {
-                    // Eject the disk
-                    DeviceIoControl(fileHandle, IOCTL_STORAGE_EJECT_MEDIA, IntPtr.Zero, 0, IntPtr.Zero, 0, ref returnedBytes, IntPtr.Zero);
+                    // Create an handle to the drive
+                    fileHandle = CreateFile(@"\\.\" + driveLetter, GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+                    if ((int)fileHandle != INVALID_HANDLE)
+                    {
+                        // Eject the disk
+                        DeviceIoControl(fileHandle, IOCTL_STORAGE_EJECT_MEDIA, IntPtr.Zero, 0, IntPtr.Zero, 0, ref returnedBytes, IntPtr.Zero);
+                    }
+                }
+                catch
+                {
+                    throw new Exception(Marshal.GetLastWin32Error().ToString());
+                }
+                finally
+                {
+                    // Close Drive Handle
+                    CloseHandle(fileHandle);
+                    fileHandle = IntPtr.Zero;
                 }
             }
-            catch
+            else
             {
-                throw new Exception(Marshal.GetLastWin32Error().ToString());
-            }
-            finally
-            {
-                // Close Drive Handle
-                CloseHandle(fileHandle);
-                fileHandle = IntPtr.Zero;
+                throw new ArgumentException("Invalid drive letter!", "driveLetter");
             }
         }
     }

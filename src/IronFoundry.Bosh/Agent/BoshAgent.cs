@@ -62,6 +62,18 @@
             agentID = (string)settings["agent_id"];
             natsUriStr = (string)settings["mbus"];
 
+
+            /*
+             * TODO:
+             * run sysprep
+             * set ip address
+             * set licensing server
+             * set admin password
+netsh interface ipv4 set address name="Local Area Connection" source=static address=%1 mask=%2 gateway=%3
+netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
+netsh interface ipv4 add dns name="Local Area Connection" addr=%5
+             */
+
             // TODO string baseDir = @"C:\BOSH";
 
             // agent/lib/agent/handler.rb
