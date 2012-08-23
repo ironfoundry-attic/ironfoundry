@@ -16,6 +16,14 @@
 
     public sealed class BoshAgent : IAgent
     {
+        private const string DefaultBaseDir = @"C:\IronFoundry"; // /var/vcap
+        private const string BoshDirName = "BOSH";
+        private const string SettingsFileName = @"settings.json";
+        private const string StateFileName = @"state.yml";
+
+        private readonly string SettingsFile = Path.Combine(DefaultBaseDir, BoshDirName, SettingsFileName);
+        private readonly string StateFile = Path.Combine(DefaultBaseDir, BoshDirName, StateFileName);
+
         private readonly ushort NatsRetries = 10;
         private readonly TimeSpan NatsReconnectSleep = TimeSpan.FromSeconds(1);
         private readonly TimeSpan HeartbeatInterval = TimeSpan.FromSeconds(60);
@@ -56,12 +64,13 @@
              * Configure and enable Monit
              * Starts the Handler
              */
+            InitializeDirectories();
+
             BoshAgentInfrastructureVsphereSettings_LoadSettings();
 
             JObject settings = JObject.Parse(settingsJsonStr);
             agentID = (string)settings["agent_id"];
             natsUriStr = (string)settings["mbus"];
-
 
             /*
              * TODO:
@@ -73,8 +82,6 @@ netsh interface ipv4 set address name="Local Area Connection" source=static addr
 netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
 netsh interface ipv4 add dns name="Local Area Connection" addr=%5
              */
-
-            // TODO string baseDir = @"C:\BOSH";
 
             // agent/lib/agent/handler.rb
 
@@ -118,6 +125,12 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
               end
             end
              */
+        }
+
+        private void InitializeDirectories()
+        {
+            Directory.CreateDirectory(DefaultBaseDir);
+            Directory.CreateDirectory(Path.Combine(DefaultBaseDir, BoshDirName));
         }
 
         private void SetupSubscriptions()
@@ -283,33 +296,43 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
         private void BoshAgentInfrastructureVsphereSettings_LoadSettings()
         {
-            // settings_file (default) /var/vcap/bosh/settings.json
-            // load cdrom settings
-            bool found = false;
-            for (int i = 0; i < 5 && false == found; ++i)
+            bool settingsFound = false;
+            DirectoryInfo driveRootDirectory = null;
+
+            for (int i = 0; i < 5 && false == settingsFound; ++i)
             {
                 foreach (var drive in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom && d.IsReady))
                 {
-                    DirectoryInfo rootDirectory = drive.RootDirectory;
-                    string envPath = Path.Combine(rootDirectory.FullName, "env");
+                    driveRootDirectory = drive.RootDirectory;
+                    string envPath = Path.Combine(driveRootDirectory.FullName, "env");
                     if (File.Exists(envPath))
                     {
                         settingsJsonStr = File.ReadAllText(envPath);
                         Settings.Default.SettingsJson = settingsJsonStr;
                         Settings.Default.Save();
-                        EjectMedia.Eject(rootDirectory.FullName);
-                        found = true;
+                        settingsFound = true;
                         break;
                     }
                 }
-                if (false == found)
+                if (false == settingsFound)
                 {
-                    log.Warn("No CD rom drives ready. Waiting 5 seconds...");
-                    Thread.Sleep(TimeSpan.FromSeconds(5));
+                    log.Warn("No CD rom drives ready...");
+                    // Thread.Sleep(TimeSpan.FromSeconds(2));
                 }
             }
 
-            if (settingsJsonStr.IsNullOrEmpty())
+            if (settingsFound)
+            {
+                EjectMedia.Eject(driveRootDirectory.FullName);
+                File.WriteAllText(SettingsFile, settingsJsonStr);
+            }
+            else if (File.Exists(SettingsFile))
+            {
+                settingsJsonStr = File.ReadAllText(SettingsFile);
+                settingsFound = true;
+            }
+
+            if (false == settingsFound)
             {
                 throw new Exception(); // Should be LoadSettingsException
             }

@@ -17,11 +17,16 @@
         private readonly ILog log;
         private readonly IService[] services;
 
+        /*
+         * TODO BOSH AGENT
+         * Create task factory and start each service on own thread?
+         * Must have way for starting service to throw exception and cause start to fail for all services.
+         */
         public MultipleServiceManager(ILog log, IService[] services)
         {
             this.log = log;
             this.services = services.OrderBy(s => s.StartIndex).ToArray();
-            ServiceName = "IronFoundryDEA"; // NB: must match installer Product.wxs
+            ServiceName = "IronFoundryDEA"; // NB: must match installer Product.wxs TODO BOSH AGENT
             AutoLog = true;
         }
 

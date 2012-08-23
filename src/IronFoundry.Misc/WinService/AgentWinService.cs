@@ -23,7 +23,7 @@
             this.agent = agent;
 
             agentTask = new Task(() => agent.Start());
-            agentMonitorTimer = new Timer(agentMonitor);
+            agentMonitorTimer = new Timer(AgentMonitor);
         }
 
         public string ServiceName
@@ -50,7 +50,7 @@
             agentTask.Wait(ThirtySecondInterval);
         }
 
-        private void agentMonitor(object argState)
+        private void AgentMonitor(object argState)
         {
             Timer t = (Timer)argState;
             t.Stop();
