@@ -55,13 +55,9 @@
 
         private const uint OPEN_EXISTING    = 3;
 
-        private static readonly int pmrSz = Marshal.SizeOf(typeof(PREVENT_MEDIA_REMOVAL));
-
         private const string createFileNamePrefix = @"\\.\";
         private static readonly char[] driveLetterTrimChars = new[] { '\\' };
         private static readonly Regex driveLetterRe = new Regex(@"^[A-Z]:\\?$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-        private static uint returnedBytes;
 
         [DllImport("kernel32", SetLastError = true)]
         static extern SafeFileHandle CreateFile(string fileName, uint desiredAccess, uint shareMode, IntPtr attributes,
@@ -71,12 +67,17 @@
         static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, IntPtr lpInBuffer, int nInBufferSize,
             IntPtr lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
 
+        [DllImport("Kernel32.dll", SetLastError = true)]
+        extern static bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode,
+            ref PREVENT_MEDIA_REMOVAL lpInBuffer, int nInBufferSize,
+            IntPtr lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
+
         public static void Eject(string driveLetter)
         {
             if (driveLetterRe.IsMatch(driveLetter))
             {
+                uint returnedBytes = 0;
                 SafeFileHandle fileHandle = null;
-                IntPtr pmrPtr = IntPtr.Zero;
                 try
                 {
                     string driveFileName = createFileNamePrefix + driveLetter.TrimEnd(driveLetterTrimChars);
@@ -109,15 +110,9 @@
                         throw new Win32Exception();
                     }
                     // ENABLE REMOVAL
-                    var pmr = new PREVENT_MEDIA_REMOVAL();
-                    pmr.PreventMediaRemoval = false;
-                    pmrPtr = Marshal.AllocHGlobal(pmrSz);
-                    if (IntPtr.Zero == pmrPtr)
-                    {
-                        throw new Exception();
-                    }
-                    Marshal.StructureToPtr(pmr, pmrPtr, false);
-                    if (false == DeviceIoControl(fileHandle, IOCTL_STORAGE_MEDIA_REMOVAL, pmrPtr, pmrSz, IntPtr.Zero, 0, out returnedBytes, IntPtr.Zero))
+                    var pmr = new PREVENT_MEDIA_REMOVAL { PreventMediaRemoval = false };
+                    int pmrSz = Marshal.SizeOf(pmr);
+                    if (false == DeviceIoControl(fileHandle, IOCTL_STORAGE_MEDIA_REMOVAL, ref pmr, pmrSz, IntPtr.Zero, 0, ref returnedBytes, IntPtr.Zero))
                     {
                         throw new Win32Exception();
                     }
@@ -129,10 +124,6 @@
                 }
                 finally
                 {
-                    if (IntPtr.Zero != pmrPtr)
-                    {
-                        Marshal.FreeHGlobal(pmrPtr);
-                    }
                     if (null != fileHandle)
                     {
                         fileHandle.Close();

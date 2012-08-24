@@ -7,7 +7,6 @@
 
     public class EjectTest
     {
-        // [Fact(Skip="MANUAL")]
         [Fact]
         public void Can_Eject_CD()
         {
