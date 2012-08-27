@@ -120,4 +120,10 @@
   <data name="ActionTimer_UnhandledException_Message" xml:space="preserve">
     <value>Unhandled Exception in timer callback! Exiting!</value>
   </data>
+  <data name="ExecCmd_CmdFailed_Fmt" xml:space="preserve">
+    <value>Command '{0} {1}' failed: {2}</value>
+  </data>
+  <data name="ExecCmd_PathNotFound_Fmt" xml:space="preserve">
+    <value>Command not found: '{0}'</value>
+  </data>
 </root>

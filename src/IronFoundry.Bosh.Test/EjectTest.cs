@@ -32,7 +32,10 @@
                     }
                 }
             }
-            EjectMedia.Eject(driveRootDirectory.FullName);
+            if (null != driveRootDirectory)
+            {
+                EjectMedia.Eject(driveRootDirectory.FullName);
+            }
         }
     }
 }

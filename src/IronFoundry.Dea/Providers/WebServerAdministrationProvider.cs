@@ -6,11 +6,12 @@
     using System.Net;
     using System.Text.RegularExpressions;
     using System.Threading;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
     using IronFoundry.Misc;
-    using IronFoundry.Dea.Configuration;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Misc.Utilities;
 
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
@@ -60,7 +61,7 @@
                     lock (appcmdLock)
                     {
                         string cmd = String.Format("add apppool /name:{0}", applicationInstanceName);
-                        AppCmdResult rslt = ExecAppcmd(cmd, 5, twoSeconds);
+                        ExecCmdResult rslt = ExecAppcmd(cmd, 5, twoSeconds);
                         if (false == rslt.Success)
                         {
                             return null;
@@ -209,7 +210,7 @@
         {
             IDictionary<string, IList<int>> rv = null;
 
-            AppCmdResult rslt = ExecAppcmd("list wp", 1, null, true);
+            ExecCmdResult rslt = ExecAppcmd("list wp", 1, null, true);
             if (rslt.Success && false == rslt.Output.IsNullOrWhiteSpace())
             {
                 string[] lines = rslt.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -247,7 +248,7 @@
         {
             string rv = null;
 
-            AppCmdResult rslt = ExecAppcmd(String.Format(@"list {0} ""/name:{1}""", IIsAppPoolObject, objectName), 1, null, true);
+            ExecCmdResult rslt = ExecAppcmd(String.Format(@"list {0} ""/name:{1}""", IIsAppPoolObject, objectName), 1, null, true);
             if (rslt.Success)
             {
                 Match m = apppoolStateRegex.Match(rslt.Output);
@@ -266,65 +267,11 @@
             }
         }
 
-        private class AppCmdResult
-        {
-            private readonly bool success = false;
-            private readonly string output = null;
-
-            public AppCmdResult(bool success, string output)
-            {
-                this.success = success;
-                this.output = output;
-            }
-
-            public bool Success { get { return success; } }
-            public string Output { get { return output; } }
-        }
-
-        private AppCmdResult ExecAppcmd(string arguments,
+        private ExecCmdResult ExecAppcmd(string arguments,
             ushort numTries = 1, TimeSpan? retrySleepInterval = null, bool expectError = false)
         {
-            bool success = false;
-            string output = null, errout = null;
-            try
-            {
-                for (ushort i = 0; i < numTries && false == success; ++i)
-                {
-                    lock (appcmdLock)
-                    {
-                        var p = new Process();
-                        p.StartInfo.CreateNoWindow = true;
-                        p.StartInfo.UseShellExecute = false;
-                        p.StartInfo.RedirectStandardOutput = true;
-                        p.StartInfo.RedirectStandardError = true;
-                        p.StartInfo.FileName = appCmdPath;
-                        p.StartInfo.Arguments = arguments;
-                        p.Start();
-                        output = p.StandardOutput.ReadToEnd().TrimEnd('\r', '\n');
-                        errout = p.StandardError.ReadToEnd().TrimEnd('\r', '\n');
-                        p.WaitForExit();
-                        success = 0 == p.ExitCode;
-                    }
-                    if (false == success)
-                    {
-                        if (false == expectError)
-                        {
-                            log.Error(Resources.WebServerAdministrationProvider_AppCmdFailed_Fmt, arguments, errout);
-                        }
-                        if (numTries > 1 && retrySleepInterval.HasValue)
-                        {
-                            Thread.Sleep(retrySleepInterval.Value);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                success = false;
-                output = null;
-                log.Error(ex);
-            }
-            return new AppCmdResult(success, output);
+            var execCmd = new ExecCmd(log, appCmdPath, arguments);
+            return execCmd.Run(numTries, retrySleepInterval, expectError);
         }
     }
 }

@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Include="EjectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XmlParsing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IronFoundry.Bosh\IronFoundry.Bosh.csproj">
@@ -41,6 +42,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="xunit">
       <HintPath>..\..\test\xunit\xunit.dll</HintPath>
     </Reference>

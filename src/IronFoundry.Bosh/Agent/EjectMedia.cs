@@ -70,7 +70,7 @@
         [DllImport("Kernel32.dll", SetLastError = true)]
         extern static bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode,
             ref PREVENT_MEDIA_REMOVAL lpInBuffer, int nInBufferSize,
-            IntPtr lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
+            IntPtr lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
 
         public static void Eject(string driveLetter)
         {
@@ -112,7 +112,7 @@
                     // ENABLE REMOVAL
                     var pmr = new PREVENT_MEDIA_REMOVAL { PreventMediaRemoval = false };
                     int pmrSz = Marshal.SizeOf(pmr);
-                    if (false == DeviceIoControl(fileHandle, IOCTL_STORAGE_MEDIA_REMOVAL, ref pmr, pmrSz, IntPtr.Zero, 0, ref returnedBytes, IntPtr.Zero))
+                    if (false == DeviceIoControl(fileHandle, IOCTL_STORAGE_MEDIA_REMOVAL, ref pmr, pmrSz, IntPtr.Zero, 0, out returnedBytes, IntPtr.Zero))
                     {
                         throw new Win32Exception();
                     }

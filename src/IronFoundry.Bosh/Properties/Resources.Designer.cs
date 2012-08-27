@@ -22,7 +22,7 @@ namespace IronFoundry.Bosh.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace IronFoundry.Bosh.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IronFoundry.Bosh.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace IronFoundry.Bosh.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Message: {0}.
         /// </summary>
-        internal static string BoshAgent_AgentMessage_Fmt {
+        public static string BoshAgent_AgentMessage_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_AgentMessage_Fmt", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Exception handling method &apos;{0}&apos;!.
         /// </summary>
-        internal static string BoshAgent_ExceptionHandlingMethod_Fmt {
+        public static string BoshAgent_ExceptionHandlingMethod_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_ExceptionHandlingMethod_Fmt", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Missing handler for method &apos;{0}&apos;!.
         /// </summary>
-        internal static string BoshAgent_MissingHandlerForMethod_Fmt {
+        public static string BoshAgent_MissingHandlerForMethod_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_MissingHandlerForMethod_Fmt", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Missing reply_to in: {0}.
         /// </summary>
-        internal static string BoshAgent_MissingReplyTo_Fmt {
+        public static string BoshAgent_MissingReplyTo_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_MissingReplyTo_Fmt", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to reply_to: {0}: payload: {1}.
         /// </summary>
-        internal static string BoshAgent_ResponseDebug_Fmt {
+        public static string BoshAgent_ResponseDebug_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_ResponseDebug_Fmt", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to message size {0} &gt; NATS_MAX_PAYLOAD_SIZE {1}.
         /// </summary>
-        internal static string BoshAgent_ResponseJsonTooLarge_Fmt {
+        public static string BoshAgent_ResponseJsonTooLarge_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_ResponseJsonTooLarge_Fmt", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Unable to reconnect to NATS after {0} retries, exiting....
         /// </summary>
-        internal static string BoshAgent_UnableToConnectAfterRetries_Fmt {
+        public static string BoshAgent_UnableToConnectAfterRetries_Fmt {
             get {
                 return ResourceManager.GetString("BoshAgent_UnableToConnectAfterRetries_Fmt", resourceCulture);
             }
@@ -126,9 +126,23 @@ namespace IronFoundry.Bosh.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Heartbeat requires agentID..
         /// </summary>
-        internal static string Heartbeat_RequiresAgentID_Message {
+        public static string Heartbeat_RequiresAgentID_Message {
             get {
                 return ResourceManager.GetString("Heartbeat_RequiresAgentID_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;unattend xmlns=&quot;urn:schemas-microsoft-com:unattend&quot;&gt;
+        ///  &lt;settings pass=&quot;specialize&quot;&gt;
+        ///    &lt;component name=&quot;Microsoft-Windows-Shell-Setup&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+        ///      &lt;ComputerName&gt;COMPUTERNAME&lt;/ComputerName&gt;
+        ///      &lt;ProductKey&gt;YC6KT-GKW9T-YTKYR-T4X34-R7VHC&lt;/ProductKey&gt;        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string UnattendXML {
+            get {
+                return ResourceManager.GetString("UnattendXML", resourceCulture);
             }
         }
     }

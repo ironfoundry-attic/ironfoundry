@@ -68,5 +68,23 @@ namespace IronFoundry.Misc.Properties {
                 return ResourceManager.GetString("ActionTimer_UnhandledException_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Command &apos;{0} {1}&apos; failed: {2}.
+        /// </summary>
+        internal static string ExecCmd_CmdFailed_Fmt {
+            get {
+                return ResourceManager.GetString("ExecCmd_CmdFailed_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Command not found: &apos;{0}&apos;.
+        /// </summary>
+        internal static string ExecCmd_PathNotFound_Fmt {
+            get {
+                return ResourceManager.GetString("ExecCmd_PathNotFound_Fmt", resourceCulture);
+            }
+        }
     }
 }

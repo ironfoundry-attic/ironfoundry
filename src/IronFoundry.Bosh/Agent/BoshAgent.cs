@@ -5,10 +5,14 @@
     using System.Linq;
     using System.Text;
     using System.Threading;
+    using System.Xml;
+    using System.Xml.Linq;
+    using System.Xml.XPath;
     using IronFoundry.Bosh.Agent.Handlers;
     using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Agent;
     using IronFoundry.Misc.Logging;
+    using IronFoundry.Misc.Utilities;
     using IronFoundry.Nats.Client;
     using IronFoundry.Nats.Configuration;
     using Newtonsoft.Json.Linq;
@@ -21,8 +25,8 @@
         private const string SettingsFileName = @"settings.json";
         private const string StateFileName = @"state.yml";
 
-        private readonly string SettingsFile = Path.Combine(DefaultBaseDir, BoshDirName, SettingsFileName);
-        private readonly string StateFile = Path.Combine(DefaultBaseDir, BoshDirName, StateFileName);
+        private readonly string SettingsFilePath = Path.Combine(DefaultBaseDir, BoshDirName, SettingsFileName);
+        private readonly string StateFilePath = Path.Combine(DefaultBaseDir, BoshDirName, StateFileName);
 
         private readonly ushort NatsRetries = 10;
         private readonly TimeSpan NatsReconnectSleep = TimeSpan.FromSeconds(1);
@@ -32,7 +36,7 @@
         private readonly ILog log;
         private readonly INatsClient natsClient;
 
-        private string settingsJsonStr;
+        private JObject settings;
         private string agentID;
         private string natsUriStr;
 
@@ -68,20 +72,21 @@
 
             BoshAgentInfrastructureVsphereSettings_LoadSettings();
 
-            JObject settings = JObject.Parse(settingsJsonStr);
             agentID = (string)settings["agent_id"];
             natsUriStr = (string)settings["mbus"];
 
             /*
              * TODO:
              * run sysprep
+                 set admin password (via unattend.xml)
              * set ip address
              * set licensing server
-             * set admin password
 netsh interface ipv4 set address name="Local Area Connection" source=static address=%1 mask=%2 gateway=%3
 netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
 netsh interface ipv4 add dns name="Local Area Connection" addr=%5
              */
+            Sysprep();
+            SetupNetworking();
 
             // agent/lib/agent/handler.rb
 
@@ -125,6 +130,119 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
               end
             end
              */
+        }
+
+        private void SetupNetworking()
+        {
+            /*
+             * TODO:
+             * set ip address
+netsh interface ipv4 set address name="Local Area Connection" source=static address=%1 mask=%2 gateway=%3
+netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
+netsh interface ipv4 add dns name="Local Area Connection" addr=%5
+             */
+            if ((bool)settings["vm"]["network_setup"])
+            {
+                return;
+            }
+            var network = settings["networks"].First;
+            if (network.HasValues)
+            {
+            	var net = network.First;
+                string ip = (string)net["ip"];
+            	string netmask = (string)net["netmask"];
+                string gateway = (string)net["gateway"];
+
+                string args = String.Format(
+                    @"interface ipv4 set address name=""Local Area Connection"" source=static address={0} mask={1} gateway={2}",
+                    ip, netmask, gateway);
+
+                bool err = false;
+                var exec = new ExecCmd(log, "netsh", args);
+                ExecCmdResult rslt = exec.Run();
+                if (rslt.Success)
+                {
+                    bool firstDns = true;
+                    foreach (string dnsStr in net["dns"])
+                    {
+                        if (firstDns)
+                        {
+                            args = String.Format(@"netsh interface ipv4 set dns name=""Local Area Connection"" source=static addr={0}", dnsStr);
+                            firstDns = false;
+                        }
+                        else
+                        {
+                            args = String.Format(@"netsh interface ipv4 add dns name=""Local Area Connection"" addr={0}", dnsStr);
+                        }
+                        exec = new ExecCmd(log, "netsh", args);
+                        rslt = exec.Run();
+                        if (false == rslt.Success)
+                        {
+                            // TODO
+                            err = true;
+                        }
+                    }
+                }
+                else
+                {
+                    // TODO
+                    err = true;
+                }
+                if (false == err)
+                {
+                    settings["vm"]["network_setup"] = true;
+                    SaveSettings();
+                }
+            }
+        }
+
+        private void Sysprep()
+        {
+            if ((bool)settings["vm"]["sysprepped"])
+            {
+                return;
+            }
+
+            string unattendXml = Resources.UnattendXML;
+            var xdoc = XDocument.Parse(unattendXml);
+            XNamespace ns = xdoc.Root.GetDefaultNamespace();
+            XmlNamespaceManager nsMgr = new XmlNamespaceManager(new NameTable());
+            nsMgr.AddNamespace("ns", ns.NamespaceName);
+
+            // ComputerName
+            var eleComputerName = xdoc.XPathSelectElement(@"/ns:unattend/ns:settings/ns:component/ns:ComputerName", nsMgr);
+            string computerName = (string)settings["vm"]["name"];
+            eleComputerName.Value = computerName;
+
+            // RegisteredOrganization
+            var elements = xdoc.XPathSelectElements(@"//ns:component/ns:RegisteredOrganization", nsMgr);
+            foreach (var ele in elements)
+            {
+                ele.Value = "ORG TODO"; // TODO
+            }
+
+            // RegisteredOwner
+            elements = xdoc.XPathSelectElements(@"//ns:component/ns:RegisteredOwner", nsMgr);
+            foreach (var ele in elements)
+            {
+                ele.Value = "OWNER TODO"; // TODO
+            }
+
+            string pathToUnattend = Path.GetTempFileName();
+            using (var writer = new XmlTextWriter(pathToUnattend, null))
+            {
+                xdoc.WriteTo(writer);
+            }
+            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/generalize /oobe /unattend:" + pathToUnattend); // TODO: /reboot ?
+            log.Info("Executing: '{0}'", cmd);
+            ExecCmdResult rslt = cmd.Run();
+            log.Info("Result: '{0}'", rslt);
+
+            if (rslt.Success)
+            {
+                settings["vm"]["sysprepped"] = true;
+                SaveSettings();
+            }
         }
 
         private void InitializeDirectories()
@@ -299,43 +417,73 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             bool settingsFound = false;
             DirectoryInfo driveRootDirectory = null;
 
-            for (int i = 0; i < 5 && false == settingsFound; ++i)
+            try
             {
-                foreach (var drive in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom && d.IsReady))
+                for (int i = 0; i < 5 && false == settingsFound; ++i)
                 {
-                    driveRootDirectory = drive.RootDirectory;
-                    string envPath = Path.Combine(driveRootDirectory.FullName, "env");
-                    if (File.Exists(envPath))
+                    foreach (var drive in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom && d.IsReady))
                     {
-                        settingsJsonStr = File.ReadAllText(envPath);
-                        Settings.Default.SettingsJson = settingsJsonStr;
-                        Settings.Default.Save();
-                        settingsFound = true;
-                        break;
+                        driveRootDirectory = drive.RootDirectory;
+                        string envPath = Path.Combine(driveRootDirectory.FullName, "env");
+                        if (File.Exists(envPath))
+                        {
+                            string settingsJsonStr = File.ReadAllText(envPath);
+                            LoadSettings(settingsJsonStr);
+                            SaveSettings();
+                            settingsFound = true;
+                            break;
+                        }
+                    }
+                    if (false == settingsFound)
+                    {
+                        log.Warn("No CD rom drives ready...");
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
                     }
                 }
-                if (false == settingsFound)
-                {
-                    log.Warn("No CD rom drives ready...");
-                    // Thread.Sleep(TimeSpan.FromSeconds(2));
-                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
             }
 
             if (settingsFound)
             {
                 EjectMedia.Eject(driveRootDirectory.FullName);
-                File.WriteAllText(SettingsFile, settingsJsonStr);
             }
-            else if (File.Exists(SettingsFile))
+            else
             {
-                settingsJsonStr = File.ReadAllText(SettingsFile);
-                settingsFound = true;
+                settingsFound = LoadSettings();
             }
 
             if (false == settingsFound)
             {
                 throw new Exception(); // Should be LoadSettingsException
             }
+        }
+
+        private bool LoadSettings()
+        {
+            bool rv = false;
+
+            if (File.Exists(SettingsFilePath))
+            {
+                rv = LoadSettings(File.ReadAllText(SettingsFilePath));
+            }
+
+            return rv;
+        }
+
+        private bool LoadSettings(string settingsJsonStr)
+        {
+            bool rv = false;
+            settings = JObject.Parse(settingsJsonStr);
+            return rv;
+        }
+
+        private void SaveSettings()
+        {
+            string settingsJsonStr = settings.ToString();
+            File.WriteAllText(SettingsFilePath, settingsJsonStr);
         }
 
         private class BoshAgentNatsConfig : INatsConfig

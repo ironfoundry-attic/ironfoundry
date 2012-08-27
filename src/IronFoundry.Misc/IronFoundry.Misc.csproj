@@ -58,6 +58,8 @@
     </Compile>
     <Compile Include="Utilities.cs" />
     <Compile Include="Utilities\ActionTimer.cs" />
+    <Compile Include="Utilities\ExecCmd.cs" />
+    <Compile Include="Utilities\ExecCmdResult.cs" />
     <Compile Include="WinService\CustomCommands.cs" />
     <Compile Include="WinService\AgentWinService.cs" />
     <Compile Include="WinService\IService.cs" />
