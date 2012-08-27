@@ -233,7 +233,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             {
                 xdoc.WriteTo(writer);
             }
-            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/generalize /oobe /unattend:" + pathToUnattend); // TODO: /reboot ?
+            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/generalize /oobe /reboot /unattend:" + pathToUnattend); // TODO: /reboot ?
             log.Info("Executing: '{0}'", cmd);
             ExecCmdResult rslt = cmd.Run();
             log.Info("Result: '{0}'", rslt);
