@@ -14,6 +14,7 @@
 
         public ExecCmd(ILog log, string cmd, string arguments)
         {
+            this.log = log;
             this.cmd = cmd;
             this.arguments = arguments;
         }

@@ -141,7 +141,8 @@ netsh interface ipv4 set address name="Local Area Connection" source=static addr
 netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
 netsh interface ipv4 add dns name="Local Area Connection" addr=%5
              */
-            if ((bool)settings["vm"]["network_setup"])
+            var network_setup_setting = settings["vm"]["network_setup"];
+            if (null != network_setup_setting && (bool)network_setup_setting)
             {
                 return;
             }
@@ -198,7 +199,8 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
         private void Sysprep()
         {
-            if ((bool)settings["vm"]["sysprepped"])
+            var sysprepped_setting = settings["vm"]["sysprepped"];
+            if (null != sysprepped_setting && (bool)sysprepped_setting)
             {
                 return;
             }
