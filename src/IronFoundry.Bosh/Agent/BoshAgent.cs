@@ -160,7 +160,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
                 bool err = false;
                 var exec = new ExecCmd(log, "netsh", args);
-                ExecCmdResult rslt = exec.Run();
+                ExecCmdResult rslt = exec.Run(6, TimeSpan.FromSeconds(10));
                 if (rslt.Success)
                 {
                     bool firstDns = true;
@@ -168,15 +168,15 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                     {
                         if (firstDns)
                         {
-                            args = String.Format(@"netsh interface ipv4 set dns name=""Local Area Connection"" source=static addr={0}", dnsStr);
+                            args = String.Format(@"interface ipv4 set dns name=""Local Area Connection"" source=static addr={0}", dnsStr);
                             firstDns = false;
                         }
                         else
                         {
-                            args = String.Format(@"netsh interface ipv4 add dns name=""Local Area Connection"" addr={0}", dnsStr);
+                            args = String.Format(@"interface ipv4 add dns name=""Local Area Connection"" addr={0}", dnsStr);
                         }
                         exec = new ExecCmd(log, "netsh", args);
-                        rslt = exec.Run();
+                        rslt = exec.Run(6, TimeSpan.FromSeconds(10));
                         if (false == rslt.Success)
                         {
                             // TODO
@@ -214,24 +214,24 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             // ComputerName
             var eleComputerName = xdoc.XPathSelectElement(@"/ns:unattend/ns:settings/ns:component/ns:ComputerName", nsMgr);
             string computerName = (string)settings["vm"]["name"];
-            eleComputerName.Value = computerName;
+            eleComputerName.Value = computerName.Substring(0, Math.Min(15, computerName.Length));
 
             // RegisteredOrganization
             var elements = xdoc.XPathSelectElements(@"//ns:component/ns:RegisteredOrganization", nsMgr);
             foreach (var ele in elements)
             {
-                ele.Value = "ORG TODO"; // TODO
+                ele.Value = "Tier3"; // TODO
             }
 
             // RegisteredOwner
             elements = xdoc.XPathSelectElements(@"//ns:component/ns:RegisteredOwner", nsMgr);
             foreach (var ele in elements)
             {
-                ele.Value = "OWNER TODO"; // TODO
+                ele.Value = "Tier3"; // TODO
             }
 
             string pathToUnattend = Path.GetTempFileName();
-            using (var writer = new XmlTextWriter(pathToUnattend, null))
+            using (var writer = XmlWriter.Create(pathToUnattend))
             {
                 xdoc.WriteTo(writer);
             }
@@ -419,6 +419,12 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             bool settingsFound = false;
             DirectoryInfo driveRootDirectory = null;
 
+            settingsFound = LoadSettings();
+            if (settingsFound)
+            {
+                return;
+            }
+
             try
             {
                 for (int i = 0; i < 5 && false == settingsFound; ++i)
@@ -477,9 +483,8 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
         private bool LoadSettings(string settingsJsonStr)
         {
-            bool rv = false;
             settings = JObject.Parse(settingsJsonStr);
-            return rv;
+            return true;
         }
 
         private void SaveSettings()
