@@ -58,6 +58,7 @@
     <Compile Include="Agent\Handlers\Ping.cs" />
     <Compile Include="Agent\Handlers\IMessageHandler.cs" />
     <Compile Include="Agent\Handlers\Noop.cs" />
+    <Compile Include="Blobstore\BlobstoreException.cs" />
     <Compile Include="Blobstore\BlobstoreOptions.cs" />
     <Compile Include="Blobstore\SimpleBlobstoreClient.cs" />
     <Compile Include="Messages\Heartbeat.cs" />

@@ -61,6 +61,42 @@ namespace IronFoundry.Bosh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not create object {0}/{1}.
+        /// </summary>
+        public static string BlobstoreClient_CouldNotCreateObject_Fmt {
+            get {
+                return ResourceManager.GetString("BlobstoreClient_CouldNotCreateObject_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not delete object {0}/{1}.
+        /// </summary>
+        public static string BlobstoreClient_CouldNotDeleteObject_Fmt {
+            get {
+                return ResourceManager.GetString("BlobstoreClient_CouldNotDeleteObject_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not fetch object {0}/{1}.
+        /// </summary>
+        public static string BlobstoreClient_CouldNotFetchObject_Fmt {
+            get {
+                return ResourceManager.GetString("BlobstoreClient_CouldNotFetchObject_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local file &apos;{0}&apos; does not exist..
+        /// </summary>
+        public static string BlobstoreClient_LocalFileDoesNotExist_Fmt {
+            get {
+                return ResourceManager.GetString("BlobstoreClient_LocalFileDoesNotExist_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Message: {0}.
         /// </summary>
         public static string BoshAgent_AgentMessage_Fmt {

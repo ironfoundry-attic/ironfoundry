@@ -12,10 +12,8 @@
         {
             var options = new BlobstoreOptions("http://172.21.10.181:25250", "agent", "agent");
             var client = new SimpleBlobstoreClient(options);
-            using (var fs = File.OpenRead(@"C:\proj\tmp\env.iso"))
-            {
-                client.CreateFile(fs);
-            }
+            var localFile = new FileInfo(@"C:\proj\tmp\env.iso");
+            string response = client.Create(localFile);
         }
     }
 }

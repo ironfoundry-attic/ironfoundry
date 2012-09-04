@@ -135,6 +135,11 @@
             By default the included XmlSerializer is used.
             </summary>
         </member>
+        <member name="P:RestSharp.IRestRequest.ResponseWriter">
+            <summary>
+            Set this to write response to Stream rather than reading into memory.
+            </summary>
+        </member>
         <member name="P:RestSharp.IRestRequest.Parameters">
             <summary>
             Container of all HTTP parameters to be passed with the request. 
@@ -391,6 +396,11 @@
             <summary>
             Serializer to use when writing XML request bodies. Used if RequestFormat is Xml.
             By default the included XmlSerializer is used.
+            </summary>
+        </member>
+        <member name="P:RestSharp.RestRequest.ResponseWriter">
+            <summary>
+            Set this to write response to Stream rather than reading into memory.
             </summary>
         </member>
         <member name="P:RestSharp.RestRequest.Parameters">
@@ -1181,6 +1191,11 @@
         <member name="P:RestSharp.Http.CookieContainer">
             <summary>
             The System.Net.CookieContainer to be used for the request
+            </summary>
+        </member>
+        <member name="P:RestSharp.Http.ResponseWriter">
+            <summary>
+            The method to use to write the response instead of reading into RawBytes
             </summary>
         </member>
         <member name="P:RestSharp.Http.Files">
