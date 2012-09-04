@@ -17,6 +17,7 @@
                     x.Type<Ping>().Named("ping");
                     x.Type<Shutdown>().Named("shutdown");
                     x.Type<GetTask>().Named("get_task");
+                    x.Type<Stop>().Named("stop");
                 }
             );
         }
