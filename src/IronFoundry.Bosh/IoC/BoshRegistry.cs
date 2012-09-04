@@ -13,11 +13,19 @@
 
             For<IMessageHandler>().AddInstances(x =>
                 {
-                    x.Type<Noop>().Named("noop");
+                    // agent/lib/agent/handler.rb
                     x.Type<Ping>().Named("ping");
-                    x.Type<Shutdown>().Named("shutdown");
-                    x.Type<GetTask>().Named("get_task");
+                    x.Type<Noop>().Named("noop");
+                    x.Type<Start>().Named("start");
                     x.Type<Stop>().Named("stop");
+                    x.Type<PrepareNetworkChange>().Named("preparenetworkchange");
+
+                    x.Type<Apply>().Named("apply");
+                    x.Type<CompilePackage>().Named("compilepackage");
+                    x.Type<Drain>().Named("drain");
+                    x.Type<GetTask>().Named("get_task");
+                    x.Type<State>().Named("state");
+                    x.Type<Shutdown>().Named("shutdown");
                 }
             );
         }

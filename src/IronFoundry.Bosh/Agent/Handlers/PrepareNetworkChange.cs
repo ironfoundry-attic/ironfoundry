@@ -2,11 +2,11 @@
 {
     using Newtonsoft.Json.Linq;
 
-    public class Noop : BaseMessageHandler
+    public class PrepareNetworkChange : BaseMessageHandler
     {
         public override HandlerResponse Handle(JObject parsed)
         {
-            return new HandlerResponse("nope");
+            return new HandlerResponse(true);
         }
     }
 }

@@ -44,6 +44,12 @@
     <Compile Include="Agent\BoshAgentSubscription.cs" />
     <Compile Include="Agent\EjectMedia.cs" />
     <Compile Include="Agent\Handlers\BaseMessageHandler.cs" />
+    <Compile Include="Agent\Handlers\Apply.cs" />
+    <Compile Include="Agent\Handlers\CompilePackage.cs" />
+    <Compile Include="Agent\Handlers\State.cs" />
+    <Compile Include="Agent\Handlers\Drain.cs" />
+    <Compile Include="Agent\Handlers\PrepareNetworkChange.cs" />
+    <Compile Include="Agent\Handlers\Start.cs" />
     <Compile Include="Agent\Handlers\Stop.cs" />
     <Compile Include="Agent\Handlers\Shutdown.cs" />
     <Compile Include="Agent\Handlers\GetTask.cs" />
@@ -96,6 +102,9 @@
     <None Include="Resources\unattend.xml">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Blobstore\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

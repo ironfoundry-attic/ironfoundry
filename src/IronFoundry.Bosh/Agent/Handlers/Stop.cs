@@ -6,6 +6,9 @@
     {
         public override HandlerResponse Handle(JObject parsed)
         {
+            // TODO long_running? is true
+            // agent/lib/agent/handler.rb 410
+            // Monit.stop_services
             return new HandlerResponse("stopped");
         }
     }

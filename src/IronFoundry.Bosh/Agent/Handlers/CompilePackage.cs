@@ -1,12 +1,13 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
+    using System;
     using Newtonsoft.Json.Linq;
 
-    public class Noop : BaseMessageHandler
+    public class CompilePackage : BaseMessageHandler
     {
         public override HandlerResponse Handle(JObject parsed)
         {
-            return new HandlerResponse("nope");
+            throw new NotImplementedException();
         }
     }
 }

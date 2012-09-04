@@ -25,6 +25,11 @@
     {
         public abstract HandlerResponse Handle(JObject parsed);
 
+        public virtual bool IsLongRunning
+        {
+            get { return false; }
+        }
+
         public virtual void OnPostReply() { }
     }
 }

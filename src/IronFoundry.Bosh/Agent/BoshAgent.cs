@@ -302,9 +302,10 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
             log.Debug(Resources.BoshAgent_AgentMessage_Fmt, message);
 
-            // encryption code here
+            // encryption code here if @credentials
 
             string method = (string)j["method"];
+
             if (method == "get_state")
             {
                 method = "state";
