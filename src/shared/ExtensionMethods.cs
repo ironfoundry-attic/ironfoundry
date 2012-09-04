@@ -51,6 +51,14 @@ namespace System.Collections.Generic
 
             return argThis.ToArray();
         }
+
+        public static IEnumerable<T> Compact<T>(this IEnumerable<T> argThis)
+        {
+            if (null == argThis)
+                return null;
+
+            return argThis.Where<T>(t => t != null);
+        }
     }
 }
 
