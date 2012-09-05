@@ -1,27 +1,43 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
+    using System.IO;
     using IronFoundry.Bosh.Configuration;
+    using IronFoundry.Misc.Logging;
     using Newtonsoft.Json.Linq;
 
     public class CompilePackage : BaseMessageHandler
     {
-        public CompilePackage(IBoshConfig config) : base(config) { }
+        private readonly ILog log;
+
+        private readonly string dataDirPath;
+        private readonly string tmpDirPath;
+        private readonly string logFilePath;
+        private readonly string compileBasePath;
+        private readonly string installBasePath;
+
+        public CompilePackage(IBoshConfig config, ILog log) : base(config)
+        {
+            dataDirPath = Path.Combine(config.BaseDir, "data");
+            tmpDirPath = Path.Combine(dataDirPath, "tmp");
+            Directory.CreateDirectory(tmpDirPath);
+            logFilePath = Path.Combine(tmpDirPath, config.AgentID);
+            compileBasePath = Path.Combine(dataDirPath, "compile");
+            installBasePath = Path.Combine(dataDirPath, "packages");
+
+            this.log = log;
+        }
 
         public override HandlerResponse Handle(JObject parsed)
         {
-            /*
-             * agent/lib/agent/message/compile_package.rb
-            # TODO implement sha1 verification
-            # TODO propagate errors
-            install_dependencies
-            get_source_package
-            unpack_source_package
-            compile
-            pack
-            result = upload
-            return { "result" => result }
-             */
+            var args = parsed["arguments"];
+            @blobstore_id, @sha1, @package_name, @package_version, @dependencies = args
 
+            // agent/lib/agent/message/compile_package.rb
+            InstallDependencies();
+            GetSourcePackage();
+            UnpackSourcePackage();
+            Compile();
+            Pack();
             string result = Upload();
             return new HandlerResponse(result);
         }
