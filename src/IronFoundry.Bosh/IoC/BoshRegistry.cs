@@ -2,6 +2,7 @@
 {
     using IronFoundry.Bosh.Agent;
     using IronFoundry.Bosh.Agent.Handlers;
+    using IronFoundry.Bosh.Configuration;
     using IronFoundry.Misc.Agent;
     using StructureMap.Configuration.DSL;
 
@@ -9,6 +10,8 @@
     {
         public BoshRegistry()
         {
+            For<IBoshConfig>().Singleton().Use<BoshConfig>();
+
             For<IAgent>().Use<BoshAgent>();
 
             For<IMessageHandler>().AddInstances(x =>

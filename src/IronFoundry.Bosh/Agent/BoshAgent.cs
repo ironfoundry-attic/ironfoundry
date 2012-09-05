@@ -9,6 +9,7 @@
     using System.Xml.Linq;
     using System.Xml.XPath;
     using IronFoundry.Bosh.Agent.Handlers;
+    using IronFoundry.Bosh.Configuration;
     using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Agent;
     using IronFoundry.Misc.Logging;
@@ -20,14 +21,6 @@
 
     public sealed class BoshAgent : IAgent
     {
-        private const string DefaultBaseDir = @"C:\IronFoundry"; // /var/vcap
-        private const string BoshDirName = "BOSH";
-        private const string SettingsFileName = @"settings.json";
-        private const string StateFileName = @"state.yml";
-
-        private readonly string SettingsFilePath = Path.Combine(DefaultBaseDir, BoshDirName, SettingsFileName);
-        private readonly string StateFilePath = Path.Combine(DefaultBaseDir, BoshDirName, StateFileName);
-
         private readonly ushort NatsRetries = 10;
         private readonly TimeSpan NatsReconnectSleep = TimeSpan.FromSeconds(1);
         private readonly TimeSpan HeartbeatInterval = TimeSpan.FromSeconds(60);
@@ -35,6 +28,7 @@
         private readonly IContainer ioc;
         private readonly ILog log;
         private readonly INatsClient natsClient;
+        private readonly IBoshConfig config;
 
         private JObject settings;
         private string agentID;
@@ -42,11 +36,12 @@
 
         private HeartbeatProcessor heartbeatProcessor;
 
-        public BoshAgent(IContainer ioc, ILog log, INatsClient natsClient)
+        public BoshAgent(IContainer ioc, ILog log, INatsClient natsClient, IBoshConfig config)
         {
             this.ioc = ioc;
             this.log = log;
             this.natsClient = natsClient;
+            this.config = config;
         }
 
         public string Name
@@ -68,12 +63,14 @@
              * Configure and enable Monit
              * Starts the Handler
              */
-            InitializeDirectories();
 
             BoshAgentInfrastructureVsphereSettings_LoadSettings();
 
             agentID = (string)settings["agent_id"];
+            config.AgentID = agentID;
+
             natsUriStr = (string)settings["mbus"];
+            config.Mbus = new Uri(natsUriStr);
 
             /*
              * TODO:
@@ -92,8 +89,8 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
             // find_message_processors
 
-            var config = new BoshAgentNatsConfig(natsUriStr);
-            natsClient.UseConfig(config);
+            var natsConfig = new BoshAgentNatsConfig(config.Mbus);
+            natsClient.UseConfig(natsConfig);
 
             ushort natsFailCount = 0;
             while (false == natsClient.Start())
@@ -245,12 +242,6 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 settings["vm"]["sysprepped"] = true;
                 SaveSettings();
             }
-        }
-
-        private void InitializeDirectories()
-        {
-            Directory.CreateDirectory(DefaultBaseDir);
-            Directory.CreateDirectory(Path.Combine(DefaultBaseDir, BoshDirName));
         }
 
         private void SetupSubscriptions()
@@ -415,6 +406,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             }
         }
 
+        // TODO move to Bootstrap class
         private void BoshAgentInfrastructureVsphereSettings_LoadSettings()
         {
             bool settingsFound = false;
@@ -474,9 +466,9 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
         {
             bool rv = false;
 
-            if (File.Exists(SettingsFilePath))
+            if (File.Exists(config.SettingsFilePath))
             {
-                rv = LoadSettings(File.ReadAllText(SettingsFilePath));
+                rv = LoadSettings(File.ReadAllText(config.SettingsFilePath));
             }
 
             return rv;
@@ -491,7 +483,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
         private void SaveSettings()
         {
             string settingsJsonStr = settings.ToString();
-            File.WriteAllText(SettingsFilePath, settingsJsonStr);
+            File.WriteAllText(config.SettingsFilePath, settingsJsonStr);
         }
 
         private class BoshAgentNatsConfig : INatsConfig
@@ -501,14 +493,13 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             private readonly string user;
             private readonly string password;
 
-            public BoshAgentNatsConfig(string natsUriStr)
+            public BoshAgentNatsConfig(Uri mbus)
             {
                 // nats://nats:nats@172.21.10.181:4222
-                var natsUri = new Uri(natsUriStr);
-                this.host = natsUri.Host;
-                this.port = (ushort)natsUri.Port;
+                this.host = mbus.Host;
+                this.port = (ushort)mbus.Port;
 
-                string[] userInfo = natsUri.UserInfo.Split(new[] { ':' });
+                string[] userInfo = mbus.UserInfo.Split(new[] { ':' });
                 this.user = userInfo[0];
                 this.password = userInfo[1];
             }

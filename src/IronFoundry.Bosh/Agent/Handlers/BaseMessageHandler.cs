@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
+    using IronFoundry.Bosh.Configuration;
     using Newtonsoft.Json.Linq;
 
     /*
@@ -23,6 +24,13 @@
 
     public abstract class BaseMessageHandler : IMessageHandler
     {
+        protected readonly IBoshConfig config;
+
+        public BaseMessageHandler(IBoshConfig config)
+        {
+            this.config = config;
+        }
+
         public abstract HandlerResponse Handle(JObject parsed);
 
         public virtual bool IsLongRunning

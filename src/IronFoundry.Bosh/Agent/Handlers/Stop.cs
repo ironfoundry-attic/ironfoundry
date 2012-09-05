@@ -1,9 +1,12 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
+    using IronFoundry.Bosh.Configuration;
     using Newtonsoft.Json.Linq;
 
     public class Stop : BaseMessageHandler
     {
+        public Stop(IBoshConfig config) : base(config) { }
+
         public override HandlerResponse Handle(JObject parsed)
         {
             // TODO long_running? is true
