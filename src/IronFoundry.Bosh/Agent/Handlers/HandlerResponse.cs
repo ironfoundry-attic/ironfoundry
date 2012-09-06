@@ -2,6 +2,7 @@
 {
     using System;
     using IronFoundry.Nats.Client;
+using Newtonsoft.Json;
 
     public class HandlerResponse : NatsMessage
     {
@@ -16,6 +17,7 @@
             this.value = value;
         }
 
+        [JsonProperty(PropertyName="value")]
         public object Value { get { return value; } }
 
         public override string PublishSubject

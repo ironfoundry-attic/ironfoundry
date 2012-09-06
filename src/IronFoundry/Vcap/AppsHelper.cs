@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Security.Cryptography;
     using System.Threading;
     using ICSharpCode.SharpZipLib.Zip;
     using IronFoundry;
@@ -296,7 +295,7 @@
             {
                 totalSize += (ulong)file.Length;
 
-                string hash     = GenerateHash(file.FullName);
+                string hash = file.Hexdigest();
                 string filename = file.FullName;
                 // The root path should be stripped. This is used
                 // by the server to tar up the file that gets pushed
@@ -313,17 +312,6 @@
             }
 
             return totalSize;
-        }
-
-        private static string GenerateHash(string fileName)
-        {
-            using (FileStream fs = File.OpenRead(fileName))
-            {
-                using (var sha1 = new SHA1Managed())
-                {
-                    return BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", String.Empty).ToLowerInvariant();
-                }
-            }
         }
 
         private static void ProcessPath(DirectoryInfo path, DirectoryInfo explodeDir)

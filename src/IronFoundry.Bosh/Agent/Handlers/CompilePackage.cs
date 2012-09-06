@@ -67,8 +67,8 @@
                 UnpackSourcePackage();
                 Compile();
                 Pack();
-                string result = Upload();
-                return new HandlerResponse(result);
+                object result = Upload();
+                return new HandlerResponse(new { result = result });
             }
             finally
             {
@@ -88,7 +88,6 @@
                 string depBlobstoreID = (string)val["blobstore_id"];
                 string depSha1 = (string)val["sha1"];
                 string depVersion = (string)val["version"];
-
                 /*
                  * TODO
           install_dir = File.join(@install_base, pkg_name, pkg['version'])
@@ -212,12 +211,56 @@
             }
         }
 
-        private void Pack()
+        private string CompiledPackage
         {
+            get { return sourceFile + ".compiled"; }
         }
 
-        private string Upload()
+        private void Pack()
         {
+                // TODO @logger.info("Packing #{@package_name} #{@package_version}")
+                /*
+                Dir.chdir(install_dir) do
+                  `tar -zcf #{compiled_package} .`
+                end
+                 */
+            string installDirTmp = InstallDir.Replace('\\', '/');
+            using (var fs = File.OpenWrite(CompiledPackage))
+            {
+                using (var gzipStream = new GZipOutputStream(fs))
+                {
+                    using (var tarArchive = TarArchive.CreateOutputTarArchive(gzipStream))
+                    {
+                        tarArchive.RootPath = installDirTmp;
+                        var tarEntry = TarEntry.CreateEntryFromFile(installDirTmp);
+                    	tarArchive.WriteEntry(tarEntry, true);
+                    }
+                }
+            }
+        }
+
+        private object Upload()
+        {
+            BlobstoreClient client = blobstoreClientFactory.Create();
+            string compiledBlobstoreID = client.Create(CompiledPackage);
+            var fiCompiledPackage = new FileInfo(CompiledPackage);
+            string compiledSha1 = fiCompiledPackage.Hexdigest();
+            string compileLogID = client.Create(logFilePath); // TODO
+            return new { sha1 = compiledSha1, blobstore_id = compiledBlobstoreID, compile_log_id = compileLogID };
+            /*
+        compiled_blobstore_id = nil
+        File.open(compiled_package, 'r') do |f|
+          compiled_blobstore_id = @blobstore_client.create(f)
+        end
+        compiled_sha1 = Digest::SHA1.hexdigest(File.read(compiled_package))
+        compile_log_id = @blobstore_client.create(@log_file)
+        @logger.info("Uploaded #{@package_name} #{@package_version} " +
+                     "(sha1: #{compiled_sha1}, " +
+                     "blobstore_id: #{compiled_blobstore_id})")
+        @logger = nil
+        { "sha1" => compiled_sha1, "blobstore_id" => compiled_blobstore_id,
+          "compile_log_id" => compile_log_id }
+             */
         }
 
         private void DeleteTmpFiles()
@@ -226,6 +269,17 @@
 
         private void ClearLogFile()
         {
+            /*
+      # Clears the log file after a compilation runs.  This is needed because if
+      # reuse_compilation_vms is being used then without clearing the log then
+      # the log from each subsequent compilation will include the previous
+      # compilation's output.
+      # @param [String] log_file Path to the log file.
+      def clear_log_file(log_file)
+        File.delete(log_file) if File.exists?(log_file)
+        @logger = Logger.new(log_file)
+      end
+             */
         }
     }
 }

@@ -31,8 +31,6 @@
         private readonly IBoshConfig config;
 
         private JObject settings;
-        private string agentID;
-        private string natsUriStr;
 
         private HeartbeatProcessor heartbeatProcessor;
 
@@ -107,7 +105,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             SetupSubscriptions();
 
             // setup heartbeats
-            heartbeatProcessor = new HeartbeatProcessor(log, natsClient, agentID, TimeSpan.FromSeconds(1));
+            heartbeatProcessor = new HeartbeatProcessor(log, natsClient, config.AgentID, TimeSpan.FromSeconds(1));
             heartbeatProcessor.Start();
 
             // SetupSshdMonitor();
@@ -241,7 +239,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
         private void SetupSubscriptions()
         {
-            var agentSubscription = new BoshAgentSubscription(agentID);
+            var agentSubscription = new BoshAgentSubscription(config.AgentID);
             natsClient.Subscribe(agentSubscription, HandleAgentMessage);
         }
 

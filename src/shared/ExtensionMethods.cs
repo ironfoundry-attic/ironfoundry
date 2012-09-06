@@ -62,6 +62,26 @@ namespace System.Collections.Generic
     }
 }
 
+namespace System.IO
+{
+    using System.Security.Cryptography;
+
+    internal static class FileInfoExtensionMethods
+    {
+        // http://blogs.msdn.com/b/blambert/archive/2009/02/22/blambert-codesnip-fast-byte-array-to-hex-string-conversion.aspx
+        public static string Hexdigest(this FileInfo argThis)
+        {
+            using (FileStream fs = File.OpenRead(argThis.FullName))
+            {
+                using (var sha1 = SHA1.Create())
+                {
+                    return BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", String.Empty).ToLowerInvariant();
+                }
+            }
+        }
+    }
+}
+
 namespace System.Text.RegularExpressions
 {
     internal static class RegexExtensionMethods
