@@ -40,6 +40,9 @@
     <Compile Include="..\shared\ExtensionMethods.cs">
       <Link>Extensions\ExtensionMethods.cs</Link>
     </Compile>
+    <Compile Include="Agent\AgentException.cs" />
+    <Compile Include="Agent\MessageHandlerException.cs" />
+    <Compile Include="Agent\RemoteException.cs" />
     <Compile Include="Blobstore\BlobstoreClient.cs" />
     <Compile Include="Agent\BoshAgent.cs" />
     <Compile Include="Agent\BoshAgentSubscription.cs" />

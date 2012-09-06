@@ -126,6 +126,11 @@
             }
         }
 
+        public void PublishReply(string replyTo, string json, uint delay)
+        {
+            DoPublish(replyTo, json, delay);
+        }
+
         public void PublishReply(string replyTo, INatsMessage message, uint delay)
         {
             if (message.CanPublishWithSubject(replyTo))
@@ -329,9 +334,13 @@
             {
                 throw new InvalidOperationException(Resources.NatsClient_PublishReceiveOnlyMessage);
             }
+            DoPublish(subject, message.ToJson(), delay);
+        }
 
-            log.Debug(Resources.NatsClient_PublishMessage_Fmt, subject, delay, message);
-            string formattedMessage = NatsCommand.FormatPublishMessage(subject, message);
+        private void DoPublish(string subject, string json, uint delay = 0)
+        {
+            log.Debug(Resources.NatsClient_PublishMessage_Fmt, subject, delay, json);
+            string formattedMessage = NatsCommand.FormatPublishMessage(subject, json);
             log.Trace(Resources.NatsClient_LogSent_Fmt, formattedMessage);
 
             if (delay == 0)

@@ -61,7 +61,12 @@
         public static string FormatPublishMessage(string subject, INatsMessage message)
         {
             string messageJson = message.ToJson();
-            return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.PublishFmt, subject, Encoding.ASCII.GetBytes(messageJson).Length, messageJson);
+            return FormatPublishMessage(subject, messageJson);
+        }
+
+        public static string FormatPublishMessage(string subject, string json)
+        {
+            return String.Format(CultureInfo.InvariantCulture, NatsCommandFormats.PublishFmt, subject, Encoding.ASCII.GetBytes(json).Length, json);
         }
 
         public static string FormatConnectMessage(INatsMessage message)

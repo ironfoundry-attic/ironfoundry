@@ -47,6 +47,8 @@
 
             this.log = log;
             this.blobstoreClientFactory = blobstoreClientFactory;
+
+            log.AddFileTarget(config.AgentID, logFilePath);
         }
 
         public override HandlerResponse Handle(JObject parsed)
@@ -218,7 +220,7 @@
 
         private void Pack()
         {
-                // TODO @logger.info("Packing #{@package_name} #{@package_version}")
+            // TODO @logger.info("Packing #{@package_name} #{@package_version}")
                 /*
                 Dir.chdir(install_dir) do
                   `tar -zcf #{compiled_package} .`

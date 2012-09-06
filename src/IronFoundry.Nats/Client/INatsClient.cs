@@ -11,6 +11,7 @@ using IronFoundry.Nats.Configuration;
         void Publish(NatsCommand argCommand, INatsMessage argMessage);
         void Publish(INatsMessage argMessage);
 
+        void PublishReply(string replyTo, string json, uint delay);
         void PublishReply(string replyTo, INatsMessage message, uint delay);
 
         void Subscribe(INatsSubscription argSubscription, Action<string, string> argCallback);

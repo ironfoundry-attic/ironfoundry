@@ -9,6 +9,7 @@
     using System.Xml.Linq;
     using System.Xml.XPath;
     using IronFoundry.Bosh.Agent.Handlers;
+    using IronFoundry.Bosh.Blobstore;
     using IronFoundry.Bosh.Configuration;
     using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Agent;
@@ -16,6 +17,7 @@
     using IronFoundry.Misc.Utilities;
     using IronFoundry.Nats.Client;
     using IronFoundry.Nats.Configuration;
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using StructureMap;
 
@@ -29,17 +31,20 @@
         private readonly ILog log;
         private readonly INatsClient natsClient;
         private readonly IBoshConfig config;
+        private readonly IBlobstoreClientFactory blobstoreClientFactory;
 
         private JObject settings;
 
         private HeartbeatProcessor heartbeatProcessor;
 
-        public BoshAgent(IContainer ioc, ILog log, INatsClient natsClient, IBoshConfig config)
+        public BoshAgent(IContainer ioc, ILog log, INatsClient natsClient,
+            IBoshConfig config, IBlobstoreClientFactory blobstoreClientFactory)
         {
             this.ioc = ioc;
             this.log = log;
             this.natsClient = natsClient;
             this.config = config;
+            this.blobstoreClientFactory = blobstoreClientFactory;
         }
 
         public string Name
@@ -339,6 +344,8 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             catch (Exception ex)
             {
                 log.Error(ex, Resources.BoshAgent_ExceptionHandlingMethod_Fmt, method);
+                var remoteException = RemoteException.From(ex);
+                Publish(replyTo, remoteException);
                 return;
             }
 
@@ -346,23 +353,65 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             handler.OnPostReply();
         }
 
+        private void Publish(string replyTo, RemoteException exception)
+        {
+            // TODO UGLY!
+            string blobstoreID = null;
+            if (null != exception.Blob)
+            {
+                string tmpFile = Path.GetTempFileName();
+                try
+                {
+                    File.WriteAllText(tmpFile, exception.Blob);
+                    BlobstoreClient bsc = blobstoreClientFactory.Create();
+                    blobstoreID = bsc.Create(tmpFile);
+                }
+                finally
+                {
+                    if (File.Exists(tmpFile))
+                    {
+                        File.Delete(tmpFile);
+                    }
+                }
+            }
+            var pMessage = new JProperty("message", exception.Message);
+            var pBacktrace = new JProperty("backtrace", exception.Backtrace);
+            var pBlobstoreID = new JProperty("blobstore_id", blobstoreID);
+            var jobj = new JObject(new JProperty("exception", new JObject(pMessage, pBacktrace, pBlobstoreID)));
+            string json;
+            using (var sw = new StringWriter())
+            {
+            	using (var writer = new JsonTextWriter(sw))
+            	{
+            		jobj.WriteTo(writer);
+            	}
+                json = sw.ToString();
+            }
+            Publish(replyTo, json);
+        }
+
         private void Publish(string replyTo, HandlerResponse response)
+        {
+            string responseJsonStr = response.ToJson();
+            Publish(replyTo, responseJsonStr);
+        }
+
+        private void Publish(string replyTo, string json)
         {
             const uint NATS_MAX_PAYLOAD_SIZE = 1024 * 1024;
 
             // TODO encrypt?
 
-            string responseJsonStr = response.ToJson();
-            int responseJsonSize = Encoding.ASCII.GetByteCount(responseJsonStr);
+            int responseJsonSize = Encoding.ASCII.GetByteCount(json);
 
-            log.Debug(Resources.BoshAgent_ResponseDebug_Fmt, replyTo, responseJsonStr);
+            log.Debug(Resources.BoshAgent_ResponseDebug_Fmt, replyTo, json);
 
             /*
               TODO figure out if we want to try to scale down the message instead of generating an exception
              */
             if (responseJsonSize < NATS_MAX_PAYLOAD_SIZE)
             {
-                natsClient.PublishReply(replyTo, response, 0);
+                natsClient.PublishReply(replyTo, json, 0);
             }
             else
             {

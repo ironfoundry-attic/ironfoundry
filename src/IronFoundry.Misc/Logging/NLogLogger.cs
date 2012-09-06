@@ -26,6 +26,11 @@
             logger = LogManager.GetLogger(name);
         }
 
+        public void Flush()
+        {
+            LogManager.Flush();
+        }
+
         public void EnableDebug()
         {
             modifyFileLoggingRules(lr => lr.EnableLoggingForLevel(LogLevel.Debug));
@@ -34,6 +39,14 @@
         public void DisableDebug()
         {
             modifyFileLoggingRules(lr => lr.DisableLoggingForLevel(LogLevel.Debug));
+        }
+
+        public void Debug(string message)
+        {
+            if (logger.IsDebugEnabled)
+            {
+                log(LogLevel.Debug, message);
+            }
         }
 
         public void Debug(string fmt, params object[] args)
@@ -76,11 +89,27 @@
             }
         }
 
+        public void Fatal(string message)
+        {
+            if (logger.IsFatalEnabled)
+            {
+                log(LogLevel.Fatal, message);
+            }
+        }
+
         public void Fatal(string fmt, params object[] args)
         {
             if (logger.IsFatalEnabled)
             {
                 log(LogLevel.Fatal, fmt, args);
+            }
+        }
+
+        public void Info(string message)
+        {
+            if (logger.IsInfoEnabled)
+            {
+                log(LogLevel.Info, message);
             }
         }
 
@@ -92,11 +121,27 @@
             }
         }
 
+        public void Trace(string message)
+        {
+            if (logger.IsTraceEnabled)
+            {
+                log(LogLevel.Trace, message);
+            }
+        }
+
         public void Trace(string fmt, params object[] args)
         {
             if (logger.IsTraceEnabled)
             {
                 log(LogLevel.Trace, fmt, args);
+            }
+        }
+
+        public void Warn(string message)
+        {
+            if (logger.IsWarnEnabled)
+            {
+                log(LogLevel.Warn, message);
             }
         }
 
@@ -106,6 +151,22 @@
             {
                 log(LogLevel.Warn, fmt, args);
             }
+        }
+
+        public void AddFileTarget(string targetName, string logFilePath)
+        {
+            LoggingConfiguration config = LogManager.Configuration;
+            var newFileTarget = new FileTarget {
+                Name = targetName,
+                FileName = logFilePath,
+                Layout = "${longdate}|${level:uppercase=true}|${logger:shortName=true}|${message}${onexception:|${exception:format=Message}}",
+                DeleteOldFileOnStartup = true,
+                CreateDirs = true,
+                AutoFlush = true,
+                EnableFileDelete = true,
+            };
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, newFileTarget));
+            LogManager.ReconfigExistingLoggers();
         }
 
         private void log(LogLevel level, string message)

@@ -36,6 +36,7 @@
     <Compile Include="Blobstore.cs" />
     <Compile Include="EjectTest.cs" />
     <Compile Include="JsonTests.cs" />
+    <Compile Include="LoggingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlParsing.cs" />
   </ItemGroup>
@@ -43,6 +44,10 @@
     <ProjectReference Include="..\IronFoundry.Bosh\IronFoundry.Bosh.csproj">
       <Project>{3E576C47-730B-4F05-BD03-3C9BAD7C45BA}</Project>
       <Name>IronFoundry.Bosh</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IronFoundry.Misc\IronFoundry.Misc.csproj">
+      <Project>{E2B80FE5-34A9-4FAF-B638-8C6B744F9F1F}</Project>
+      <Name>IronFoundry.Misc</Name>
     </ProjectReference>
     <ProjectReference Include="..\IronFoundry.Nats\IronFoundry.Nats.csproj">
       <Project>{0BAC887C-9B35-4BC4-9F79-B84DB8D959E1}</Project>
@@ -58,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="IronFoundry.Bosh.Test.xunit">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
