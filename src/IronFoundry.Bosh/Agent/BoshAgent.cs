@@ -65,12 +65,7 @@
              */
 
             BoshAgentInfrastructureVsphereSettings_LoadSettings();
-
-            agentID = (string)settings["agent_id"];
-            config.AgentID = agentID;
-
-            natsUriStr = (string)settings["mbus"];
-            config.Mbus = new Uri(natsUriStr);
+            config.UpdateFrom(settings);
 
             /*
              * TODO:

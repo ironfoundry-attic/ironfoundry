@@ -9,9 +9,9 @@
     using System.Text;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
+    using IronFoundry.Dea.Configuration;
     using IronFoundry.Dea.Types;
     using IronFoundry.Misc;
-    using IronFoundry.Dea.Configuration;
     using IronFoundry.Misc.Logging;
 
     public class FilesManager : IFilesManager
@@ -116,9 +116,11 @@
 
                     using (var gzipStream = new GZipInputStream(file.FileStream))
                     {
-                        var tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
-                        tarArchive.ExtractContents(paths.DropletsPath);
-                        tarArchive.Close();
+                        using (var tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
+                        {
+                            tarArchive.ExtractContents(paths.DropletsPath);
+                            tarArchive.Close();
+                        }
                     }
 
                     instanceApplicationDirInfo = new DirectoryInfo(paths.BaseAppPath);

@@ -44,6 +44,14 @@
             }
         }
 
+        public void Error(string message)
+        {
+            if (logger.IsErrorEnabled)
+            {
+                log(LogLevel.Error, message);
+            }
+        }
+
         public void Error(string fmt, params object[] args)
         {
             if (logger.IsErrorEnabled)
@@ -98,6 +106,11 @@
             {
                 log(LogLevel.Warn, fmt, args);
             }
+        }
+
+        private void log(LogLevel level, string message)
+        {
+            logit(new LogEventInfo(level, logger.Name, message));
         }
 
         private void log(LogLevel level, string fmt, params object[] args)

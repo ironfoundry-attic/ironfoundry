@@ -6,6 +6,7 @@
     {
         void Debug(string fmt, params object[] args);
 
+        void Error(string message);
         void Error(string fmt, params object[] args);
         void Error(Exception exception, string fmt, params object[] args);
         void Error(Exception exception);

@@ -97,6 +97,15 @@ namespace IronFoundry.Bosh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown plugin in Blobstore client factory: {0}.
+        /// </summary>
+        public static string BlobstoreClientFactory_UnknownPlugin_Fmt {
+            get {
+                return ResourceManager.GetString("BlobstoreClientFactory_UnknownPlugin_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Message: {0}.
         /// </summary>
         public static string BoshAgent_AgentMessage_Fmt {

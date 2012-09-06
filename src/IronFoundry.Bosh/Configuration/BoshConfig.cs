@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using Newtonsoft.Json.Linq;
 
     public class BoshConfig : IBoshConfig
     {
@@ -45,7 +46,28 @@
         public string SettingsFilePath { get { return settingsFilePath; } }
         public string StateFilePath { get { return stateFilePath; } }
 
-        public Uri Mbus { get; set; }
-        public string AgentID { get; set; }
+        public Uri Mbus { get; private set; }
+        public string AgentID { get; private set; }
+
+        public string BlobstorePlugin { get; private set; }
+        public Uri BlobstoreEndpoint { get; private set; }
+        public string BlobstoreUser { get; private set; }
+        public string BlobstorePassword { get; private set; }
+
+        public void UpdateFrom(JObject settings)
+        {
+            AgentID = (string)settings["agent_id"];
+            Mbus = new Uri((string)settings["mbus"]);
+
+            var bs = settings["blobstore"];
+            if (bs != null)
+            {
+                BlobstorePlugin = (string)bs["plugin"];
+                var bsp = bs["properties"];
+                BlobstoreEndpoint = new Uri((string)bsp["endpoint"]);
+                BlobstoreUser = (string)bsp["user"];
+                BlobstorePassword = (string)bsp["password"];
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@
     using IronFoundry.Bosh.Properties;
     using RestSharp;
 
-    public class SimpleBlobstoreClient : BaseClient
+    public class SimpleBlobstoreClient : BlobstoreClient
     {
         private readonly RestClient client;
 
@@ -25,14 +25,14 @@
             }
         }
 
-        public override string Create(FileInfo localFile)
+        public override string Create(string localFilePath)
         {
-            if (false == localFile.Exists)
+            if (false == File.Exists(localFilePath))
             {
-                throw new ArgumentException(Resources.BlobstoreClient_LocalFileDoesNotExist_Fmt, localFile.FullName);
+                throw new ArgumentException(Resources.BlobstoreClient_LocalFileDoesNotExist_Fmt, localFilePath);
             }
             var request = new RestRequest(GetUrl(), Method.POST);
-            request.AddFile("content", localFile.FullName);
+            request.AddFile("content", localFilePath);
             IRestResponse response = client.Execute(request);
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -41,11 +41,11 @@
             return response.Content;
         }
 
-        public override void Get(string blobstoreID, FileInfo localFile)
+        public override void Get(string blobstoreID, string localFilePath)
         {
             var request = new RestRequest(GetUrl(blobstoreID), Method.GET);
             IRestResponse response;
-            using (var fs = File.Open(localFile.FullName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+            using (var fs = File.Open(localFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
             {
                 request.ResponseWriter = (responseStream) => responseStream.CopyTo(fs);
                 response = client.Execute(request);
@@ -68,7 +68,7 @@
 
         private string GetUrl(string id = null)
         {
-            var s = new[] { options.Endpoint, options.Bucket, id };
+            var s = new[] { options.Endpoint.AbsoluteUri, options.Bucket, id };
             return String.Join("/", s.Compact());
         }
     }
