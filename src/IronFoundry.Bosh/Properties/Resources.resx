@@ -153,6 +153,27 @@
   <data name="BoshAgent_UnableToConnectAfterRetries_Fmt" xml:space="preserve">
     <value>Unable to reconnect to NATS after {0} retries, exiting...</value>
   </data>
+  <data name="CompilePackage_CompilePackageFailure_Fmt" xml:space="preserve">
+    <value>Compile package failure (exit code: {0})</value>
+  </data>
+  <data name="CompilePackage_CompilingPackage_Fmt" xml:space="preserve">
+    <value>Compiling {0} {1}</value>
+  </data>
+  <data name="CompilePackage_ErrorDeleting_Fmt" xml:space="preserve">
+    <value>Error deleting dir:{0}</value>
+  </data>
+  <data name="CompilePackage_InstallingDependencies_Message" xml:space="preserve">
+    <value>Installing Dependencies</value>
+  </data>
+  <data name="CompilePackage_InstallingDependency_Fmt" xml:space="preserve">
+    <value>Installing dependency: {0} {1}</value>
+  </data>
+  <data name="CompilePackage_Packing_Fmt" xml:space="preserve">
+    <value>Packing {0} {1}</value>
+  </data>
+  <data name="CompilePackage_Uploaded_Fmt" xml:space="preserve">
+    <value>Uploaded {0} {1} (sha1: {2}, blobstore_id: {3})</value>
+  </data>
   <data name="Heartbeat_RequiresAgentID_Message" xml:space="preserve">
     <value>Heartbeat requires agentID.</value>
   </data>

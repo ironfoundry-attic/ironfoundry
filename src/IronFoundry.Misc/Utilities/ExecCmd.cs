@@ -1,7 +1,6 @@
 ﻿namespace IronFoundry.Misc.Utilities
 {
     using System;
-    using System.Diagnostics;
     using System.Threading;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Properties;
@@ -27,25 +26,11 @@
             {
                 for (ushort i = 0; i < numTries && false == success; ++i)
                 {
-                    var p = new Process();
-
-                    ProcessStartInfo si = p.StartInfo;
-                    si.CreateNoWindow = true;
-                    si.UseShellExecute = false;
-                    si.RedirectStandardOutput = true;
-                    si.RedirectStandardError = true;
-                    si.FileName = cmd;
-                    si.Arguments = arguments;
-
-                    p.Start();
-
-                    output = p.StandardOutput.ReadToEnd().TrimEnd('\r', '\n');
-                    errout = p.StandardError.ReadToEnd().TrimEnd('\r', '\n');
-
-                    p.WaitForExit();
-
+                    var p = new RedirectedProcess(cmd, arguments);
+                    p.StartAndWait();
+                    output = p.STDOUT;
+                    errout = p.STDERR;
                     success = 0 == p.ExitCode;
-
                     if (false == success)
                     {
                         if (false == expectError)

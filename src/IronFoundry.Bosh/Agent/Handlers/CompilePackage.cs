@@ -1,21 +1,21 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.IO;
-    using System.Management.Automation;
-    using System.Management.Automation.Runspaces;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using IronFoundry.Bosh.Blobstore;
     using IronFoundry.Bosh.Configuration;
+    using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Utilities;
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     public class CompilePackage : BaseMessageHandler
     {
         private const string PackagingScriptName = "packaging";
+        private const string PackagingScriptNamePS1 = "packaging.ps1";
 
         private readonly ILog log;
         private readonly IBlobstoreClientFactory blobstoreClientFactory;
@@ -69,8 +69,13 @@
                 UnpackSourcePackage();
                 Compile();
                 Pack();
-                object result = Upload();
-                return new HandlerResponse(new { result = result });
+                UploadResult result = Upload();
+                return new HandlerResponse(new JObject(new JProperty("result", result)));
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                throw new MessageHandlerException(ex);
             }
             finally
             {
@@ -81,15 +86,18 @@
 
         private void InstallDependencies(JToken dependencies)
         {
+            log.Info(Resources.CompilePackage_InstallingDependencies_Message);
             foreach (var d in dependencies)
             {
                 var prop = (JProperty)d;
                 var val = prop.Value;
 
-                string depPkgName = prop.Name;
+                string depPkgName     = prop.Name;
                 string depBlobstoreID = (string)val["blobstore_id"];
-                string depSha1 = (string)val["sha1"];
-                string depVersion = (string)val["version"];
+                string depSha1        = (string)val["sha1"];
+                string depVersion     = (string)val["version"];
+
+                log.Info(Resources.CompilePackage_InstallingDependency_Fmt, depPkgName, val.ToString());
                 /*
                  * TODO
           install_dir = File.join(@install_base, pkg_name, pkg['version'])
@@ -190,25 +198,26 @@
             {
                 if (File.Exists(PackagingScriptName))
                 {
-                    using (var runspace = RunspaceFactory.CreateRunspace())
+                    log.Info(Resources.CompilePackage_CompilingPackage_Fmt, packageName, packageVersion);
+
+                    // NB: has to have .ps1 extension
+                    File.Copy(PackagingScriptName, PackagingScriptNamePS1);
+                    string stdout, stderr;
+                    int exitcode;
+                    using (var exe = new PowershellExecutor(PackagingScriptNamePS1))
                     {
-                        runspace.Open();
-                        runspace.SessionStateProxy.SetVariable("BoshCompileTarget", CompileDir);
-                        runspace.SessionStateProxy.SetVariable("BoshInstallTarget", InstallDir);
-                        using (Pipeline pipeline = runspace.CreatePipeline())
-                        {
-                            var cmd = new Command(PackagingScriptName);
-                            pipeline.Commands.Add(cmd);
-                            Collection<PSObject> results = pipeline.Invoke();
-                        }
-                        runspace.Close();
-                        /* TODO
-                        unless $?.exitstatus == 0
-                          raise Bosh::Agent::MessageHandlerError.new(
-                            "Compile Package Failure (exit code: #{$?.exitstatus})", output)
-                        end
-                         */
+                        exe.StartAndWait();
+                        stdout = exe.STDOUT;
+                        stderr = exe.STDERR;
+                        exitcode = exe.ExitCode;
                     }
+                    if (exitcode != 0)
+                    {
+                        throw new MessageHandlerException(
+                            String.Format(Resources.CompilePackage_CompilePackageFailure_Fmt, exitcode),
+                            String.Join(" / ", stdout, stderr));
+                    }
+                    log.Info(stdout);
                 }
             }
         }
@@ -220,13 +229,8 @@
 
         private void Pack()
         {
-            // TODO @logger.info("Packing #{@package_name} #{@package_version}")
-                /*
-                Dir.chdir(install_dir) do
-                  `tar -zcf #{compiled_package} .`
-                end
-                 */
-            string installDirTmp = InstallDir.Replace('\\', '/');
+            log.Info(Resources.CompilePackage_Packing_Fmt, packageVersion, packageVersion);
+            string installDirTmp = InstallDir.Replace('\\', '/'); // NB: TarArchive requires forward slashes
             using (var fs = File.OpenWrite(CompiledPackage))
             {
                 using (var gzipStream = new GZipOutputStream(fs))
@@ -241,47 +245,56 @@
             }
         }
 
-        private object Upload()
+        private class UploadResult
+        {
+            private string sha1;
+            private string blobstoreID;
+            private string compileLogID;
+
+            [JsonProperty(PropertyName = "sha1")]
+            public string SHA1 { get { return sha1; } }
+            [JsonProperty(PropertyName = "blobstore_id")]
+            public string BlobstoreID { get { return blobstoreID; } }
+            [JsonProperty(PropertyName = "compile_log_id")]
+            public string CompileLogID { get { return compileLogID; } }
+
+            public UploadResult(string sha1, string blobstoreID, string compileLogID)
+            {
+                this.sha1 = sha1;
+                this.blobstoreID = blobstoreID;
+                this.compileLogID = compileLogID;
+            }
+        }
+
+        private UploadResult Upload()
         {
             BlobstoreClient client = blobstoreClientFactory.Create();
             string compiledBlobstoreID = client.Create(CompiledPackage);
             var fiCompiledPackage = new FileInfo(CompiledPackage);
             string compiledSha1 = fiCompiledPackage.Hexdigest();
             string compileLogID = client.Create(logFilePath); // TODO
-            return new { sha1 = compiledSha1, blobstore_id = compiledBlobstoreID, compile_log_id = compileLogID };
-            /*
-        compiled_blobstore_id = nil
-        File.open(compiled_package, 'r') do |f|
-          compiled_blobstore_id = @blobstore_client.create(f)
-        end
-        compiled_sha1 = Digest::SHA1.hexdigest(File.read(compiled_package))
-        compile_log_id = @blobstore_client.create(@log_file)
-        @logger.info("Uploaded #{@package_name} #{@package_version} " +
-                     "(sha1: #{compiled_sha1}, " +
-                     "blobstore_id: #{compiled_blobstore_id})")
-        @logger = nil
-        { "sha1" => compiled_sha1, "blobstore_id" => compiled_blobstore_id,
-          "compile_log_id" => compile_log_id }
-             */
+            log.Info(Resources.CompilePackage_Uploaded_Fmt, packageName, packageVersion, compiledSha1, compiledBlobstoreID);
+            return new UploadResult(compiledSha1, compiledBlobstoreID, compileLogID);
         }
 
         private void DeleteTmpFiles()
         {
+            try
+            {
+                foreach (var dir in new[] { compileBasePath, installBasePath })
+                {
+                    Directory.Delete(dir, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Warn(Resources.CompilePackage_ErrorDeleting_Fmt, ex.Message);
+            }
         }
 
         private void ClearLogFile()
         {
-            /*
-      # Clears the log file after a compilation runs.  This is needed because if
-      # reuse_compilation_vms is being used then without clearing the log then
-      # the log from each subsequent compilation will include the previous
-      # compilation's output.
-      # @param [String] log_file Path to the log file.
-      def clear_log_file(log_file)
-        File.delete(log_file) if File.exists?(log_file)
-        @logger = Logger.new(log_file)
-      end
-             */
+            File.Delete(logFilePath);
         }
     }
 }

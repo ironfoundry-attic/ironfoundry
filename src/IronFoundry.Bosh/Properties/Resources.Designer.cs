@@ -169,6 +169,69 @@ namespace IronFoundry.Bosh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compile package failure (exit code: {0}).
+        /// </summary>
+        public static string CompilePackage_CompilePackageFailure_Fmt {
+            get {
+                return ResourceManager.GetString("CompilePackage_CompilePackageFailure_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compiling {0} {1}.
+        /// </summary>
+        public static string CompilePackage_CompilingPackage_Fmt {
+            get {
+                return ResourceManager.GetString("CompilePackage_CompilingPackage_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error deleting dir:{0}.
+        /// </summary>
+        public static string CompilePackage_ErrorDeleting_Fmt {
+            get {
+                return ResourceManager.GetString("CompilePackage_ErrorDeleting_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing Dependencies.
+        /// </summary>
+        public static string CompilePackage_InstallingDependencies_Message {
+            get {
+                return ResourceManager.GetString("CompilePackage_InstallingDependencies_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing dependency: {0} {1}.
+        /// </summary>
+        public static string CompilePackage_InstallingDependency_Fmt {
+            get {
+                return ResourceManager.GetString("CompilePackage_InstallingDependency_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packing {0} {1}.
+        /// </summary>
+        public static string CompilePackage_Packing_Fmt {
+            get {
+                return ResourceManager.GetString("CompilePackage_Packing_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uploaded {0} {1} (sha1: {2}, blobstore_id: {3}).
+        /// </summary>
+        public static string CompilePackage_Uploaded_Fmt {
+            get {
+                return ResourceManager.GetString("CompilePackage_Uploaded_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Heartbeat requires agentID..
         /// </summary>
         public static string Heartbeat_RequiresAgentID_Message {

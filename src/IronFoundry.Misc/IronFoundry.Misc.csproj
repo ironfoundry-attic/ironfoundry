@@ -61,6 +61,8 @@
     <Compile Include="Utilities\DirectoryScope.cs" />
     <Compile Include="Utilities\ExecCmd.cs" />
     <Compile Include="Utilities\ExecCmdResult.cs" />
+    <Compile Include="Utilities\PowershellExecutor.cs" />
+    <Compile Include="Utilities\RedirectedProcess.cs" />
     <Compile Include="WinService\CustomCommands.cs" />
     <Compile Include="WinService\AgentWinService.cs" />
     <Compile Include="WinService\IService.cs" />

@@ -126,4 +126,10 @@
   <data name="ExecCmd_PathNotFound_Fmt" xml:space="preserve">
     <value>Command not found: '{0}'</value>
   </data>
+  <data name="PowershellExecutor_CantFindDir_Message" xml:space="preserve">
+    <value>Can't find the powershell installation directory.</value>
+  </data>
+  <data name="PowershellExecutor_CantFindExe_Message" xml:space="preserve">
+    <value>Can't find the powershell.exe executable.</value>
+  </data>
 </root>

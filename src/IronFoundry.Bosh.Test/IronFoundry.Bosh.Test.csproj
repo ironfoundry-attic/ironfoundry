@@ -37,7 +37,9 @@
     <Compile Include="EjectTest.cs" />
     <Compile Include="JsonTests.cs" />
     <Compile Include="LoggingTests.cs" />
+    <Compile Include="PowershellTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NoopLogger.cs" />
     <Compile Include="XmlParsing.cs" />
   </ItemGroup>
   <ItemGroup>

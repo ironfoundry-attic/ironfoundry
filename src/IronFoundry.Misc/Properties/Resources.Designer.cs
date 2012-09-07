@@ -86,5 +86,23 @@ namespace IronFoundry.Misc.Properties {
                 return ResourceManager.GetString("ExecCmd_PathNotFound_Fmt", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the powershell installation directory..
+        /// </summary>
+        internal static string PowershellExecutor_CantFindDir_Message {
+            get {
+                return ResourceManager.GetString("PowershellExecutor_CantFindDir_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the powershell.exe executable..
+        /// </summary>
+        internal static string PowershellExecutor_CantFindExe_Message {
+            get {
+                return ResourceManager.GetString("PowershellExecutor_CantFindExe_Message", resourceCulture);
+            }
+        }
     }
 }
