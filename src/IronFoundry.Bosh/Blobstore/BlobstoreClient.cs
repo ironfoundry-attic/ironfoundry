@@ -2,7 +2,7 @@
 {
     using System;
 
-    public abstract class BlobstoreClient
+    public abstract class BlobstoreClient : IBlobstoreClient
     {
         protected readonly BlobstoreOptions options;
 

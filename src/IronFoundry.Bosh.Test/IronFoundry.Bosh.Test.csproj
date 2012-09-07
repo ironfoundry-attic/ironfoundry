@@ -41,6 +41,7 @@
     <Compile Include="PowershellTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NoopLogger.cs" />
+    <Compile Include="TestBoshConfig.cs" />
     <Compile Include="XmlParsing.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="iis-setup.tgz">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="IronFoundry.Bosh.Test.xunit">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

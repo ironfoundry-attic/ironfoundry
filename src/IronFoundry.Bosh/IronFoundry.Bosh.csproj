@@ -64,6 +64,7 @@
     <Compile Include="Blobstore\BlobstoreException.cs" />
     <Compile Include="Blobstore\BlobstoreClientFactory.cs" />
     <Compile Include="Blobstore\BlobstoreOptions.cs" />
+    <Compile Include="Blobstore\IBlobstoreClient.cs" />
     <Compile Include="Blobstore\IBlobstoreClientFactory.cs" />
     <Compile Include="Blobstore\SimpleBlobstoreClient.cs" />
     <Compile Include="Configuration\BoshConfig.cs" />

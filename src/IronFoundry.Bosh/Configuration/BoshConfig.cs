@@ -8,8 +8,8 @@
     {
         public const string DefaultBaseDir = @"C:\IronFoundry"; // /var/vcap
         public const string DefaultBoshDirName = @"BOSH";
-        private const string SettingsFileName = @"settings.json";
-        private const string StateFileName = @"state.yml";
+        public const string SettingsFileName = @"settings.json";
+        public const string StateFileName = @"state.yml";
 
         private readonly string baseDir;
         private readonly string boshBaseDir;

@@ -2,6 +2,6 @@
 {
     public interface IBlobstoreClientFactory
     {
-        BlobstoreClient Create();
+        IBlobstoreClient Create();
     }
 }

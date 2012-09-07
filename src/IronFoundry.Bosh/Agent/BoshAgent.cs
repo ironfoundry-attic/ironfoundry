@@ -300,17 +300,6 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 method = "state";
             }
 
-            IMessageHandler handler;
-            try
-            {
-                handler = ioc.GetInstance<IMessageHandler>(method);
-            }
-            catch (StructureMapException ex)
-            {
-                log.Error(ex, Resources.BoshAgent_MissingHandlerForMethod_Fmt, method);
-                return;
-            }
-
             /*
              * NB: long running tasks get a task ID that is sent to the director,
       if processor
@@ -336,21 +325,26 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
     end
              */
 
-            HandlerResponse response;
             try
             {
-                response = handler.Handle(j);
+                using (IMessageHandler handler = ioc.GetInstance<IMessageHandler>(method))
+                {
+                    HandlerResponse response = handler.Handle(j);
+                    Publish(replyTo, response);
+                    handler.OnPostReply();
+                }
+            }
+            catch (StructureMapException ex)
+            {
+                log.Error(ex, Resources.BoshAgent_MissingHandlerForMethod_Fmt, method);
+                return;
             }
             catch (Exception ex)
             {
                 log.Error(ex, Resources.BoshAgent_ExceptionHandlingMethod_Fmt, method);
                 var remoteException = RemoteException.From(ex);
                 Publish(replyTo, remoteException);
-                return;
             }
-
-            Publish(replyTo, response);
-            handler.OnPostReply();
         }
 
         private void Publish(string replyTo, RemoteException exception)
@@ -363,7 +357,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 try
                 {
                     File.WriteAllText(tmpFile, exception.Blob);
-                    BlobstoreClient bsc = blobstoreClientFactory.Create();
+                    IBlobstoreClient bsc = blobstoreClientFactory.Create();
                     blobstoreID = bsc.Create(tmpFile);
                 }
                 finally

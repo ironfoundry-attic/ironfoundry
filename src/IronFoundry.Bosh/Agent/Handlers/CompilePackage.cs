@@ -2,15 +2,36 @@
 {
     using System;
     using System.IO;
+    using ICSharpCode.SharpZipLib.GZip;
+    using ICSharpCode.SharpZipLib.Tar;
     using IronFoundry.Bosh.Blobstore;
     using IronFoundry.Bosh.Configuration;
     using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Utilities;
-    using Newtonsoft.Json.Linq;
     using Newtonsoft.Json;
-    using ICSharpCode.SharpZipLib.GZip;
-    using ICSharpCode.SharpZipLib.Tar;
+    using Newtonsoft.Json.Linq;
+
+    public class UploadResult
+    {
+        private string sha1;
+        private string blobstoreID;
+        private string compileLogID;
+
+        [JsonProperty(PropertyName = "sha1")]
+        public string SHA1 { get { return sha1; } }
+        [JsonProperty(PropertyName = "blobstore_id")]
+        public string BlobstoreID { get { return blobstoreID; } }
+        [JsonProperty(PropertyName = "compile_log_id")]
+        public string CompileLogID { get { return compileLogID; } }
+
+        public UploadResult(string sha1, string blobstoreID, string compileLogID)
+        {
+            this.sha1 = sha1;
+            this.blobstoreID = blobstoreID;
+            this.compileLogID = compileLogID;
+        }
+    }
 
     public class CompilePackage : BaseMessageHandler
     {
@@ -57,10 +78,10 @@
             {
                 var args = parsed["arguments"];
 
-                blobstoreID = (string)args[0];
-                sha1 = (string)args[1];
-                packageName = (string)args[2];
-                packageVersion = (string)args[3];
+                blobstoreID      = (string)args[0];
+                sha1             = (string)args[1];
+                packageName      = (string)args[2];
+                packageVersion   = (string)args[3];
                 var dependencies = args[4];
 
                 // agent/lib/agent/message/compile_package.rb
@@ -70,7 +91,7 @@
                 Compile();
                 Pack();
                 UploadResult result = Upload();
-                return new HandlerResponse(new JObject(new JProperty("result", result)));
+                return new HandlerResponse(new JObject(new JProperty("result", JObject.FromObject(result))));
             }
             catch (Exception ex)
             {
@@ -78,6 +99,16 @@
                 throw new MessageHandlerException(ex);
             }
             finally
+            {
+                ClearLogFile();
+                DeleteTmpFiles();
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing)
             {
                 ClearLogFile();
                 DeleteTmpFiles();
@@ -114,7 +145,7 @@
             Directory.CreateDirectory(compileTmp);
             sourceFile = Path.Combine(compileTmp, blobstoreID);
             File.Delete(sourceFile);
-            BlobstoreClient client = blobstoreClientFactory.Create();
+            IBlobstoreClient client = blobstoreClientFactory.Create();
             client.Get(blobstoreID, sourceFile);
         }
 
@@ -184,6 +215,7 @@
             {
                 Directory.Delete(InstallDir, true);
             }
+            Directory.CreateDirectory(InstallDir);
 
             /* TODO
         pct_space_used = pct_disk_used(@compile_base)
@@ -206,6 +238,8 @@
                     int exitcode;
                     using (var exe = new PowershellExecutor(PackagingScriptNamePS1))
                     {
+                        exe.AddEnvironmentVariable("BoshCompileTarget", CompileDir);
+                        exe.AddEnvironmentVariable("BoshInstallTarget", InstallDir);
                         exe.StartAndWait();
                         stdout = exe.STDOUT;
                         stderr = exe.STDERR;
@@ -245,30 +279,9 @@
             }
         }
 
-        private class UploadResult
-        {
-            private string sha1;
-            private string blobstoreID;
-            private string compileLogID;
-
-            [JsonProperty(PropertyName = "sha1")]
-            public string SHA1 { get { return sha1; } }
-            [JsonProperty(PropertyName = "blobstore_id")]
-            public string BlobstoreID { get { return blobstoreID; } }
-            [JsonProperty(PropertyName = "compile_log_id")]
-            public string CompileLogID { get { return compileLogID; } }
-
-            public UploadResult(string sha1, string blobstoreID, string compileLogID)
-            {
-                this.sha1 = sha1;
-                this.blobstoreID = blobstoreID;
-                this.compileLogID = compileLogID;
-            }
-        }
-
         private UploadResult Upload()
         {
-            BlobstoreClient client = blobstoreClientFactory.Create();
+            IBlobstoreClient client = blobstoreClientFactory.Create();
             string compiledBlobstoreID = client.Create(CompiledPackage);
             var fiCompiledPackage = new FileInfo(CompiledPackage);
             string compiledSha1 = fiCompiledPackage.Hexdigest();

@@ -16,7 +16,7 @@
             this.config = config;
         }
 
-        public BlobstoreClient Create()
+        public IBlobstoreClient Create()
         {
             BlobstoreClient rv;
 

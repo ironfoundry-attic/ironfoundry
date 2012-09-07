@@ -8,7 +8,7 @@
     [System.ComponentModel.DesignerCategory(@"Code")]
     public class PowershellExecutor : RedirectedProcess
     {
-        private const string powershellArgsFmt = @"-NoLogo -NonInteractive -WindowStyle Hidden -ExecutionPolicy Unrestricted -File ""{0}""";
+        private const string powershellArgsFmt = @"-NoProfile -NoLogo -NonInteractive -WindowStyle Hidden -ExecutionPolicy Unrestricted -File ""{0}""";
         private static readonly string powershellExe;
 
         static PowershellExecutor()
