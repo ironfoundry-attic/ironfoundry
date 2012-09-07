@@ -6,8 +6,8 @@
 
     public class BoshConfig : IBoshConfig
     {
-        private const string DefaultBaseDir = @"C:\IronFoundry"; // /var/vcap
-        private const string DefaultBoshDirName = @"BOSH";
+        public const string DefaultBaseDir = @"C:\IronFoundry"; // /var/vcap
+        public const string DefaultBoshDirName = @"BOSH";
         private const string SettingsFileName = @"settings.json";
         private const string StateFileName = @"state.yml";
 

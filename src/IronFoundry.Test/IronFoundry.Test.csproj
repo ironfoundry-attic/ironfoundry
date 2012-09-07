@@ -41,7 +41,7 @@
     <AssemblyOriginatorKeyFile>IronFoundry.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=104.0.0.0, Culture=neutral, PublicKeyToken=aed551a8db69a9bd, processorArchitecture=MSIL">
@@ -53,7 +53,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="xunit, Version=1.8.0.1545, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\xunit\xunit.dll</HintPath>
+      <HintPath>..\..\packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

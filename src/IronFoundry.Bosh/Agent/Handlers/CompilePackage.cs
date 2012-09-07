@@ -2,15 +2,15 @@
 {
     using System;
     using System.IO;
-    using ICSharpCode.SharpZipLib.GZip;
-    using ICSharpCode.SharpZipLib.Tar;
     using IronFoundry.Bosh.Blobstore;
     using IronFoundry.Bosh.Configuration;
     using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Utilities;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Newtonsoft.Json;
+    using ICSharpCode.SharpZipLib.GZip;
+    using ICSharpCode.SharpZipLib.Tar;
 
     public class CompilePackage : BaseMessageHandler
     {
