@@ -1,6 +1,9 @@
 ﻿namespace IronFoundry.Bosh.Configuration
 {
     using System;
+#if DEBUG
+    using System.Configuration;
+#endif
     using System.IO;
     using Newtonsoft.Json.Linq;
 
@@ -11,6 +14,11 @@
         public const string SettingsFileName = @"settings.json";
         public const string StateFileName = @"state.yml";
 
+#if DEBUG
+        public const string BoshAgentDebugging_AppSettingKey = @"BoshAgentDebugging";
+        private readonly bool debugging = false;
+#endif
+
         private readonly string baseDir;
         private readonly string boshBaseDir;
         private readonly string settingsFilePath;
@@ -18,6 +26,12 @@
 
         public BoshConfig()
         {
+#if DEBUG
+            if (false == Boolean.TryParse(ConfigurationManager.AppSettings[BoshAgentDebugging_AppSettingKey], out debugging))
+            {
+                debugging = false;
+            }
+#endif
             /*
              * unconfigured defaults from agent/lib/agent.rb
               options = {
@@ -40,6 +54,10 @@
 
             Directory.CreateDirectory(BoshBaseDir);
         }
+
+#if DEBUG
+        public bool Debugging { get { return debugging; } }
+#endif
 
         public string BaseDir { get { return baseDir; } }
         public string BoshBaseDir { get { return boshBaseDir; } }

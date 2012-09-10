@@ -44,9 +44,14 @@
 
             try
             {
-                RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default);
-                RegistryKey subKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\InetStp");
-                string iisInstallPath = subKey.GetValue("InstallPath").ToString();
+                string iisInstallPath = null;
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default))
+                {
+                    using (RegistryKey subKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\InetStp"))
+                    {
+                        iisInstallPath = subKey.GetValue("InstallPath").ToString();
+                    }
+                }
                 appCmdPath = Path.Combine(iisInstallPath, "appcmd.exe");
                 if (File.Exists(appCmdPath))
                 {

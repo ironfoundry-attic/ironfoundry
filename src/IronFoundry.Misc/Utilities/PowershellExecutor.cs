@@ -13,9 +13,14 @@
 
         static PowershellExecutor()
         {
-            RegistryKey localKey = Registry.LocalMachine;
-            RegistryKey subKey = localKey.OpenSubKey(@"SOFTWARE\Microsoft\PowerShell\1\PowerShellEngine");
-            string powershellDir = subKey.GetValue("ApplicationBase").ToString();
+            string powershellDir = null;
+            using (RegistryKey subKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\PowerShell\1\PowerShellEngine"))
+            {
+                if (null != subKey)
+                {
+                    powershellDir = subKey.GetValue("ApplicationBase").ToString();
+                }
+            }
             if (false == Directory.Exists(powershellDir))
             {
                 throw new Exception(Resources.PowershellExecutor_CantFindDir_Message);

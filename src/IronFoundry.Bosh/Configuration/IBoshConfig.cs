@@ -5,6 +5,10 @@
 
     public interface IBoshConfig
     {
+#if DEBUG
+        bool Debugging { get; }
+#endif
+
         string BaseDir { get; }
         string BoshBaseDir { get; }
         string SettingsFilePath { get; }

@@ -22,6 +22,7 @@
             stateFilePath = Path.Combine(boshBaseDir, BoshConfig.StateFileName);
         }
 
+        public bool Debugging { get { return false; } }
         public string BaseDir { get { return baseDir; } }
         public string BoshBaseDir { get { return boshBaseDir; } }
         public string SettingsFilePath { get { return settingsFilePath; } }

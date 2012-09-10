@@ -41,6 +41,7 @@
       <Link>Extensions\ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="Agent\AgentException.cs" />
+    <Compile Include="Agent\Handlers\UploadResult.cs" />
     <Compile Include="Agent\MessageHandlerException.cs" />
     <Compile Include="Agent\RemoteException.cs" />
     <Compile Include="Blobstore\BlobstoreClient.cs" />
@@ -99,6 +100,7 @@
       <HintPath>..\..\packages\structuremap.2.6.4.1\lib\net40\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>

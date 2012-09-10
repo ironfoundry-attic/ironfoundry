@@ -59,6 +59,13 @@
 
         public void Start()
         {
+#if DEBUG
+            if (config.Debugging)
+            {
+                log.Debug("WAITING 30 SECONDS");
+                Thread.Sleep(TimeSpan.FromSeconds(30));
+            }
+#endif
             /*
              * agent/lib/agent.rb
              * Takes command line args in agent/bin/agent
@@ -80,13 +87,13 @@ netsh interface ipv4 set address name="Local Area Connection" source=static addr
 netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
 netsh interface ipv4 add dns name="Local Area Connection" addr=%5
              */
-            SetupNetworking();
             bool wasSysprepped = Sysprep();
             if (wasSysprepped)
             {
                 Stop();
                 Environment.Exit(0); // TODO not the prettiest way to do this.
             }
+            SetupNetworking();
 
             // agent/lib/agent/handler.rb
 
@@ -154,6 +161,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             	string netmask = (string)net["netmask"];
                 string gateway = (string)net["gateway"];
 
+                // TODO: Depending on "Local Area Connection" is brittle.
                 string args = String.Format(
                     @"interface ipv4 set address name=""Local Area Connection"" source=static address={0} mask={1} gateway={2}",
                     ip, netmask, gateway);
@@ -193,6 +201,13 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 {
                     settings["vm"]["network_setup"] = true;
                     SaveSettings();
+#if DEBUG
+                    if (config.Debugging)
+                    {
+                        log.Debug("NETWORKING SETUP, WAITING 60 SECONDS");
+                        Thread.Sleep(TimeSpan.FromSeconds(60));
+                    }
+#endif
                 }
             }
         }
@@ -237,7 +252,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             {
                 xdoc.WriteTo(writer);
             }
-            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/generalize /oobe /unattend:" + pathToUnattend);
+            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/quit /generalize /oobe /unattend:" + pathToUnattend);
             log.Info("Executing: '{0}'", cmd);
             ExecCmdResult rslt = cmd.Run();
             log.Info("Result: '{0}'", rslt);
@@ -247,7 +262,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 settings["vm"]["sysprepped"] = true;
                 SaveSettings();
             }
-            cmd = new ExecCmd(log, @"C:\Windows\System32\shutdown.exe", "/r /t 10 /c BOSHAgent");
+            cmd = new ExecCmd(log, @"C:\Windows\System32\shutdown.exe", "/r /t 10 /c BOSHAgent /d p:4:2");
             log.Info("Executing: '{0}'", cmd);
             rslt = cmd.Run();
             log.Info("Result: '{0}'", rslt);

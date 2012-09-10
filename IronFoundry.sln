@@ -79,6 +79,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dea", "dea", "{8B059873-AB6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Bosh.Test", "src\IronFoundry.Bosh.Test\IronFoundry.Bosh.Test.csproj", "{38D09558-E875-40B8-B3B0-8BC9B155D12A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Bosh.Monit", "src\IronFoundry.Bosh.Monit\IronFoundry.Bosh.Monit.csproj", "{3036ED5E-9E52-4927-8BE1-8C9025D29503}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -190,6 +192,14 @@ Global
 		{38D09558-E875-40B8-B3B0-8BC9B155D12A}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{38D09558-E875-40B8-B3B0-8BC9B155D12A}.Release|x64.ActiveCfg = Release|Any CPU
 		{38D09558-E875-40B8-B3B0-8BC9B155D12A}.Release|x86.ActiveCfg = Release|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Debug|x64.Build.0 = Debug|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Debug|x86.Build.0 = Debug|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Release|x64.ActiveCfg = Release|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Release|x64.Build.0 = Release|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Release|x86.ActiveCfg = Release|Any CPU
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -213,5 +223,6 @@ Global
 		{C6E076BF-108A-4379-AE35-8F47059F4331} = {63D7F4DB-A7A4-42F0-8297-88E2FA56A783}
 		{E95499FC-9AEF-420E-915A-8B2C22947E83} = {ABFF6A60-2D67-4859-A3C5-007F18E27DE2}
 		{3E576C47-730B-4F05-BD03-3C9BAD7C45BA} = {ABFF6A60-2D67-4859-A3C5-007F18E27DE2}
+		{3036ED5E-9E52-4927-8BE1-8C9025D29503} = {ABFF6A60-2D67-4859-A3C5-007F18E27DE2}
 	EndGlobalSection
 EndGlobal

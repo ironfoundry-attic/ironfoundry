@@ -1,5 +1,8 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
+#if DEBUG
+    using System.Diagnostics;
+#endif
     using IronFoundry.Bosh.Configuration;
     using Newtonsoft.Json.Linq;
 
@@ -10,6 +13,12 @@
         public override HandlerResponse Handle(JObject parsed)
         {
             var newSpec = parsed["arguments"].First;
+#if DEBUG
+            if (config.Debugging)
+            {
+                Debugger.Break();
+            }
+#endif
             return new HandlerResponse(newSpec);
             /*
                 logger.info("Applying: #{@new_spec.inspect}")

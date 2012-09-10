@@ -35,11 +35,13 @@
             Icon rv = null;
 
             string className = "Unknown";
-            RegistryKey classKey = Registry.CurrentUser.OpenSubKey(
-                @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + extension + @"\OpenWithProgids");
-            if (null != classKey)
+            using (RegistryKey classKey =
+                Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + extension + @"\OpenWithProgids"))
             {
-                className = classKey.GetValueNames().First();
+                if (null != classKey)
+                {
+                    className = classKey.GetValueNames().First();
+                }
             }
 
             if (className.EndsWith("Folder") || extension == DirectoryExtension)
@@ -70,8 +72,9 @@
         {
             Icon rv = null;
 
-            var root = Registry.ClassesRoot;
-            var applicationKey = root.OpenSubKey(className);
+            // TODO: using / Dispose for reg keys?
+            RegistryKey root = Registry.ClassesRoot;
+            RegistryKey applicationKey = root.OpenSubKey(className);
             RegistryKey currentVer = null;
 
             RegistryKey curVerSubKey = applicationKey.OpenSubKey("CurVer");

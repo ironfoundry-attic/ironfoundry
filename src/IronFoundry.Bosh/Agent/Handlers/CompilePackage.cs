@@ -1,6 +1,9 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
     using System;
+#if DEBUG
+    using System.Diagnostics;
+#endif
     using System.IO;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
@@ -9,29 +12,7 @@
     using IronFoundry.Bosh.Properties;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Utilities;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-
-    public class UploadResult
-    {
-        private string sha1;
-        private string blobstoreID;
-        private string compileLogID;
-
-        [JsonProperty(PropertyName = "sha1")]
-        public string SHA1 { get { return sha1; } }
-        [JsonProperty(PropertyName = "blobstore_id")]
-        public string BlobstoreID { get { return blobstoreID; } }
-        [JsonProperty(PropertyName = "compile_log_id")]
-        public string CompileLogID { get { return compileLogID; } }
-
-        public UploadResult(string sha1, string blobstoreID, string compileLogID)
-        {
-            this.sha1 = sha1;
-            this.blobstoreID = blobstoreID;
-            this.compileLogID = compileLogID;
-        }
-    }
 
     public class CompilePackage : BaseMessageHandler
     {
@@ -74,6 +55,12 @@
 
         public override HandlerResponse Handle(JObject parsed)
         {
+#if DEBUG
+            if (config.Debugging)
+            {
+                Debugger.Break();
+            }
+#endif
             try
             {
                 var args = parsed["arguments"];
