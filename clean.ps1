@@ -1,6 +1,8 @@
 Get-Childitem src -include bin,obj -recurse | ?{ $_.PsIsContainer -eq $true } | %{
-    Write-Host -foregroundcolor 'yellow' "Removing: $_"
-    Remove-Item $_ -recurse -force
+    Write-Host -ForegroundColor 'yellow' "Removing: $_"
+    Remove-Item $_ -Recurse -Force -ErrorAction Continue
 }
-Write-Host -foregroundcolor 'yellow' "Removing: packages"
-Remove-Item packages -recurse -force
+if (Get-Item packages) {
+  Write-Host -ForegroundColor 'yellow' "Removing: packages"
+  Remove-Item packages -Recurse -Force -ErrorAction Continue
+}

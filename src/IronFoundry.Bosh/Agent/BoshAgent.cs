@@ -80,8 +80,13 @@ netsh interface ipv4 set address name="Local Area Connection" source=static addr
 netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
 netsh interface ipv4 add dns name="Local Area Connection" addr=%5
              */
-            Sysprep();
             SetupNetworking();
+            bool wasSysprepped = Sysprep();
+            if (wasSysprepped)
+            {
+                Stop();
+                Environment.Exit(0); // TODO not the prettiest way to do this.
+            }
 
             // agent/lib/agent/handler.rb
 
@@ -192,12 +197,14 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             }
         }
 
-        private void Sysprep()
+        private bool Sysprep()
         {
+            bool wasSysprepped = false;
+
             var sysprepped_setting = settings["vm"]["sysprepped"];
             if (null != sysprepped_setting && (bool)sysprepped_setting)
             {
-                return;
+                return wasSysprepped;
             }
 
             string unattendXml = Resources.UnattendXML;
@@ -230,16 +237,21 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             {
                 xdoc.WriteTo(writer);
             }
-            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/generalize /oobe /reboot /unattend:" + pathToUnattend); // TODO: /reboot ?
+            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/generalize /oobe /unattend:" + pathToUnattend);
             log.Info("Executing: '{0}'", cmd);
             ExecCmdResult rslt = cmd.Run();
             log.Info("Result: '{0}'", rslt);
-
             if (rslt.Success)
             {
+                wasSysprepped = true;
                 settings["vm"]["sysprepped"] = true;
                 SaveSettings();
             }
+            cmd = new ExecCmd(log, @"C:\Windows\System32\shutdown.exe", "/r /t 10 /c BOSHAgent");
+            log.Info("Executing: '{0}'", cmd);
+            rslt = cmd.Run();
+            log.Info("Result: '{0}'", rslt);
+            return wasSysprepped;
         }
 
         private void SetupSubscriptions()
