@@ -1,9 +1,6 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
     using System;
-#if DEBUG
-    using System.Diagnostics;
-#endif
     using System.IO;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
@@ -55,12 +52,6 @@
 
         public override HandlerResponse Handle(JObject parsed)
         {
-#if DEBUG
-            if (config.Debugging)
-            {
-                Debugger.Break();
-            }
-#endif
             try
             {
                 var args = parsed["arguments"];
