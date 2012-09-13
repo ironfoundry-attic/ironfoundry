@@ -8,5 +8,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("https://github.com/IronFoundry/ironfoundry")]
 [assembly: AssemblyProduct("Iron Foundry")]
 [assembly: AssemblyTrademark("Iron Foundry")]
-[assembly: AssemblyFileVersion("1.7.0.0")]
-[assembly: AssemblyVersion("1.7.0.0")]
+[assembly: AssemblyFileVersion("1.7.1.0")]
+[assembly: AssemblyVersion("1.7.1.0")]

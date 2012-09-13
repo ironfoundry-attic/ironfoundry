@@ -129,7 +129,6 @@
     <Compile Include="Services\MonitoringService.cs" />
     <Compile Include="Types\Advertise.cs" />
     <Compile Include="Types\Connect.cs" />
-    <Compile Include="Types\Credentials.cs" />
     <Compile Include="Types\Discover.cs" />
     <Compile Include="Types\Droplet.cs" />
     <Compile Include="Types\DropletEntry.cs" />
@@ -167,9 +166,6 @@
     <Compile Include="WcfInfrastructure\IocServiceHost.cs" />
     <Compile Include="WcfInfrastructure\PerCallServiceHost.cs" />
     <Compile Include="WcfInfrastructure\WcfWinService.cs" />
-    <Compile Include="WindowsJobObjects\JobObject.cs" />
-    <Compile Include="WindowsJobObjects\JobObjectHandle.cs" />
-    <Compile Include="WindowsJobObjects\NativeMethods.cs" />
     <Compile Include="WinService\CustomCommands.cs" />
     <Compile Include="WinService\MonitoringWinService.cs" />
     <Compile Include="WinService\DeaWinService.cs" />

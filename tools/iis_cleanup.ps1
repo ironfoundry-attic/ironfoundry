@@ -24,5 +24,6 @@ if ($iisVersion.MajorVersion -eq 7)
     }
 }
 
-Get-ChildItem IIS:\AppPools | %{ Stop-WebAppPool -Name $_.Name; Remove-WebAppPool -Name $_.Name }
+Get-ChildItem IIS:\AppPools | %{ Stop-WebAppPool -Name $_.Name; }
 Get-ChildItem IIS:\Sites | %{ Stop-Website -Name $_.Name; Remove-Website -Name $_.Name }
+Get-ChildItem IIS:\AppPools | %{ Remove-WebAppPool -Name $_.Name }

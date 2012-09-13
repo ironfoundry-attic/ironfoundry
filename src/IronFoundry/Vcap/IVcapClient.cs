@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Net;
     using IronFoundry.Types;
 
     public interface IVcapClient
@@ -14,6 +15,7 @@
         Info GetInfo();
 
         void Target(string uri);
+        void Target(string uri, IPAddress ipAddress);
         string CurrentTarget { get; }
 
         void Login();
