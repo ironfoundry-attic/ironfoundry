@@ -15,12 +15,13 @@
     {
         private Application application;
         public Dispatcher Dispatcher;
+        private ICloudFoundryProvider provider;
 
         public ApplicationTreeViewItemViewModel(Application application, CloudTreeViewItemViewModel parentCloud)
             : base(parentCloud, true)
         {
             Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
-                                       Messages.GetCloudFoundryProvider, p => p));
+                                       Messages.GetCloudFoundryProvider, p => provider = p));
             OpenApplicationCommand = new RelayCommand<MouseButtonEventArgs>(OpenApplication);
             StartApplicationCommand = new RelayCommand(StartApplication, CanStart);
             StopApplicationCommand = new RelayCommand(StopApplication, CanStop);
