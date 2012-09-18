@@ -1,4 +1,9 @@
-﻿namespace IronFoundry.Types
+﻿using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System;
+
+namespace IronFoundry.Models
 {
     using Newtonsoft.Json;
 
@@ -12,26 +17,5 @@
 
         [JsonProperty(PropertyName="appservers")]
         public AppServer[] AppServers { get; private set; }
-    }
-
-    public class Runtime : EntityBase
-    {
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; private set; }
-
-        [JsonProperty(PropertyName = "version")]
-        public string Version { get; private set; }
-
-        [JsonProperty(PropertyName = "description")]
-        public string Description { get; private set; }
-    }
-
-    public class AppServer : EntityBase
-    {
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; private set; }
-
-        [JsonProperty(PropertyName = "description")]
-        public string Description { get; private set; }
     }
 }

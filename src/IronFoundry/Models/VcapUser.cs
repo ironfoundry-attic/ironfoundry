@@ -7,7 +7,6 @@ namespace IronFoundry.Models
 {
     using System;
     using Newtonsoft.Json;
-    using Types;
 
     [Serializable]
     public class VcapUser

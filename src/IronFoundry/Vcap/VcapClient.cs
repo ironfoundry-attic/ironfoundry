@@ -8,7 +8,6 @@
     using System.Text.RegularExpressions;
     using Extensions;
     using Models;
-    using Types;
 
     public class VcapClient : IVcapClient
     {

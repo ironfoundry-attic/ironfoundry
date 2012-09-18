@@ -1,102 +1,167 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace IronFoundry.Types
-{ 
+namespace IronFoundry.Models
+{
     [Serializable]
     public class Instance : EntityBase, IMergeable<Instance>
     {
-        private int id;
-        private string state;
         private int cores;
-        private long memoryQuota;
+        private float cpu;
+        private long disk;
         private long diskQuota;
         private string host;
-        private float cpu;
+        private int id;
         private long memory;
-        private long disk;
-        private TimeSpan uptime;
+        private long memoryQuota;
         private Application parent;
+        private string state;
+        private TimeSpan uptime;
 
-        public int ID {
-            get { return this.id; }
-            set { this.id = value; RaisePropertyChanged("ID"); }
+        public int Id
+        {
+            get { return id; }
+            set
+            {
+                id = value;
+                RaisePropertyChanged("Id");
+            }
         }
+
         public string State
         {
-            get { return this.state; }
-            set { this.state = value; RaisePropertyChanged("State"); }
+            get { return state; }
+            set
+            {
+                state = value;
+                RaisePropertyChanged("State");
+            }
         }
+
         public int Cores
         {
-            get { return this.cores; }
-            set { this.cores = value; RaisePropertyChanged("Cores"); }
+            get { return cores; }
+            set
+            {
+                cores = value;
+                RaisePropertyChanged("Cores");
+            }
         }
+
         public long MemoryQuota
         {
-            get { return this.memoryQuota; }
-            set { this.memoryQuota = value; RaisePropertyChanged("MemoryQuota"); }
+            get { return memoryQuota; }
+            set
+            {
+                memoryQuota = value;
+                RaisePropertyChanged("MemoryQuota");
+            }
         }
+
         public long DiskQuota
         {
-            get { return this.diskQuota; }
-            set { this.diskQuota = value; RaisePropertyChanged("DiskQuota"); }
+            get { return diskQuota; }
+            set
+            {
+                diskQuota = value;
+                RaisePropertyChanged("DiskQuota");
+            }
         }
+
         public string Host
         {
-            get { return this.host; }
-            set { this.host = value; RaisePropertyChanged("Host"); }
+            get { return host; }
+            set
+            {
+                host = value;
+                RaisePropertyChanged("Host");
+            }
         }
+
         public float Cpu
         {
-            get { return this.cpu; }
-            set { this.cpu = value; RaisePropertyChanged("Cpu"); }
+            get { return cpu; }
+            set
+            {
+                cpu = value;
+                RaisePropertyChanged("Cpu");
+            }
         }
+
         public long Memory
         {
-            get { return this.memory; }
-            set { this.memory = value; RaisePropertyChanged("Memory"); }
+            get { return memory; }
+            set
+            {
+                memory = value;
+                RaisePropertyChanged("Memory");
+            }
         }
+
         public long Disk
         {
-            get { return this.disk; }
-            set { this.disk = value; RaisePropertyChanged("Disk"); }
+            get { return disk; }
+            set
+            {
+                disk = value;
+                RaisePropertyChanged("Disk");
+            }
         }
+
         public TimeSpan Uptime
         {
-            get { return this.uptime; }
-            set { this.uptime = value; RaisePropertyChanged("Uptime"); }
+            get { return uptime; }
+            set
+            {
+                uptime = value;
+                RaisePropertyChanged("Uptime");
+            }
         }
+
         public Application Parent
         {
-            get { return this.parent; }
-            set { this.parent = value; RaisePropertyChanged("Parent"); }
+            get { return parent; }
+            set
+            {
+                parent = value;
+                RaisePropertyChanged("Parent");
+            }
         }
+
+        #region IMergeable<Instance> Members
 
         public void Merge(Instance obj)
         {
-            this.Cores = obj.Cores;
-            this.MemoryQuota = obj.MemoryQuota;
-            this.DiskQuota = obj.DiskQuota;
-            this.Host = obj.Host;
-            this.Cpu = obj.Cpu;
-            this.Memory = obj.Memory;
-            this.Disk = obj.Disk;
-            this.Uptime = obj.Uptime;
-            this.State = obj.State;
+            Cores = obj.Cores;
+            MemoryQuota = obj.MemoryQuota;
+            DiskQuota = obj.DiskQuota;
+            Host = obj.Host;
+            Cpu = obj.Cpu;
+            Memory = obj.Memory;
+            Disk = obj.Disk;
+            Uptime = obj.Uptime;
+            State = obj.State;
         }
+
+        #endregion
     }
 
     public class InstanceEqualityComparer : IEqualityComparer<Instance>
     {
+        #region IEqualityComparer<Instance> Members
+
         public bool Equals(Instance c1, Instance c2)
         {
-            return c1.ID.Equals(c2.ID);
+            return c1.Id.Equals(c2.Id);
         }
 
         public int GetHashCode(Instance c)
         {
-            return c.ID.GetHashCode();
+            return c.Id.GetHashCode();
         }
+
+        #endregion
     }
 }

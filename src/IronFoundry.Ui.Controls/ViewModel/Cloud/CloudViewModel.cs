@@ -12,10 +12,10 @@
     using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Utilities;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
-    using Application = Types.Application;
+    using Application = Models.Application;
 
     public class CloudViewModel : ViewModelBase
     {

@@ -7,8 +7,8 @@
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
 
     public class UpdateViewModel : DialogViewModel
@@ -17,7 +17,7 @@
         private bool canChangeDirectory = true;
         private string name;
         private string pushFromDirectory;
-        private Types.Cloud selectedCloud;
+        private Models.Cloud selectedCloud;
 
         public UpdateViewModel() : base(Messages.UpdateDialogResult)
         {
@@ -39,12 +39,12 @@
         }
 
         // public SafeObservableCollection<Types.Cloud> Clouds
-        public IEnumerable<Types.Cloud> Clouds
+        public IEnumerable<Models.Cloud> Clouds
         {
             get { return provider.Clouds; }
         }
 
-        public Types.Cloud SelectedCloud
+        public Models.Cloud SelectedCloud
         {
             get { return selectedCloud; }
             set
@@ -52,7 +52,7 @@
                 selectedCloud = value;
                 if (selectedCloud != null)
                 {
-                    ProviderResponse<Types.Cloud> local = provider.Connect(selectedCloud);
+                    ProviderResponse<Models.Cloud> local = provider.Connect(selectedCloud);
                     if (local.Response != null)
                     {
                         selectedCloud.Services.Synchronize(local.Response.Services,

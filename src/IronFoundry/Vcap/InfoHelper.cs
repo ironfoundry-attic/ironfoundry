@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using IronFoundry.Types;
     using Models;
     using Newtonsoft.Json;
     using RestSharp;

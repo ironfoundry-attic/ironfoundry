@@ -8,8 +8,8 @@
     using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Utilities;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
 
     public class PushViewModel : DialogViewModel

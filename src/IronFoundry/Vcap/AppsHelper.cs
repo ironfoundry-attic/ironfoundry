@@ -9,7 +9,6 @@
     using ICSharpCode.SharpZipLib.Zip;
     using IronFoundry;
     using Properties;
-    using Types;
     using Models;
     using Newtonsoft.Json;
     using RestSharp;

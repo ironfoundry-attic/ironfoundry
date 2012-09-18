@@ -51,6 +51,11 @@
     </Compile>
     <Compile Include="Extensions\ObjectExtensionMethods.cs" />
     <Compile Include="Extensions\UriExtensionMethods.cs" />
+    <Compile Include="Models\AppServer.cs" />
+    <Compile Include="Models\InfoLimits.cs" />
+    <Compile Include="Models\InfoUsage.cs" />
+    <Compile Include="Models\Runtime.cs" />
+    <Compile Include="Models\SystemServiceEqualityComparer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

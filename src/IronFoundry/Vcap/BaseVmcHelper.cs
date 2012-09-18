@@ -8,7 +8,6 @@ namespace IronFoundry.Vcap
     using Models;
     using Newtonsoft.Json;
     using RestSharp;
-    using Types;
 
     internal abstract class BaseVmcHelper
     {

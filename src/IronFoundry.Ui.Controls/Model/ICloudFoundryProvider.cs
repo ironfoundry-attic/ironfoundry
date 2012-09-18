@@ -3,8 +3,8 @@ namespace IronFoundry.Ui.Controls.Model
     using System;
     using System.Collections.Generic;
     using Extensions;
-    using IronFoundry.Types;
-    using IronFoundry.Vcap;
+    using Vcap;
+    using Models;
 
     public interface ICloudFoundryProvider
     {

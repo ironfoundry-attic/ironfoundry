@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Properties;
-    using Types;
     using Models;
     using Newtonsoft.Json.Linq;
     using RestSharp;

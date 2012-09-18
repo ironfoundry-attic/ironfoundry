@@ -5,9 +5,9 @@
     using System.ComponentModel;
     using Extensions;
     using GalaSoft.MvvmLight.Messaging;
-    using IronFoundry.Types;
-    using IronFoundry.Ui.Controls.Properties;
-    using IronFoundry.Vcap;
+    using Properties;
+    using Vcap;
+    using Models;
     using Utilities;
 
     public class CloudFoundryProvider : ICloudFoundryProvider
@@ -170,7 +170,7 @@
                     {
                         var instance = new Instance()
                                        {
-                                           ID = stat.ID,
+                                           Id = stat.ID,
                                            State = stat.State
                                        };
                         if (stat.Stats != null)
@@ -481,7 +481,7 @@
                 case "Url":
                 case "TimeoutStart":
                 case "TimeoutStop":
-                case "ID":
+                case "Id":
                 case "Password":
                 case "IsConnected":
                 case "IsDisconnected":

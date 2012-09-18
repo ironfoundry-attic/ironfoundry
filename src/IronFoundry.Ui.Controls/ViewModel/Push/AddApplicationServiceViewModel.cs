@@ -3,8 +3,8 @@
     using System.ComponentModel;
     using Extensions;
     using GalaSoft.MvvmLight.Messaging;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
 
     public class AddApplicationServiceViewModel : DialogViewModel

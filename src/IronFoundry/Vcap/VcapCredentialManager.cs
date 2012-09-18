@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Net;
     using Extensions;
-    using Types;
+    using Models;
     using Newtonsoft.Json;
 
     /*

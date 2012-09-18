@@ -7,7 +7,7 @@ namespace IronFoundry.Extensions
 {
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
-    using Types;
+    using Models;
 
     [Serializable]
     public class SafeObservableCollection<T> : ObservableCollection<T> where T : class

@@ -1,16 +1,21 @@
-﻿namespace IronFoundry.Types
+﻿using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System;
+
+namespace IronFoundry.Models
 {
     using Newtonsoft.Json;
 
     public abstract class Message : EntityBase
     {
-        public const string RECEIVE_ONLY = "RECEIVE_ONLY";
-        public const string REPLY_OK = "REPLY_OK";
+        public const string ReceiveOnly = "RECEIVE_ONLY";
+        public const string ReplyOk = "REPLY_OK";
 
         [JsonIgnore]
         public virtual string PublishSubject
         {
-            get { return RECEIVE_ONLY; }
+            get { return ReceiveOnly; }
         }
 
         [JsonIgnore]
