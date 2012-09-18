@@ -1,21 +1,21 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel.Cloud
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
     using System.Threading;
     using System.Windows;
     using System.Windows.Threading;
+    using Extensions;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Utilities;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
-    using Application = Types.Application;
+    using Application = Models.Application;
 
     public class CloudViewModel : ViewModelBase
     {

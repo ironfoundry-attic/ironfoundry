@@ -1,8 +1,13 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System;
 
-namespace IronFoundry.Types
+namespace IronFoundry.Models
 {
+    using System;
+    using Newtonsoft.Json;
+
     [Serializable]
     public class VcapUser
     {

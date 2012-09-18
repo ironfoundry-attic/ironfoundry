@@ -7,8 +7,8 @@
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
 
     public class CloudTreeViewItemViewModel : TreeViewItemViewModel

@@ -11,7 +11,7 @@
     using Mvvm;
     using Utilities;
     using Vcap;
-    using Application = Types.Application;
+    using Application = Models.Application;
 
     public class FolderTreeViewItemViewModel : TreeViewItemViewModel
     {
