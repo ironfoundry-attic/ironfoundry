@@ -6,25 +6,26 @@
     using System.Net;
     using System.Text;
     using System.Text.RegularExpressions;
-    using IronFoundry.Types;
+    using Extensions;
+    using Models;
 
     public class VcapClient : IVcapClient
     {
         private VcapCredentialManager credMgr;
         private readonly Cloud cloud;
-        private static readonly Regex file_re;
-        private static readonly Regex dir_re;
+        private static readonly Regex FileRe;
+        private static readonly Regex DirRe;
         private VcapUser proxyUser;
 
         static VcapClient()
         {
             char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
             string validFileNameRegexStr = String.Format(@"^([^{0}]+)\s+([0-9]+(?:\.[0-9]+)?[KBMG])$", new String(invalidFileNameChars));
-            file_re = new Regex(validFileNameRegexStr, RegexOptions.Compiled);
+            FileRe = new Regex(validFileNameRegexStr, RegexOptions.Compiled);
 
             char[] invalidPathChars = Path.GetInvalidPathChars();
             string validPathRegexStr = String.Format(@"^([^{0}]+)/\s+-$", new String(invalidPathChars));
-            dir_re = new Regex(validPathRegexStr, RegexOptions.Compiled);
+            DirRe = new Regex(validPathRegexStr, RegexOptions.Compiled);
         }
 
         public VcapClient()
@@ -291,7 +292,7 @@
                     }
                 }
                 string firstLine = Encoding.ASCII.GetString(content, 0, i);
-                if (file_re.IsMatch(firstLine) || dir_re.IsMatch(firstLine))
+                if (FileRe.IsMatch(firstLine) || DirRe.IsMatch(firstLine))
                 {
                     // Probably looking at a listing, not a file
                     string contentAscii = Encoding.ASCII.GetString(content);
@@ -299,8 +300,8 @@
                     rv = new VcapFilesResult();
                     foreach (string item in contentAry)
                     {
-                        Match fileMatch = file_re.Match(item);
-                        if (null != fileMatch && fileMatch.Success)
+                        Match fileMatch = FileRe.Match(item);
+                        if (fileMatch.Success)
                         {
                             string fileName = fileMatch.Groups[1].Value; // NB: 0 is the entire matched string
                             string fileSize = fileMatch.Groups[2].Value;
@@ -308,8 +309,8 @@
                             continue;
                         }
 
-                        Match dirMatch = dir_re.Match(item);
-                        if (null != dirMatch && dirMatch.Success)
+                        Match dirMatch = DirRe.Match(item);
+                        if (dirMatch.Success)
                         {
                             string dirName = dirMatch.Groups[1].Value;
                             rv.AddDirectory(dirName);

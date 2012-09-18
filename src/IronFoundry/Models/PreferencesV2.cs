@@ -1,4 +1,9 @@
-namespace IronFoundry.Types
+using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System;
+
+namespace IronFoundry.Models
 {
     using System;
 

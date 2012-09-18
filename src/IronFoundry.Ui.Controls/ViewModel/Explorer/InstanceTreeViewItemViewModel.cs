@@ -5,8 +5,8 @@
     using System.Windows.Threading;
     using GalaSoft.MvvmLight.Messaging;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
     using Vcap;
 
@@ -43,7 +43,7 @@
             worker.DoWork += (s, e) =>
             {
                 dispatcher.BeginInvoke((Action) (() => Children.Clear()));
-                var id = (ushort) instance.ID;
+                var id = (ushort) instance.Id;
                 ProviderResponse<VcapFilesResult> result = provider.GetFiles(app.Parent, app, "/", id);
                 if (result.Response == null)
                 {

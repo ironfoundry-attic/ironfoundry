@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Net;
-    using IronFoundry.Types;
+    using Models;
 
     public interface IVcapClient
     {

@@ -1,8 +1,13 @@
-﻿namespace IronFoundry.Types
+﻿using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System;
+
+namespace IronFoundry.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+    using Extensions;
     using Newtonsoft.Json;
 
     [Serializable]
@@ -10,23 +15,10 @@
     {
         private static class VcapStates
         {
-            public const string STARTING      = "STARTING";
-            public const string STOPPED       = "STOPPED";
-            public const string RUNNING       = "RUNNING";
-            public const string STARTED       = "STARTED";
-            public const string SHUTTING_DOWN = "SHUTTING_DOWN";
-            public const string CRASHED       = "CRASHED";
-            public const string DELETED       = "DELETED";
-
-            public static bool IsValid(string argState)
-            {
-                return STARTING == argState ||
-                       STOPPED == argState ||
-                       RUNNING == argState ||
-                       SHUTTING_DOWN == argState ||
-                       CRASHED == argState ||
-                       DELETED == argState;
-            }
+            public const string Starting      = "Starting";
+            public const string Stopped       = "STOPPED";
+            public const string Running       = "RUNNING";
+            public const string Started       = "STARTED";
         }
 
         private string name;
@@ -134,13 +126,13 @@
         [JsonIgnore]
         public bool IsStarted
         {
-            get { return State == VcapStates.STARTED; }
+            get { return State == VcapStates.Started; }
         }
 
         [JsonIgnore]
         public bool IsStopped
         {
-            get { return State == VcapStates.STOPPED; }
+            get { return State == VcapStates.Stopped; }
         }
 
         [JsonIgnore]
@@ -148,7 +140,7 @@
         {
             get
             {
-                return ! (State == VcapStates.RUNNING || State == VcapStates.STARTED || State == VcapStates.STARTING);
+                return ! (State == VcapStates.Running || State == VcapStates.Started || State == VcapStates.Starting);
             }
         }
 
@@ -157,7 +149,7 @@
         {
             get
             {
-                return State == VcapStates.RUNNING || State == VcapStates.STARTED || State == VcapStates.STARTING;
+                return State == VcapStates.Running || State == VcapStates.Started || State == VcapStates.Starting;
             }
         }
 
@@ -175,12 +167,12 @@
 
         public void Start()
         {
-            this.State = VcapStates.STARTED;
+            this.State = VcapStates.Started;
         }
 
         public void Stop()
         {
-            this.State = VcapStates.STOPPED;
+            this.State = VcapStates.Stopped;
         }
     }
 
