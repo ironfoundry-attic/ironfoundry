@@ -3,13 +3,14 @@
     using System;
     using System.Collections.Generic;
     using IronFoundry.Types;
+    using Models;
     using Newtonsoft.Json;
     using RestSharp;
 
     internal class InfoHelper : BaseVmcHelper
     {
-        public InfoHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
-            : base(proxyUser, credMgr) { }
+        public InfoHelper(VcapUser proxyUser, VcapCredentialManager credentialManager)
+            : base(proxyUser, credentialManager) { }
 
         public string GetLogs(Application argApp, ushort argInstance)
         {

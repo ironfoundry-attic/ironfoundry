@@ -1,8 +1,8 @@
 ﻿namespace IronFoundry.Types
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.Windows;
+    using Extensions;
 
     [Serializable]
     public class Cloud : EntityBase, IEquatable<Cloud>, IMergeable<Cloud>

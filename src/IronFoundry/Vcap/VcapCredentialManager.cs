@@ -5,7 +5,8 @@
     using System.IO;
     using System.Linq;
     using System.Net;
-    using IronFoundry.Types;
+    using Extensions;
+    using Types;
     using Newtonsoft.Json;
 
     /*
@@ -17,13 +18,13 @@
      */
     public class VcapCredentialManager
     {
-        private const string TOKEN_FILE = ".vmc_token";
-        private const string TARGET_FILE = ".vmc_target";
+        private const string TokenFile = ".vmc_token";
+        private const string TargetFile = ".vmc_target";
 
         private readonly string tokenFile;
         private readonly string targetFile;
 
-        private bool shouldWrite = true;
+        private readonly bool shouldWrite = true;
 
         private readonly IDictionary<Uri, AccessToken> tokenDict = new Dictionary<Uri, AccessToken>();
 
@@ -33,8 +34,8 @@
         private VcapCredentialManager(string json)
         {
             string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            tokenFile = Path.Combine(userProfilePath, TOKEN_FILE);
-            targetFile = Path.Combine(userProfilePath, TARGET_FILE);
+            tokenFile = Path.Combine(userProfilePath, TokenFile);
+            targetFile = Path.Combine(userProfilePath, TargetFile);
 
             if (json.IsNullOrWhiteSpace())
             {

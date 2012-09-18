@@ -8,7 +8,6 @@
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
-    using IronFoundry.Ui.Controls.Views;
     using Model;
     using Mvvm;
     using Push;

@@ -2,7 +2,7 @@ namespace IronFoundry.Ui.Controls.Model
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+    using Extensions;
     using IronFoundry.Types;
     using IronFoundry.Vcap;
 

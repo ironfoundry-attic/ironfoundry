@@ -4,14 +4,15 @@
     using System.Collections.Generic;
     using System.Linq;
     using IronFoundry.Types;
+    using Models;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RestSharp;
 
     internal class ServicesHelper : BaseVmcHelper
     {
-        public ServicesHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
-            : base(proxyUser, credMgr) { }
+        public ServicesHelper(VcapUser proxyUser, VcapCredentialManager credentialManager)
+            : base(proxyUser, credentialManager) { }
 
         public IEnumerable<SystemService> GetSystemServices()
         {
@@ -63,7 +64,7 @@
 
         public void BindService(string provisionedServiceName, string appName)
         {
-            var apps = new AppsHelper(proxyUser, credMgr);
+            var apps = new AppsHelper(ProxyUser, CredentialManager);
 
             Application app = apps.GetApplication(appName);
             app.Services.Add(provisionedServiceName);
@@ -82,7 +83,7 @@
 
         public void UnbindService(string provisionedServiceName, string appName)
         {
-            var apps = new AppsHelper(proxyUser, credMgr);
+            var apps = new AppsHelper(ProxyUser, CredentialManager);
             string appJson = apps.GetApplicationJson(appName);
             var appParsed = JObject.Parse(appJson);
             var services = (JArray)appParsed["services"];
@@ -92,7 +93,7 @@
             r.AddBody(appParsed);
             r.Execute();
 
-            apps = new AppsHelper(proxyUser, credMgr);
+            apps = new AppsHelper(ProxyUser, CredentialManager);
             apps.Restart(appName);
         }
     }

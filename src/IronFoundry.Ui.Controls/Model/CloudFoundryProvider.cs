@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using Extensions;
     using GalaSoft.MvvmLight.Messaging;
     using IronFoundry.Types;
     using IronFoundry.Ui.Controls.Properties;

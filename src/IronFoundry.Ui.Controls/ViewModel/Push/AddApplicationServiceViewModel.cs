@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel.Push
 {
-    using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using Extensions;
     using GalaSoft.MvvmLight.Messaging;
     using Mvvm;
     using Types;

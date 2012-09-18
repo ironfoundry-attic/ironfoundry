@@ -56,49 +56,49 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Types\AccessToken.cs">
+    <Compile Include="Models\AccessToken.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\Application.cs">
+    <Compile Include="Models\Application.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\Preferences.cs" />
-    <Compile Include="Types\Crash.cs">
+    <Compile Include="Models\Preferences.cs" />
+    <Compile Include="Models\Crash.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\ExternalInstance.cs">
+    <Compile Include="Models\ExternalInstance.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\IMergeable.cs" />
-    <Compile Include="Types\Info.cs">
+    <Compile Include="Models\IMergeable.cs" />
+    <Compile Include="Models\Info.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\Instance.cs">
+    <Compile Include="Models\Instance.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\Limits.cs">
+    <Compile Include="Models\Limits.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\Message.cs">
+    <Compile Include="Models\Message.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\PreferencesV2.cs" />
-    <Compile Include="Types\ProvisionedService.cs" />
-    <Compile Include="Types\Cloud.cs" />
-    <Compile Include="Types\CloudUrl.cs" />
-    <Compile Include="Types\StatInfo.cs" />
-    <Compile Include="Types\Framework.cs" />
-    <Compile Include="Types\Stats.cs" />
-    <Compile Include="Types\EntityBase.cs" />
-    <Compile Include="Types\SystemService.cs" />
+    <Compile Include="Models\PreferencesV2.cs" />
+    <Compile Include="Models\ProvisionedService.cs" />
+    <Compile Include="Models\Cloud.cs" />
+    <Compile Include="Models\CloudUrl.cs" />
+    <Compile Include="Models\StatInfo.cs" />
+    <Compile Include="Models\Framework.cs" />
+    <Compile Include="Models\Stats.cs" />
+    <Compile Include="Models\EntityBase.cs" />
+    <Compile Include="Models\SystemService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Types\Usage.cs">
+    <Compile Include="Models\Usage.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\VcapResponse.cs">
+    <Compile Include="Models\VcapResponse.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Types\VcapUserApp.cs" />
+    <Compile Include="Models\VcapUserApp.cs" />
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\CustomSerializationBinder.cs" />
     <Compile Include="Extensions\SafeObservableCollection.cs" />
@@ -112,7 +112,7 @@
     <Compile Include="Vcap\UserHelper.cs" />
     <Compile Include="Vcap\VcapCredentialManager.cs" />
     <Compile Include="Vcap\VcapFilesResult.cs" />
-    <Compile Include="Types\VcapUser.cs" />
+    <Compile Include="Models\VcapUser.cs" />
     <Compile Include="Vcap\VcapExceptions.cs" />
     <Compile Include="Vcap\VcapRequest.cs" />
     <Compile Include="Vcap\VcapClientResult.cs" />

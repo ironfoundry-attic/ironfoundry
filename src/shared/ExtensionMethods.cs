@@ -16,7 +16,7 @@ namespace System
 
 namespace System.Collections
 {
-    internal static class IEnumerableExtensionMethods
+    internal static class EnumerableExtensionMethods
     {
         public static bool IsNullOrEmpty(this IEnumerable argThis)
         {
@@ -27,9 +27,9 @@ namespace System.Collections
 
 namespace System.Collections.Generic
 {
-    using System.Linq;
+    using Linq;
 
-    internal static class IEnumerableExtensionMethods
+    internal static class EnumerableExtensionMethods
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> argThis)
         {

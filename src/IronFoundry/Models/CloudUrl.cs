@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+    using Extensions;
 
     [Serializable, Obsolete]
     public class CloudUrl : EntityBase, IMergeable<CloudUrl>

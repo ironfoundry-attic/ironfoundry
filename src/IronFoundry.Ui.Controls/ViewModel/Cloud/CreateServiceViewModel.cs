@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel.Cloud
 {
-    using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using Extensions;
     using GalaSoft.MvvmLight.Messaging;
     using Model;
     using Mvvm;

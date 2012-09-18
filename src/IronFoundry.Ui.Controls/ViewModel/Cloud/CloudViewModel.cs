@@ -1,12 +1,12 @@
 ﻿namespace IronFoundry.Ui.Controls.ViewModel.Cloud
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
     using System.Threading;
     using System.Windows;
     using System.Windows.Threading;
+    using Extensions;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
