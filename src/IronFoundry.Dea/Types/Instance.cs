@@ -111,6 +111,12 @@
         [JsonProperty(PropertyName = "runtime")]
         public string Runtime { get; set; }
 
+        [JsonIgnore]
+        public ushort ManagedRuntimeVersion
+        {
+            get { return Constants.GetManagedRuntimeVersion(Runtime); }
+        }
+
         [JsonProperty(PropertyName = "framework")]
         public string Framework { get; set; }
 
