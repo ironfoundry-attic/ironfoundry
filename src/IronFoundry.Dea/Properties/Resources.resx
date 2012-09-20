@@ -313,4 +313,7 @@
   <data name="WebServerAdministrationProvider_AppCmdFailed_Fmt" xml:space="preserve">
     <value>'appcmd.exe {0}' failed: {1}</value>
   </data>
+  <data name="WebServerAdministrationProvider_InvalidManagedRuntimeVersion_Fmt" xml:space="preserve">
+    <value>Invalid managed runtime version: {0}</value>
+  </data>
 </root>

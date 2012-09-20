@@ -199,7 +199,7 @@
             if (filesManager.Stage(droplet, instance))
             {
                 WebServerAdministrationBinding binding = webServerProvider.InstallWebApp(
-                    filesManager.GetApplicationPathFor(instance), instance.Staged);
+                    filesManager.GetApplicationPathFor(instance), instance.Staged, instance.ManagedRuntimeVersion);
                 if (null == binding)
                 {
                     log.Error(Resources.Agent_ProcessDeaStartNoBindingAvailable, instance.Staged);
@@ -277,7 +277,7 @@
             log.Debug(Resources.Agent_ProcessDeaDiscover_Fmt, message, reply);
 
             Discover discover = Message.FromJson<Discover>(message);
-            if (discover.Runtime == Constants.SupportedRuntime)
+            if (Constants.IsSupportedRuntime(discover.Runtime))
             {
                 uint delay = 0;
                 dropletManager.ForAllInstances(discover.DropletID, (instance) =>
