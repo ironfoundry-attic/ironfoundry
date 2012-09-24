@@ -4,6 +4,7 @@
 
     public class BlobstoreOptions
     {
+        private static readonly char[] endpointTrimChars = new[] { '/' };
         private readonly Uri endpoint;
         private readonly string bucket;
         private readonly string user;
@@ -24,7 +25,7 @@
             this.password = password;
         }
 
-        public Uri Endpoint { get { return endpoint; } }
+        public string Endpoint { get { return endpoint.AbsoluteUri.TrimEnd(endpointTrimChars); } }
         public string Bucket { get { return bucket; } }
         public string User { get { return user; } }
         public string Password { get { return password; } }

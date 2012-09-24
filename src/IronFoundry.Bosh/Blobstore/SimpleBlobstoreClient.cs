@@ -68,7 +68,7 @@
 
         private string GetUrl(string id = null)
         {
-            var s = new[] { options.Endpoint.AbsoluteUri, options.Bucket, id };
+            var s = new[] { options.Endpoint, options.Bucket, id };
             return String.Join("/", s.Compact());
         }
     }
