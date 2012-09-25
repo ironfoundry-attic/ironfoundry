@@ -528,7 +528,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
         {
             settings = JObject.Parse(settingsJsonStr);
 
-            if (null == settings["vm-setup"])
+            if (null == settings["vm-setup-state"])
             {
                 var setup = new VMSetupState { IsSysprepped = false, IsNetworkSetup = false };
                 settings["vm-setup-state"] = JObject.FromObject(setup);
