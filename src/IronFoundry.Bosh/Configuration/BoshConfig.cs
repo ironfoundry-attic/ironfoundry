@@ -9,6 +9,7 @@
 
     public class BoshConfig : IBoshConfig
     {
+        private const string BOSH_PROTOCOL = "1"; // agent/lib/agent/version.rb
         public const string DefaultBaseDir = @"C:\IronFoundry"; // /var/vcap
         public const string DefaultBoshDirName = @"BOSH";
         public const string SettingsFileName = @"settings.json";
@@ -66,16 +67,20 @@
 
         public Uri Mbus { get; private set; }
         public string AgentID { get; private set; }
+        public object VM { get; private set; } // TODO real object
 
         public string BlobstorePlugin { get; private set; }
         public Uri BlobstoreEndpoint { get; private set; }
         public string BlobstoreUser { get; private set; }
         public string BlobstorePassword { get; private set; }
 
+        public string BoshProtocol { get { return BOSH_PROTOCOL; } }
+
         public void UpdateFrom(JObject settings)
         {
             AgentID = (string)settings["agent_id"];
             Mbus = new Uri((string)settings["mbus"]);
+            VM = settings["vm"];
 
             var bs = settings["blobstore"];
             if (bs != null)

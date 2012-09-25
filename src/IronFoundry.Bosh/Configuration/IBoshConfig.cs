@@ -17,11 +17,15 @@
         Uri Mbus { get; }
         string AgentID { get; }
 
+        object VM { get; }
+
         string BlobstorePlugin { get; }
         Uri BlobstoreEndpoint { get; }
         string BlobstoreUser { get; }
         string BlobstorePassword { get; }
 
         void UpdateFrom(JObject settings);
+
+        string BoshProtocol { get; }
     }
 }

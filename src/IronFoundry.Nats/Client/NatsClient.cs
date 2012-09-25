@@ -143,6 +143,11 @@
             }
         }
 
+        public void Publish(string message)
+        {
+            DoPublish(message, (string)null);
+        }
+
         public void Publish(INatsMessage message)
         {
             DoPublish(message.PublishSubject, message);

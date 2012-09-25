@@ -4,15 +4,18 @@
     using IronFoundry.Bosh.Agent.Handlers;
     using IronFoundry.Bosh.Configuration;
     using IronFoundry.Misc.Agent;
+    using IronFoundry.Nats.Client;
     using StructureMap.Configuration.DSL;
 
     public class BoshRegistry : Registry
     {
         public BoshRegistry()
         {
+            For<IAgent>().Use<BoshAgent>();
+
             For<IBoshConfig>().Singleton().Use<BoshConfig>();
 
-            For<IAgent>().Use<BoshAgent>();
+            For<INatsClient>().Singleton().Use<NatsClient>();
 
             For<IMessageHandler>().AddInstances(x =>
                 {

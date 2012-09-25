@@ -59,13 +59,6 @@
 
         public void Start()
         {
-#if DEBUG
-            if (config.Debugging)
-            {
-                log.Debug("WAITING 30 SECONDS");
-                Thread.Sleep(TimeSpan.FromSeconds(30));
-            }
-#endif
             /*
              * agent/lib/agent.rb
              * Takes command line args in agent/bin/agent
@@ -148,8 +141,8 @@ netsh interface ipv4 set address name="Local Area Connection" source=static addr
 netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
 netsh interface ipv4 add dns name="Local Area Connection" addr=%5
              */
-            var network_setup_setting = settings["vm"]["network_setup"];
-            if (null != network_setup_setting && (bool)network_setup_setting)
+            VMSetupState vmSetupState = settings["vm-setup-state"].ToObject<VMSetupState>();
+            if (vmSetupState.IsNetworkSetup)
             {
                 return;
             }
@@ -199,15 +192,9 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 }
                 if (false == err)
                 {
-                    settings["vm"]["network_setup"] = true;
+                    vmSetupState.IsNetworkSetup = true;
+                    settings["vm-setup-state"] = JObject.FromObject(vmSetupState);
                     SaveSettings();
-#if DEBUG
-                    if (config.Debugging)
-                    {
-                        log.Debug("NETWORKING SETUP, WAITING 60 SECONDS");
-                        Thread.Sleep(TimeSpan.FromSeconds(60));
-                    }
-#endif
                 }
             }
         }
@@ -216,8 +203,8 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
         {
             bool wasSysprepped = false;
 
-            var sysprepped_setting = settings["vm"]["sysprepped"];
-            if (null != sysprepped_setting && (bool)sysprepped_setting)
+            VMSetupState vmSetupState = settings["vm-setup-state"].ToObject<VMSetupState>();
+            if (vmSetupState.IsSysprepped)
             {
                 return wasSysprepped;
             }
@@ -258,8 +245,8 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             log.Info("Result: '{0}'", rslt);
             if (rslt.Success)
             {
-                wasSysprepped = true;
-                settings["vm"]["sysprepped"] = true;
+                wasSysprepped = vmSetupState.IsSysprepped = true;
+                settings["vm-setup-state"] = JObject.FromObject(vmSetupState);
                 SaveSettings();
             }
             cmd = new ExecCmd(log, @"C:\Windows\System32\shutdown.exe", "/r /t 10 /c BOSHAgent /d p:4:2");
@@ -540,6 +527,13 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
         private bool LoadSettings(string settingsJsonStr)
         {
             settings = JObject.Parse(settingsJsonStr);
+
+            if (null == settings["vm-setup"])
+            {
+                var setup = new VMSetupState { IsSysprepped = false, IsNetworkSetup = false };
+                settings["vm-setup-state"] = JObject.FromObject(setup);
+            }
+
             return true;
         }
 

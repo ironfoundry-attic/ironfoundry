@@ -7,6 +7,7 @@ using IronFoundry.Nats.Configuration;
     {
         Guid UniqueIdentifier { get; }
 
+        void Publish(string message);
         void Publish(string subject, INatsMessage message);
         void Publish(NatsCommand argCommand, INatsMessage argMessage);
         void Publish(INatsMessage argMessage);

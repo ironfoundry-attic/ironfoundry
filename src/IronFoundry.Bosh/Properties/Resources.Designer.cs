@@ -232,6 +232,15 @@ namespace IronFoundry.Bosh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown drain type {0}.
+        /// </summary>
+        public static string Drain_UnknownDrainType_Fmt {
+            get {
+                return ResourceManager.GetString("Drain_UnknownDrainType_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Heartbeat requires agentID..
         /// </summary>
         public static string Heartbeat_RequiresAgentID_Message {

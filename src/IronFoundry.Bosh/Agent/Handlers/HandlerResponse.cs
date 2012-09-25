@@ -2,7 +2,7 @@
 {
     using System;
     using IronFoundry.Nats.Client;
-using Newtonsoft.Json;
+    using Newtonsoft.Json;
 
     public class HandlerResponse : NatsMessage
     {

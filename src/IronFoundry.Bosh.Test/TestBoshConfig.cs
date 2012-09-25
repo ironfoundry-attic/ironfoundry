@@ -34,5 +34,16 @@
         public string BlobstoreUser { get { return "agent"; } }
         public string BlobstorePassword { get { return "agent"; } }
         public void UpdateFrom(JObject settings) { }
+
+
+        public object VM
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string BoshProtocol
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

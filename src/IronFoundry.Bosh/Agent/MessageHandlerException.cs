@@ -19,6 +19,9 @@
         public MessageHandlerException(Exception inner)
             : base(null, inner) { }
 
+        public MessageHandlerException(string message)
+            : this(message, (Exception)null) { }
+
         public MessageHandlerException(string message, Exception inner)
             : base(message, inner) { }
 

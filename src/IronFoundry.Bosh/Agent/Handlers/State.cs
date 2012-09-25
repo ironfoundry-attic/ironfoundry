@@ -1,6 +1,5 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
-    using System;
     using IronFoundry.Bosh.Configuration;
     using Newtonsoft.Json.Linq;
 
@@ -10,7 +9,8 @@
 
         public override HandlerResponse Handle(JObject parsed)
         {
-            throw new NotImplementedException();
+            var stateResult = new StateResult(config.AgentID, config.VM, "starting", config.BoshProtocol);
+            return new HandlerResponse(stateResult);
         }
     }
 }
