@@ -42,9 +42,16 @@
             UnlockLogging();
         }
 
-        public WebServerAdministrationBinding InstallWebApp(string localDirectory, string applicationInstanceName)
+        public WebServerAdministrationBinding InstallWebApp(
+            string localDirectory, string applicationInstanceName, ushort managedRuntimeVersion)
         {
             WebServerAdministrationBinding rv = null;
+
+            if (managedRuntimeVersion != 2 && managedRuntimeVersion != 4)
+            {
+                throw new ArgumentException(
+                    String.Format(Resources.WebServerAdministrationProvider_InvalidManagedRuntimeVersion_Fmt, managedRuntimeVersion), "managedRuntimeVersion");
+            }
 
             try
             {
@@ -68,8 +75,8 @@
                         }
 
                         cmd = String.Format(
-                            "set apppool {0} /autoStart:true /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated /processModel.loadUserProfile:true",
-                            applicationInstanceName);
+                            "set apppool {0} /autoStart:true /managedRuntimeVersion:v{1}.0 /managedPipelineMode:Integrated /processModel.loadUserProfile:true",
+                            applicationInstanceName, managedRuntimeVersion);
                         rslt = ExecAppcmd(cmd, 5, twoSeconds);
                         if (false == rslt.Success)
                         {

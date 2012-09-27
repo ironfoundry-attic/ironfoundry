@@ -384,5 +384,14 @@ namespace IronFoundry.Dea.Properties {
                 return ResourceManager.GetString("WebServerAdministrationProvider_AppCmdFailed_Fmt", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid managed runtime version: {0}.
+        /// </summary>
+        internal static string WebServerAdministrationProvider_InvalidManagedRuntimeVersion_Fmt {
+            get {
+                return ResourceManager.GetString("WebServerAdministrationProvider_InvalidManagedRuntimeVersion_Fmt", resourceCulture);
+            }
+        }
     }
 }

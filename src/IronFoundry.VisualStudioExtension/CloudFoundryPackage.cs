@@ -10,10 +10,10 @@
     using System.Windows.Interop;
     using EnvDTE;
     using GalaSoft.MvvmLight.Messaging;
-    using IronFoundry.Types;
     using IronFoundry.Vcap;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
+    using Models;
     using Ui.Controls.Model;
     using Ui.Controls.Mvvm;
     using Ui.Controls.Utilities;

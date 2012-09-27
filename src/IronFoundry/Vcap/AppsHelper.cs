@@ -7,15 +7,15 @@
     using System.Threading;
     using ICSharpCode.SharpZipLib.Zip;
     using IronFoundry;
-    using IronFoundry.Properties;
-    using IronFoundry.Types;
+    using Properties;
+    using Models;
     using Newtonsoft.Json;
     using RestSharp;
 
     internal class AppsHelper : BaseVmcHelper
     {
-        public AppsHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
-            : base(proxyUser, credMgr) { }
+        public AppsHelper(VcapUser proxyUser, VcapCredentialManager credentialManager)
+            : base(proxyUser, credentialManager) { }
 
         public void Start(string applicationName)
         {
@@ -147,7 +147,7 @@
                     {
                         foreach (string serviceName in provisionedServiceNames)
                         {
-                            var servicesHelper = new ServicesHelper(proxyUser, credMgr);
+                            var servicesHelper = new ServicesHelper(ProxyUser, CredentialManager);
                             servicesHelper.BindService(serviceName, app.Name);
                         }
                     }

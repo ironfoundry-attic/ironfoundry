@@ -1,21 +1,25 @@
-namespace IronFoundry.Types
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace IronFoundry.Models
 {
-    using System;
-    using System.Collections.ObjectModel;
+    using Extensions;
 
     [Serializable, Obsolete]
     public class Preferences
-    {             
-        private SafeObservableCollection<Cloud> clouds;
+    {
         private SafeObservableCollection<CloudUrl> cloudUrls;
+        private SafeObservableCollection<Cloud> clouds;
 
-        public SafeObservableCollection<Cloud> Clouds 
+        public SafeObservableCollection<Cloud> Clouds
         {
-            get { return this.clouds; }
+            get { return clouds; }
             set
             {
-                this.clouds = value.DeepCopy();
-                foreach (var cloud in this.clouds)
+                clouds = value.DeepCopy();
+                foreach (Cloud cloud in clouds)
                 {
                     cloud.Services.Clear();
                     cloud.Applications.Clear();
@@ -28,11 +32,8 @@ namespace IronFoundry.Types
 
         public SafeObservableCollection<CloudUrl> CloudUrls
         {
-            get { return this.cloudUrls; }
-            set
-            {
-                this.cloudUrls = value.DeepCopy();
-            }
+            get { return cloudUrls; }
+            set { cloudUrls = value.DeepCopy(); }
         }
     }
 }

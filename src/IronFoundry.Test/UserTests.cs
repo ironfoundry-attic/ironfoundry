@@ -1,8 +1,8 @@
 ﻿namespace IronFoundry.Test
 {
     using System;
-    using IronFoundry.Types;
-    using IronFoundry.Vcap;
+    using Vcap;
+    using Models;
     using Xunit;
 
     public class UserTests

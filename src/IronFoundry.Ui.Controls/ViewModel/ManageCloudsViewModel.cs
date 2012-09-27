@@ -6,9 +6,9 @@
     using System.ComponentModel;
     using System.Linq;
     using GalaSoft.MvvmLight.Command;
-    using IronFoundry.Ui.Controls.Model;
-    using IronFoundry.Ui.Controls.Mvvm;
-    using IronFoundry.Ui.Controls.Utilities;
+    using Model;
+    using Mvvm;
+    using Utilities;
 
     public class ManageCloudsViewModel : DialogViewModel
     {
@@ -173,7 +173,7 @@
         protected override void OnProviderRetrieved()
         {
             cloudData.Clear();
-            foreach (Types.Cloud cloud in provider.Clouds)
+            foreach (Models.Cloud cloud in provider.Clouds)
             {
                 AddCloud(new ManageCloudsData(cloud.ID)
                 {

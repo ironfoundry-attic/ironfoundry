@@ -5,7 +5,7 @@
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Runtime.Serialization.Formatters.Binary;
-    using IronFoundry.Types;
+    using Models;
 
     public class PreferencesProvider : IPreferencesProvider
     {

@@ -6,8 +6,6 @@
 
     public class Advertise : Message
     {
-        private static readonly string[] runtimes = new[] { Constants.SupportedRuntime };
-
         private const string publishSubject = "dea.advertise";
 
         [JsonIgnore]
@@ -31,7 +29,7 @@
         [JsonProperty(PropertyName = "runtimes")]
         public string[] Runtimes
         {
-            get { return runtimes; }
+            get { return Constants.SupportedRuntimes; }
         }
 
         public Advertise(Guid id, uint availableMemory, ushort currentlyPending, bool ready)

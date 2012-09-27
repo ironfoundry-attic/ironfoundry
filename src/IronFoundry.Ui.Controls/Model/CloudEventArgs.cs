@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Ui.Controls.Model
 {
     using System;
-    using IronFoundry.Types;
+    using Models;
 
     public class CloudEventArgs : EventArgs
     {
