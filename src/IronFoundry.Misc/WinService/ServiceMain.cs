@@ -32,7 +32,7 @@
             }
             else
             {
-                ServiceBase.Run(new[] { Bootstrapper.ServiceBase });
+                ServiceBase.Run(new[] { Bootstrapper.GetServiceBase(args) });
             }
         }
 

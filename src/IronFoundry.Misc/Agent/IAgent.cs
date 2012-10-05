@@ -6,5 +6,6 @@
         bool Error { get; }
         void Start();
         void Stop();
+        string[] ProgramArguments { get; set; }
     }
 }

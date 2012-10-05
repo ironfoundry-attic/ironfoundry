@@ -17,6 +17,8 @@
         private readonly Task agentTask;
         private readonly Timer agentMonitorTimer;
 
+        protected string[] programArguments;
+
         public AgentWinService(ILog log, IAgent agent)
         {
             this.log = log;
@@ -36,8 +38,9 @@
             get { return 10; }
         }
 
-        public StartServiceResult StartService(IntPtr serviceHandle)
+        public StartServiceResult StartService(IntPtr serviceHandle, string[] programArguments)
         {
+            agent.ProgramArguments = programArguments;
             agentTask.Start();
             agentMonitorTimer.Change(ThirtySecondInterval, FiveSecondInterval);
             return new StartServiceResult();

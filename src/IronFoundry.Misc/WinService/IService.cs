@@ -6,7 +6,7 @@
     {
         string ServiceName { get; }
         ushort StartIndex { get; }
-        StartServiceResult StartService(IntPtr serviceHandle);
+        StartServiceResult StartService(IntPtr serviceHandle, string[] programArguments);
         void StopService();
     }
 

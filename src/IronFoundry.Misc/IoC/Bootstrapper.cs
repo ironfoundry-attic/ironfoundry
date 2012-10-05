@@ -2,7 +2,6 @@
 {
     using System;
     using System.ServiceProcess;
-    using IronFoundry.Misc.IoC;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.WinService;
     using StructureMap;
@@ -14,6 +13,13 @@
         static Bootstrapper()
         {
             ObjectFactory.Initialize(init => init.AddRegistry<ServiceRegistry>());
+        }
+
+        public static ServiceBase GetServiceBase(string[] args)
+        {
+            IMultipleServiceManager mgr = Bootstrapper.ServiceManager;
+            mgr.ProgramArguments = args;
+            return mgr as ServiceBase;
         }
 
         public static ServiceBase ServiceBase

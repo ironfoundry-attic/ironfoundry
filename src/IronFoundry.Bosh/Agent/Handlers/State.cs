@@ -9,7 +9,8 @@
 
         public override HandlerResponse Handle(JObject parsed)
         {
-            var stateResult = new StateResult(config.AgentID, config.VM, "starting", config.BoshProtocol);
+            // agent/lib/agent/monit.rb running, starting, failing or unknown
+            var stateResult = new StateResult(config.AgentID, config.VM, "running", config.BoshProtocol);
             return new HandlerResponse(stateResult);
         }
     }

@@ -14,7 +14,7 @@
         {
             this.agentID = agentID;
             this.vm = vm;
-            this.serviceGroupState = serviceGroupState; // agent/lib/agent/monit.rb running, starting or failing
+            this.serviceGroupState = serviceGroupState; // agent/lib/agent/monit.rb running, starting, failing or unknown
             this.boshProtocol = boshProtocol;
         }
 

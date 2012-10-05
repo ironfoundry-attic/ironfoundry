@@ -10,7 +10,7 @@
     {
         private const string defaultLoggerName = "IronFoundry";
 
-        private readonly Predicate<Assembly> skipStructureMap =
+        private static readonly Predicate<Assembly> skipStructureMap =
             (assm) => false == assm.FullName.StartsWith("StructureMap", StringComparison.InvariantCultureIgnoreCase);
 
         public ServiceRegistry()

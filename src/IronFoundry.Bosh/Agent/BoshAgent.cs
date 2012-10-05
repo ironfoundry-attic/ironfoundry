@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Bosh.Agent
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -57,6 +58,17 @@
             get { return false; } // TODO
         }
 
+        public string[] ProgramArguments { get; set; }
+
+        private bool ShouldWaitAtStartup
+        {
+            get
+            {
+                return false == ProgramArguments.IsNullOrEmpty() &&
+                    ProgramArguments[0].Equals("--startup-wait", StringComparison.InvariantCultureIgnoreCase);
+            }
+        }
+
         public void Start()
         {
             /*
@@ -88,6 +100,14 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             }
             SetupNetworking();
 
+#if DEBUG
+            if (config.Debugging && this.ShouldWaitAtStartup)
+            {
+                log.Info("Waiting 90 seconds...");
+                Thread.Sleep(TimeSpan.FromSeconds(90));
+            }
+#endif
+
             // agent/lib/agent/handler.rb
 
             // find_message_processors
@@ -115,7 +135,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             SetupSubscriptions();
 
             // setup heartbeats
-            heartbeatProcessor = new HeartbeatProcessor(log, natsClient, config.AgentID, TimeSpan.FromSeconds(1));
+            heartbeatProcessor = new HeartbeatProcessor(log, natsClient, config);
             heartbeatProcessor.Start();
 
             // SetupSshdMonitor();

@@ -45,5 +45,21 @@
         {
             get { throw new NotImplementedException(); }
         }
+
+
+        public void SetState(Types.Spec spec)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HeartbeatStateData HeartbeatStateData
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public TimeSpan HeartbeatInterval
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

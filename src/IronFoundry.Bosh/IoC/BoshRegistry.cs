@@ -26,6 +26,15 @@
                     x.Type<Stop>().Named("stop");
                     x.Type<PrepareNetworkChange>().Named("prepare_network_change");
 
+                    x.Type<Ssh>().Named("ssh");
+
+                    x.Type<FetchLogs>().Named("fetch_logs");
+
+                    x.Type<MigrateDisk>().Named("migrate_disk");
+                    x.Type<ListDisk>().Named("list_disk");
+                    x.Type<MountDisk>().Named("mount_disk");
+                    x.Type<UnmountDisk>().Named("unmount_disk");
+
                     x.Type<Apply>().Named("apply");
                     x.Type<CompilePackage>().Named("compile_package");
                     x.Type<Drain>().Named("drain");

@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Bosh.Configuration
 {
     using System;
+    using IronFoundry.Bosh.Types;
     using Newtonsoft.Json.Linq;
 
     public interface IBoshConfig
@@ -27,5 +28,10 @@
         void UpdateFrom(JObject settings);
 
         string BoshProtocol { get; }
+
+        void SetState(Spec spec);
+        HeartbeatStateData HeartbeatStateData { get; }
+
+        TimeSpan HeartbeatInterval { get; }
     }
 }

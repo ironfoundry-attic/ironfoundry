@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Bosh.Agent.Handlers
 {
     using IronFoundry.Bosh.Configuration;
+    using IronFoundry.Bosh.Types;
     using Newtonsoft.Json.Linq;
 
     public class Apply : BaseMessageHandler
@@ -10,6 +11,9 @@
         public override HandlerResponse Handle(JObject parsed)
         {
             var newSpec = parsed["arguments"].First;
+            Spec newSpecObj = newSpec.ToObject<Spec>();
+            config.SetState(newSpecObj);
+
             return new HandlerResponse(newSpec);
             /*
                 logger.info("Applying: #{@new_spec.inspect}")

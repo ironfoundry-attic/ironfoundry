@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Bosh.Agent
 {
     using System;
+    using IronFoundry.Bosh.Configuration;
     using IronFoundry.Bosh.Messages;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Utilities;
@@ -12,15 +13,15 @@
 
         private readonly ILog log;
         private readonly INatsClient natsClient;
-        private readonly string agentID;
+        private readonly IBoshConfig config;
         private readonly ActionTimer actionTimer;
 
-        public HeartbeatProcessor(ILog log, INatsClient natsClient, string agentID, TimeSpan heartbeatInterval)
+        public HeartbeatProcessor(ILog log, INatsClient natsClient, IBoshConfig config)
         {
             this.log = log;
             this.natsClient = natsClient;
-            this.agentID = agentID;
-            this.actionTimer = new ActionTimer(log, heartbeatInterval, this.Beat, false, false);
+            this.config = config;
+            this.actionTimer = new ActionTimer(log, config.HeartbeatInterval, this.Beat, false, false);
         }
 
         public void Start()
@@ -40,11 +41,14 @@
 
         private void Beat()
         {
-            var hb = new Heartbeat(agentID);
+            HeartbeatStateData hsb = config.HeartbeatStateData;
 
-            hb.Job = "TEST";
-            hb.Index = 0;
-            hb.JobState = "running";
+            var hb = new Heartbeat(config.AgentID)
+                {
+                    Job      = hsb.Job,
+                    Index    = hsb.Index,
+                    JobState = hsb.JobState,
+                };
 
             hb.Vitals = new Vitals
             {

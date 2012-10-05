@@ -71,6 +71,7 @@
     <Compile Include="Blobstore\IBlobstoreClientFactory.cs" />
     <Compile Include="Blobstore\SimpleBlobstoreClient.cs" />
     <Compile Include="Configuration\BoshConfig.cs" />
+    <Compile Include="Configuration\HeartbeatStateData.cs" />
     <Compile Include="Configuration\IBoshConfig.cs" />
     <Compile Include="Messages\Heartbeat.cs" />
     <Compile Include="Agent\HeartbeatProcessor.cs" />
@@ -81,6 +82,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Types\Spec.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

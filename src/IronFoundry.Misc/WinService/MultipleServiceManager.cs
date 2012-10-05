@@ -7,6 +7,7 @@
 
     public interface IMultipleServiceManager
     {
+        string[] ProgramArguments { get; set; }
         void StartServiceManager();
         void StopServiceManager();
     }
@@ -29,6 +30,8 @@
             ServiceName = "IronFoundryDEA"; // NB: must match installer Product.wxs TODO BOSH AGENT
             AutoLog = true;
         }
+
+        public string[] ProgramArguments { get; set; }
 
         public void StartServiceManager()
         {
@@ -65,7 +68,7 @@
             {
                 foreach (IService s in services)
                 {
-                    StartServiceResult result = s.StartService(base.ServiceHandle);
+                    StartServiceResult result = s.StartService(base.ServiceHandle, this.ProgramArguments);
                     if (false == result.Success)
                     {
                         errorExit = true;
