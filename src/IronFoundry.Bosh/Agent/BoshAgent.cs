@@ -13,6 +13,7 @@
     using IronFoundry.Bosh.Blobstore;
     using IronFoundry.Bosh.Configuration;
     using IronFoundry.Bosh.Properties;
+    using IronFoundry.Bosh.Utilities;
     using IronFoundry.Misc.Agent;
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Utilities;
@@ -154,13 +155,6 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
         private void SetupNetworking()
         {
-            /*
-             * TODO:
-             * set ip address
-netsh interface ipv4 set address name="Local Area Connection" source=static address=%1 mask=%2 gateway=%3
-netsh interface ipv4 set dns name="Local Area Connection" source=static addr=%4
-netsh interface ipv4 add dns name="Local Area Connection" addr=%5
-             */
             VMSetupState vmSetupState = settings["vm-setup-state"].ToObject<VMSetupState>();
             if (vmSetupState.IsNetworkSetup)
             {
@@ -173,44 +167,11 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 string ip = (string)net["ip"];
             	string netmask = (string)net["netmask"];
                 string gateway = (string)net["gateway"];
+                var dnsStrAry = net["dns"].Select(d => (string)d);
 
-                // TODO: Depending on "Local Area Connection" is brittle.
-                string args = String.Format(
-                    @"interface ipv4 set address name=""Local Area Connection"" source=static address={0} mask={1} gateway={2}",
-                    ip, netmask, gateway);
-
-                bool err = false;
-                var exec = new ExecCmd(log, "netsh", args);
-                ExecCmdResult rslt = exec.Run(6, TimeSpan.FromSeconds(10));
-                if (rslt.Success)
-                {
-                    bool firstDns = true;
-                    foreach (string dnsStr in net["dns"])
-                    {
-                        if (firstDns)
-                        {
-                            args = String.Format(@"interface ipv4 set dns name=""Local Area Connection"" source=static addr={0}", dnsStr);
-                            firstDns = false;
-                        }
-                        else
-                        {
-                            args = String.Format(@"interface ipv4 add dns name=""Local Area Connection"" addr={0}", dnsStr);
-                        }
-                        exec = new ExecCmd(log, "netsh", args);
-                        rslt = exec.Run(6, TimeSpan.FromSeconds(10));
-                        if (false == rslt.Success)
-                        {
-                            // TODO
-                            err = true;
-                        }
-                    }
-                }
-                else
-                {
-                    // TODO
-                    err = true;
-                }
-                if (false == err)
+                var netConfig = new NetworkConfigurator(log, ip, netmask, gateway, dnsStrAry);
+                bool netConfigSuccess = netConfig.ConfigureNetwork();
+                if (netConfigSuccess)
                 {
                     vmSetupState.IsNetworkSetup = true;
                     settings["vm-setup-state"] = JObject.FromObject(vmSetupState);
