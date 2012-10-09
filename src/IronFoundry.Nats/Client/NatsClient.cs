@@ -310,7 +310,7 @@
             }
             else
             {
-                log.Fatal(Resources.NatsClient_ConnectionFailed_Fmt, natsHost, natsPort);
+                log.Error(Resources.NatsClient_ConnectionFailed_Fmt, natsHost, natsPort);
                 status = NatsMessagingStatus.ERROR;
             }
 
@@ -503,7 +503,7 @@
                 {
                     if (false == Reconnect())
                     {
-                        log.Fatal(Resources.NatsClient_CouldNotReconnect_Message);
+                        log.Error(Resources.NatsClient_CouldNotReconnect_Message);
                         status = NatsMessagingStatus.ERROR;
                         break;
                     }

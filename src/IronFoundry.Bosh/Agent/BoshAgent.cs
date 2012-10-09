@@ -222,7 +222,9 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
             {
                 xdoc.WriteTo(writer);
             }
-            var cmd = new ExecCmd(log, @"C:\sysadmin\sysprep\sysprep.exe", "/quit /generalize /oobe /unattend:" + pathToUnattend);
+            // TODO: this is the sysprep location on 2008
+            // http://kb.vmware.com/selfservice/microsites/search.do?language=en_US&cmd=displayKC&externalId=1005593
+            var cmd = new ExecCmd(log, @"C:\Windows\System32\sysprep\sysprep.exe", "/quit /generalize /oobe /unattend:" + pathToUnattend);
             log.Info("Executing: '{0}'", cmd);
             ExecCmdResult rslt = cmd.Run();
             log.Info("Result: '{0}'", rslt);
