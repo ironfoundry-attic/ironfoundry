@@ -123,6 +123,9 @@
   <data name="ExecCmd_CmdFailed_Fmt" xml:space="preserve">
     <value>Command '{0} {1}' failed: {2}</value>
   </data>
+  <data name="ExecCmd_Cmd_Fmt" xml:space="preserve">
+    <value>ExecCmd: '{0} {1}'</value>
+  </data>
   <data name="ExecCmd_PathNotFound_Fmt" xml:space="preserve">
     <value>Command not found: '{0}'</value>
   </data>

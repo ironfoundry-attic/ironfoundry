@@ -26,6 +26,7 @@
             {
                 for (ushort i = 0; i < numTries && false == success; ++i)
                 {
+                    log.Debug(Resources.ExecCmd_Cmd_Fmt, cmd, arguments);
                     var p = new RedirectedProcess(cmd, arguments);
                     p.StartAndWait();
                     output = p.STDOUT;

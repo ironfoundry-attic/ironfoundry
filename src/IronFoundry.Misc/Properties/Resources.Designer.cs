@@ -70,6 +70,15 @@ namespace IronFoundry.Misc.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ExecCmd: &apos;{0} {1}&apos;.
+        /// </summary>
+        internal static string ExecCmd_Cmd_Fmt {
+            get {
+                return ResourceManager.GetString("ExecCmd_Cmd_Fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Command &apos;{0} {1}&apos; failed: {2}.
         /// </summary>
         internal static string ExecCmd_CmdFailed_Fmt {
