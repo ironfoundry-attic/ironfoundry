@@ -40,18 +40,6 @@ using IronFoundry.Bosh.Types;
                 debugging = false;
             }
 #endif
-            /*
-             * unconfigured defaults from agent/lib/agent.rb
-              options = {
-                "configure"         => true,
-                "logging"           => { "level" => "DEBUG" },
-                "mbus"              => "nats://localhost:4222",
-                "agent_id"          => "not_configured",
-                "base_dir"          => "/var/vcap",
-                "platform_name"     => "ubuntu",
-                "blobstore_options" => {}
-              }
-             */
             baseDir = DefaultBaseDir;
             boshBaseDir = Path.Combine(baseDir, DefaultBoshDirName);
             settingsFilePath = Path.Combine(boshBaseDir, SettingsFileName);
@@ -61,6 +49,8 @@ using IronFoundry.Bosh.Types;
             AgentID = "not_configured";
 
             Directory.CreateDirectory(BoshBaseDir);
+
+            ReadState(); // TODO state file should be wrapped in class managing it.
         }
 
 #if DEBUG

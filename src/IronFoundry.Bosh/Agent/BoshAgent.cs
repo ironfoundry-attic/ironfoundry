@@ -155,11 +155,14 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
 
         private void SetupNetworking()
         {
+            var netConfig = new NetworkConfigurator(log);
+
             VMSetupState vmSetupState = settings["vm-setup-state"].ToObject<VMSetupState>();
-            if (vmSetupState.IsNetworkSetup)
+            if (netConfig.NetworkConfigured && vmSetupState.IsNetworkSetup)
             {
                 return;
             }
+
             var network = settings["networks"].First;
             if (network.HasValues)
             {
@@ -169,8 +172,7 @@ netsh interface ipv4 add dns name="Local Area Connection" addr=%5
                 string gateway = (string)net["gateway"];
                 var dnsStrAry = net["dns"].Select(d => (string)d);
 
-                var netConfig = new NetworkConfigurator(log, ip, netmask, gateway, dnsStrAry);
-                bool netConfigSuccess = netConfig.ConfigureNetwork();
+                bool netConfigSuccess = netConfig.ConfigureNetwork(ip, netmask, gateway, dnsStrAry);
                 if (netConfigSuccess)
                 {
                     vmSetupState.IsNetworkSetup = true;
