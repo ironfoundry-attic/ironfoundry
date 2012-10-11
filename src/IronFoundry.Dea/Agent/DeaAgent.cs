@@ -77,6 +77,11 @@
 
         public bool Error { get; private set; }
 
+        public string[] ProgramArguments
+        {
+            get; set;
+        }
+
         public void Start()
         {
             if (natsClient.Start())

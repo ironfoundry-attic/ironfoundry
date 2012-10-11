@@ -49,10 +49,10 @@
             get { return 1; }
         }
 
-        public override StartServiceResult StartService(IntPtr ignored)
+        public override StartServiceResult StartService(IntPtr ignored, string[] args)
         {
             firewallService.Open(config.FilesServicePort, Resources.FilesWinService_ServiceName);
-            return base.StartService(ignored);
+            return base.StartService(ignored, args);
         }
 
         public override void StopService()

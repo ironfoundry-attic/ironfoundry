@@ -31,7 +31,7 @@
             get { return serviceHost.Description.ServiceType.FullName; }
         }
 
-        public virtual StartServiceResult StartService(IntPtr ignored)
+        public virtual StartServiceResult StartService(IntPtr ignored, string[] args)
         {
             if (shouldRun)
             {

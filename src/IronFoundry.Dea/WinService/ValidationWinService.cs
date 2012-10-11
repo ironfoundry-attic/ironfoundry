@@ -28,7 +28,7 @@
             get { return 0; }
         }
 
-        public StartServiceResult StartService(IntPtr serviceHandle)
+        public StartServiceResult StartService(IntPtr serviceHandle, string[] args)
         {
             var rv = new StartServiceResult();
 
