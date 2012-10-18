@@ -99,6 +99,12 @@
         [JsonProperty(PropertyName = "mem_quota")]
         public uint MemQuotaBytes { get; set; }
 
+        [JsonIgnore]
+        public ushort MemQuotaMB
+        {
+            get { return (ushort)(MemQuotaBytes / (1024 * 1024)); }
+        }
+
         [JsonProperty(PropertyName = "disk_quota")]
         public uint DiskQuotaBytes { get; set; }
 

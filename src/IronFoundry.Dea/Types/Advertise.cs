@@ -20,24 +20,20 @@
         [JsonProperty(PropertyName = "available_memory")]
         public uint AvailableMemory { get; private set; }
 
-        [JsonProperty(PropertyName = "currently_pending")]
-        public ushort CurrentlyPending { get; private set; }
-
-        [JsonProperty(PropertyName = "ready")]
-        public bool Ready { get; private set; }
-
         [JsonProperty(PropertyName = "runtimes")]
         public string[] Runtimes
         {
             get { return Constants.SupportedRuntimes; }
         }
 
-        public Advertise(Guid id, uint availableMemory, ushort currentlyPending, bool ready)
+        [JsonProperty(PropertyName = "prod")]
+        public bool Prod { get; private set; }
+
+        public Advertise(Guid id, uint availableMemory, bool prod)
         {
-            this.ID               = id;
-            this.AvailableMemory  = availableMemory;
-            this.CurrentlyPending = currentlyPending;
-            this.Ready            = ready;
+            this.ID              = id;
+            this.AvailableMemory = availableMemory;
+            this.Prod            = prod;
         }
     }
 }

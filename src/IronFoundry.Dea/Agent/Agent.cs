@@ -39,6 +39,7 @@
         private bool shutting_down = false;
 
         private ushort maxMemoryMB;
+        private ushort reservedMemoryMB;
 
         private VcapComponentDiscover discoverMessage;
 
@@ -224,6 +225,8 @@
                         dropletManager.Add(droplet.ID, instance);
 
                         TakeSnapshot();
+
+                        reservedMemoryMB += instance.MemQuotaMB;
                     }
                 }
             }
@@ -269,6 +272,10 @@
 
         private void ProcessDeaDiscover(string message, string reply)
         {
+            const ushort TaintMsPerApp = 10;
+            const ushort TaintMsForMem = 100;
+            const ushort TaintMaxDelay = 250;
+
             if (shutting_down)
             {
                 return;
@@ -282,9 +289,12 @@
                 uint delay = 0;
                 dropletManager.ForAllInstances(discover.DropletID, (instance) =>
                     {
-                        delay += 10; // NB: 10 milliseconds delay per app
+                        delay += TaintMsPerApp;
                     });
-                messagingProvider.Publish(reply, helloMessage, Math.Min(delay, 250));
+
+                float memPercent = reservedMemoryMB / ((float)maxMemoryMB);
+                delay += (ushort)(memPercent * TaintMsForMem);
+                messagingProvider.Publish(reply, helloMessage, Math.Min(delay, TaintMaxDelay));
             }
             else
             {
@@ -311,6 +321,7 @@
                     {
                         instance.OnDeaStop();
                         StopDroplet(instance);
+                        reservedMemoryMB -= instance.MemQuotaMB;
                     }
                 });
         }
@@ -536,7 +547,8 @@
             {
                 return;
             }
-            var message = new Advertise(messagingProvider.UniqueIdentifier, 4096, 0, true); // TODO mem
+            ushort availableMemoryMB = (ushort)(maxMemoryMB - reservedMemoryMB);
+            var message = new Advertise(messagingProvider.UniqueIdentifier, availableMemoryMB, true);
             messagingProvider.Publish(message);
         }
 
@@ -585,6 +597,8 @@
                 dropletManager.FromSnapshot(snapshot);
                 SendHeartbeat();
                 TakeSnapshot();
+                reservedMemoryMB = 0;
+                dropletManager.ForAllInstances((instance) => reservedMemoryMB += instance.MemQuotaMB);
             }
         }
 

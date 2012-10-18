@@ -295,6 +295,7 @@
 
             public MessageTimer(uint delay, string message) : base(delay)
             {
+                this.AutoReset = false;
                 this.message = message;
             }
 
@@ -321,7 +322,7 @@
             }
             else
             {
-                var delayTimer = new MessageTimer(delay, formattedMessage) { AutoReset = false };
+                var delayTimer = new MessageTimer(delay, formattedMessage);
                 delayTimer.Elapsed += DelayedPublishElapsedHandler;
                 delayTimer.Enabled = true;
             }
