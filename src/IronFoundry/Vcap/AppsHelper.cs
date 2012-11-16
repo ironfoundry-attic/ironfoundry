@@ -8,9 +8,9 @@
     using System.Threading;
     using ICSharpCode.SharpZipLib.Zip;
     using IronFoundry;
-    using Properties;
     using Models;
     using Newtonsoft.Json;
+    using Properties;
     using RestSharp;
 
     internal class AppsHelper : BaseVmcHelper
@@ -257,8 +257,9 @@
 
                     var zipper = new FastZip();
                     zipper.CreateZip(uploadFile, explodeDir.FullName, true, String.Empty);
-                    var request = base.BuildVcapJsonRequest(Method.PUT, Constants.APPS_PATH, name, "application");
+                    var request = base.BuildVcapJsonRequest(Method.POST, Constants.APPS_PATH, name, "application");
                     request.AddFile("application", uploadFile);
+                    request.AddParameter("_method", "put");
                     request.AddParameter("resources", JsonConvert.SerializeObject(appcloudResources.ToArrayOrNull()));
                     IRestResponse response = request.Execute();
                 }
