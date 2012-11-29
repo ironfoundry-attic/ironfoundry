@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="D11F588D-A83B-40C1-9637-A5F44B65D110">
-    <Name>Cloud Foundry for Visual Studio 2010</Name>
-    <Author>CloudFoundry</Author>
-    <Version>1.6</Version>
-    <Description xml:space="preserve">Cloud Foundry Package to push ASP.NET applications into the Cloud!</Description>
+    <Name>Iron Foundry for Visual Studio</Name>
+    <Author>Iron Foundry</Author>
+    <Version>1.9</Version>
+    <Description xml:space="preserve">Push ASP.NET applications into the Cloud!</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://www.ironfoundry.org</MoreInfoUrl>
     <License>Resources\LICENSE.txt</License>
-    <GettingStartedGuide>http://www.cloudfoundry.com/faq</GettingStartedGuide>
+    <GettingStartedGuide>http://help.ironfoundry.org/forums/20455848-visual-studio-extension</GettingStartedGuide>
     <Icon>Resources\cloud_foundry_icon.ico</Icon>
     <PreviewImage>Resources\cloud_foundry_logo.png</PreviewImage>
     <InstalledByMsi>false</InstalledByMsi>
