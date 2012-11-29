@@ -15,6 +15,8 @@
 
     internal class AppsHelper : BaseVmcHelper
     {
+        const ushort timeoutSeconds = 180;
+
         public AppsHelper(VcapUser proxyUser, VcapCredentialManager credentialManager)
             : base(proxyUser, credentialManager) { }
 
@@ -28,7 +30,7 @@
         {
             application.Start();
             UpdateApplication(application);
-            if (!IsStarted(application.Name))
+            if (!IsStarted(application.Name, 180))
             {
                 throw new VcapException("Failed to start application.");
             }
@@ -142,7 +144,7 @@
                     r.AddBody(app);
                     r.Execute();
 
-                    bool started = IsStarted(app.Name);
+                    bool started = IsStarted(app.Name, timeoutSeconds);
 
                     if (started && !provisionedServiceNames.IsNullOrEmpty())
                     {
@@ -187,11 +189,15 @@
             return base.GetApplications(user.Email);
         }
 
-        private bool IsStarted(string name)
+        private bool IsStarted(string name, ushort timeoutSeconds)
         {
+            const int sleepSeconds = 3;
+            var sleepSpan = TimeSpan.FromSeconds(sleepSeconds);
+
             bool started = false;
 
-            for (int i = 0; i < 20; ++i)
+            int tries = timeoutSeconds / sleepSeconds;
+            for (int i = 0; i < tries; ++i)
             {
                 Application app = GetApplication(name);
 
@@ -203,7 +209,7 @@
                 }
                 else
                 {
-                    Thread.Sleep(TimeSpan.FromSeconds(3));
+                    Thread.Sleep(sleepSpan);
                 }
             }
 
