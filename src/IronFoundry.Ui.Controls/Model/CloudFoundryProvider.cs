@@ -180,7 +180,7 @@
                             instance.DiskQuota = stat.Stats.DiskQuota/1048576;
                             instance.Host = stat.Stats.Host;
                             instance.Parent = app;
-                            instance.Uptime = TimeSpan.FromSeconds(Convert.ToInt32(stat.Stats.Uptime));
+                            instance.Uptime = TimeSpan.FromSeconds(stat.Stats.Uptime);
 
                             if (stat.Stats.Usage != null)
                             {
