@@ -2,7 +2,7 @@
 
 setlocal
 
-set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
+set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\Tools\VsDevCmd.bat"
 
 set SLN="%~dp0\IronFoundry.sln"
 set VERSION=1.9.0
