@@ -29,6 +29,12 @@
         [JsonProperty(PropertyName = "prod")]
         public bool Prod { get; private set; }
 
+        [JsonProperty(PropertyName = "ready")]
+        public bool Ready { get { return true; } }
+
+        [JsonProperty(PropertyName = "currently_pending")]
+        public ushort CurrentlyPending { get { return 0; } }
+
         public Advertise(Guid id, uint availableMemory, bool prod)
         {
             this.ID              = id;
