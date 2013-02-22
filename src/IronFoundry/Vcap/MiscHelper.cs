@@ -1,12 +1,12 @@
 ﻿namespace IronFoundry.Vcap
 {
     using System;
-    using IronFoundry.Types;
+    using Models;
 
     internal class MiscHelper : BaseVmcHelper
     {
-        public MiscHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
-            : base(proxyUser, credMgr) { }
+        public MiscHelper(VcapUser proxyUser, VcapCredentialManager credentialManager)
+            : base(proxyUser, credentialManager) { }
 
         public Info GetInfo()
         {
@@ -34,8 +34,8 @@
 
             if (success)
             {
-                credMgr.SetTarget(uri);
-                credMgr.StoreTarget();
+                CredentialManager.SetTarget(uri);
+                CredentialManager.StoreTarget();
             }
             else
             {

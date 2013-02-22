@@ -7,14 +7,14 @@
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
 
     public class ApplicationTreeViewItemViewModel : TreeViewItemViewModel
     {
         private Application application;
-        public Dispatcher dispatcher;
+        public Dispatcher Dispatcher;
         private ICloudFoundryProvider provider;
 
         public ApplicationTreeViewItemViewModel(Application application, CloudTreeViewItemViewModel parentCloud)
@@ -30,7 +30,7 @@
 
             Application = application;
             Application.InstanceCollection.CollectionChanged += InstanceCollection_CollectionChanged;
-            dispatcher = Dispatcher.CurrentDispatcher;
+            Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
         public RelayCommand<MouseButtonEventArgs> OpenApplicationCommand { get; private set; }

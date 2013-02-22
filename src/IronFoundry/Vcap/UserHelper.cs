@@ -2,15 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
-    using IronFoundry.Properties;
-    using IronFoundry.Types;
+    using Properties;
+    using Models;
     using Newtonsoft.Json.Linq;
     using RestSharp;
 
     internal class UserHelper : BaseVmcHelper
     {
-        public UserHelper(VcapUser proxyUser, VcapCredentialManager credMgr)
-            : base(proxyUser, credMgr) { }
+        public UserHelper(VcapUser proxyUser, VcapCredentialManager credentialManager)
+            : base(proxyUser, credentialManager) { }
 
         public void Login(string email, string password)
         {
@@ -22,11 +22,11 @@
                 IRestResponse response = r.Execute();
                 var parsed = JObject.Parse(response.Content);
                 string token = parsed.Value<string>("token");
-                credMgr.RegisterToken(token);
+                CredentialManager.RegisterToken(token);
             }
             catch (VcapAuthException)
             {
-                throw new VcapAuthException(string.Format(Resources.Vmc_LoginFail_Fmt, credMgr.CurrentTarget));
+                throw new VcapAuthException(string.Format(Resources.Vmc_LoginFail_Fmt, CredentialManager.CurrentTarget));
             }
         }
 
@@ -55,13 +55,13 @@
             // TODO: doing this causes a "not logged in" failure when the user
             // doesn't exist, which is kind of misleading.
 
-            var appsHelper = new AppsHelper(proxyUser, credMgr);
+            var appsHelper = new AppsHelper(ProxyUser, CredentialManager);
             foreach (Application a in appsHelper.GetApplications(email))
             {
                 appsHelper.Delete(a.Name);
             }
 
-            var servicesHelper = new ServicesHelper(proxyUser, credMgr);
+            var servicesHelper = new ServicesHelper(ProxyUser, CredentialManager);
             foreach (ProvisionedService ps in servicesHelper.GetProvisionedServices())
             {
                 servicesHelper.DeleteService(ps.Name);

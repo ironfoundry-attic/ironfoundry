@@ -1,6 +1,6 @@
 namespace IronFoundry.Ui.Controls.Model
 {
-    using IronFoundry.Types;
+    using Models;
 
     public interface IPreferencesProvider
     {

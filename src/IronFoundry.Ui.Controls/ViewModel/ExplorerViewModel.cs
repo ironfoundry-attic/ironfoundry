@@ -10,7 +10,7 @@
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
     using Model;
-    using Types;
+    using Models;
     using Utilities;
 
     public class ExplorerViewModel : ViewModelBase
@@ -28,7 +28,7 @@
             Messenger.Default.Send(new NotificationMessageAction<ICloudFoundryProvider>(
                                        Messages.GetCloudFoundryProvider, p => provider = p));
 
-            Messenger.Default.Register<NotificationMessage<Types.Cloud>>(this, ProcessCloudNotification);
+            Messenger.Default.Register<NotificationMessage<Models.Cloud>>(this, ProcessCloudNotification);
             Messenger.Default.Register<NotificationMessage<Application>>(this, ProcessApplicationNotification);
             Messenger.Default.Register<NotificationMessage<string>>(this, ProcessErrorMessage);
 
@@ -81,7 +81,7 @@
 
         private void provider_CloudRemoved(object sender, CloudEventArgs e)
         {
-            Types.Cloud cloud = e.Cloud;
+            Models.Cloud cloud = e.Cloud;
             CloudViewModel cloudViewItem = clouds.SingleOrDefault((i) => i.Cloud.Equals(cloud));
             clouds.Remove(cloudViewItem);
         }
@@ -100,7 +100,7 @@
                 CloudViewModel selectedCloudViewModel = Clouds.SingleOrDefault((i) => i.Cloud.Equals(application.Parent));
                 if (selectedCloudViewModel == null)
                 {
-                    Types.Cloud currentCloud = provider.Clouds.SingleOrDefault((c) => c.Equals(application.Parent));
+                    Models.Cloud currentCloud = provider.Clouds.SingleOrDefault((c) => c.Equals(application.Parent));
                     selectedCloudViewModel = new CloudViewModel(currentCloud);
                     Clouds.Add(selectedCloudViewModel);
                 }
@@ -116,7 +116,7 @@
                 ErrorMessage = message.Content;
         }
 
-        private void ProcessCloudNotification(NotificationMessage<Types.Cloud> message)
+        private void ProcessCloudNotification(NotificationMessage<Models.Cloud> message)
         {
             if (message.Notification.Equals(Messages.OpenCloud))
             {

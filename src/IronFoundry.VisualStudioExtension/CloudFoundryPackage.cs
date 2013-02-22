@@ -10,10 +10,10 @@
     using System.Windows.Interop;
     using EnvDTE;
     using GalaSoft.MvvmLight.Messaging;
-    using IronFoundry.Types;
     using IronFoundry.Vcap;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
+    using Models;
     using Ui.Controls.Model;
     using Ui.Controls.Mvvm;
     using Ui.Controls.Utilities;
@@ -152,7 +152,6 @@
             PerformAction("Update Application", project, modelData.SelectedCloud, projectDirectories, (c, d) =>
             {
                 c.Update(modelData.SelectedApplication.Name, d);
-                c.Restart(new Application {Name = modelData.SelectedApplication.Name});
             });
         }
 
@@ -233,9 +232,14 @@
                     process.Start();
                     string output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
-                    if (false == String.IsNullOrEmpty(output))
+                    if (process.ExitCode != 0)
                     {
-                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError("Asp Compile Error: " + output))));
+                        string message = "Asp Compile Error";
+                        if (false == String.IsNullOrEmpty(output))
+                        {
+                            message += ": " + output;
+                        }
+                        dispatcher.BeginInvoke((Action)(() => Messenger.Default.Send(new ProgressError(message))));
                         return;
                     }
                 }

@@ -4,8 +4,8 @@
     using System.ComponentModel;
     using GalaSoft.MvvmLight.Messaging;
     using Model;
+    using Models;
     using Mvvm;
-    using Types;
     using Utilities;
 
     public class ChangePasswordViewModel : DialogViewModel
