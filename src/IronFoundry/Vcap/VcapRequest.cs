@@ -118,7 +118,7 @@ namespace IronFoundry.Vcap
             string baseUrl = currentTargetUri.AbsoluteUri;
             if (null != credentialManager.CurrentTargetIP)
             {
-                baseUrl = String.Format("{0}://{1}", Uri.UriSchemeHttp, credentialManager.CurrentTargetIP.ToString());
+                baseUrl = String.Format("{0}://{1}:{2}", Uri.UriSchemeHttp, credentialManager.CurrentTargetIP.ToString(), credentialManager.CurrentTargetPort);
                 requestHostHeader = currentTargetUri.Host;
             }
 
@@ -218,21 +218,6 @@ namespace IronFoundry.Vcap
                 request.Resource = String.Join("/", args).Replace("//", "/");
             }
             return request;
-        }
-
-        public RestClient Client
-        {
-            get { return client; }
-        }
-
-        public RestRequest Request
-        {
-            get { return request; }
-        }
-
-        public string RequestHostHeader
-        {
-            get { return requestHostHeader; }
         }
     }
 

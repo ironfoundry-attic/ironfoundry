@@ -44,9 +44,9 @@
             this.cloud = cloud;
         }
 
-        public VcapClient(Uri uri, IPAddress ipAddress)
+        public VcapClient(Uri uri, IPAddress ipAddress, int port = 80)
         {
-            credMgr = new VcapCredentialManager(uri, ipAddress);
+            credMgr = new VcapCredentialManager(uri, ipAddress, port);
         }
 
         public void ProxyAs(VcapUser user)
@@ -68,13 +68,6 @@
         {
             var helper = new MiscHelper(proxyUser, credMgr);
             return helper.GetInfo();
-        }
-
-        // TODO: we need a different DI-based design that doesn't require this method for testing
-        public VcapRequest GetRequestForTesting()
-        {
-            var helper = new MiscHelper(proxyUser, credMgr);
-            return helper.BuildInfoRequest();
         }
 
         public void Target(string uri)

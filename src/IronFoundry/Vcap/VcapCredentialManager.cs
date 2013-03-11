@@ -30,6 +30,7 @@
 
         private Uri currentTarget;
         private IPAddress currentTargetIP;
+        private int currentTargetPort = 80;
 
         public static Func<string, string> FileReaderFunc = fileName => File.ReadAllText(fileName);
         public static Action<string, string> FileWriterAction = (fileName, text) => File.WriteAllText(fileName, text);
@@ -54,7 +55,7 @@
             SetTarget(currentTarget);
         }
 
-        public VcapCredentialManager(Uri currentTarget, IPAddress currentTargetIP) : this()
+        public VcapCredentialManager(Uri currentTarget, IPAddress currentTargetIP, int currentTargetPort = 80) : this()
         {
             if (null == currentTarget)
             {
@@ -65,6 +66,7 @@
                 throw new ArgumentNullException("currentTargetIP");
             }
             SetTarget(currentTarget, currentTargetIP);
+            this.currentTargetPort = currentTargetPort;
         }
 
         public Uri CurrentTarget
@@ -75,6 +77,11 @@
         public IPAddress CurrentTargetIP
         {
             get { return currentTargetIP; }
+        }
+
+        public int CurrentTargetPort
+        {
+            get { return currentTargetPort; }
         }
 
         public string CurrentToken
