@@ -70,7 +70,8 @@
             return helper.GetInfo();
         }
 
-        internal VcapRequest GetRequestForTesting()
+        // TODO: we need a different DI-based design that doesn't require this method for testing
+        public VcapRequest GetRequestForTesting()
         {
             var helper = new MiscHelper(proxyUser, credMgr);
             return helper.BuildInfoRequest();

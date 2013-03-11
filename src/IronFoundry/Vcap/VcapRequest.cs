@@ -220,17 +220,17 @@ namespace IronFoundry.Vcap
             return request;
         }
 
-        internal RestClient Client
+        public RestClient Client
         {
             get { return client; }
         }
 
-        internal RestRequest Request
+        public RestRequest Request
         {
             get { return request; }
         }
 
-        internal string RequestHostHeader
+        public string RequestHostHeader
         {
             get { return requestHostHeader; }
         }

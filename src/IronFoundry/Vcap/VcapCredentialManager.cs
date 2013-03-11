@@ -31,27 +31,21 @@
         private Uri currentTarget;
         private IPAddress currentTargetIP;
 
-        private VcapCredentialManager(string json)
+        public static Func<string, string> FileReaderFunc = fileName => File.ReadAllText(fileName);
+        public static Action<string, string> FileWriterAction = (fileName, text) => File.WriteAllText(fileName, text);
+
+        public VcapCredentialManager()
         {
             string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             tokenFile = Path.Combine(userProfilePath, TokenFile);
             targetFile = Path.Combine(userProfilePath, TargetFile);
 
-            if (json.IsNullOrWhiteSpace())
-            {
-                ParseJson(ReadTokenFile());
-            }
-            else
-            {
-                ParseJson(json);
-            }
+            ParseJson(ReadTokenFile());
 
             currentTarget = ReadTargetFile();
         }
 
-        public VcapCredentialManager() : this((string)null) { }
-
-        public VcapCredentialManager(Uri currentTarget) : this((string)null)
+        public VcapCredentialManager(Uri currentTarget) : this()
         {
             if (null == currentTarget)
             {
@@ -60,7 +54,7 @@
             SetTarget(currentTarget);
         }
 
-        public VcapCredentialManager(Uri currentTarget, IPAddress currentTargetIP) : this((string)null)
+        public VcapCredentialManager(Uri currentTarget, IPAddress currentTargetIP) : this()
         {
             if (null == currentTarget)
             {
@@ -71,11 +65,6 @@
                 throw new ArgumentNullException("currentTargetIP");
             }
             SetTarget(currentTarget, currentTargetIP);
-        }
-
-        internal VcapCredentialManager(string tokenJson, bool shouldWrite) : this(tokenJson)
-        {
-            this.shouldWrite = shouldWrite;
         }
 
         public Uri CurrentTarget
@@ -154,7 +143,7 @@
             return rv;
         }
 
-        private void ParseJson(string tokenJson, bool shouldWrite = false)
+        private void ParseJson(string tokenJson)
         {
             if (false == tokenJson.IsNullOrWhiteSpace())
             {
@@ -166,10 +155,8 @@
                     var accessToken = new AccessToken(uriStr, token);
                     tokenDict[accessToken.Uri] = accessToken;
                 }
-                if (shouldWrite)
-                {
-                    WriteTokenFile();
-                }
+
+                WriteTokenFile();
             }
         }
 
@@ -180,7 +167,7 @@
 
             try
             {
-                rv = File.ReadAllText(tokenFile);
+                rv = FileReaderFunc(tokenFile);
             }
             catch (FileNotFoundException) { }
 
@@ -195,7 +182,7 @@
                 try
                 {
                     Dictionary<string, string> tmp = tokenDict.ToDictionary(e => e.Key.AbsoluteUriTrimmed(), e => e.Value.Token);
-                    File.WriteAllText(tokenFile, JsonConvert.SerializeObject(tmp));
+                    FileWriterAction(tokenFile, JsonConvert.SerializeObject(tmp));
                 }
                 catch (IOException)
                 {
