@@ -2,46 +2,43 @@
 {
     using System;
     using System.Net;
-    using IronFoundry.Utilities;
+    using System.Threading.Tasks;
     using IronFoundry.Vcap;
-    using RestSharp;
     using Xunit;
 
     public class VcapClientTests
     {
+        private HttpListener httpListener;
+
         [Fact]
         public void Test_Using_Host_And_IPAddress()
         {
-            string ipStr = "10.0.0.1";
-            string host = "api.vcap.me";
+            IPAddress ip = IPAddress.Parse("127.0.0.1");
+            string host = "localhost";
+
+            var listenTask = StartWebServer();
+            listenTask.ContinueWith(context =>
+            {
+                Assert.Equal(context.Result.Request.Headers["host"], host);
+                context.Result.Response.OutputStream.Close();
+            }).ContinueWith(context => StopWebServer());
 
             var uri = new Uri("http://" + host);
-            IPAddress ip;
-            IPAddress.TryParse(ipStr, out ip);
-            var client = new VcapClient(uri, ip);
-            VcapRequest infoRequest = client.GetRequestForTesting();
-
-            RestClient restClient = infoRequest.Client;
-            RestRequest restRequest = infoRequest.Request;
-
-            Assert.Equal("http://" + ipStr, restClient.BaseUrl);
-            Assert.Equal(host, infoRequest.RequestHostHeader);
-
-            Assert.NotNull(restRequest.JsonSerializer);
-            Assert.IsType<NewtonsoftJsonSerializer>(restRequest.JsonSerializer);
+            var client = new VcapClient(uri, ip, 12345);
+            client.GetInfo();
         }
 
-        [Fact(Skip="MANUAL")]
-        public void Test_Using_Host_And_IPAddress_Against_Local()
+        private Task<HttpListenerContext> StartWebServer()
         {
-            string ipStr = "172.21.114.11";
-            string host = "api.vcap.me";
+            httpListener = new HttpListener();
+            httpListener.Prefixes.Add("http://localhost:12345/");
+            httpListener.Start();
+            return httpListener.GetContextAsync();
+        }
 
-            var uri = new Uri("http://" + host);
-            IPAddress ip;
-            IPAddress.TryParse(ipStr, out ip);
-            var client = new VcapClient(uri, ip);
-            client.Login("user@foo.com", "Password");
+        private void StopWebServer()
+        {
+            httpListener.Stop();
         }
     }
 }
