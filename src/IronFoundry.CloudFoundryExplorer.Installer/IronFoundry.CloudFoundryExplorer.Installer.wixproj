@@ -11,11 +11,9 @@
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
-    <RestorePackages>true</RestorePackages>
     <IncludeSearchPaths>$(SolutionDir)\src\wixshared\</IncludeSearchPaths>
     <OutputPath>bin\$(Configuration)_$(Platform)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\ironfoundry\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DefineConstants>Debug;PLATFORM=x86;VERSION=1.1.0.0</DefineConstants>
@@ -63,13 +61,4 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <!--
-	To modify your build process, add your task inside one of the targets below and uncomment it.
-	Other similar extension points exist, see Wix.targets.
-	<Target Name="BeforeBuild">
-	</Target>
-	<Target Name="AfterBuild">
-	</Target>
-	-->
 </Project>
