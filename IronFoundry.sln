@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{698503
 		LICENSE.txt = LICENSE.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry", "src\IronFoundry\IronFoundry.csproj", "{506CCDF4-11FE-4138-8061-25495EEBF8E0}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{63D980C4-727A-4473-8BFA-8966B5AF1681}"
 	ProjectSection(SolutionItems) = preProject
 		images\cloud_droplet.png = images\cloud_droplet.png
@@ -30,6 +28,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{63D980
 		images\Images_24bit.bmp = images\Images_24bit.bmp
 		images\server.png = images\server.png
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{EE6F9E81-B251-47D5-B847-D0EA8957414C}"
+	ProjectSection(SolutionItems) = preProject
+		tools\iis_cleanup.ps1 = tools\iis_cleanup.ps1
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry", "src\IronFoundry\IronFoundry.csproj", "{506CCDF4-11FE-4138-8061-25495EEBF8E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Dea", "src\IronFoundry.Dea\IronFoundry.Dea.csproj", "{9E0B2522-39F5-4AC4-BF2F-A7C6B16C9EAA}"
 EndProject
@@ -50,15 +55,10 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "IronFoundry.CloudFoundryExp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Test", "src\IronFoundry.Test\IronFoundry.Test.csproj", "{34013CB7-3FF3-4061-9E45-CB6101F5977A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{443DDB66-F24A-4C73-AA16-9C27DD8B67C8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{29769CCF-862B-4B66-BBDB-44AAC3DEB42B}"
 	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{EE6F9E81-B251-47D5-B847-D0EA8957414C}"
-	ProjectSection(SolutionItems) = preProject
-		tools\iis_cleanup.ps1 = tools\iis_cleanup.ps1
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Nats", "src\IronFoundry.Nats\IronFoundry.Nats.csproj", "{0BAC887C-9B35-4BC4-9F79-B84DB8D959E1}"

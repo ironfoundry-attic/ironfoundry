@@ -19,7 +19,9 @@
             var json = String.Format("{{\"{0}\":\"{1}\",\"{2}\":\"{3}\"}}",
                                         uri1.AbsoluteUri, tokenStr1, uri2.AbsoluteUri, tokenStr2);
 
-            var credentialManager = new VcapCredentialManager(json, false);
+            VcapCredentialManager.FileReaderFunc = fileName => json;
+            VcapCredentialManager.FileWriterAction = (fileName, text) => { };
+            var credentialManager = new VcapCredentialManager();
 
             credentialManager.SetTarget(uri1.AbsoluteUri);
             var token1 = credentialManager.CurrentToken;

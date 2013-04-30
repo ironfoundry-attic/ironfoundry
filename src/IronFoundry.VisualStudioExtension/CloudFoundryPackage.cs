@@ -152,7 +152,6 @@
             PerformAction("Update Application", project, modelData.SelectedCloud, projectDirectories, (c, d) =>
             {
                 c.Update(modelData.SelectedApplication.Name, d);
-                c.Restart(new Application {Name = modelData.SelectedApplication.Name});
             });
         }
 
