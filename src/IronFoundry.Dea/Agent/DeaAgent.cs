@@ -304,7 +304,7 @@
 
                 float memPercent = reservedMemoryMB / ((float)maxMemoryMB);
                 delay += (ushort)(memPercent * TaintMsForMem);
-                messagingProvider.Publish(reply, helloMessage, Math.Min(delay, TaintMaxDelay));
+                natsClient.PublishReply(reply, helloMessage, Math.Min(delay, TaintMaxDelay));
             }
             else
             {
@@ -558,8 +558,8 @@
                 return;
             }
             ushort availableMemoryMB = (ushort)(maxMemoryMB - reservedMemoryMB);
-            var message = new Advertise(messagingProvider.UniqueIdentifier, availableMemoryMB, true);
-            messagingProvider.Publish(message);
+            var message = new Advertise(natsClient.UniqueIdentifier, availableMemoryMB, true);
+            natsClient.Publish(message);
         }
 
         private string GetApplicationState(string name)

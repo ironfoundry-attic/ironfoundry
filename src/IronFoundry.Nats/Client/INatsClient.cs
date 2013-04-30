@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Nats.Client
 {
     using System;
-using IronFoundry.Nats.Configuration;
+    using IronFoundry.Nats.Configuration;
 
     public interface INatsClient : IDisposable
     {
