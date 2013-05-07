@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyCompany("Tier 3")]
-[assembly: AssemblyCopyright("Copyright © Tier 3 2012")]
+[assembly: AssemblyCopyright("Copyright © Tier 3 2013")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyDescription("https://github.com/IronFoundry/ironfoundry")]
 [assembly: AssemblyProduct("Iron Foundry")]

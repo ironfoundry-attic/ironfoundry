@@ -6,6 +6,9 @@
     using IronFoundry.Misc.IoC;
     using IronFoundry.Misc.Logging;
 
+    /*
+     * TODO: use Topshelf
+     */
     public static class ServiceMain
     {
         static readonly ILog log;
