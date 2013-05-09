@@ -1,4 +1,4 @@
-$proto_dir = '.\warden\warden-protocol\lib\warden\protocol\pb'
+$proto_dir = '.\pb'
 $protogen_exe = Get-ChildItem -Recurse -Include protogen.exe | Select-Object -First 1 -ExpandProperty FullName
 
 if (!(Test-Path $protogen_exe))

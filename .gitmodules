@@ -1,3 +1,0 @@
-[submodule "src/IronFoundry.WardenProtocol/warden"]
-	path = src/IronFoundry.WardenProtocol/warden
-	url = https://github.com/cloudfoundry/warden.git
