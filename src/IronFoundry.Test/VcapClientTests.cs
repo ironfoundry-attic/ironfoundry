@@ -16,24 +16,22 @@
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             string host = "localhost";
 
-            var listenTask = StartWebServer();
-            listenTask.ContinueWith(context =>
-            {
-                Assert.Equal(context.Result.Request.Headers["host"], host);
-                context.Result.Response.OutputStream.Close();
-            }).ContinueWith(context => StopWebServer());
+            var context = StartWebServer();
+            Assert.Equal(context.Request.Headers["host"], host);
+            context.Response.OutputStream.Close();
+            StopWebServer();
 
             var uri = new Uri("http://" + host);
             var client = new VcapClient(uri, ip, 12345);
             client.GetInfo();
         }
 
-        private Task<HttpListenerContext> StartWebServer()
+        private HttpListenerContext StartWebServer()
         {
             httpListener = new HttpListener();
             httpListener.Prefixes.Add("http://localhost:12345/");
             httpListener.Start();
-            return httpListener.GetContextAsync();
+            return httpListener.GetContext();
         }
 
         private void StopWebServer()

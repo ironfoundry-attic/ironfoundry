@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IronFoundry.Test</RootNamespace>
     <AssemblyName>IronFoundry.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -79,8 +79,8 @@
       <Project>{E2B80FE5-34A9-4FAF-B638-8C6B744F9F1F}</Project>
       <Name>IronFoundry.Misc</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\IronFoundry\IronFoundry.csproj">
-      <Project>{506CCDF4-11FE-4138-8061-25495EEBF8E0}</Project>
+    <ProjectReference Include="..\IronFoundry\IronFoundry.csproj">
+      <Project>{506ccdf4-11fe-4138-8061-25495eebf8e0}</Project>
       <Name>IronFoundry</Name>
     </ProjectReference>
   </ItemGroup>

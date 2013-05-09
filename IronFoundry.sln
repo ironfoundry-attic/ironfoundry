@@ -83,7 +83,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Bosh.Monit", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "warden", "warden", "{15F33796-AEC7-43E3-92D0-4AC86B5A3644}"
 	ProjectSection(SolutionItems) = preProject
-		docs\WARDEN-NOTES.md = docs\WARDEN-NOTES.md
+		docs\dea-ng-deploy-java.txt = docs\dea-ng-deploy-java.txt
+		docs\dea-ng-deploy-sinatra.txt = docs\dea-ng-deploy-sinatra.txt
+		docs\dea_ng-notes.md = docs\dea_ng-notes.md
+		docs\warden-notes.md = docs\warden-notes.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Warden", "src\IronFoundry.Warden\IronFoundry.Warden.csproj", "{84414841-E608-430B-A61C-9E933E1683F4}"
