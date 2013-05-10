@@ -25,7 +25,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message StreamRequest {
   required string handle = 1;

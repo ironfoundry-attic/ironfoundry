@@ -24,7 +24,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message LinkRequest {
   required string handle = 1;

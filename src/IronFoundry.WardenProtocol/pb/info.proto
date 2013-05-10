@@ -22,7 +22,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message InfoRequest {
   required string handle = 1;
@@ -86,10 +86,10 @@ message InfoResponse {
   optional string container_ip   = 31;
   optional string container_path = 32;
 
-  optional MemoryStat memory_stat       = 40;
-  optional CpuStat cpu_stat             = 41;
-  optional DiskStat disk_stat           = 42;
-  optional BandwidthStat bandwidth_stat = 43;
+  optional MemoryStat memory_stat_info       = 40;
+  optional CpuStat cpu_stat_info             = 41;
+  optional DiskStat disk_stat_info           = 42;
+  optional BandwidthStat bandwidth_stat_info = 43;
 
   repeated uint64 job_ids = 44;
 }

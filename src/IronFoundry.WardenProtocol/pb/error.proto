@@ -10,7 +10,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message ErrorResponse {
   optional string message = 2;

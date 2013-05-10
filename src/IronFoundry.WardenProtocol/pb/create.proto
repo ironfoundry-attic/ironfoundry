@@ -35,7 +35,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message CreateRequest {
   message BindMount {
@@ -46,7 +46,7 @@ message CreateRequest {
 
     required string src_path = 1;
     required string dst_path = 2;
-    required Mode mode = 3;
+    required Mode bind_mount_mode = 3;
   }
 
   repeated BindMount bind_mounts = 1;

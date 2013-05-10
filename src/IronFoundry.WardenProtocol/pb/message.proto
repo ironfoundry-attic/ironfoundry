@@ -1,6 +1,6 @@
 // nodoc
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message Message {
   enum Type {
@@ -31,6 +31,6 @@ message Message {
     Echo = 93;
   }
 
-  required Type type = 1;
+  required Type message_type = 1;
   required bytes payload = 2;
 }

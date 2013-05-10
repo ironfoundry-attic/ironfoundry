@@ -1,11 +1,14 @@
-﻿namespace IronFoundry.Warden
+﻿namespace IronFoundry.WardenService
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using IronFoundry.Warden;
     using IronFoundry.WardenProtocol;
     using NLog;
     using ProtoBuf;
@@ -58,7 +61,7 @@
             while (!cts.IsCancellationRequested)
             {
                 TcpClient client = await listener.AcceptTcpClientAsync();
-                log.Debug("Client connected!");
+                log.Trace("Client connected!");
                 ProcessClient(client);
             }
 
@@ -68,8 +71,9 @@
 
         private async void ProcessClient(TcpClient client)
         {
-            log.Debug("ProcessClient START {0}", client.GetHashCode());
+            log.Trace("ProcessClient START {0}", client.GetHashCode());
             uint messageCount = 0;
+
             using (client)
             {
                 using (var buffer = new WBuffer())
@@ -84,7 +88,12 @@
                                 do
                                 {
                                     int bytes = await ns.ReadAsync(byteBuffer, 0, byteBuffer.Length);
-                                    if (bytes > 0)
+                                    if (bytes == 0)
+                                    {
+                                        // Still there?
+                                        ns.Write(Constants.CRLF, 0, 2); 
+                                    }
+                                    else
                                     {
                                         buffer.Push(byteBuffer, bytes);
                                     }
@@ -93,76 +102,109 @@
 
                                 foreach (var request in buffer.GetMessages())
                                 {
-                                    ++messageCount;
-
-                                    Message rsp = HandleRequest(request);
-
-                                    // TODO: buffer.rb / payload_to_wire
-                                    byte[] rspData = null;
-                                    using (var ms = new MemoryStream())
+                                    if (!client.Connected)
                                     {
-                                        Serializer.Serialize(ms, rsp);
-                                        rspData = ms.ToArray();
+                                        break;
                                     }
 
-                                    if (client.Connected)
+                                    Message response = HandleRequest(request);
+                                    if (response != null)
                                     {
-                                        try
-                                        {
-                                            client.Write(rspData);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            HandleSocketException(ex);
-                                        }
+                                        ++messageCount;
                                     }
-                                    else
+
+                                    if (!client.Connected)
                                     {
-                                        // TODO?
+                                        break;
                                     }
+
+                                    WriteMessage(response, ns);
                                 }
                             }
                             catch (Exception ex)
                             {
                                 HandleSocketException(ex);
+                                if (ex is WardenException)
+                                {
+                                    ErrorResponse(ex, ns);
+                                }
+                                break;
                             }
                         }
-                    }
-
-                    foreach (var request in buffer.GetMessages())
-                    {
-                        ++messageCount;
-                        HandleRequest(request);
                     }
                 }
 
                 client.Close();
             }
 
-            log.Debug("ProcessClient STOP Message count: '{0}'", messageCount);
+            log.Trace("ProcessClient STOP Message count: '{0}'", messageCount);
+        }
+
+        private void ErrorResponse(Exception ex, NetworkStream ns)
+        {
+            var response = new ErrorResponse { Message = ex.Message, Data = ex.StackTrace };
+            var wrapper = new ResponseWrapper(response);
+            Message errorMessage = wrapper.GetMessage();
+            WriteMessage(errorMessage, ns);
+        }
+
+        private void WriteMessage(Message rsp, NetworkStream ns)
+        {
+            byte[] responsePayload = null;
+            using (var ms = new MemoryStream())
+            {
+                Serializer.Serialize(ms, rsp);
+                responsePayload = ms.ToArray();
+            }
+
+            int payloadLen = responsePayload.Length;
+            var payloadLenBytes = Encoding.ASCII.GetBytes(payloadLen.ToString());
+
+            try
+            {
+#if DEBUG
+                // TODO: MemoryStream/ToArray for debugging only
+                byte[] toWrite = null;
+                using (var ms = new MemoryStream())
+                {
+                    DoWriteMessage(ms, payloadLenBytes, responsePayload);
+                    toWrite = ms.ToArray();
+                }
+                Debug.WriteLine(String.Format("MESSAGE: {0}", BitConverter.ToString(toWrite)));
+                ns.Write(toWrite, 0, toWrite.Length);
+#else
+                DoWriteMessage(ns, payloadLenBytes, responsePayload);
+#endif
+            }
+            catch (Exception ex)
+            {
+                HandleSocketException(ex);
+            }
+        }
+
+        private static void DoWriteMessage(Stream s, byte[] payloadLenBytes, byte[] responsePayload)
+        {
+            s.Write(payloadLenBytes, 0, payloadLenBytes.Length);
+            s.WriteByte(Constants.CR);
+            s.WriteByte(Constants.LF);
+            s.Write(responsePayload, 0, responsePayload.Length);
+            s.WriteByte(Constants.CR);
+            s.WriteByte(Constants.LF);
         }
 
         private Message HandleRequest(Message msg)
         {
-            log.Trace("HandleRequest: '{0}'", msg.type.ToString());
+            log.Trace("HandleRequest: '{0}'", msg.MessageType.ToString());
 
-            Message response = null;
+            var unwrapper = new MessageUnwrapper(msg);
+            Request request = unwrapper.GetRequest();
 
-            switch (msg.type)
-            {
-                case Message.Type.Ping:
-                    var rsp = new PingResponse();
-                    byte[] msgPayload = null;
-                    using (var ms = new MemoryStream())
-                    {
-                        Serializer.Serialize(ms, rsp);
-                        msgPayload = ms.ToArray();
-                    }
-                    response = new Message { type = Message.Type.Ping, payload = msgPayload };
-                    break;
-            }
+            var factory = new RequestHandlerFactory(msg.MessageType, request);
+            var handler = factory.GetHandler();
+            Response response = handler.Handle();
 
-            return response;
+            var wrapper = new ResponseWrapper(response);
+            return wrapper.GetMessage();
         }
 
         private void HandleSocketException(Exception ex)

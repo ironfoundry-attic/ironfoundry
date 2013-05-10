@@ -9,7 +9,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message ResourceLimits {
   optional uint64 as         =  1;

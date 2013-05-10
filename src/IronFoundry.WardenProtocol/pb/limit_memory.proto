@@ -21,7 +21,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message LimitMemoryRequest {
   required string handle = 1;

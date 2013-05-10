@@ -24,8 +24,8 @@ foreach ($proto_file in $proto_files)
 }
 
 # NB: we can't use -p:fixCase due to type clashes
-$protogen_output = & $protogen_exe -q $protogen_args
+$protogen_output = & $protogen_exe -p:fixCase -q $protogen_args
 
 Pop-Location -Verbose
 
-Set-Content Messages.cs $protogen_output.Replace('namespace warden','namespace IronFoundry.WardenProtocol').Replace('warden.','')
+Set-Content Messages.cs $protogen_output

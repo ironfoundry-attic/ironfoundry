@@ -17,24 +17,24 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
-    private string _src_path;
+    private string _srcPath;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"src_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string src_path
+    public string SrcPath
     {
-      get { return _src_path; }
-      set { _src_path = value; }
+      get { return _srcPath; }
+      set { _srcPath = value; }
     }
-    private string _dst_path;
+    private string _dstPath;
     [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"dst_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string dst_path
+    public string DstPath
     {
-      get { return _dst_path; }
-      set { _dst_path = value; }
+      get { return _dstPath; }
+      set { _dstPath = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -62,30 +62,30 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
-    private string _src_path;
+    private string _srcPath;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"src_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string src_path
+    public string SrcPath
     {
-      get { return _src_path; }
-      set { _src_path = value; }
+      get { return _srcPath; }
+      set { _srcPath = value; }
     }
-    private string _dst_path;
+    private string _dstPath;
     [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"dst_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string dst_path
+    public string DstPath
     {
-      get { return _dst_path; }
-      set { _dst_path = value; }
+      get { return _dstPath; }
+      set { _dstPath = value; }
     }
 
     private string _owner = "";
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"owner", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string owner
+    public string Owner
     {
       get { return _owner; }
       set { _owner = value; }
@@ -114,27 +114,27 @@ namespace IronFoundry.WardenProtocol
   {
     public CreateRequest() {}
     
-    private readonly global::System.Collections.Generic.List<CreateRequest.BindMount> _bind_mounts = new global::System.Collections.Generic.List<CreateRequest.BindMount>();
+    private readonly global::System.Collections.Generic.List<IronFoundry.WardenProtocol.CreateRequest.BindMount> _bindMounts = new global::System.Collections.Generic.List<IronFoundry.WardenProtocol.CreateRequest.BindMount>();
     [global::ProtoBuf.ProtoMember(1, Name=@"bind_mounts", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<CreateRequest.BindMount> bind_mounts
+    public global::System.Collections.Generic.List<IronFoundry.WardenProtocol.CreateRequest.BindMount> BindMounts
     {
-      get { return _bind_mounts; }
+      get { return _bindMounts; }
     }
   
 
-    private uint _grace_time = default(uint);
+    private uint _graceTime = default(uint);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"grace_time", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint grace_time
+    public uint GraceTime
     {
-      get { return _grace_time; }
-      set { _grace_time = value; }
+      get { return _graceTime; }
+      set { _graceTime = value; }
     }
 
     private string _handle = "";
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
@@ -143,7 +143,7 @@ namespace IronFoundry.WardenProtocol
     private string _network = "";
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"network", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string network
+    public string Network
     {
       get { return _network; }
       set { _network = value; }
@@ -152,7 +152,7 @@ namespace IronFoundry.WardenProtocol
     private string _rootfs = "";
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"rootfs", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string rootfs
+    public string Rootfs
     {
       get { return _rootfs; }
       set { _rootfs = value; }
@@ -162,26 +162,26 @@ namespace IronFoundry.WardenProtocol
   {
     public BindMount() {}
     
-    private string _src_path;
+    private string _srcPath;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"src_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string src_path
+    public string SrcPath
     {
-      get { return _src_path; }
-      set { _src_path = value; }
+      get { return _srcPath; }
+      set { _srcPath = value; }
     }
-    private string _dst_path;
+    private string _dstPath;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"dst_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string dst_path
+    public string DstPath
     {
-      get { return _dst_path; }
-      set { _dst_path = value; }
+      get { return _dstPath; }
+      set { _dstPath = value; }
     }
-    private CreateRequest.BindMount.Mode _mode;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"mode", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public CreateRequest.BindMount.Mode mode
+    private IronFoundry.WardenProtocol.CreateRequest.BindMount.Mode _bindMountMode;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"bind_mount_mode", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public IronFoundry.WardenProtocol.CreateRequest.BindMount.Mode BindMountMode
     {
-      get { return _mode; }
-      set { _mode = value; }
+      get { return _bindMountMode; }
+      set { _bindMountMode = value; }
     }
     [global::ProtoBuf.ProtoContract(Name=@"Mode")]
     public enum Mode
@@ -211,7 +211,7 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
@@ -232,7 +232,7 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
@@ -263,7 +263,7 @@ namespace IronFoundry.WardenProtocol
     
     private string _message;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"message", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string message
+    public string Message
     {
       get { return _message; }
       set { _message = value; }
@@ -280,7 +280,7 @@ namespace IronFoundry.WardenProtocol
     
     private string _message;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"message", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string message
+    public string Message
     {
       get { return _message; }
       set { _message = value; }
@@ -303,7 +303,7 @@ namespace IronFoundry.WardenProtocol
     private string _message = "";
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"message", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string message
+    public string Message
     {
       get { return _message; }
       set { _message = value; }
@@ -312,14 +312,14 @@ namespace IronFoundry.WardenProtocol
     private string _data = "";
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string data
+    public string Data
     {
       get { return _data; }
       set { _data = value; }
     }
     private readonly global::System.Collections.Generic.List<string> _backtrace = new global::System.Collections.Generic.List<string>();
     [global::ProtoBuf.ProtoMember(3, Name=@"backtrace", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<string> backtrace
+    public global::System.Collections.Generic.List<string> Backtrace
     {
       get { return _backtrace; }
     }
@@ -340,7 +340,7 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
@@ -359,86 +359,86 @@ namespace IronFoundry.WardenProtocol
     private string _state = "";
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"state", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string state
+    public string State
     {
       get { return _state; }
       set { _state = value; }
     }
     private readonly global::System.Collections.Generic.List<string> _events = new global::System.Collections.Generic.List<string>();
     [global::ProtoBuf.ProtoMember(20, Name=@"events", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<string> events
+    public global::System.Collections.Generic.List<string> Events
     {
       get { return _events; }
     }
   
 
-    private string _host_ip = "";
+    private string _hostIp = "";
     [global::ProtoBuf.ProtoMember(30, IsRequired = false, Name=@"host_ip", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string host_ip
+    public string HostIp
     {
-      get { return _host_ip; }
-      set { _host_ip = value; }
+      get { return _hostIp; }
+      set { _hostIp = value; }
     }
 
-    private string _container_ip = "";
+    private string _containerIp = "";
     [global::ProtoBuf.ProtoMember(31, IsRequired = false, Name=@"container_ip", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string container_ip
+    public string ContainerIp
     {
-      get { return _container_ip; }
-      set { _container_ip = value; }
+      get { return _containerIp; }
+      set { _containerIp = value; }
     }
 
-    private string _container_path = "";
+    private string _containerPath = "";
     [global::ProtoBuf.ProtoMember(32, IsRequired = false, Name=@"container_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string container_path
+    public string ContainerPath
     {
-      get { return _container_path; }
-      set { _container_path = value; }
+      get { return _containerPath; }
+      set { _containerPath = value; }
     }
 
-    private InfoResponse.MemoryStat _memory_stat = null;
-    [global::ProtoBuf.ProtoMember(40, IsRequired = false, Name=@"memory_stat", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private IronFoundry.WardenProtocol.InfoResponse.MemoryStat _memoryStatInfo = null;
+    [global::ProtoBuf.ProtoMember(40, IsRequired = false, Name=@"memory_stat_info", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public InfoResponse.MemoryStat memory_stat
+    public IronFoundry.WardenProtocol.InfoResponse.MemoryStat MemoryStatInfo
     {
-      get { return _memory_stat; }
-      set { _memory_stat = value; }
+      get { return _memoryStatInfo; }
+      set { _memoryStatInfo = value; }
     }
 
-    private InfoResponse.CpuStat _cpu_stat = null;
-    [global::ProtoBuf.ProtoMember(41, IsRequired = false, Name=@"cpu_stat", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private IronFoundry.WardenProtocol.InfoResponse.CpuStat _cpuStatInfo = null;
+    [global::ProtoBuf.ProtoMember(41, IsRequired = false, Name=@"cpu_stat_info", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public InfoResponse.CpuStat cpu_stat
+    public IronFoundry.WardenProtocol.InfoResponse.CpuStat CpuStatInfo
     {
-      get { return _cpu_stat; }
-      set { _cpu_stat = value; }
+      get { return _cpuStatInfo; }
+      set { _cpuStatInfo = value; }
     }
 
-    private InfoResponse.DiskStat _disk_stat = null;
-    [global::ProtoBuf.ProtoMember(42, IsRequired = false, Name=@"disk_stat", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private IronFoundry.WardenProtocol.InfoResponse.DiskStat _diskStatInfo = null;
+    [global::ProtoBuf.ProtoMember(42, IsRequired = false, Name=@"disk_stat_info", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public InfoResponse.DiskStat disk_stat
+    public IronFoundry.WardenProtocol.InfoResponse.DiskStat DiskStatInfo
     {
-      get { return _disk_stat; }
-      set { _disk_stat = value; }
+      get { return _diskStatInfo; }
+      set { _diskStatInfo = value; }
     }
 
-    private InfoResponse.BandwidthStat _bandwidth_stat = null;
-    [global::ProtoBuf.ProtoMember(43, IsRequired = false, Name=@"bandwidth_stat", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private IronFoundry.WardenProtocol.InfoResponse.BandwidthStat _bandwidthStatInfo = null;
+    [global::ProtoBuf.ProtoMember(43, IsRequired = false, Name=@"bandwidth_stat_info", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public InfoResponse.BandwidthStat bandwidth_stat
+    public IronFoundry.WardenProtocol.InfoResponse.BandwidthStat BandwidthStatInfo
     {
-      get { return _bandwidth_stat; }
-      set { _bandwidth_stat = value; }
+      get { return _bandwidthStatInfo; }
+      set { _bandwidthStatInfo = value; }
     }
-    private readonly global::System.Collections.Generic.List<ulong> _job_ids = new global::System.Collections.Generic.List<ulong>();
+    private readonly global::System.Collections.Generic.List<ulong> _jobIds = new global::System.Collections.Generic.List<ulong>();
     [global::ProtoBuf.ProtoMember(44, Name=@"job_ids", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public global::System.Collections.Generic.List<ulong> job_ids
+    public global::System.Collections.Generic.List<ulong> JobIds
     {
-      get { return _job_ids; }
+      get { return _jobIds; }
     }
   
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"MemoryStat")]
@@ -450,7 +450,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _cache = default(ulong);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"cache", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong cache
+    public ulong Cache
     {
       get { return _cache; }
       set { _cache = value; }
@@ -459,25 +459,25 @@ namespace IronFoundry.WardenProtocol
     private ulong _rss = default(ulong);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"rss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong rss
+    public ulong Rss
     {
       get { return _rss; }
       set { _rss = value; }
     }
 
-    private ulong _mapped_file = default(ulong);
+    private ulong _mappedFile = default(ulong);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"mapped_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong mapped_file
+    public ulong MappedFile
     {
-      get { return _mapped_file; }
-      set { _mapped_file = value; }
+      get { return _mappedFile; }
+      set { _mappedFile = value; }
     }
 
     private ulong _pgpgin = default(ulong);
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"pgpgin", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong pgpgin
+    public ulong Pgpgin
     {
       get { return _pgpgin; }
       set { _pgpgin = value; }
@@ -486,7 +486,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _pgpgout = default(ulong);
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"pgpgout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong pgpgout
+    public ulong Pgpgout
     {
       get { return _pgpgout; }
       set { _pgpgout = value; }
@@ -495,7 +495,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _swap = default(ulong);
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"swap", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong swap
+    public ulong Swap
     {
       get { return _swap; }
       set { _swap = value; }
@@ -504,7 +504,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _pgfault = default(ulong);
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"pgfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong pgfault
+    public ulong Pgfault
     {
       get { return _pgfault; }
       set { _pgfault = value; }
@@ -513,190 +513,190 @@ namespace IronFoundry.WardenProtocol
     private ulong _pgmajfault = default(ulong);
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"pgmajfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong pgmajfault
+    public ulong Pgmajfault
     {
       get { return _pgmajfault; }
       set { _pgmajfault = value; }
     }
 
-    private ulong _inactive_anon = default(ulong);
+    private ulong _inactiveAnon = default(ulong);
     [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"inactive_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inactive_anon
+    public ulong InactiveAnon
     {
-      get { return _inactive_anon; }
-      set { _inactive_anon = value; }
+      get { return _inactiveAnon; }
+      set { _inactiveAnon = value; }
     }
 
-    private ulong _active_anon = default(ulong);
+    private ulong _activeAnon = default(ulong);
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"active_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong active_anon
+    public ulong ActiveAnon
     {
-      get { return _active_anon; }
-      set { _active_anon = value; }
+      get { return _activeAnon; }
+      set { _activeAnon = value; }
     }
 
-    private ulong _inactive_file = default(ulong);
+    private ulong _inactiveFile = default(ulong);
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"inactive_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inactive_file
+    public ulong InactiveFile
     {
-      get { return _inactive_file; }
-      set { _inactive_file = value; }
+      get { return _inactiveFile; }
+      set { _inactiveFile = value; }
     }
 
-    private ulong _active_file = default(ulong);
+    private ulong _activeFile = default(ulong);
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"active_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong active_file
+    public ulong ActiveFile
     {
-      get { return _active_file; }
-      set { _active_file = value; }
+      get { return _activeFile; }
+      set { _activeFile = value; }
     }
 
     private ulong _unevictable = default(ulong);
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"unevictable", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong unevictable
+    public ulong Unevictable
     {
       get { return _unevictable; }
       set { _unevictable = value; }
     }
 
-    private ulong _hierarchical_memory_limit = default(ulong);
+    private ulong _hierarchicalMemoryLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"hierarchical_memory_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong hierarchical_memory_limit
+    public ulong HierarchicalMemoryLimit
     {
-      get { return _hierarchical_memory_limit; }
-      set { _hierarchical_memory_limit = value; }
+      get { return _hierarchicalMemoryLimit; }
+      set { _hierarchicalMemoryLimit = value; }
     }
 
-    private ulong _hierarchical_memsw_limit = default(ulong);
+    private ulong _hierarchicalMemswLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"hierarchical_memsw_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong hierarchical_memsw_limit
+    public ulong HierarchicalMemswLimit
     {
-      get { return _hierarchical_memsw_limit; }
-      set { _hierarchical_memsw_limit = value; }
+      get { return _hierarchicalMemswLimit; }
+      set { _hierarchicalMemswLimit = value; }
     }
 
-    private ulong _total_cache = default(ulong);
+    private ulong _totalCache = default(ulong);
     [global::ProtoBuf.ProtoMember(16, IsRequired = false, Name=@"total_cache", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_cache
+    public ulong TotalCache
     {
-      get { return _total_cache; }
-      set { _total_cache = value; }
+      get { return _totalCache; }
+      set { _totalCache = value; }
     }
 
-    private ulong _total_rss = default(ulong);
+    private ulong _totalRss = default(ulong);
     [global::ProtoBuf.ProtoMember(17, IsRequired = false, Name=@"total_rss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_rss
+    public ulong TotalRss
     {
-      get { return _total_rss; }
-      set { _total_rss = value; }
+      get { return _totalRss; }
+      set { _totalRss = value; }
     }
 
-    private ulong _total_mapped_file = default(ulong);
+    private ulong _totalMappedFile = default(ulong);
     [global::ProtoBuf.ProtoMember(18, IsRequired = false, Name=@"total_mapped_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_mapped_file
+    public ulong TotalMappedFile
     {
-      get { return _total_mapped_file; }
-      set { _total_mapped_file = value; }
+      get { return _totalMappedFile; }
+      set { _totalMappedFile = value; }
     }
 
-    private ulong _total_pgpgin = default(ulong);
+    private ulong _totalPgpgin = default(ulong);
     [global::ProtoBuf.ProtoMember(19, IsRequired = false, Name=@"total_pgpgin", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_pgpgin
+    public ulong TotalPgpgin
     {
-      get { return _total_pgpgin; }
-      set { _total_pgpgin = value; }
+      get { return _totalPgpgin; }
+      set { _totalPgpgin = value; }
     }
 
-    private ulong _total_pgpgout = default(ulong);
+    private ulong _totalPgpgout = default(ulong);
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"total_pgpgout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_pgpgout
+    public ulong TotalPgpgout
     {
-      get { return _total_pgpgout; }
-      set { _total_pgpgout = value; }
+      get { return _totalPgpgout; }
+      set { _totalPgpgout = value; }
     }
 
-    private ulong _total_swap = default(ulong);
+    private ulong _totalSwap = default(ulong);
     [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"total_swap", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_swap
+    public ulong TotalSwap
     {
-      get { return _total_swap; }
-      set { _total_swap = value; }
+      get { return _totalSwap; }
+      set { _totalSwap = value; }
     }
 
-    private ulong _total_pgfault = default(ulong);
+    private ulong _totalPgfault = default(ulong);
     [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"total_pgfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_pgfault
+    public ulong TotalPgfault
     {
-      get { return _total_pgfault; }
-      set { _total_pgfault = value; }
+      get { return _totalPgfault; }
+      set { _totalPgfault = value; }
     }
 
-    private ulong _total_pgmajfault = default(ulong);
+    private ulong _totalPgmajfault = default(ulong);
     [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"total_pgmajfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_pgmajfault
+    public ulong TotalPgmajfault
     {
-      get { return _total_pgmajfault; }
-      set { _total_pgmajfault = value; }
+      get { return _totalPgmajfault; }
+      set { _totalPgmajfault = value; }
     }
 
-    private ulong _total_inactive_anon = default(ulong);
+    private ulong _totalInactiveAnon = default(ulong);
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"total_inactive_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_inactive_anon
+    public ulong TotalInactiveAnon
     {
-      get { return _total_inactive_anon; }
-      set { _total_inactive_anon = value; }
+      get { return _totalInactiveAnon; }
+      set { _totalInactiveAnon = value; }
     }
 
-    private ulong _total_active_anon = default(ulong);
+    private ulong _totalActiveAnon = default(ulong);
     [global::ProtoBuf.ProtoMember(25, IsRequired = false, Name=@"total_active_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_active_anon
+    public ulong TotalActiveAnon
     {
-      get { return _total_active_anon; }
-      set { _total_active_anon = value; }
+      get { return _totalActiveAnon; }
+      set { _totalActiveAnon = value; }
     }
 
-    private ulong _total_inactive_file = default(ulong);
+    private ulong _totalInactiveFile = default(ulong);
     [global::ProtoBuf.ProtoMember(26, IsRequired = false, Name=@"total_inactive_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_inactive_file
+    public ulong TotalInactiveFile
     {
-      get { return _total_inactive_file; }
-      set { _total_inactive_file = value; }
+      get { return _totalInactiveFile; }
+      set { _totalInactiveFile = value; }
     }
 
-    private ulong _total_active_file = default(ulong);
+    private ulong _totalActiveFile = default(ulong);
     [global::ProtoBuf.ProtoMember(27, IsRequired = false, Name=@"total_active_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_active_file
+    public ulong TotalActiveFile
     {
-      get { return _total_active_file; }
-      set { _total_active_file = value; }
+      get { return _totalActiveFile; }
+      set { _totalActiveFile = value; }
     }
 
-    private ulong _total_unevictable = default(ulong);
+    private ulong _totalUnevictable = default(ulong);
     [global::ProtoBuf.ProtoMember(28, IsRequired = false, Name=@"total_unevictable", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong total_unevictable
+    public ulong TotalUnevictable
     {
-      get { return _total_unevictable; }
-      set { _total_unevictable = value; }
+      get { return _totalUnevictable; }
+      set { _totalUnevictable = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -712,7 +712,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _usage = default(ulong);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"usage", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong usage
+    public ulong Usage
     {
       get { return _usage; }
       set { _usage = value; }
@@ -721,7 +721,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _user = default(ulong);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"user", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong user
+    public ulong User
     {
       get { return _user; }
       set { _user = value; }
@@ -730,7 +730,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _system = default(ulong);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"system", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong system
+    public ulong System
     {
       get { return _system; }
       set { _system = value; }
@@ -746,22 +746,22 @@ namespace IronFoundry.WardenProtocol
     public DiskStat() {}
     
 
-    private ulong _bytes_used = default(ulong);
+    private ulong _bytesUsed = default(ulong);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"bytes_used", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong bytes_used
+    public ulong BytesUsed
     {
-      get { return _bytes_used; }
-      set { _bytes_used = value; }
+      get { return _bytesUsed; }
+      set { _bytesUsed = value; }
     }
 
-    private ulong _inodes_used = default(ulong);
+    private ulong _inodesUsed = default(ulong);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"inodes_used", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inodes_used
+    public ulong InodesUsed
     {
-      get { return _inodes_used; }
-      set { _inodes_used = value; }
+      get { return _inodesUsed; }
+      set { _inodesUsed = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -774,40 +774,40 @@ namespace IronFoundry.WardenProtocol
     public BandwidthStat() {}
     
 
-    private ulong _in_rate = default(ulong);
+    private ulong _inRate = default(ulong);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"in_rate", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong in_rate
+    public ulong InRate
     {
-      get { return _in_rate; }
-      set { _in_rate = value; }
+      get { return _inRate; }
+      set { _inRate = value; }
     }
 
-    private ulong _in_burst = default(ulong);
+    private ulong _inBurst = default(ulong);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"in_burst", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong in_burst
+    public ulong InBurst
     {
-      get { return _in_burst; }
-      set { _in_burst = value; }
+      get { return _inBurst; }
+      set { _inBurst = value; }
     }
 
-    private ulong _out_rate = default(ulong);
+    private ulong _outRate = default(ulong);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"out_rate", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong out_rate
+    public ulong OutRate
     {
-      get { return _out_rate; }
-      set { _out_rate = value; }
+      get { return _outRate; }
+      set { _outRate = value; }
     }
 
-    private ulong _out_burst = default(ulong);
+    private ulong _outBurst = default(ulong);
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"out_burst", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong out_burst
+    public ulong OutBurst
     {
-      get { return _out_burst; }
-      set { _out_burst = value; }
+      get { return _outBurst; }
+      set { _outBurst = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -830,21 +830,21 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
     private ulong _rate;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"rate", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public ulong rate
+    public ulong Rate
     {
       get { return _rate; }
       set { _rate = value; }
     }
     private ulong _burst;
     [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"burst", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public ulong burst
+    public ulong Burst
     {
       get { return _burst; }
       set { _burst = value; }
@@ -861,14 +861,14 @@ namespace IronFoundry.WardenProtocol
     
     private ulong _rate;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"rate", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public ulong rate
+    public ulong Rate
     {
       get { return _rate; }
       set { _rate = value; }
     }
     private ulong _burst;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"burst", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public ulong burst
+    public ulong Burst
     {
       get { return _burst; }
       set { _burst = value; }
@@ -889,118 +889,118 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
 
-    private ulong _block_limit = default(ulong);
+    private ulong _blockLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"block_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block_limit
+    public ulong BlockLimit
     {
-      get { return _block_limit; }
-      set { _block_limit = value; }
+      get { return _blockLimit; }
+      set { _blockLimit = value; }
     }
 
     private ulong _block = default(ulong);
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"block", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block
+    public ulong Block
     {
       get { return _block; }
       set { _block = value; }
     }
 
-    private ulong _block_soft = default(ulong);
+    private ulong _blockSoft = default(ulong);
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"block_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block_soft
+    public ulong BlockSoft
     {
-      get { return _block_soft; }
-      set { _block_soft = value; }
+      get { return _blockSoft; }
+      set { _blockSoft = value; }
     }
 
-    private ulong _block_hard = default(ulong);
+    private ulong _blockHard = default(ulong);
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"block_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block_hard
+    public ulong BlockHard
     {
-      get { return _block_hard; }
-      set { _block_hard = value; }
+      get { return _blockHard; }
+      set { _blockHard = value; }
     }
 
-    private ulong _inode_limit = default(ulong);
+    private ulong _inodeLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"inode_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode_limit
+    public ulong InodeLimit
     {
-      get { return _inode_limit; }
-      set { _inode_limit = value; }
+      get { return _inodeLimit; }
+      set { _inodeLimit = value; }
     }
 
     private ulong _inode = default(ulong);
     [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"inode", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode
+    public ulong Inode
     {
       get { return _inode; }
       set { _inode = value; }
     }
 
-    private ulong _inode_soft = default(ulong);
+    private ulong _inodeSoft = default(ulong);
     [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"inode_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode_soft
+    public ulong InodeSoft
     {
-      get { return _inode_soft; }
-      set { _inode_soft = value; }
+      get { return _inodeSoft; }
+      set { _inodeSoft = value; }
     }
 
-    private ulong _inode_hard = default(ulong);
+    private ulong _inodeHard = default(ulong);
     [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"inode_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode_hard
+    public ulong InodeHard
     {
-      get { return _inode_hard; }
-      set { _inode_hard = value; }
+      get { return _inodeHard; }
+      set { _inodeHard = value; }
     }
 
-    private ulong _byte_limit = default(ulong);
+    private ulong _byteLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(30, IsRequired = false, Name=@"byte_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong byte_limit
+    public ulong ByteLimit
     {
-      get { return _byte_limit; }
-      set { _byte_limit = value; }
+      get { return _byteLimit; }
+      set { _byteLimit = value; }
     }
 
     private ulong _byte = default(ulong);
     [global::ProtoBuf.ProtoMember(31, IsRequired = false, Name=@"byte", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong @byte
+    public ulong Byte
     {
       get { return _byte; }
       set { _byte = value; }
     }
 
-    private ulong _byte_soft = default(ulong);
+    private ulong _byteSoft = default(ulong);
     [global::ProtoBuf.ProtoMember(32, IsRequired = false, Name=@"byte_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong byte_soft
+    public ulong ByteSoft
     {
-      get { return _byte_soft; }
-      set { _byte_soft = value; }
+      get { return _byteSoft; }
+      set { _byteSoft = value; }
     }
 
-    private ulong _byte_hard = default(ulong);
+    private ulong _byteHard = default(ulong);
     [global::ProtoBuf.ProtoMember(33, IsRequired = false, Name=@"byte_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong byte_hard
+    public ulong ByteHard
     {
-      get { return _byte_hard; }
-      set { _byte_hard = value; }
+      get { return _byteHard; }
+      set { _byteHard = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1013,112 +1013,112 @@ namespace IronFoundry.WardenProtocol
     public LimitDiskResponse() {}
     
 
-    private ulong _block_limit = default(ulong);
+    private ulong _blockLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"block_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block_limit
+    public ulong BlockLimit
     {
-      get { return _block_limit; }
-      set { _block_limit = value; }
+      get { return _blockLimit; }
+      set { _blockLimit = value; }
     }
 
     private ulong _block = default(ulong);
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"block", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block
+    public ulong Block
     {
       get { return _block; }
       set { _block = value; }
     }
 
-    private ulong _block_soft = default(ulong);
+    private ulong _blockSoft = default(ulong);
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"block_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block_soft
+    public ulong BlockSoft
     {
-      get { return _block_soft; }
-      set { _block_soft = value; }
+      get { return _blockSoft; }
+      set { _blockSoft = value; }
     }
 
-    private ulong _block_hard = default(ulong);
+    private ulong _blockHard = default(ulong);
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"block_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong block_hard
+    public ulong BlockHard
     {
-      get { return _block_hard; }
-      set { _block_hard = value; }
+      get { return _blockHard; }
+      set { _blockHard = value; }
     }
 
-    private ulong _inode_limit = default(ulong);
+    private ulong _inodeLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"inode_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode_limit
+    public ulong InodeLimit
     {
-      get { return _inode_limit; }
-      set { _inode_limit = value; }
+      get { return _inodeLimit; }
+      set { _inodeLimit = value; }
     }
 
     private ulong _inode = default(ulong);
     [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"inode", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode
+    public ulong Inode
     {
       get { return _inode; }
       set { _inode = value; }
     }
 
-    private ulong _inode_soft = default(ulong);
+    private ulong _inodeSoft = default(ulong);
     [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"inode_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode_soft
+    public ulong InodeSoft
     {
-      get { return _inode_soft; }
-      set { _inode_soft = value; }
+      get { return _inodeSoft; }
+      set { _inodeSoft = value; }
     }
 
-    private ulong _inode_hard = default(ulong);
+    private ulong _inodeHard = default(ulong);
     [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"inode_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong inode_hard
+    public ulong InodeHard
     {
-      get { return _inode_hard; }
-      set { _inode_hard = value; }
+      get { return _inodeHard; }
+      set { _inodeHard = value; }
     }
 
-    private ulong _byte_limit = default(ulong);
+    private ulong _byteLimit = default(ulong);
     [global::ProtoBuf.ProtoMember(30, IsRequired = false, Name=@"byte_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong byte_limit
+    public ulong ByteLimit
     {
-      get { return _byte_limit; }
-      set { _byte_limit = value; }
+      get { return _byteLimit; }
+      set { _byteLimit = value; }
     }
 
     private ulong _byte = default(ulong);
     [global::ProtoBuf.ProtoMember(31, IsRequired = false, Name=@"byte", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong @byte
+    public ulong Byte
     {
       get { return _byte; }
       set { _byte = value; }
     }
 
-    private ulong _byte_soft = default(ulong);
+    private ulong _byteSoft = default(ulong);
     [global::ProtoBuf.ProtoMember(32, IsRequired = false, Name=@"byte_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong byte_soft
+    public ulong ByteSoft
     {
-      get { return _byte_soft; }
-      set { _byte_soft = value; }
+      get { return _byteSoft; }
+      set { _byteSoft = value; }
     }
 
-    private ulong _byte_hard = default(ulong);
+    private ulong _byteHard = default(ulong);
     [global::ProtoBuf.ProtoMember(33, IsRequired = false, Name=@"byte_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong byte_hard
+    public ulong ByteHard
     {
-      get { return _byte_hard; }
-      set { _byte_hard = value; }
+      get { return _byteHard; }
+      set { _byteHard = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1136,19 +1136,19 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
 
-    private ulong _limit_in_bytes = default(ulong);
+    private ulong _limitInBytes = default(ulong);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"limit_in_bytes", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong limit_in_bytes
+    public ulong LimitInBytes
     {
-      get { return _limit_in_bytes; }
-      set { _limit_in_bytes = value; }
+      get { return _limitInBytes; }
+      set { _limitInBytes = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1161,13 +1161,13 @@ namespace IronFoundry.WardenProtocol
     public LimitMemoryResponse() {}
     
 
-    private ulong _limit_in_bytes = default(ulong);
+    private ulong _limitInBytes = default(ulong);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"limit_in_bytes", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong limit_in_bytes
+    public ulong LimitInBytes
     {
-      get { return _limit_in_bytes; }
-      set { _limit_in_bytes = value; }
+      get { return _limitInBytes; }
+      set { _limitInBytes = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1185,17 +1185,17 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
-    private uint _job_id;
+    private uint _jobId;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"job_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint job_id
+    public uint JobId
     {
-      get { return _job_id; }
-      set { _job_id = value; }
+      get { return _jobId; }
+      set { _jobId = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1208,19 +1208,19 @@ namespace IronFoundry.WardenProtocol
     public LinkResponse() {}
     
 
-    private uint _exit_status = default(uint);
+    private uint _exitStatus = default(uint);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint exit_status
+    public uint ExitStatus
     {
-      get { return _exit_status; }
-      set { _exit_status = value; }
+      get { return _exitStatus; }
+      set { _exitStatus = value; }
     }
 
     private string _stdout = "";
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"stdout", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string stdout
+    public string Stdout
     {
       get { return _stdout; }
       set { _stdout = value; }
@@ -1229,7 +1229,7 @@ namespace IronFoundry.WardenProtocol
     private string _stderr = "";
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"stderr", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string stderr
+    public string Stderr
     {
       get { return _stderr; }
       set { _stderr = value; }
@@ -1260,7 +1260,7 @@ namespace IronFoundry.WardenProtocol
     
     private readonly global::System.Collections.Generic.List<string> _handles = new global::System.Collections.Generic.List<string>();
     [global::ProtoBuf.ProtoMember(1, Name=@"handles", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<string> handles
+    public global::System.Collections.Generic.List<string> Handles
     {
       get { return _handles; }
     }
@@ -1279,16 +1279,16 @@ namespace IronFoundry.WardenProtocol
   {
     public Message() {}
     
-    private Message.Type _type;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public Message.Type type
+    private IronFoundry.WardenProtocol.Message.Type _messageType;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"message_type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public IronFoundry.WardenProtocol.Message.Type MessageType
     {
-      get { return _type; }
-      set { _type = value; }
+      get { return _messageType; }
+      set { _messageType = value; }
     }
     private byte[] _payload;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"payload", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public byte[] payload
+    public byte[] Payload
     {
       get { return _payload; }
       set { _payload = value; }
@@ -1371,28 +1371,28 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
 
-    private uint _host_port = default(uint);
+    private uint _hostPort = default(uint);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"host_port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint host_port
+    public uint HostPort
     {
-      get { return _host_port; }
-      set { _host_port = value; }
+      get { return _hostPort; }
+      set { _hostPort = value; }
     }
 
-    private uint _container_port = default(uint);
+    private uint _containerPort = default(uint);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"container_port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint container_port
+    public uint ContainerPort
     {
-      get { return _container_port; }
-      set { _container_port = value; }
+      get { return _containerPort; }
+      set { _containerPort = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1404,19 +1404,19 @@ namespace IronFoundry.WardenProtocol
   {
     public NetInResponse() {}
     
-    private uint _host_port;
+    private uint _hostPort;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"host_port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint host_port
+    public uint HostPort
     {
-      get { return _host_port; }
-      set { _host_port = value; }
+      get { return _hostPort; }
+      set { _hostPort = value; }
     }
-    private uint _container_port;
+    private uint _containerPort;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"container_port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint container_port
+    public uint ContainerPort
     {
-      get { return _container_port; }
-      set { _container_port = value; }
+      get { return _containerPort; }
+      set { _containerPort = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1434,7 +1434,7 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
@@ -1443,7 +1443,7 @@ namespace IronFoundry.WardenProtocol
     private string _network = "";
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"network", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string network
+    public string Network
     {
       get { return _network; }
       set { _network = value; }
@@ -1452,7 +1452,7 @@ namespace IronFoundry.WardenProtocol
     private uint _port = default(uint);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint port
+    public uint Port
     {
       get { return _port; }
       set { _port = value; }
@@ -1509,7 +1509,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _as = default(ulong);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"as", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong @as
+    public ulong As
     {
       get { return _as; }
       set { _as = value; }
@@ -1518,7 +1518,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _core = default(ulong);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"core", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong core
+    public ulong Core
     {
       get { return _core; }
       set { _core = value; }
@@ -1527,7 +1527,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _cpu = default(ulong);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"cpu", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong cpu
+    public ulong Cpu
     {
       get { return _cpu; }
       set { _cpu = value; }
@@ -1536,7 +1536,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _data = default(ulong);
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong data
+    public ulong Data
     {
       get { return _data; }
       set { _data = value; }
@@ -1545,7 +1545,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _fsize = default(ulong);
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"fsize", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong fsize
+    public ulong Fsize
     {
       get { return _fsize; }
       set { _fsize = value; }
@@ -1554,7 +1554,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _locks = default(ulong);
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"locks", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong locks
+    public ulong Locks
     {
       get { return _locks; }
       set { _locks = value; }
@@ -1563,7 +1563,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _memlock = default(ulong);
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"memlock", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong memlock
+    public ulong Memlock
     {
       get { return _memlock; }
       set { _memlock = value; }
@@ -1572,7 +1572,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _msgqueue = default(ulong);
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"msgqueue", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong msgqueue
+    public ulong Msgqueue
     {
       get { return _msgqueue; }
       set { _msgqueue = value; }
@@ -1581,7 +1581,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _nice = default(ulong);
     [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"nice", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong nice
+    public ulong Nice
     {
       get { return _nice; }
       set { _nice = value; }
@@ -1590,7 +1590,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _nofile = default(ulong);
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"nofile", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong nofile
+    public ulong Nofile
     {
       get { return _nofile; }
       set { _nofile = value; }
@@ -1599,7 +1599,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _nproc = default(ulong);
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"nproc", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong nproc
+    public ulong Nproc
     {
       get { return _nproc; }
       set { _nproc = value; }
@@ -1608,7 +1608,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _rss = default(ulong);
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"rss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong rss
+    public ulong Rss
     {
       get { return _rss; }
       set { _rss = value; }
@@ -1617,7 +1617,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _rtprio = default(ulong);
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"rtprio", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong rtprio
+    public ulong Rtprio
     {
       get { return _rtprio; }
       set { _rtprio = value; }
@@ -1626,7 +1626,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _sigpending = default(ulong);
     [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"sigpending", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong sigpending
+    public ulong Sigpending
     {
       get { return _sigpending; }
       set { _sigpending = value; }
@@ -1635,7 +1635,7 @@ namespace IronFoundry.WardenProtocol
     private ulong _stack = default(ulong);
     [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"stack", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong stack
+    public ulong Stack
     {
       get { return _stack; }
       set { _stack = value; }
@@ -1657,14 +1657,14 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
     private string _script;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"script", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string script
+    public string Script
     {
       get { return _script; }
       set { _script = value; }
@@ -1673,16 +1673,16 @@ namespace IronFoundry.WardenProtocol
     private bool _privileged = (bool)false;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"privileged", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue((bool)false)]
-    public bool privileged
+    public bool Privileged
     {
       get { return _privileged; }
       set { _privileged = value; }
     }
 
-    private ResourceLimits _rlimits = null;
+    private IronFoundry.WardenProtocol.ResourceLimits _rlimits = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"rlimits", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public ResourceLimits rlimits
+    public IronFoundry.WardenProtocol.ResourceLimits Rlimits
     {
       get { return _rlimits; }
       set { _rlimits = value; }
@@ -1698,19 +1698,19 @@ namespace IronFoundry.WardenProtocol
     public RunResponse() {}
     
 
-    private uint _exit_status = default(uint);
+    private uint _exitStatus = default(uint);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint exit_status
+    public uint ExitStatus
     {
-      get { return _exit_status; }
-      set { _exit_status = value; }
+      get { return _exitStatus; }
+      set { _exitStatus = value; }
     }
 
     private string _stdout = "";
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"stdout", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string stdout
+    public string Stdout
     {
       get { return _stdout; }
       set { _stdout = value; }
@@ -1719,7 +1719,7 @@ namespace IronFoundry.WardenProtocol
     private string _stderr = "";
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"stderr", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string stderr
+    public string Stderr
     {
       get { return _stderr; }
       set { _stderr = value; }
@@ -1741,14 +1741,14 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
     private string _script;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"script", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string script
+    public string Script
     {
       get { return _script; }
       set { _script = value; }
@@ -1757,16 +1757,16 @@ namespace IronFoundry.WardenProtocol
     private bool _privileged = (bool)false;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"privileged", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue((bool)false)]
-    public bool privileged
+    public bool Privileged
     {
       get { return _privileged; }
       set { _privileged = value; }
     }
 
-    private ResourceLimits _rlimits = null;
+    private IronFoundry.WardenProtocol.ResourceLimits _rlimits = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"rlimits", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public ResourceLimits rlimits
+    public IronFoundry.WardenProtocol.ResourceLimits Rlimits
     {
       get { return _rlimits; }
       set { _rlimits = value; }
@@ -1781,12 +1781,12 @@ namespace IronFoundry.WardenProtocol
   {
     public SpawnResponse() {}
     
-    private uint _job_id;
+    private uint _jobId;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"job_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint job_id
+    public uint JobId
     {
-      get { return _job_id; }
-      set { _job_id = value; }
+      get { return _jobId; }
+      set { _jobId = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1804,7 +1804,7 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
@@ -1813,7 +1813,7 @@ namespace IronFoundry.WardenProtocol
     private bool _background = (bool)false;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"background", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue((bool)false)]
-    public bool background
+    public bool Background
     {
       get { return _background; }
       set { _background = value; }
@@ -1822,7 +1822,7 @@ namespace IronFoundry.WardenProtocol
     private bool _kill = (bool)false;
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"kill", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue((bool)false)]
-    public bool kill
+    public bool Kill
     {
       get { return _kill; }
       set { _kill = value; }
@@ -1853,17 +1853,17 @@ namespace IronFoundry.WardenProtocol
     
     private string _handle;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string handle
+    public string Handle
     {
       get { return _handle; }
       set { _handle = value; }
     }
-    private uint _job_id;
+    private uint _jobId;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"job_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint job_id
+    public uint JobId
     {
-      get { return _job_id; }
-      set { _job_id = value; }
+      get { return _jobId; }
+      set { _jobId = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1879,7 +1879,7 @@ namespace IronFoundry.WardenProtocol
     private string _name = "";
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string name
+    public string Name
     {
       get { return _name; }
       set { _name = value; }
@@ -1888,19 +1888,19 @@ namespace IronFoundry.WardenProtocol
     private string _data = "";
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string data
+    public string Data
     {
       get { return _data; }
       set { _data = value; }
     }
 
-    private uint _exit_status = default(uint);
+    private uint _exitStatus = default(uint);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint exit_status
+    public uint ExitStatus
     {
-      get { return _exit_status; }
-      set { _exit_status = value; }
+      get { return _exitStatus; }
+      set { _exitStatus = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

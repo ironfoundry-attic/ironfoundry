@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Warden
+﻿namespace IronFoundry.WardenService
 {
     using System;
     using System.Collections.Generic;

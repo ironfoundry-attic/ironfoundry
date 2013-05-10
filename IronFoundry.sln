@@ -89,9 +89,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "warden", "warden", "{15F337
 		docs\warden-notes.md = docs\warden-notes.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Warden", "src\IronFoundry.Warden\IronFoundry.Warden.csproj", "{84414841-E608-430B-A61C-9E933E1683F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.WardenService", "src\IronFoundry.WardenService\IronFoundry.WardenService.csproj", "{84414841-E608-430B-A61C-9E933E1683F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.WardenProtocol", "src\IronFoundry.WardenProtocol\IronFoundry.WardenProtocol.csproj", "{DDD0537B-4AFE-4BEB-BF30-4DF0A5367A18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronFoundry.Warden", "src\IronFoundry.Warden\IronFoundry.Warden.csproj", "{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -222,6 +224,12 @@ Global
 		{DDD0537B-4AFE-4BEB-BF30-4DF0A5367A18}.Release|x64.ActiveCfg = Release|Any CPU
 		{DDD0537B-4AFE-4BEB-BF30-4DF0A5367A18}.Release|x64.Build.0 = Release|Any CPU
 		{DDD0537B-4AFE-4BEB-BF30-4DF0A5367A18}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B}.Release|x64.Build.0 = Release|Any CPU
+		{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -249,5 +257,6 @@ Global
 		{3036ED5E-9E52-4927-8BE1-8C9025D29503} = {ABFF6A60-2D67-4859-A3C5-007F18E27DE2}
 		{84414841-E608-430B-A61C-9E933E1683F4} = {15F33796-AEC7-43E3-92D0-4AC86B5A3644}
 		{DDD0537B-4AFE-4BEB-BF30-4DF0A5367A18} = {15F33796-AEC7-43E3-92D0-4AC86B5A3644}
+		{CC1C255A-A120-4D7F-B40F-C4CB3CDB193B} = {15F33796-AEC7-43E3-92D0-4AC86B5A3644}
 	EndGlobalSection
 EndGlobal

@@ -22,7 +22,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 import "resource_limits.proto";
 

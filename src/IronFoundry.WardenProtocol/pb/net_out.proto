@@ -22,7 +22,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message NetOutRequest {
   required string handle = 1;

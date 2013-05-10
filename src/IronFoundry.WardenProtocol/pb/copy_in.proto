@@ -23,7 +23,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message CopyInRequest {
   required string handle = 1;

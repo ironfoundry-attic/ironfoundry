@@ -31,7 +31,7 @@
 // ### Definition
 //
 
-package warden;
+package IronFoundry.WardenProtocol;
 
 message LimitDiskRequest {
   required string handle = 1;

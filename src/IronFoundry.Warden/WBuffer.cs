@@ -1,17 +1,16 @@
-﻿namespace IronFoundry.WardenProtocol
+﻿namespace IronFoundry.Warden
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using IronFoundry.WardenProtocol;
     using NLog;
     using ProtoBuf;
 
     public class WBuffer : IDisposable
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
-        private const byte CR = 0x0d;
-        private const byte NL = 0x0a;
         private const int MemStreamSize = 32768;
 
         private MemoryStream ms = new MemoryStream(MemStreamSize);
@@ -116,12 +115,12 @@
                 len = data.Length;
             for (; i < len; ++i)
             {
-                if (data[i] == CR)
+                if (data[i] == Constants.CR)
                 {
                     j = i + 1;
                     if (j < len)
                     {
-                        if (data[j] == NL)
+                        if (data[j] == Constants.LF)
                         {
                             idx = i;
                             break;
