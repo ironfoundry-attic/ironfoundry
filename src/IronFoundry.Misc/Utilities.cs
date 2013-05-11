@@ -2,7 +2,9 @@
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Net;
+    using System.Net.NetworkInformation;
     using System.Net.Sockets;
     using Microsoft.VisualBasic.Devices;
 
@@ -73,6 +75,31 @@
             catch { }
 
             return false;
+        }
+
+        public static IPAddress GetLocalIPAddress()
+        {
+            if (!NetworkInterface.GetIsNetworkAvailable())
+            {
+                return null;
+            }
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+        }
+
+        public static IPAddress GetLocalIPAddress(string localRoute, string remoteHost)
+        {
+            string ipToTry = localRoute;
+            if (Utility.IsLocalIpAddress(ipToTry))
+            {
+                ipToTry = remoteHost;
+            }
+            using (var udpClient = new UdpClient())
+            {
+                udpClient.Connect(ipToTry, 1);
+                IPEndPoint ep = (IPEndPoint)udpClient.Client.LocalEndPoint;
+                return ep.Address;
+            }
         }
     }
 }

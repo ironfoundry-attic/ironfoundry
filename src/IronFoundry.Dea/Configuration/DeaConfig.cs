@@ -5,7 +5,6 @@
     using System.Globalization;
     using System.IO;
     using System.Net;
-    using System.Net.Sockets;
     using IronFoundry.Misc;
     using IronFoundry.Nats.Configuration;
     using Microsoft.Win32;
@@ -30,7 +29,7 @@
         public DeaConfig(INatsConfig natsConfig)
         {
             this.deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
-            this.localIPAddress = GetLocalIPAddress(natsConfig.Host);
+            this.localIPAddress = Utility.GetLocalIPAddress(deaSection.LocalRoute, natsConfig.Host);
 
             this.filesServiceUri = new Uri(String.Format("http://localhost:{0}", FilesServicePort));
 
@@ -138,21 +137,6 @@
         public bool HasAppCmd
         {
             get { return hasAppCmd; }
-        }
-
-        private IPAddress GetLocalIPAddress(string natsHost)
-        {
-            string localRoute = deaSection.LocalRoute;
-            if (Utility.IsLocalIpAddress(localRoute))
-            {
-                localRoute = natsHost;
-            }
-            using (var udpClient = new UdpClient())
-            {
-                udpClient.Connect(localRoute, 1);
-                IPEndPoint ep = (IPEndPoint)udpClient.Client.LocalEndPoint;
-                return ep.Address;
-            }
         }
     }
 }

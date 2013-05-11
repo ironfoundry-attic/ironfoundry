@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DDD0537B-4AFE-4BEB-BF30-4DF0A5367A18}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IronFoundry.Warden.Protocol</RootNamespace>
+    <AssemblyName>IronFoundry.Warden.Protocol</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\shared\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\shared\ExtensionMethods.cs">
+      <Link>ExtensionMethods.cs</Link>
+    </Compile>
+    <Compile Include="StreamRequest.cs" />
+    <Compile Include="StreamResponse.cs" />
+    <Compile Include="StopRequest.cs" />
+    <Compile Include="StopResponse.cs" />
+    <Compile Include="SpawnRequest.cs" />
+    <Compile Include="SpawnResponse.cs" />
+    <Compile Include="RunRequest.cs" />
+    <Compile Include="RunResponse.cs" />
+    <Compile Include="NetOutRequest.cs" />
+    <Compile Include="NetOutResponse.cs" />
+    <Compile Include="NetInRequest.cs" />
+    <Compile Include="NetInResponse.cs" />
+    <Compile Include="ListRequest.cs" />
+    <Compile Include="ListResponse.cs" />
+    <Compile Include="LinkRequest.cs" />
+    <Compile Include="LinkResponse.cs" />
+    <Compile Include="LimitMemoryRequest.cs" />
+    <Compile Include="LimitMemoryResponse.cs" />
+    <Compile Include="LimitDiskRequest.cs" />
+    <Compile Include="LimitDiskResponse.cs" />
+    <Compile Include="LimitBandwidthRequest.cs" />
+    <Compile Include="LimitBandwidthResponse.cs" />
+    <Compile Include="InfoRequest.cs" />
+    <Compile Include="InfoResponse.cs" />
+    <Compile Include="DestroyRequest.cs" />
+    <Compile Include="DestroyResponse.cs" />
+    <Compile Include="CreateRequest.cs" />
+    <Compile Include="CreateResponse.cs" />
+    <Compile Include="CopyOutRequest.cs" />
+    <Compile Include="CopyOutResponse.cs" />
+    <Compile Include="CopyInRequest.cs" />
+    <Compile Include="CopyInResponse.cs" />
+    <Compile Include="EchoRequest.cs" />
+    <Compile Include="EchoResponse.cs" />
+    <Compile Include="ErrorResponse.cs" />
+    <Compile Include="PingResponse.cs" />
+    <Compile Include="Request.cs" />
+    <Compile Include="Messages.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="protobuf-net, Version=2.0.0.621, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\protobuf-net.2.0.0.621\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Response.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PingRequest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,50 +1,36 @@
 @echo off
+setlocal EnableExtensions
 
-setlocal
+if (%FrameworkDir%)==() set FrameworkDir=%WINDIR%\Microsoft.NET\Framework64\
+if (%FrameworkVersion%)==() set FrameworkVersion=v4.0.30319
 
-set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\Tools\VsDevCmd.bat"
+set MSBUILD=%FrameworkDir%%FrameworkVersion%\msbuild.exe
 
-set SLN="%~dp0\IronFoundry.sln"
-set VERSION=1.9.0
+if not exist %MSBUILD% goto Error_NoMsBuild
 
-set NOCLEAN=0
-if /i "%1"=="NOCLEAN" set NOCLEAN=1
+set TARGET=%1
+if (%TARGET%)==() set TARGET=Default
 
-if not exist %VCVARSALL% (
-    echo Required file %VCVARSALL% not found.
-    exit 1
-)
+set VERBOSITY=%2
+if (%VERBOSITY%)==() set VERBOSITY=minimal
 
-if not exist %SLN% (
-    echo Required file %SLN% not found.
-    exit 1
-)
+%MSBUILD% /verbosity:%VERBOSITY% /nologo /m /t:%TARGET% %~dp0build/build.proj
 
-rem Prevent this from being run multiple times on a dev machine
-if "%DevEnvDir%"=="" (
-    call %VCVARSALL% x86
-)
+if errorlevel 1 goto Error_BuildFailed
 
-if %NOCLEAN% equ 0 (
-  echo CLEANING...
-  powershell -noprofile -nologo -file clean.ps1
-  echo DONE.
-)
+echo.
+echo *** BUILD SUCCESSFUL ***
+echo.
+goto :EOF
 
-msbuild /v:n /t:build /p:Configuration=Debug /p:Platform=x86 %SLN%
-if ERRORLEVEL 1 goto build_failed
+:Error_BuildFailed
+echo.
+echo *** BUILD FAILED ***
+echo.
+exit /b 1
 
-msbuild /v:n /t:build /p:Configuration=Debug /p:Platform=x64 %SLN%
-if ERRORLEVEL 1 goto build_failed
-
-msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x86 /p:WixValues="VERSION=%VERSION%" %SLN%
-if ERRORLEVEL 1 goto build_failed
-
-msbuild /v:n /t:build /p:Configuration=Release /p:Platform=x64 /p:WixValues="VERSION=%VERSION%" %SLN%
-if ERRORLEVEL 1 goto build_failed
-
-exit /b %ERRORLEVEL%
-
-:build_failed
-echo Build failed!
+:Error_NoMsBuild
+echo.
+echo. ERROR: Unable to locate MSBuild.exe (expected location: %MSBUILD%)
+echo.
 exit /b 1

@@ -1,11 +1,12 @@
 ﻿namespace IronFoundry.Warden
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using IronFoundry.WardenProtocol;
-    using NLog;
-    using ProtoBuf;
+using System.Collections.Generic;
+using System.IO;
+using IronFoundry.Warden.Containers;
+using IronFoundry.Warden.Protocol;
+using NLog;
+using ProtoBuf;
 
     public class MessageUnwrapper
     {
@@ -31,6 +32,9 @@
                 {
                     case Message.Type.Ping:
                         request = new PingRequest();
+                        break;
+                    case Message.Type.Create:
+                        request = new CreateRequest { Rootfs = ContainerType.Console.ToString() }; // TODO: not Rootfs
                         break;
                     default:
                         throw new WardenException("Invalid message type '{0}' for message WITHOUT payload.", message.MessageType);

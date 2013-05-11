@@ -2,7 +2,7 @@
 {
     using System;
     using System.IO;
-    using IronFoundry.WardenProtocol;
+    using IronFoundry.Warden.Protocol;
     using NLog;
     using ProtoBuf;
 

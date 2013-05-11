@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using IronFoundry.WardenProtocol;
+    using IronFoundry.Warden.Protocol;
     using NLog;
     using ProtoBuf;
 

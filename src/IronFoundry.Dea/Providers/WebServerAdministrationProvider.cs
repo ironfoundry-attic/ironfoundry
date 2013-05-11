@@ -2,10 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Net;
     using System.Text.RegularExpressions;
-    using System.Threading;
     using IronFoundry.Dea.Configuration;
     using IronFoundry.Dea.Properties;
     using IronFoundry.Dea.Services;
@@ -13,6 +11,7 @@
     using IronFoundry.Misc.Logging;
     using IronFoundry.Misc.Utilities;
 
+    // HKLM\Software\Microsoft\InetStp\MajorVersion
     public class WebServerAdministrationProvider : IWebServerAdministrationProvider
     {
         private static readonly TimeSpan twoSeconds = TimeSpan.FromSeconds(2);
