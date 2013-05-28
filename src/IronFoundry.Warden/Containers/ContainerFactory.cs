@@ -31,7 +31,21 @@
 
         public Container CreateContainer()
         {
-            throw new NotImplementedException();
+            Container created = null;
+            
+            switch (containerType)
+            {
+                case ContainerType.Console :
+                    created = new ConsoleContainer();
+                    break;
+                case ContainerType.IIS :
+                    created = new IISContainer();
+                    break;
+                default:
+                    throw new WardenException("Unknown container type: '{0}'", containerType);
+            }
+            
+            return created;
         }
     }
 }

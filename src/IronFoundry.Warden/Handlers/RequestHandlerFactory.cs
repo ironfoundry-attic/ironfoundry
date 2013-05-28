@@ -1,16 +1,21 @@
-﻿namespace IronFoundry.Warden
+﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
-    using IronFoundry.Warden.Handlers;
+    using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
 
     public class RequestHandlerFactory
     {
+        private readonly IContainerManager containerManager;
         private readonly Message.Type requestType;
         private readonly Request request;
 
-        public RequestHandlerFactory(Message.Type requestType, Request request)
+        public RequestHandlerFactory(IContainerManager containerManager, Message.Type requestType, Request request)
         {
+            if (containerManager == null)
+            {
+                throw new ArgumentNullException("containerManager");
+            }
             if (requestType == default(Message.Type))
             {
                 throw new ArgumentNullException("requestType");
@@ -19,6 +24,7 @@
             {
                 throw new ArgumentNullException("message");
             }
+            this.containerManager = containerManager;
             this.requestType = requestType;
             this.request = request;
         }
@@ -36,10 +42,10 @@
                     handler = new CopyOutRequestHandler(request);
                     break;
                 case Message.Type.Create:
-                    handler = new CreateRequestHandler(request);
+                    handler = new CreateRequestHandler(containerManager, request);
                     break;
                 case Message.Type.Destroy:
-                    handler = new DestroyRequestHandler(request);
+                    handler = new DestroyRequestHandler(containerManager, request);
                     break;
                 case Message.Type.Echo:
                     handler = new EchoRequestHandler(request);
@@ -60,7 +66,7 @@
                     handler = new LinkRequestHandler(request);
                     break;
                 case Message.Type.List:
-                    handler = new ListRequestHandler(request);
+                    handler = new ListRequestHandler(containerManager, request);
                     break;
                 case Message.Type.NetIn:
                     handler = new NetInRequestHandler(request);

@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IronFoundry.Warden</RootNamespace>
     <AssemblyName>IronFoundry.Warden</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +31,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\shared\CommonAssemblyInfo.cs">
@@ -37,12 +40,18 @@
     <Compile Include="..\shared\ExtensionMethods.cs">
       <Link>ExtensionMethods.cs</Link>
     </Compile>
+    <Compile Include="Configuration\WardenConfig.cs" />
+    <Compile Include="Configuration\WardenSection.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Containers\Container.cs" />
     <Compile Include="Containers\ConsoleContainer.cs" />
+    <Compile Include="Containers\ContainerDirectory.cs" />
     <Compile Include="Containers\ContainerHandle.cs" />
     <Compile Include="Containers\ContainerFactory.cs" />
+    <Compile Include="Containers\ContainerManager.cs" />
     <Compile Include="Containers\ContainerType.cs" />
+    <Compile Include="Containers\ContainerUser.cs" />
+    <Compile Include="Containers\IContainerManager.cs" />
     <Compile Include="Containers\IISContainer.cs" />
     <Compile Include="Handlers\CopyInRequestHandler.cs" />
     <Compile Include="Handlers\CopyOutRequestHandler.cs" />
@@ -55,20 +64,23 @@
     <Compile Include="Handlers\LimitMemoryRequestHandler.cs" />
     <Compile Include="Handlers\LinkRequestHandler.cs" />
     <Compile Include="Handlers\ListRequestHandler.cs" />
-    <Compile Include="MessageUnwrapper.cs" />
+    <Compile Include="Server\MessageUnwrapper.cs" />
     <Compile Include="Handlers\NetInRequestHandler.cs" />
     <Compile Include="Handlers\NetOutRequestHandler.cs" />
-    <Compile Include="ResponseWrapper.cs" />
+    <Compile Include="Server\ResponseWrapper.cs" />
     <Compile Include="Handlers\RequestHandler.cs" />
-    <Compile Include="RequestHandlerFactory.cs" />
+    <Compile Include="Handlers\RequestHandlerFactory.cs" />
     <Compile Include="Handlers\PingRequestHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Handlers\RunRequestHandler.cs" />
     <Compile Include="Handlers\SpawnRequestHandler.cs" />
     <Compile Include="Handlers\StopRequestHandler.cs" />
     <Compile Include="Handlers\StreamRequestHandler.cs" />
+    <Compile Include="Server\TcpServer.cs" />
+    <Compile Include="Utilities\LocalPrincipalManager.cs" />
+    <Compile Include="Utilities\ServiceHelper.cs" />
     <Compile Include="WardenException.cs" />
-    <Compile Include="WBuffer.cs" />
+    <Compile Include="Server\Buffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IronFoundry.Misc\IronFoundry.Misc.csproj">
@@ -88,10 +100,14 @@
       <HintPath>..\..\packages\protobuf-net.2.0.0.621\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

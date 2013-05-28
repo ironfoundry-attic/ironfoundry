@@ -53,6 +53,16 @@
         {
         }
 
+        public static bool operator ==(ContainerHandle x, ContainerHandle y)
+        {
+            return x.Equals(y);
+        }
+
+        public static bool operator !=(ContainerHandle x, ContainerHandle y)
+        {
+            return !(x == y);
+        }
+
         public override string ToString()
         {
             return value;
@@ -88,9 +98,9 @@
             return new ContainerHandle(input);
         }
 
-        public static implicit operator string(ContainerHandle containerID)
+        public static implicit operator string(ContainerHandle handle)
         {
-            return containerID.value;
+            return handle.value;
         }
 
         private static string GenerateID(long input)

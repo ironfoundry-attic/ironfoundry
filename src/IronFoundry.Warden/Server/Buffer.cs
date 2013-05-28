@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Warden
+﻿namespace IronFoundry.Warden.Server
 {
     using System;
     using System.Collections.Generic;
@@ -8,7 +8,7 @@
     using NLog;
     using ProtoBuf;
 
-    public class WBuffer : IDisposable
+    public class Buffer : IDisposable
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private const int MemStreamSize = 32768;
@@ -19,15 +19,15 @@
 
         public void Push(byte[] data, int count)
         {
-            log.Trace("WBuffer.Push({0}, {1}) (ms.Position:{2})", data.GetHashCode(), count, ms.Position);
+            log.Trace("Buffer.Push({0}, {1}) (ms.Position:{2})", data.GetHashCode(), count, ms.Position);
             ms.Write(data, 0, count);
         }
 
         public IEnumerable<Message> GetMessages()
         {
-            log.Trace("WBuffer.GetMessages() START");
+            log.Trace("Buffer.GetMessages() START");
             var rv = ParseData();
-            log.Trace("WBuffer.GetMessages() (rv.Count {0})", rv.Count);
+            log.Trace("Buffer.GetMessages() (rv.Count {0})", rv.Count);
             return rv;
         }
 
@@ -44,59 +44,51 @@
         {
             var messages = new List<Message>();
 
-            int lastDecodedMessagePos = -1;
+            int startPos = 0;
             byte[] data = ms.ToArray();
             if (data.Length > 0)
             {
-                int startPos = 0;
                 do
                 {
-                    int crlfIdx = CrlfIdx(data, startPos);
-                    if (crlfIdx < 0)
+                    int crlf = CrlfIdx(data, startPos);
+                    if (crlf < 0)
                     {
                         break;
                     }
 
-                    int skip1stCrlfIdx = crlfIdx + 2;
+                    string dataLengthStr = Encoding.ASCII.GetString(data, startPos, crlf);
 
-                    int crlf2Idx = CrlfIdx(data, skip1stCrlfIdx);
-                    if (crlf2Idx < 0)
+                    int length;
+                    if (Int32.TryParse(dataLengthStr, out length))
                     {
-                        break;
+                        int protocolLength = crlf + 2 + length + 2;
+                        if (data.Length < protocolLength)
+                        {
+                            break;
+                        }
+                        Message m = DecodePayload(data, crlf + 2, length);
+                        messages.Add(m);
+                        ms.Position = startPos = protocolLength;
                     }
-
-                    int skip2ndCrlfIdx = crlf2Idx + 2;
-
-                    int countBytesForDataLengthStr = crlfIdx - startPos;
-                    int dataLength = Convert.ToInt32(Encoding.ASCII.GetString(data, startPos, countBytesForDataLengthStr));
-
-                    Message m = DecodePayload(data, skip1stCrlfIdx, dataLength);
-                    messages.Add(m);
-
-                    startPos = lastDecodedMessagePos = skip2ndCrlfIdx;
+                    else
+                    {
+                        log.Error("Could not parse '{0}' as Int32!", dataLengthStr);
+                    }
                 } while (true);
             }
 
-            if (lastDecodedMessagePos != -1 && data != null)
-            {
-                ResetStreamWith(data, lastDecodedMessagePos);
-            }
+            ResetStream();
 
             return messages;
         }
 
-        private void ResetStreamWith(byte[] data, int startPos)
+        private void ResetStream()
         {
-            int count = data.Length - startPos;
-            log.Trace("WBuffer.ResetStreamWith({0}, {1}) (data.Length:{2}, count:{3})",
-                data.GetHashCode(), startPos, data.Length, count);
+            var tmp = new MemoryStream(MemStreamSize);
+            ms.CopyTo(tmp);
             ms.Dispose();
             ms = null;
-            ms = new MemoryStream(MemStreamSize);
-            if (count > 0)
-            {
-                ms.Write(data, startPos, count);
-            }
+            ms = tmp;
         }
 
         private static Message DecodePayload(byte[] data, int startPos, int length)

@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Warden
+﻿namespace IronFoundry.Warden.Server
 {
     using System;
     using System.IO;

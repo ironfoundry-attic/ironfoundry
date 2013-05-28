@@ -17,5 +17,10 @@
         }
 
         public abstract Response Handle();
+
+        public override string ToString()
+        {
+            return String.Format("{0}: {1}", this.GetType().ToString(), request.ToString());
+        }
     }
 }

@@ -159,12 +159,4 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(TargetDir)premerge.dll"
-$(SolutionDir)packages\ilmerge.2.13.0307\ilmerge.exe /internalize /targetplatform:v4 /keyfile:$(SolutionDir)common\IronFoundry.snk /out:$(TargetDir)IronFoundry.dll $(TargetDir)premerge.dll $(TargetDir)ICSharpCode.SharpZipLib.dll $(TargetDir)Newtonsoft.Json.dll $(TargetDir)RestSharp.dll
-del $(TargetDir)premerge.dll
-del $(TargetDir)ICSharpCode.SharpZipLib.*
-del $(TargetDir)Newtonsoft.Json.*
-del $(TargetDir)RestSharp.*</PostBuildEvent>
-  </PropertyGroup>
 </Project>

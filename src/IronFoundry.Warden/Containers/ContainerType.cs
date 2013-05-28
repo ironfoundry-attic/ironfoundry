@@ -2,7 +2,7 @@
 {
     public enum ContainerType
     {
-        IIS,
-        Console
+        Console,
+        IIS
     }
 }
