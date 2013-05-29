@@ -1,9 +1,11 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using IronFoundry.Warden.Protocol;
+    using NLog;
 
     public class SpawnRequestHandler : RequestHandler
     {
+        private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly SpawnRequest request;
 
         public SpawnRequestHandler(Request request)
@@ -14,8 +16,9 @@
 
         public override Response Handle()
         {
-            // TODO do work!
-            return new SpawnResponse();
+            // TODO do work
+            log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
+            return new SpawnResponse { JobId = 1 };
         }
     }
 }

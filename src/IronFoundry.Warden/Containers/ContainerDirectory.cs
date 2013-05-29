@@ -31,6 +31,11 @@
             containerDirectory.Delete(true);
         }
 
+        public override string ToString()
+        {
+            return containerDirectory.FullName;
+        }
+
         private static DirectoryInfo CreateContainerDirectory(ContainerHandle handle, ContainerUser user)
         {
             var dirInfo = GetContainerDirectoryInfo(handle);

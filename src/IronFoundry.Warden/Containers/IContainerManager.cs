@@ -8,5 +8,6 @@
         void DestroyContainer(ContainerHandle handle);
         void AddContainer(Container container);
         IEnumerable<ContainerHandle> Handles { get; }
+        Container GetContainer(string handle);
     }
 }

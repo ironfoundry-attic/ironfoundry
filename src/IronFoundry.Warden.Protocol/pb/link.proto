@@ -26,6 +26,8 @@
 
 package IronFoundry.Warden.Protocol;
 
+import "info.proto";
+
 message LinkRequest {
   required string handle = 1;
 
@@ -36,4 +38,5 @@ message LinkResponse {
   optional uint32 exit_status = 1;
   optional string stdout = 2;
   optional string stderr = 3;
+  optional InfoResponse info = 4;
 }

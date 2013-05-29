@@ -1176,6 +1176,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: link.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"LinkRequest")]
@@ -1233,6 +1234,15 @@ namespace IronFoundry.Warden.Protocol
     {
       get { return _stderr; }
       set { _stderr = value; }
+    }
+
+    private IronFoundry.Warden.Protocol.InfoResponse _info = null;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"info", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public IronFoundry.Warden.Protocol.InfoResponse Info
+    {
+      get { return _info; }
+      set { _info = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1648,6 +1658,7 @@ namespace IronFoundry.Warden.Protocol
 }
 // Generated from: run.proto
 // Note: requires additional types generated from: resource_limits.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RunRequest")]
@@ -1723,6 +1734,15 @@ namespace IronFoundry.Warden.Protocol
     {
       get { return _stderr; }
       set { _stderr = value; }
+    }
+
+    private IronFoundry.Warden.Protocol.InfoResponse _info = null;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"info", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public IronFoundry.Warden.Protocol.InfoResponse Info
+    {
+      get { return _info; }
+      set { _info = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1844,6 +1864,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: stream.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"StreamRequest")]
@@ -1901,6 +1922,15 @@ namespace IronFoundry.Warden.Protocol
     {
       get { return _exitStatus; }
       set { _exitStatus = value; }
+    }
+
+    private IronFoundry.Warden.Protocol.InfoResponse _info = null;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"info", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public IronFoundry.Warden.Protocol.InfoResponse Info
+    {
+      get { return _info; }
+      set { _info = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

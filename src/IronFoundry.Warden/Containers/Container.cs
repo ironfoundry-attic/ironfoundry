@@ -28,6 +28,11 @@
             get { return handle; }
         }
 
+        public string Path
+        {
+            get { return directory.ToString(); }
+        }
+
         public void Destroy()
         {
             rwlock.EnterWriteLock();

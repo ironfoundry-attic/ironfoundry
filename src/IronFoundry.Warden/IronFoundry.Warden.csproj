@@ -53,6 +53,7 @@
     <Compile Include="Containers\ContainerUser.cs" />
     <Compile Include="Containers\IContainerManager.cs" />
     <Compile Include="Containers\IISContainer.cs" />
+    <Compile Include="Containers\InfoBuilder.cs" />
     <Compile Include="Handlers\CopyInRequestHandler.cs" />
     <Compile Include="Handlers\CopyOutRequestHandler.cs" />
     <Compile Include="Handlers\CreateRequestHandler.cs" />

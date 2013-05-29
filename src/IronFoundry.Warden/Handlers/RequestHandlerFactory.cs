@@ -51,7 +51,7 @@
                     handler = new EchoRequestHandler(request);
                     break;
                 case Message.Type.Info:
-                    handler = new InfoRequestHandler(request);
+                    handler = new InfoRequestHandler(containerManager, request);
                     break;
                 case Message.Type.LimitBandwidth:
                     handler = new LimitBandwidthRequestHandler(request);
@@ -63,7 +63,7 @@
                     handler = new LimitMemoryRequestHandler(request);
                     break;
                 case Message.Type.Link:
-                    handler = new LinkRequestHandler(request);
+                    handler = new LinkRequestHandler(containerManager, request);
                     break;
                 case Message.Type.List:
                     handler = new ListRequestHandler(containerManager, request);
@@ -78,7 +78,7 @@
                     handler = new PingRequestHandler(request);
                     break;
                 case Message.Type.Run:
-                    handler = new RunRequestHandler(request);
+                    handler = new RunRequestHandler(containerManager, request);
                     break;
                 case Message.Type.Spawn:
                     handler = new SpawnRequestHandler(request);
@@ -87,7 +87,7 @@
                     handler = new StopRequestHandler(request);
                     break;
                 case Message.Type.Stream:
-                    handler = new StreamRequestHandler(request);
+                    handler = new StreamRequestHandler(containerManager, request);
                     break;
                 default:
                     throw new WardenException("Unknown request type '{0}' passed to handler factory.", requestType);

@@ -56,7 +56,13 @@
                         break;
                     }
 
-                    string dataLengthStr = Encoding.ASCII.GetString(data, startPos, crlf);
+                    int count = crlf - startPos;
+                    if (!(count > 0))
+                    {
+                        throw new InvalidOperationException("Expected count > 0!");
+                    }
+
+                    string dataLengthStr = Encoding.ASCII.GetString(data, startPos, count);
 
                     int length;
                     if (Int32.TryParse(dataLengthStr, out length))
@@ -73,6 +79,7 @@
                     else
                     {
                         log.Error("Could not parse '{0}' as Int32!", dataLengthStr);
+                        break;
                     }
                 } while (true);
             }

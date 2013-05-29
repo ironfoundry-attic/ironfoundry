@@ -1,7 +1,6 @@
 ﻿namespace IronFoundry.Warden.Server
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
@@ -26,42 +25,62 @@
         {
             Request request = null;
 
-            if (message.Payload.IsNullOrEmpty())
+            switch (message.MessageType)
             {
-                switch (message.MessageType)
-                {
-                    case Message.Type.Create:
-                        request = new CreateRequest { Rootfs = ContainerType.Console.ToString() }; // TODO: not Rootfs
-                        break;
-                    case Message.Type.List:
-                        request = new ListRequest();
-                        break;
-                    case Message.Type.Ping:
-                        request = new PingRequest();
-                        break;
-                    default:
-                        throw new WardenException("Invalid message type '{0}' for message WITHOUT payload.", message.MessageType);
-                }
-            }
-            else
-            {
-                using (var ms = new MemoryStream(message.Payload))
-                {
-                    switch (message.MessageType)
-                    {
-                        case Message.Type.Echo:
-                            request = Serializer.Deserialize<EchoRequest>(ms);
-                            break;
-                        case Message.Type.Destroy:
-                            request = Serializer.Deserialize<DestroyRequest>(ms);
-                            break;
-                        default:
-                            throw new WardenException("Invalid message type '{0}' for message WITH payload.", message.MessageType);
-                    }
-                }
+                case Message.Type.Create:
+                    var createRequest = Deserialize<CreateRequest>(message.Payload);
+                    createRequest.Rootfs = ContainerType.Console.ToString(); // TODO
+                    request = createRequest;
+                    break;
+                case Message.Type.Destroy:
+                    request = Deserialize<DestroyRequest>(message.Payload);
+                    break;
+                case Message.Type.Echo:
+                    request = Deserialize<EchoRequest>(message.Payload);
+                    break;
+                case Message.Type.Info:
+                    request = Deserialize<InfoRequest>(message.Payload);
+                    break;
+                case Message.Type.LimitBandwidth:
+                    request = Deserialize<LimitBandwidthRequest>(message.Payload);
+                    break;
+                case Message.Type.LimitDisk:
+                    request = Deserialize<LimitDiskRequest>(message.Payload);
+                    break;
+                case Message.Type.LimitMemory:
+                    request = Deserialize<LimitMemoryRequest>(message.Payload);
+                    break;
+                case Message.Type.List:
+                    request = new ListRequest();
+                    break;
+                case Message.Type.Ping:
+                    request = new PingRequest();
+                    break;
+                case Message.Type.Run:
+                    request = Deserialize<RunRequest>(message.Payload);
+                    break;
+                case Message.Type.Stop:
+                    request = Deserialize<StopRequest>(message.Payload);
+                    break;
+                case Message.Type.Spawn:
+                    request = Deserialize<SpawnRequest>(message.Payload);
+                    break;
+                case Message.Type.Stream:
+                    request = Deserialize<StreamRequest>(message.Payload);
+                    break;
+                default:
+                    throw new WardenException("Can't unwrap message type '{0}'", message.MessageType);
             }
 
             return request;
+        }
+
+        private static T Deserialize<T>(byte[] payload)
+        {
+            using (var ms = new MemoryStream(payload))
+            {
+                return Serializer.Deserialize<T>(ms);
+            }
         }
     }
 }

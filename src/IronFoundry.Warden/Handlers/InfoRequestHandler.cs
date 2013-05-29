@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
-    using IronFoundry.Misc;
+    using System;
+    using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
@@ -8,10 +9,16 @@
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly InfoRequest request;
+        private readonly InfoBuilder infoBuilder;
 
-        public InfoRequestHandler(Request request)
+        public InfoRequestHandler(IContainerManager containerManager, Request request)
             : base(request)
         {
+            if (containerManager == null)
+            {
+                throw new ArgumentNullException("containerManager");
+            }
+            this.infoBuilder = new InfoBuilder(containerManager);
             this.request = (InfoRequest)request;
         }
 
@@ -19,8 +26,7 @@
         {
             // TODO do work!
             log.Trace("Handle: '{0}'", request.Handle);
-            var hostIp = Utility.GetLocalIPAddress().ToString();
-            return new InfoResponse(hostIp, "10.0.0.1", "C:/IronFoundry/warden/app1");
+            return infoBuilder.GetInfoResponseFor(request.Handle);
         }
     }
 }

@@ -25,6 +25,17 @@
             }
         }
 
+        public Container GetContainer(string handle)
+        {
+            var cHandle = new ContainerHandle(handle);
+            Container retrieved;
+            if (!containers.TryGetValue(cHandle, out retrieved))
+            {
+                log.Warn("Expected to find container with handle '{0}'", handle);
+            }
+            return retrieved;
+        }
+
         public void DestroyContainer(ContainerHandle handle)
         {
             if (handle == null)
