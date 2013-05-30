@@ -19,14 +19,19 @@
         private readonly CancellationToken cancellationToken;
 
         private readonly ServiceHelper serviceHelper = new ServiceHelper();
-        private readonly IContainerManager containerManager = new ContainerManager();
+        private readonly IContainerManager containerManager;
 
-        public TcpServer(CancellationToken cancellationToken)
+        public TcpServer(IContainerManager containerManager, CancellationToken cancellationToken)
         {
+            if (containerManager == null)
+            {
+                throw new ArgumentNullException("containerManager");
+            }
             if (cancellationToken == null)
             {
                 throw new ArgumentNullException("cancellationToken");
             }
+            this.containerManager = containerManager;
             this.cancellationToken = cancellationToken;
         }
 
@@ -51,7 +56,6 @@
             }
 
             log.Debug("Stopping Server.");
-            containerManager.Dispose();
             listener.Stop();
         }
 

@@ -64,15 +64,15 @@
 
                     string dataLengthStr = Encoding.ASCII.GetString(data, startPos, count);
 
-                    int length;
+                    int length = 0, crlfPlus2 = crlf + 2;
                     if (Int32.TryParse(dataLengthStr, out length))
                     {
-                        int protocolLength = crlf + 2 + length + 2;
+                        int protocolLength = crlfPlus2 + length + 2;
                         if (data.Length < protocolLength)
                         {
                             break;
                         }
-                        Message m = DecodePayload(data, crlf + 2, length);
+                        Message m = DecodePayload(data, crlfPlus2, length);
                         messages.Add(m);
                         ms.Position = startPos = protocolLength;
                     }

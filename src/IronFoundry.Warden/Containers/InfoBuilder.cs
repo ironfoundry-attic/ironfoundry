@@ -19,6 +19,11 @@
 
         public InfoResponse GetInfoResponseFor(string handle)
         {
+            if (handle.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentNullException("handle");
+            }
+
             Container c = containerManager.GetContainer(handle);
             var hostIp = Utility.GetLocalIPAddress().ToString();
             return new InfoResponse(hostIp, hostIp, c.Path);

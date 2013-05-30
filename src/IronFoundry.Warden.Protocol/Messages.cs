@@ -1208,10 +1208,8 @@ namespace IronFoundry.Warden.Protocol
   {
     public LinkResponse() {}
     
-
-    private uint _exitStatus = default(uint);
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
+    private uint _exitStatus;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public uint ExitStatus
     {
       get { return _exitStatus; }
@@ -1708,10 +1706,8 @@ namespace IronFoundry.Warden.Protocol
   {
     public RunResponse() {}
     
-
-    private uint _exitStatus = default(uint);
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
+    private uint _exitStatus;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public uint ExitStatus
     {
       get { return _exitStatus; }
@@ -1914,10 +1910,8 @@ namespace IronFoundry.Warden.Protocol
       get { return _data; }
       set { _data = value; }
     }
-
-    private uint _exitStatus = default(uint);
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
+    private uint _exitStatus;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public uint ExitStatus
     {
       get { return _exitStatus; }
