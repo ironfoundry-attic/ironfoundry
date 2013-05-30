@@ -27,9 +27,15 @@
 
             switch (message.MessageType)
             {
+                case Message.Type.CopyIn:
+                    request = Deserialize<CopyInRequest>(message.Payload);
+                    break;
+                case Message.Type.CopyOut:
+                    request = Deserialize<CopyOutRequest>(message.Payload);
+                    break;
                 case Message.Type.Create:
                     var createRequest = Deserialize<CreateRequest>(message.Payload);
-                    createRequest.Rootfs = ContainerType.Console.ToString(); // TODO
+                    createRequest.Rootfs = ContainerType.Console.ToString(); // TODO TODO TODO
                     request = createRequest;
                     break;
                 case Message.Type.Destroy:
@@ -50,8 +56,17 @@
                 case Message.Type.LimitMemory:
                     request = Deserialize<LimitMemoryRequest>(message.Payload);
                     break;
+                case Message.Type.Link:
+                    request = Deserialize<LinkRequest>(message.Payload);
+                    break;
                 case Message.Type.List:
                     request = new ListRequest();
+                    break;
+                case Message.Type.NetIn:
+                    request = Deserialize<NetInRequest>(message.Payload);
+                    break;
+                case Message.Type.NetOut:
+                    request = Deserialize<NetOutRequest>(message.Payload);
                     break;
                 case Message.Type.Ping:
                     request = new PingRequest();
@@ -59,11 +74,11 @@
                 case Message.Type.Run:
                     request = Deserialize<RunRequest>(message.Payload);
                     break;
-                case Message.Type.Stop:
-                    request = Deserialize<StopRequest>(message.Payload);
-                    break;
                 case Message.Type.Spawn:
                     request = Deserialize<SpawnRequest>(message.Payload);
+                    break;
+                case Message.Type.Stop:
+                    request = Deserialize<StopRequest>(message.Payload);
                     break;
                 case Message.Type.Stream:
                     request = Deserialize<StreamRequest>(message.Payload);
