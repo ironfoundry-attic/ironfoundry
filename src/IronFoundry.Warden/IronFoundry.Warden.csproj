@@ -79,6 +79,7 @@
     <Compile Include="Handlers\StreamRequestHandler.cs" />
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
+    <Compile Include="Utilities\ScriptRunner.cs" />
     <Compile Include="Utilities\ServiceHelper.cs" />
     <Compile Include="WardenException.cs" />
     <Compile Include="Server\Buffer.cs" />

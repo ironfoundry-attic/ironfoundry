@@ -26,6 +26,7 @@
         {
             // TODO do work!
             log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
+            var runner = new ScriptRunner();
             return new RunResponse
             {
                 ExitStatus = 0,
