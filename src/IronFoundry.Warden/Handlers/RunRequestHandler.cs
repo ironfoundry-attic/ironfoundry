@@ -3,6 +3,7 @@
     using System;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
+    using IronFoundry.Warden.Utilities;
     using NLog;
 
     public class RunRequestHandler : RequestHandler

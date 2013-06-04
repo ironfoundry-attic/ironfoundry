@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IronFoundry.Warden.Utilities
 {
-    class ScriptRunner
+    public class ScriptRunner
     {
     }
 }
