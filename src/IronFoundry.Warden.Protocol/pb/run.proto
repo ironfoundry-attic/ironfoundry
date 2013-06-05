@@ -12,12 +12,13 @@
 //
 
 package IronFoundry.Warden.Protocol;
-
-import "resource_limits.proto";
 import "info.proto";
+import "resource_limits.proto";
+
 
 message RunRequest {
   required string handle = 1;
+
   required string script = 2;
   optional bool privileged = 3 [default = false];
   optional ResourceLimits rlimits = 4;

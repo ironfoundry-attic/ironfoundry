@@ -26,17 +26,18 @@
 //
 
 package IronFoundry.Warden.Protocol;
-
 import "info.proto";
+
 
 message StreamRequest {
   required string handle = 1;
+
   required uint32 job_id = 2;
 }
 
 message StreamResponse {
   optional string name = 1;
   optional string data = 2;
-  required uint32 exit_status = 3;
+  optional uint32 exit_status = 3;
   optional InfoResponse info = 4;
 }

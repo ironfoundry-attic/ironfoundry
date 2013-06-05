@@ -24,6 +24,8 @@
 //
 
 package IronFoundry.Warden.Protocol;
+import "info.proto";
+
 
 message DestroyRequest {
   required string handle = 1;

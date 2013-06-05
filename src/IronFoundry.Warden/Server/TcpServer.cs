@@ -8,6 +8,7 @@
     using System.Threading;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Handlers;
+    using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
     using IronFoundry.Warden.Utilities;
     using NLog;
@@ -20,18 +21,24 @@
 
         private readonly ServiceHelper serviceHelper = new ServiceHelper();
         private readonly IContainerManager containerManager;
+        private readonly IJobManager jobManager;
 
-        public TcpServer(IContainerManager containerManager, CancellationToken cancellationToken)
+        public TcpServer(IContainerManager containerManager, IJobManager jobManager, CancellationToken cancellationToken)
         {
             if (containerManager == null)
             {
                 throw new ArgumentNullException("containerManager");
+            }
+            if (jobManager == null)
+            {
+                throw new ArgumentNullException("jobManager");
             }
             if (cancellationToken == null)
             {
                 throw new ArgumentNullException("cancellationToken");
             }
             this.containerManager = containerManager;
+            this.jobManager = jobManager;
             this.cancellationToken = cancellationToken;
         }
 
@@ -181,7 +188,7 @@
             var unwrapper = new MessageUnwrapper(msg);
             Request request = unwrapper.GetRequest();
 
-            var factory = new RequestHandlerFactory(containerManager, msg.MessageType, request);
+            var factory = new RequestHandlerFactory(containerManager, jobManager, msg.MessageType, request);
             RequestHandler handler = factory.GetHandler();
 
             Response response;

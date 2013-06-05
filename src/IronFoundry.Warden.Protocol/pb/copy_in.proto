@@ -24,6 +24,8 @@
 //
 
 package IronFoundry.Warden.Protocol;
+import "info.proto";
+
 
 message CopyInRequest {
   required string handle = 1;

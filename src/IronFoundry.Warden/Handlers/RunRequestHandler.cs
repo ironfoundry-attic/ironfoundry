@@ -1,40 +1,40 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
-    using System;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
-    using IronFoundry.Warden.Utilities;
+    using IronFoundry.Warden.Run;
     using NLog;
 
-    public class RunRequestHandler : RequestHandler
+    public class RunRequestHandler : TaskRequestHandler
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly RunRequest request;
         private readonly InfoBuilder infoBuilder;
 
         public RunRequestHandler(IContainerManager containerManager, Request request)
-            : base(request)
+            : base(containerManager, request)
         {
-            if (containerManager == null)
-            {
-                throw new ArgumentNullException("containerManager");
-            }
             this.infoBuilder = new InfoBuilder(containerManager);
             this.request = (RunRequest)request;
         }
 
         public override Response Handle()
         {
-            // TODO do work!
             log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
-            var runner = new ScriptRunner();
-            return new RunResponse
+
+            ScriptRunner runner = base.GetScriptRunnerFor(request.Handle, request.Script);
+            var result = runner.Run();
+
+            unchecked
             {
-                ExitStatus = 0,
-                Stderr = "TODO STDERR",
-                Stdout = "TODO STDOUT",
-                Info = infoBuilder.GetInfoResponseFor(request.Handle)
-            };
+                return new RunResponse
+                {
+                    ExitStatus = (uint)result.ExitCode,
+                    Stdout = result.Stdout,
+                    Stderr = result.Stderr,
+                    Info = infoBuilder.GetInfoResponseFor(request.Handle)
+                };
+            }
         }
     }
 }

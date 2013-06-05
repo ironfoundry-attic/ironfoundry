@@ -23,8 +23,9 @@
 //
 
 package IronFoundry.Warden.Protocol;
-
+import "info.proto";
 import "resource_limits.proto";
+
 
 message SpawnRequest {
   required string handle = 1;

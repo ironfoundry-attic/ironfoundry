@@ -27,10 +27,9 @@
             return rvUserName;
         }
 
-        public string CreateUser(string userName)
+        public string CreateUser(string userName, string password)
         {
             string rvUserName;
-            string password = Guid.NewGuid().ToString("N").Substring(0, 16);
 
             using (var context = new PrincipalContext(ContextType.Machine))
             {

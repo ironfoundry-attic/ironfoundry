@@ -2,19 +2,25 @@
 {
     using System;
     using IronFoundry.Warden.Containers;
+    using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
 
     public class RequestHandlerFactory
     {
         private readonly IContainerManager containerManager;
+        private readonly IJobManager jobManager;
         private readonly Message.Type requestType;
         private readonly Request request;
 
-        public RequestHandlerFactory(IContainerManager containerManager, Message.Type requestType, Request request)
+        public RequestHandlerFactory(IContainerManager containerManager, IJobManager jobManager, Message.Type requestType, Request request)
         {
             if (containerManager == null)
             {
                 throw new ArgumentNullException("containerManager");
+            }
+            if (jobManager == null)
+            {
+                throw new ArgumentNullException("jobManager");
             }
             if (requestType == default(Message.Type))
             {
@@ -25,6 +31,7 @@
                 throw new ArgumentNullException("message");
             }
             this.containerManager = containerManager;
+            this.jobManager = jobManager;
             this.requestType = requestType;
             this.request = request;
         }
@@ -81,13 +88,13 @@
                     handler = new RunRequestHandler(containerManager, request);
                     break;
                 case Message.Type.Spawn:
-                    handler = new SpawnRequestHandler(request);
+                    handler = new SpawnRequestHandler(containerManager, jobManager, request);
                     break;
                 case Message.Type.Stop:
                     handler = new StopRequestHandler(request);
                     break;
                 case Message.Type.Stream:
-                    handler = new StreamRequestHandler(containerManager, request);
+                    handler = new StreamRequestHandler(containerManager, jobManager, request);
                     break;
                 default:
                     throw new WardenException("Unknown request type '{0}' passed to handler factory.", requestType);

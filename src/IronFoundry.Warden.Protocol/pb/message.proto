@@ -1,6 +1,8 @@
 // nodoc
 
 package IronFoundry.Warden.Protocol;
+import "info.proto";
+
 
 message Message {
   enum Type {

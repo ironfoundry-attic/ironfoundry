@@ -65,6 +65,14 @@
     <Compile Include="Handlers\LimitMemoryRequestHandler.cs" />
     <Compile Include="Handlers\LinkRequestHandler.cs" />
     <Compile Include="Handlers\ListRequestHandler.cs" />
+    <Compile Include="Jobs\IJobResult.cs" />
+    <Compile Include="Jobs\IJobRunnable.cs" />
+    <Compile Include="Jobs\Jobs.cs" />
+    <Compile Include="Run\RunCommand.cs" />
+    <Compile Include="Run\ScriptResult.cs" />
+    <Compile Include="Handlers\TaskRequestHandler.cs" />
+    <Compile Include="Jobs\IJobManager.cs" />
+    <Compile Include="Jobs\JobManager.cs" />
     <Compile Include="Server\MessageUnwrapper.cs" />
     <Compile Include="Handlers\NetInRequestHandler.cs" />
     <Compile Include="Handlers\NetOutRequestHandler.cs" />
@@ -79,7 +87,7 @@
     <Compile Include="Handlers\StreamRequestHandler.cs" />
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
-    <Compile Include="Utilities\ScriptRunner.cs" />
+    <Compile Include="Run\ScriptRunner.cs" />
     <Compile Include="Utilities\ServiceHelper.cs" />
     <Compile Include="WardenException.cs" />
     <Compile Include="Server\Buffer.cs" />
@@ -95,6 +103,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.5.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NLog">
       <HintPath>..\..\packages\NLog.2.0.1.2\lib\net40\NLog.dll</HintPath>
     </Reference>

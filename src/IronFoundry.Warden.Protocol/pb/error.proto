@@ -11,6 +11,8 @@
 //
 
 package IronFoundry.Warden.Protocol;
+import "info.proto";
+
 
 message ErrorResponse {
   optional string message = 2;

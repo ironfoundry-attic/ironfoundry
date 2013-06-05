@@ -16,6 +16,8 @@
 //
 
 package IronFoundry.Warden.Protocol;
+import "info.proto";
+
 
 message LimitBandwidthRequest {
   required string handle = 1;

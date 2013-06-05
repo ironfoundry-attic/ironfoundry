@@ -9,6 +9,7 @@
     {
         private const string userPrefix = "warden_";
         private static readonly Regex uniqueIdValidator = new Regex(@"^\w{8,}$", RegexOptions.CultureInvariant | RegexOptions.Compiled);
+        private readonly string uniqueId;
         private readonly string userName;
 
         public ContainerUser(string uniqueId, bool shouldCreate = false)
@@ -17,6 +18,7 @@
             {
                 throw new ArgumentNullException("uniqueId");
             }
+            this.uniqueId = uniqueId;
 
             if (uniqueIdValidator.IsMatch(uniqueId))
             {
@@ -30,7 +32,7 @@
             var principalManager = new LocalPrincipalManager();
             if (shouldCreate)
             {
-                principalManager.CreateUser(this.userName);
+                principalManager.CreateUser(this.userName, this.uniqueId);
             }
             else
             {

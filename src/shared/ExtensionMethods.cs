@@ -82,6 +82,21 @@ namespace System.IO
     }
 }
 
+namespace System.Text
+{
+    internal static class StringBuilderExtensionMethods
+    {
+        public static StringBuilder SmartAppendLine(this StringBuilder argThis, string toAppend)
+        {
+            if (!toAppend.IsNullOrWhiteSpace())
+            {
+                argThis.AppendLine(toAppend);
+            }
+            return argThis;
+        }
+    }
+}
+
 namespace System.Text.RegularExpressions
 {
     internal static class RegexExtensionMethods

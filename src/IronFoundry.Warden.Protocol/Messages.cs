@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 
 // Generated from: copy_in.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"CopyInRequest")]
@@ -53,6 +54,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: copy_out.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"CopyOutRequest")]
@@ -107,6 +109,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: create.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"CreateRequest")]
@@ -223,6 +226,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: destroy.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"DestroyRequest")]
@@ -254,6 +258,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: echo.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"EchoRequest")]
@@ -292,6 +297,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: error.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ErrorResponse")]
@@ -821,6 +827,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: limit_bandwidth.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"LimitBandwidthRequest")]
@@ -880,6 +887,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: limit_disk.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"LimitDiskRequest")]
@@ -1127,6 +1135,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: limit_memory.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"LimitMemoryRequest")]
@@ -1208,8 +1217,10 @@ namespace IronFoundry.Warden.Protocol
   {
     public LinkResponse() {}
     
-    private uint _exitStatus;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+
+    private uint _exitStatus = default(uint);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint ExitStatus
     {
       get { return _exitStatus; }
@@ -1249,6 +1260,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: list.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ListRequest")]
@@ -1280,6 +1292,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: message.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Message")]
@@ -1370,6 +1383,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: net_in.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"NetInRequest")]
@@ -1433,6 +1447,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: net_out.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"NetOutRequest")]
@@ -1482,6 +1497,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: ping.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"PingRequest")]
@@ -1506,6 +1522,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: resource_limits.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ResourceLimits")]
@@ -1655,8 +1672,8 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: run.proto
-// Note: requires additional types generated from: resource_limits.proto
 // Note: requires additional types generated from: info.proto
+// Note: requires additional types generated from: resource_limits.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RunRequest")]
@@ -1747,6 +1764,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: spawn.proto
+// Note: requires additional types generated from: info.proto
 // Note: requires additional types generated from: resource_limits.proto
 namespace IronFoundry.Warden.Protocol
 {
@@ -1811,6 +1829,7 @@ namespace IronFoundry.Warden.Protocol
   
 }
 // Generated from: stop.proto
+// Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"StopRequest")]
@@ -1910,8 +1929,10 @@ namespace IronFoundry.Warden.Protocol
       get { return _data; }
       set { _data = value; }
     }
-    private uint _exitStatus;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+
+    private uint _exitStatus = default(uint);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint ExitStatus
     {
       get { return _exitStatus; }

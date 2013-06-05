@@ -23,10 +23,18 @@
             {
                 throw new ArgumentNullException("handle");
             }
-
             Container c = containerManager.GetContainer(handle);
+            return GetInfoResponseFor(c);
+        }
+
+        private InfoResponse GetInfoResponseFor(Container container)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
             var hostIp = Utility.GetLocalIPAddress().ToString();
-            return new InfoResponse(hostIp, hostIp, c.Path);
+            return new InfoResponse(hostIp, hostIp, container.Path);
         }
     }
 }
