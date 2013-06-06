@@ -11,6 +11,11 @@ namespace System
         {
             return String.IsNullOrEmpty(argThis);
         }
+
+        public static string ToWinPathString(this string pathString)
+        {
+            return pathString.Replace('/', '\\');
+        }
     }
 }
 

@@ -2,8 +2,9 @@
 {
     using System;
     using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Run;
+    using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
+    using IronFoundry.Warden.Run;
 
     public abstract class TaskRequestHandler : RequestHandler
     {
@@ -19,10 +20,15 @@
             this.containerManager = containerManager;
         }
 
-        protected ScriptRunner GetScriptRunnerFor(string handle, string script)
+        protected IJobRunnable GetRunnableFor(ITaskRequest request)
         {
-            Container c = containerManager.GetContainer(handle);
-            return new ScriptRunner(c, script);
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
+            Container container = containerManager.GetContainer(request.Handle);
+            return new TaskRunner(container, request);
         }
     }
 }

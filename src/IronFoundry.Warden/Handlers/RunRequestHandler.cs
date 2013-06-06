@@ -1,8 +1,8 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using IronFoundry.Warden.Containers;
+    using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
-    using IronFoundry.Warden.Run;
     using NLog;
 
     public class RunRequestHandler : TaskRequestHandler
@@ -22,8 +22,8 @@
         {
             log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
 
-            ScriptRunner runner = base.GetScriptRunnerFor(request.Handle, request.Script);
-            var result = runner.Run();
+            IJobRunnable runnable = base.GetRunnableFor(request);
+            IJobResult result = runnable.Run(); // run synchronously
 
             unchecked
             {

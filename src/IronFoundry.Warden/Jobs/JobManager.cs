@@ -31,12 +31,25 @@
         {
             try
             {
-                rwlock.EnterReadLock();
-                return jobs[jobId];
+                rwlock.EnterUpgradeableReadLock();
+                Job rv = jobs[jobId];
+                if (rv.IsCompleted)
+                {
+                    try
+                    {
+                        rwlock.EnterWriteLock();
+                        jobs.Remove(jobId);
+                    }
+                    finally
+                    {
+                        rwlock.ExitWriteLock();
+                    }
+                }
+                return rv;
             }
             finally
             {
-                rwlock.ExitReadLock();
+                rwlock.ExitUpgradeableReadLock();
             }
         }
 

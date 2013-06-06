@@ -4,7 +4,6 @@
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
-    using IronFoundry.Warden.Run;
     using NLog;
 
     /// <summary>
@@ -32,8 +31,8 @@
         public override Response Handle()
         {
             log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
-            ScriptRunner scriptRunner = base.GetScriptRunnerFor(request.Handle, request.Script);
-            uint jobId = jobManager.StartJobFor(scriptRunner);
+            IJobRunnable runnable = base.GetRunnableFor(request);
+            uint jobId = jobManager.StartJobFor(runnable); // run async
             return new SpawnResponse { JobId = jobId };
         }
     }

@@ -23,7 +23,7 @@ foreach ($proto_file in $proto_files)
     $protogen_args += "-i:$in_name"
 }
 
-$protogen_output = & $protogen_exe -p:fixCase -q $protogen_args
+$protogen_output = & $protogen_exe -p:detectMissing -p:fixCase -q $protogen_args
 
 Pop-Location -Verbose
 

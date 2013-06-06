@@ -44,6 +44,3 @@ foreach ($proto_file in $warden_proto_files)
 
 # message.proto
 (Get-Content -Path .\pb\message.proto) | ForEach-Object { $_ -replace 'Type type', 'Type message_type' } | Set-Content .\pb\message.proto
-
-# run.proto
-(Get-Content -Path .\pb\run.proto) | ForEach-Object { $_ -replace 'optional uint32 exit_status', 'required uint32 exit_status' } | Set-Content .\pb\run.proto

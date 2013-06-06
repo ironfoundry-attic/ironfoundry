@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    public class RunCommand
+    public class TaskCommandDTO
     {
         [JsonProperty(PropertyName="cmd")]
         public string Command { get; set; }

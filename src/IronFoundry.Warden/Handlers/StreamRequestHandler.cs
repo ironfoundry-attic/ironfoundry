@@ -32,14 +32,50 @@
         public override Response Handle()
         {
             log.Trace("Handle: '{0}' JobId: '{1}''", request.Handle, request.JobId);
+
+            string responseData = String.Empty;
+            string responseName = JobDataSource.stdout.ToString();
+            uint? exitStatus = null;
+            InfoResponse info = infoBuilder.GetInfoResponseFor(request.Handle);
+
             var job = jobManager.GetJob(request.JobId);
-            return new StreamResponse
+
+            if (job == null)
             {
-                Data = "DATA TODO\n\n",
-                ExitStatus = 0,
-                Name = "stdout",
-                Info = infoBuilder.GetInfoResponseFor(request.Handle)
+                responseData = String.Format("Error! Expected to find job with ID '{0}' but could not.", request.JobId);
+                responseName = JobDataSource.stderr.ToString();
+                exitStatus = 1;
+            }
+            else
+            {
+                IJobStatus status = job.Status;
+                if (status != null)
+                {
+                    responseData = status.Data;
+                    responseName = status.DataSource.ToString();
+                    if (status.ExitStatus.HasValue)
+                    {
+                        unchecked
+                        {
+                            exitStatus = (uint)status.ExitStatus.Value;
+                        }
+                    }
+                }
+            }
+
+            var response = new StreamResponse
+            {
+                Data = responseData,
+                Name = responseName,
+                Info = info
             };
+
+            if (exitStatus.HasValue)
+            {
+                response.ExitStatus = exitStatus.Value;
+            }
+
+            return response;
         }
     }
 }

@@ -142,7 +142,7 @@
         {
             if (ex != null)
             {
-                var response = new ErrorResponse { Message = ex.Message, Data = ex.StackTrace };
+                var response = new ErrorResponse { Message = ex.ResponseMessage, Data = ex.StackTrace };
                 var wrapper = new ResponseWrapper(response);
                 Message errorMessage = wrapper.GetMessage();
                 WriteMessage(errorMessage, ns);

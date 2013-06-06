@@ -67,9 +67,14 @@
     <Compile Include="Handlers\ListRequestHandler.cs" />
     <Compile Include="Jobs\IJobResult.cs" />
     <Compile Include="Jobs\IJobRunnable.cs" />
-    <Compile Include="Jobs\Jobs.cs" />
-    <Compile Include="Run\RunCommand.cs" />
-    <Compile Include="Run\ScriptResult.cs" />
+    <Compile Include="Jobs\IJobStatus.cs" />
+    <Compile Include="Jobs\Job.cs" />
+    <Compile Include="Run\TaskCommandStatus.cs" />
+    <Compile Include="Run\MkdirCommand.cs" />
+    <Compile Include="Run\TaskCommandDTO.cs" />
+    <Compile Include="Run\TaskCommand.cs" />
+    <Compile Include="Run\TaskCommandFactory.cs" />
+    <Compile Include="Run\TaskCommandResult.cs" />
     <Compile Include="Handlers\TaskRequestHandler.cs" />
     <Compile Include="Jobs\IJobManager.cs" />
     <Compile Include="Jobs\JobManager.cs" />
@@ -87,7 +92,7 @@
     <Compile Include="Handlers\StreamRequestHandler.cs" />
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
-    <Compile Include="Run\ScriptRunner.cs" />
+    <Compile Include="Run\TaskRunner.cs" />
     <Compile Include="Utilities\ServiceHelper.cs" />
     <Compile Include="WardenException.cs" />
     <Compile Include="Server\Buffer.cs" />

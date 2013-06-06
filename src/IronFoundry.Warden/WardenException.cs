@@ -2,6 +2,7 @@
 {
     using System;
     using System.Runtime.Serialization;
+    using System.Text;
 
     [Serializable]
     public class WardenException : Exception, ISerializable
@@ -24,6 +25,19 @@
 
         public WardenException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+        }
+
+        public string ResponseMessage
+        {
+            get
+            {
+                var sb = new StringBuilder(this.Message);
+                if (this.InnerException != null)
+                {
+                    sb.AppendLine().AppendLine(this.InnerException.Message);
+                }
+                return sb.ToString();
+            }
         }
     }
 }

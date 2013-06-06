@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+// Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
+    
 // Generated from: copy_in.proto
 // Note: requires additional types generated from: info.proto
 namespace IronFoundry.Warden.Protocol
@@ -84,14 +86,23 @@ namespace IronFoundry.Warden.Protocol
       set { _dstPath = value; }
     }
 
-    private string _owner = "";
+    private string _owner;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"owner", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Owner
     {
-      get { return _owner; }
+      get { return _owner?? ""; }
       set { _owner = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool OwnerSpecified
+    {
+      get { return _owner != null; }
+      set { if (value == (_owner== null)) _owner = value ? Owner : (string)null; }
+    }
+    private bool ShouldSerializeOwner() { return OwnerSpecified; }
+    private void ResetOwner() { OwnerSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -125,41 +136,77 @@ namespace IronFoundry.Warden.Protocol
     }
   
 
-    private uint _graceTime = default(uint);
+    private uint? _graceTime;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"grace_time", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint GraceTime
     {
-      get { return _graceTime; }
+      get { return _graceTime?? default(uint); }
       set { _graceTime = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool GraceTimeSpecified
+    {
+      get { return _graceTime != null; }
+      set { if (value == (_graceTime== null)) _graceTime = value ? GraceTime : (uint?)null; }
+    }
+    private bool ShouldSerializeGraceTime() { return GraceTimeSpecified; }
+    private void ResetGraceTime() { GraceTimeSpecified = false; }
+    
 
-    private string _handle = "";
+    private string _handle;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"handle", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Handle
     {
-      get { return _handle; }
+      get { return _handle?? ""; }
       set { _handle = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool HandleSpecified
+    {
+      get { return _handle != null; }
+      set { if (value == (_handle== null)) _handle = value ? Handle : (string)null; }
+    }
+    private bool ShouldSerializeHandle() { return HandleSpecified; }
+    private void ResetHandle() { HandleSpecified = false; }
+    
 
-    private string _network = "";
+    private string _network;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"network", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Network
     {
-      get { return _network; }
+      get { return _network?? ""; }
       set { _network = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool NetworkSpecified
+    {
+      get { return _network != null; }
+      set { if (value == (_network== null)) _network = value ? Network : (string)null; }
+    }
+    private bool ShouldSerializeNetwork() { return NetworkSpecified; }
+    private void ResetNetwork() { NetworkSpecified = false; }
+    
 
-    private string _rootfs = "";
+    private string _rootfs;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"rootfs", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Rootfs
     {
-      get { return _rootfs; }
+      get { return _rootfs?? ""; }
       set { _rootfs = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool RootfsSpecified
+    {
+      get { return _rootfs != null; }
+      set { if (value == (_rootfs== null)) _rootfs = value ? Rootfs : (string)null; }
+    }
+    private bool ShouldSerializeRootfs() { return RootfsSpecified; }
+    private void ResetRootfs() { RootfsSpecified = false; }
+    
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BindMount")]
   public partial class BindMount : global::ProtoBuf.IExtensible
   {
@@ -306,23 +353,41 @@ namespace IronFoundry.Warden.Protocol
     public ErrorResponse() {}
     
 
-    private string _message = "";
+    private string _message;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"message", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Message
     {
-      get { return _message; }
+      get { return _message?? ""; }
       set { _message = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool MessageSpecified
+    {
+      get { return _message != null; }
+      set { if (value == (_message== null)) _message = value ? Message : (string)null; }
+    }
+    private bool ShouldSerializeMessage() { return MessageSpecified; }
+    private void ResetMessage() { MessageSpecified = false; }
+    
 
-    private string _data = "";
+    private string _data;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Data
     {
-      get { return _data; }
+      get { return _data?? ""; }
       set { _data = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool DataSpecified
+    {
+      get { return _data != null; }
+      set { if (value == (_data== null)) _data = value ? Data : (string)null; }
+    }
+    private bool ShouldSerializeData() { return DataSpecified; }
+    private void ResetData() { DataSpecified = false; }
+    
     private readonly global::System.Collections.Generic.List<string> _backtrace = new global::System.Collections.Generic.List<string>();
     [global::ProtoBuf.ProtoMember(3, Name=@"backtrace", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<string> Backtrace
@@ -362,14 +427,23 @@ namespace IronFoundry.Warden.Protocol
     public InfoResponse() {}
     
 
-    private string _state = "";
+    private string _state;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"state", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string State
     {
-      get { return _state; }
+      get { return _state?? ""; }
       set { _state = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool StateSpecified
+    {
+      get { return _state != null; }
+      set { if (value == (_state== null)) _state = value ? State : (string)null; }
+    }
+    private bool ShouldSerializeState() { return StateSpecified; }
+    private void ResetState() { StateSpecified = false; }
+    
     private readonly global::System.Collections.Generic.List<string> _events = new global::System.Collections.Generic.List<string>();
     [global::ProtoBuf.ProtoMember(20, Name=@"events", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<string> Events
@@ -378,32 +452,59 @@ namespace IronFoundry.Warden.Protocol
     }
   
 
-    private string _hostIp = "";
+    private string _hostIp;
     [global::ProtoBuf.ProtoMember(30, IsRequired = false, Name=@"host_ip", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string HostIp
     {
-      get { return _hostIp; }
+      get { return _hostIp?? ""; }
       set { _hostIp = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool HostIpSpecified
+    {
+      get { return _hostIp != null; }
+      set { if (value == (_hostIp== null)) _hostIp = value ? HostIp : (string)null; }
+    }
+    private bool ShouldSerializeHostIp() { return HostIpSpecified; }
+    private void ResetHostIp() { HostIpSpecified = false; }
+    
 
-    private string _containerIp = "";
+    private string _containerIp;
     [global::ProtoBuf.ProtoMember(31, IsRequired = false, Name=@"container_ip", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string ContainerIp
     {
-      get { return _containerIp; }
+      get { return _containerIp?? ""; }
       set { _containerIp = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ContainerIpSpecified
+    {
+      get { return _containerIp != null; }
+      set { if (value == (_containerIp== null)) _containerIp = value ? ContainerIp : (string)null; }
+    }
+    private bool ShouldSerializeContainerIp() { return ContainerIpSpecified; }
+    private void ResetContainerIp() { ContainerIpSpecified = false; }
+    
 
-    private string _containerPath = "";
+    private string _containerPath;
     [global::ProtoBuf.ProtoMember(32, IsRequired = false, Name=@"container_path", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string ContainerPath
     {
-      get { return _containerPath; }
+      get { return _containerPath?? ""; }
       set { _containerPath = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ContainerPathSpecified
+    {
+      get { return _containerPath != null; }
+      set { if (value == (_containerPath== null)) _containerPath = value ? ContainerPath : (string)null; }
+    }
+    private bool ShouldSerializeContainerPath() { return ContainerPathSpecified; }
+    private void ResetContainerPath() { ContainerPathSpecified = false; }
+    
 
     private IronFoundry.Warden.Protocol.InfoResponse.MemoryStat _memoryStatInfo = null;
     [global::ProtoBuf.ProtoMember(40, IsRequired = false, Name=@"memory_stat_info", DataFormat = global::ProtoBuf.DataFormat.Default)]
@@ -453,257 +554,509 @@ namespace IronFoundry.Warden.Protocol
     public MemoryStat() {}
     
 
-    private ulong _cache = default(ulong);
+    private ulong? _cache;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"cache", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Cache
     {
-      get { return _cache; }
+      get { return _cache?? default(ulong); }
       set { _cache = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool CacheSpecified
+    {
+      get { return _cache != null; }
+      set { if (value == (_cache== null)) _cache = value ? Cache : (ulong?)null; }
+    }
+    private bool ShouldSerializeCache() { return CacheSpecified; }
+    private void ResetCache() { CacheSpecified = false; }
+    
 
-    private ulong _rss = default(ulong);
+    private ulong? _rss;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"rss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Rss
     {
-      get { return _rss; }
+      get { return _rss?? default(ulong); }
       set { _rss = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool RssSpecified
+    {
+      get { return _rss != null; }
+      set { if (value == (_rss== null)) _rss = value ? Rss : (ulong?)null; }
+    }
+    private bool ShouldSerializeRss() { return RssSpecified; }
+    private void ResetRss() { RssSpecified = false; }
+    
 
-    private ulong _mappedFile = default(ulong);
+    private ulong? _mappedFile;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"mapped_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong MappedFile
     {
-      get { return _mappedFile; }
+      get { return _mappedFile?? default(ulong); }
       set { _mappedFile = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool MappedFileSpecified
+    {
+      get { return _mappedFile != null; }
+      set { if (value == (_mappedFile== null)) _mappedFile = value ? MappedFile : (ulong?)null; }
+    }
+    private bool ShouldSerializeMappedFile() { return MappedFileSpecified; }
+    private void ResetMappedFile() { MappedFileSpecified = false; }
+    
 
-    private ulong _pgpgin = default(ulong);
+    private ulong? _pgpgin;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"pgpgin", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Pgpgin
     {
-      get { return _pgpgin; }
+      get { return _pgpgin?? default(ulong); }
       set { _pgpgin = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool PgpginSpecified
+    {
+      get { return _pgpgin != null; }
+      set { if (value == (_pgpgin== null)) _pgpgin = value ? Pgpgin : (ulong?)null; }
+    }
+    private bool ShouldSerializePgpgin() { return PgpginSpecified; }
+    private void ResetPgpgin() { PgpginSpecified = false; }
+    
 
-    private ulong _pgpgout = default(ulong);
+    private ulong? _pgpgout;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"pgpgout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Pgpgout
     {
-      get { return _pgpgout; }
+      get { return _pgpgout?? default(ulong); }
       set { _pgpgout = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool PgpgoutSpecified
+    {
+      get { return _pgpgout != null; }
+      set { if (value == (_pgpgout== null)) _pgpgout = value ? Pgpgout : (ulong?)null; }
+    }
+    private bool ShouldSerializePgpgout() { return PgpgoutSpecified; }
+    private void ResetPgpgout() { PgpgoutSpecified = false; }
+    
 
-    private ulong _swap = default(ulong);
+    private ulong? _swap;
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"swap", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Swap
     {
-      get { return _swap; }
+      get { return _swap?? default(ulong); }
       set { _swap = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool SwapSpecified
+    {
+      get { return _swap != null; }
+      set { if (value == (_swap== null)) _swap = value ? Swap : (ulong?)null; }
+    }
+    private bool ShouldSerializeSwap() { return SwapSpecified; }
+    private void ResetSwap() { SwapSpecified = false; }
+    
 
-    private ulong _pgfault = default(ulong);
+    private ulong? _pgfault;
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"pgfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Pgfault
     {
-      get { return _pgfault; }
+      get { return _pgfault?? default(ulong); }
       set { _pgfault = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool PgfaultSpecified
+    {
+      get { return _pgfault != null; }
+      set { if (value == (_pgfault== null)) _pgfault = value ? Pgfault : (ulong?)null; }
+    }
+    private bool ShouldSerializePgfault() { return PgfaultSpecified; }
+    private void ResetPgfault() { PgfaultSpecified = false; }
+    
 
-    private ulong _pgmajfault = default(ulong);
+    private ulong? _pgmajfault;
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"pgmajfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Pgmajfault
     {
-      get { return _pgmajfault; }
+      get { return _pgmajfault?? default(ulong); }
       set { _pgmajfault = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool PgmajfaultSpecified
+    {
+      get { return _pgmajfault != null; }
+      set { if (value == (_pgmajfault== null)) _pgmajfault = value ? Pgmajfault : (ulong?)null; }
+    }
+    private bool ShouldSerializePgmajfault() { return PgmajfaultSpecified; }
+    private void ResetPgmajfault() { PgmajfaultSpecified = false; }
+    
 
-    private ulong _inactiveAnon = default(ulong);
+    private ulong? _inactiveAnon;
     [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"inactive_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InactiveAnon
     {
-      get { return _inactiveAnon; }
+      get { return _inactiveAnon?? default(ulong); }
       set { _inactiveAnon = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InactiveAnonSpecified
+    {
+      get { return _inactiveAnon != null; }
+      set { if (value == (_inactiveAnon== null)) _inactiveAnon = value ? InactiveAnon : (ulong?)null; }
+    }
+    private bool ShouldSerializeInactiveAnon() { return InactiveAnonSpecified; }
+    private void ResetInactiveAnon() { InactiveAnonSpecified = false; }
+    
 
-    private ulong _activeAnon = default(ulong);
+    private ulong? _activeAnon;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"active_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ActiveAnon
     {
-      get { return _activeAnon; }
+      get { return _activeAnon?? default(ulong); }
       set { _activeAnon = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ActiveAnonSpecified
+    {
+      get { return _activeAnon != null; }
+      set { if (value == (_activeAnon== null)) _activeAnon = value ? ActiveAnon : (ulong?)null; }
+    }
+    private bool ShouldSerializeActiveAnon() { return ActiveAnonSpecified; }
+    private void ResetActiveAnon() { ActiveAnonSpecified = false; }
+    
 
-    private ulong _inactiveFile = default(ulong);
+    private ulong? _inactiveFile;
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"inactive_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InactiveFile
     {
-      get { return _inactiveFile; }
+      get { return _inactiveFile?? default(ulong); }
       set { _inactiveFile = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InactiveFileSpecified
+    {
+      get { return _inactiveFile != null; }
+      set { if (value == (_inactiveFile== null)) _inactiveFile = value ? InactiveFile : (ulong?)null; }
+    }
+    private bool ShouldSerializeInactiveFile() { return InactiveFileSpecified; }
+    private void ResetInactiveFile() { InactiveFileSpecified = false; }
+    
 
-    private ulong _activeFile = default(ulong);
+    private ulong? _activeFile;
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"active_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ActiveFile
     {
-      get { return _activeFile; }
+      get { return _activeFile?? default(ulong); }
       set { _activeFile = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ActiveFileSpecified
+    {
+      get { return _activeFile != null; }
+      set { if (value == (_activeFile== null)) _activeFile = value ? ActiveFile : (ulong?)null; }
+    }
+    private bool ShouldSerializeActiveFile() { return ActiveFileSpecified; }
+    private void ResetActiveFile() { ActiveFileSpecified = false; }
+    
 
-    private ulong _unevictable = default(ulong);
+    private ulong? _unevictable;
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"unevictable", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Unevictable
     {
-      get { return _unevictable; }
+      get { return _unevictable?? default(ulong); }
       set { _unevictable = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool UnevictableSpecified
+    {
+      get { return _unevictable != null; }
+      set { if (value == (_unevictable== null)) _unevictable = value ? Unevictable : (ulong?)null; }
+    }
+    private bool ShouldSerializeUnevictable() { return UnevictableSpecified; }
+    private void ResetUnevictable() { UnevictableSpecified = false; }
+    
 
-    private ulong _hierarchicalMemoryLimit = default(ulong);
+    private ulong? _hierarchicalMemoryLimit;
     [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"hierarchical_memory_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong HierarchicalMemoryLimit
     {
-      get { return _hierarchicalMemoryLimit; }
+      get { return _hierarchicalMemoryLimit?? default(ulong); }
       set { _hierarchicalMemoryLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool HierarchicalMemoryLimitSpecified
+    {
+      get { return _hierarchicalMemoryLimit != null; }
+      set { if (value == (_hierarchicalMemoryLimit== null)) _hierarchicalMemoryLimit = value ? HierarchicalMemoryLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeHierarchicalMemoryLimit() { return HierarchicalMemoryLimitSpecified; }
+    private void ResetHierarchicalMemoryLimit() { HierarchicalMemoryLimitSpecified = false; }
+    
 
-    private ulong _hierarchicalMemswLimit = default(ulong);
+    private ulong? _hierarchicalMemswLimit;
     [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"hierarchical_memsw_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong HierarchicalMemswLimit
     {
-      get { return _hierarchicalMemswLimit; }
+      get { return _hierarchicalMemswLimit?? default(ulong); }
       set { _hierarchicalMemswLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool HierarchicalMemswLimitSpecified
+    {
+      get { return _hierarchicalMemswLimit != null; }
+      set { if (value == (_hierarchicalMemswLimit== null)) _hierarchicalMemswLimit = value ? HierarchicalMemswLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeHierarchicalMemswLimit() { return HierarchicalMemswLimitSpecified; }
+    private void ResetHierarchicalMemswLimit() { HierarchicalMemswLimitSpecified = false; }
+    
 
-    private ulong _totalCache = default(ulong);
+    private ulong? _totalCache;
     [global::ProtoBuf.ProtoMember(16, IsRequired = false, Name=@"total_cache", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalCache
     {
-      get { return _totalCache; }
+      get { return _totalCache?? default(ulong); }
       set { _totalCache = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalCacheSpecified
+    {
+      get { return _totalCache != null; }
+      set { if (value == (_totalCache== null)) _totalCache = value ? TotalCache : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalCache() { return TotalCacheSpecified; }
+    private void ResetTotalCache() { TotalCacheSpecified = false; }
+    
 
-    private ulong _totalRss = default(ulong);
+    private ulong? _totalRss;
     [global::ProtoBuf.ProtoMember(17, IsRequired = false, Name=@"total_rss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalRss
     {
-      get { return _totalRss; }
+      get { return _totalRss?? default(ulong); }
       set { _totalRss = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalRssSpecified
+    {
+      get { return _totalRss != null; }
+      set { if (value == (_totalRss== null)) _totalRss = value ? TotalRss : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalRss() { return TotalRssSpecified; }
+    private void ResetTotalRss() { TotalRssSpecified = false; }
+    
 
-    private ulong _totalMappedFile = default(ulong);
+    private ulong? _totalMappedFile;
     [global::ProtoBuf.ProtoMember(18, IsRequired = false, Name=@"total_mapped_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalMappedFile
     {
-      get { return _totalMappedFile; }
+      get { return _totalMappedFile?? default(ulong); }
       set { _totalMappedFile = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalMappedFileSpecified
+    {
+      get { return _totalMappedFile != null; }
+      set { if (value == (_totalMappedFile== null)) _totalMappedFile = value ? TotalMappedFile : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalMappedFile() { return TotalMappedFileSpecified; }
+    private void ResetTotalMappedFile() { TotalMappedFileSpecified = false; }
+    
 
-    private ulong _totalPgpgin = default(ulong);
+    private ulong? _totalPgpgin;
     [global::ProtoBuf.ProtoMember(19, IsRequired = false, Name=@"total_pgpgin", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalPgpgin
     {
-      get { return _totalPgpgin; }
+      get { return _totalPgpgin?? default(ulong); }
       set { _totalPgpgin = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalPgpginSpecified
+    {
+      get { return _totalPgpgin != null; }
+      set { if (value == (_totalPgpgin== null)) _totalPgpgin = value ? TotalPgpgin : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalPgpgin() { return TotalPgpginSpecified; }
+    private void ResetTotalPgpgin() { TotalPgpginSpecified = false; }
+    
 
-    private ulong _totalPgpgout = default(ulong);
+    private ulong? _totalPgpgout;
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"total_pgpgout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalPgpgout
     {
-      get { return _totalPgpgout; }
+      get { return _totalPgpgout?? default(ulong); }
       set { _totalPgpgout = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalPgpgoutSpecified
+    {
+      get { return _totalPgpgout != null; }
+      set { if (value == (_totalPgpgout== null)) _totalPgpgout = value ? TotalPgpgout : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalPgpgout() { return TotalPgpgoutSpecified; }
+    private void ResetTotalPgpgout() { TotalPgpgoutSpecified = false; }
+    
 
-    private ulong _totalSwap = default(ulong);
+    private ulong? _totalSwap;
     [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"total_swap", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalSwap
     {
-      get { return _totalSwap; }
+      get { return _totalSwap?? default(ulong); }
       set { _totalSwap = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalSwapSpecified
+    {
+      get { return _totalSwap != null; }
+      set { if (value == (_totalSwap== null)) _totalSwap = value ? TotalSwap : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalSwap() { return TotalSwapSpecified; }
+    private void ResetTotalSwap() { TotalSwapSpecified = false; }
+    
 
-    private ulong _totalPgfault = default(ulong);
+    private ulong? _totalPgfault;
     [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"total_pgfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalPgfault
     {
-      get { return _totalPgfault; }
+      get { return _totalPgfault?? default(ulong); }
       set { _totalPgfault = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalPgfaultSpecified
+    {
+      get { return _totalPgfault != null; }
+      set { if (value == (_totalPgfault== null)) _totalPgfault = value ? TotalPgfault : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalPgfault() { return TotalPgfaultSpecified; }
+    private void ResetTotalPgfault() { TotalPgfaultSpecified = false; }
+    
 
-    private ulong _totalPgmajfault = default(ulong);
+    private ulong? _totalPgmajfault;
     [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"total_pgmajfault", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalPgmajfault
     {
-      get { return _totalPgmajfault; }
+      get { return _totalPgmajfault?? default(ulong); }
       set { _totalPgmajfault = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalPgmajfaultSpecified
+    {
+      get { return _totalPgmajfault != null; }
+      set { if (value == (_totalPgmajfault== null)) _totalPgmajfault = value ? TotalPgmajfault : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalPgmajfault() { return TotalPgmajfaultSpecified; }
+    private void ResetTotalPgmajfault() { TotalPgmajfaultSpecified = false; }
+    
 
-    private ulong _totalInactiveAnon = default(ulong);
+    private ulong? _totalInactiveAnon;
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"total_inactive_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalInactiveAnon
     {
-      get { return _totalInactiveAnon; }
+      get { return _totalInactiveAnon?? default(ulong); }
       set { _totalInactiveAnon = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalInactiveAnonSpecified
+    {
+      get { return _totalInactiveAnon != null; }
+      set { if (value == (_totalInactiveAnon== null)) _totalInactiveAnon = value ? TotalInactiveAnon : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalInactiveAnon() { return TotalInactiveAnonSpecified; }
+    private void ResetTotalInactiveAnon() { TotalInactiveAnonSpecified = false; }
+    
 
-    private ulong _totalActiveAnon = default(ulong);
+    private ulong? _totalActiveAnon;
     [global::ProtoBuf.ProtoMember(25, IsRequired = false, Name=@"total_active_anon", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalActiveAnon
     {
-      get { return _totalActiveAnon; }
+      get { return _totalActiveAnon?? default(ulong); }
       set { _totalActiveAnon = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalActiveAnonSpecified
+    {
+      get { return _totalActiveAnon != null; }
+      set { if (value == (_totalActiveAnon== null)) _totalActiveAnon = value ? TotalActiveAnon : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalActiveAnon() { return TotalActiveAnonSpecified; }
+    private void ResetTotalActiveAnon() { TotalActiveAnonSpecified = false; }
+    
 
-    private ulong _totalInactiveFile = default(ulong);
+    private ulong? _totalInactiveFile;
     [global::ProtoBuf.ProtoMember(26, IsRequired = false, Name=@"total_inactive_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalInactiveFile
     {
-      get { return _totalInactiveFile; }
+      get { return _totalInactiveFile?? default(ulong); }
       set { _totalInactiveFile = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalInactiveFileSpecified
+    {
+      get { return _totalInactiveFile != null; }
+      set { if (value == (_totalInactiveFile== null)) _totalInactiveFile = value ? TotalInactiveFile : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalInactiveFile() { return TotalInactiveFileSpecified; }
+    private void ResetTotalInactiveFile() { TotalInactiveFileSpecified = false; }
+    
 
-    private ulong _totalActiveFile = default(ulong);
+    private ulong? _totalActiveFile;
     [global::ProtoBuf.ProtoMember(27, IsRequired = false, Name=@"total_active_file", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalActiveFile
     {
-      get { return _totalActiveFile; }
+      get { return _totalActiveFile?? default(ulong); }
       set { _totalActiveFile = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalActiveFileSpecified
+    {
+      get { return _totalActiveFile != null; }
+      set { if (value == (_totalActiveFile== null)) _totalActiveFile = value ? TotalActiveFile : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalActiveFile() { return TotalActiveFileSpecified; }
+    private void ResetTotalActiveFile() { TotalActiveFileSpecified = false; }
+    
 
-    private ulong _totalUnevictable = default(ulong);
+    private ulong? _totalUnevictable;
     [global::ProtoBuf.ProtoMember(28, IsRequired = false, Name=@"total_unevictable", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong TotalUnevictable
     {
-      get { return _totalUnevictable; }
+      get { return _totalUnevictable?? default(ulong); }
       set { _totalUnevictable = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool TotalUnevictableSpecified
+    {
+      get { return _totalUnevictable != null; }
+      set { if (value == (_totalUnevictable== null)) _totalUnevictable = value ? TotalUnevictable : (ulong?)null; }
+    }
+    private bool ShouldSerializeTotalUnevictable() { return TotalUnevictableSpecified; }
+    private void ResetTotalUnevictable() { TotalUnevictableSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -715,32 +1068,59 @@ namespace IronFoundry.Warden.Protocol
     public CpuStat() {}
     
 
-    private ulong _usage = default(ulong);
+    private ulong? _usage;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"usage", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Usage
     {
-      get { return _usage; }
+      get { return _usage?? default(ulong); }
       set { _usage = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool UsageSpecified
+    {
+      get { return _usage != null; }
+      set { if (value == (_usage== null)) _usage = value ? Usage : (ulong?)null; }
+    }
+    private bool ShouldSerializeUsage() { return UsageSpecified; }
+    private void ResetUsage() { UsageSpecified = false; }
+    
 
-    private ulong _user = default(ulong);
+    private ulong? _user;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"user", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong User
     {
-      get { return _user; }
+      get { return _user?? default(ulong); }
       set { _user = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool UserSpecified
+    {
+      get { return _user != null; }
+      set { if (value == (_user== null)) _user = value ? User : (ulong?)null; }
+    }
+    private bool ShouldSerializeUser() { return UserSpecified; }
+    private void ResetUser() { UserSpecified = false; }
+    
 
-    private ulong _system = default(ulong);
+    private ulong? _system;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"system", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong System
     {
-      get { return _system; }
+      get { return _system?? default(ulong); }
       set { _system = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool SystemSpecified
+    {
+      get { return _system != null; }
+      set { if (value == (_system== null)) _system = value ? System : (ulong?)null; }
+    }
+    private bool ShouldSerializeSystem() { return SystemSpecified; }
+    private void ResetSystem() { SystemSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -752,23 +1132,41 @@ namespace IronFoundry.Warden.Protocol
     public DiskStat() {}
     
 
-    private ulong _bytesUsed = default(ulong);
+    private ulong? _bytesUsed;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"bytes_used", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong BytesUsed
     {
-      get { return _bytesUsed; }
+      get { return _bytesUsed?? default(ulong); }
       set { _bytesUsed = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BytesUsedSpecified
+    {
+      get { return _bytesUsed != null; }
+      set { if (value == (_bytesUsed== null)) _bytesUsed = value ? BytesUsed : (ulong?)null; }
+    }
+    private bool ShouldSerializeBytesUsed() { return BytesUsedSpecified; }
+    private void ResetBytesUsed() { BytesUsedSpecified = false; }
+    
 
-    private ulong _inodesUsed = default(ulong);
+    private ulong? _inodesUsed;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"inodes_used", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InodesUsed
     {
-      get { return _inodesUsed; }
+      get { return _inodesUsed?? default(ulong); }
       set { _inodesUsed = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodesUsedSpecified
+    {
+      get { return _inodesUsed != null; }
+      set { if (value == (_inodesUsed== null)) _inodesUsed = value ? InodesUsed : (ulong?)null; }
+    }
+    private bool ShouldSerializeInodesUsed() { return InodesUsedSpecified; }
+    private void ResetInodesUsed() { InodesUsedSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -780,41 +1178,77 @@ namespace IronFoundry.Warden.Protocol
     public BandwidthStat() {}
     
 
-    private ulong _inRate = default(ulong);
+    private ulong? _inRate;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"in_rate", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InRate
     {
-      get { return _inRate; }
+      get { return _inRate?? default(ulong); }
       set { _inRate = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InRateSpecified
+    {
+      get { return _inRate != null; }
+      set { if (value == (_inRate== null)) _inRate = value ? InRate : (ulong?)null; }
+    }
+    private bool ShouldSerializeInRate() { return InRateSpecified; }
+    private void ResetInRate() { InRateSpecified = false; }
+    
 
-    private ulong _inBurst = default(ulong);
+    private ulong? _inBurst;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"in_burst", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InBurst
     {
-      get { return _inBurst; }
+      get { return _inBurst?? default(ulong); }
       set { _inBurst = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InBurstSpecified
+    {
+      get { return _inBurst != null; }
+      set { if (value == (_inBurst== null)) _inBurst = value ? InBurst : (ulong?)null; }
+    }
+    private bool ShouldSerializeInBurst() { return InBurstSpecified; }
+    private void ResetInBurst() { InBurstSpecified = false; }
+    
 
-    private ulong _outRate = default(ulong);
+    private ulong? _outRate;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"out_rate", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong OutRate
     {
-      get { return _outRate; }
+      get { return _outRate?? default(ulong); }
       set { _outRate = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool OutRateSpecified
+    {
+      get { return _outRate != null; }
+      set { if (value == (_outRate== null)) _outRate = value ? OutRate : (ulong?)null; }
+    }
+    private bool ShouldSerializeOutRate() { return OutRateSpecified; }
+    private void ResetOutRate() { OutRateSpecified = false; }
+    
 
-    private ulong _outBurst = default(ulong);
+    private ulong? _outBurst;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"out_burst", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong OutBurst
     {
-      get { return _outBurst; }
+      get { return _outBurst?? default(ulong); }
       set { _outBurst = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool OutBurstSpecified
+    {
+      get { return _outBurst != null; }
+      set { if (value == (_outBurst== null)) _outBurst = value ? OutBurst : (ulong?)null; }
+    }
+    private bool ShouldSerializeOutBurst() { return OutBurstSpecified; }
+    private void ResetOutBurst() { OutBurstSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -903,113 +1337,221 @@ namespace IronFoundry.Warden.Protocol
       set { _handle = value; }
     }
 
-    private ulong _blockLimit = default(ulong);
+    private ulong? _blockLimit;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"block_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong BlockLimit
     {
-      get { return _blockLimit; }
+      get { return _blockLimit?? default(ulong); }
       set { _blockLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockLimitSpecified
+    {
+      get { return _blockLimit != null; }
+      set { if (value == (_blockLimit== null)) _blockLimit = value ? BlockLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlockLimit() { return BlockLimitSpecified; }
+    private void ResetBlockLimit() { BlockLimitSpecified = false; }
+    
 
-    private ulong _block = default(ulong);
+    private ulong? _block;
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"block", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Block
     {
-      get { return _block; }
+      get { return _block?? default(ulong); }
       set { _block = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockSpecified
+    {
+      get { return _block != null; }
+      set { if (value == (_block== null)) _block = value ? Block : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlock() { return BlockSpecified; }
+    private void ResetBlock() { BlockSpecified = false; }
+    
 
-    private ulong _blockSoft = default(ulong);
+    private ulong? _blockSoft;
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"block_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong BlockSoft
     {
-      get { return _blockSoft; }
+      get { return _blockSoft?? default(ulong); }
       set { _blockSoft = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockSoftSpecified
+    {
+      get { return _blockSoft != null; }
+      set { if (value == (_blockSoft== null)) _blockSoft = value ? BlockSoft : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlockSoft() { return BlockSoftSpecified; }
+    private void ResetBlockSoft() { BlockSoftSpecified = false; }
+    
 
-    private ulong _blockHard = default(ulong);
+    private ulong? _blockHard;
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"block_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong BlockHard
     {
-      get { return _blockHard; }
+      get { return _blockHard?? default(ulong); }
       set { _blockHard = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockHardSpecified
+    {
+      get { return _blockHard != null; }
+      set { if (value == (_blockHard== null)) _blockHard = value ? BlockHard : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlockHard() { return BlockHardSpecified; }
+    private void ResetBlockHard() { BlockHardSpecified = false; }
+    
 
-    private ulong _inodeLimit = default(ulong);
+    private ulong? _inodeLimit;
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"inode_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InodeLimit
     {
-      get { return _inodeLimit; }
+      get { return _inodeLimit?? default(ulong); }
       set { _inodeLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeLimitSpecified
+    {
+      get { return _inodeLimit != null; }
+      set { if (value == (_inodeLimit== null)) _inodeLimit = value ? InodeLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeInodeLimit() { return InodeLimitSpecified; }
+    private void ResetInodeLimit() { InodeLimitSpecified = false; }
+    
 
-    private ulong _inode = default(ulong);
+    private ulong? _inode;
     [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"inode", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Inode
     {
-      get { return _inode; }
+      get { return _inode?? default(ulong); }
       set { _inode = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeSpecified
+    {
+      get { return _inode != null; }
+      set { if (value == (_inode== null)) _inode = value ? Inode : (ulong?)null; }
+    }
+    private bool ShouldSerializeInode() { return InodeSpecified; }
+    private void ResetInode() { InodeSpecified = false; }
+    
 
-    private ulong _inodeSoft = default(ulong);
+    private ulong? _inodeSoft;
     [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"inode_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InodeSoft
     {
-      get { return _inodeSoft; }
+      get { return _inodeSoft?? default(ulong); }
       set { _inodeSoft = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeSoftSpecified
+    {
+      get { return _inodeSoft != null; }
+      set { if (value == (_inodeSoft== null)) _inodeSoft = value ? InodeSoft : (ulong?)null; }
+    }
+    private bool ShouldSerializeInodeSoft() { return InodeSoftSpecified; }
+    private void ResetInodeSoft() { InodeSoftSpecified = false; }
+    
 
-    private ulong _inodeHard = default(ulong);
+    private ulong? _inodeHard;
     [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"inode_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InodeHard
     {
-      get { return _inodeHard; }
+      get { return _inodeHard?? default(ulong); }
       set { _inodeHard = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeHardSpecified
+    {
+      get { return _inodeHard != null; }
+      set { if (value == (_inodeHard== null)) _inodeHard = value ? InodeHard : (ulong?)null; }
+    }
+    private bool ShouldSerializeInodeHard() { return InodeHardSpecified; }
+    private void ResetInodeHard() { InodeHardSpecified = false; }
+    
 
-    private ulong _byteLimit = default(ulong);
+    private ulong? _byteLimit;
     [global::ProtoBuf.ProtoMember(30, IsRequired = false, Name=@"byte_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ByteLimit
     {
-      get { return _byteLimit; }
+      get { return _byteLimit?? default(ulong); }
       set { _byteLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteLimitSpecified
+    {
+      get { return _byteLimit != null; }
+      set { if (value == (_byteLimit== null)) _byteLimit = value ? ByteLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeByteLimit() { return ByteLimitSpecified; }
+    private void ResetByteLimit() { ByteLimitSpecified = false; }
+    
 
-    private ulong _byte = default(ulong);
+    private ulong? _byte;
     [global::ProtoBuf.ProtoMember(31, IsRequired = false, Name=@"byte", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Byte
     {
-      get { return _byte; }
+      get { return _byte?? default(ulong); }
       set { _byte = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteSpecified
+    {
+      get { return _byte != null; }
+      set { if (value == (_byte== null)) _byte = value ? Byte : (ulong?)null; }
+    }
+    private bool ShouldSerializeByte() { return ByteSpecified; }
+    private void ResetByte() { ByteSpecified = false; }
+    
 
-    private ulong _byteSoft = default(ulong);
+    private ulong? _byteSoft;
     [global::ProtoBuf.ProtoMember(32, IsRequired = false, Name=@"byte_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ByteSoft
     {
-      get { return _byteSoft; }
+      get { return _byteSoft?? default(ulong); }
       set { _byteSoft = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteSoftSpecified
+    {
+      get { return _byteSoft != null; }
+      set { if (value == (_byteSoft== null)) _byteSoft = value ? ByteSoft : (ulong?)null; }
+    }
+    private bool ShouldSerializeByteSoft() { return ByteSoftSpecified; }
+    private void ResetByteSoft() { ByteSoftSpecified = false; }
+    
 
-    private ulong _byteHard = default(ulong);
+    private ulong? _byteHard;
     [global::ProtoBuf.ProtoMember(33, IsRequired = false, Name=@"byte_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ByteHard
     {
-      get { return _byteHard; }
+      get { return _byteHard?? default(ulong); }
       set { _byteHard = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteHardSpecified
+    {
+      get { return _byteHard != null; }
+      set { if (value == (_byteHard== null)) _byteHard = value ? ByteHard : (ulong?)null; }
+    }
+    private bool ShouldSerializeByteHard() { return ByteHardSpecified; }
+    private void ResetByteHard() { ByteHardSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1021,113 +1563,221 @@ namespace IronFoundry.Warden.Protocol
     public LimitDiskResponse() {}
     
 
-    private ulong _blockLimit = default(ulong);
+    private ulong? _blockLimit;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"block_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong BlockLimit
     {
-      get { return _blockLimit; }
+      get { return _blockLimit?? default(ulong); }
       set { _blockLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockLimitSpecified
+    {
+      get { return _blockLimit != null; }
+      set { if (value == (_blockLimit== null)) _blockLimit = value ? BlockLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlockLimit() { return BlockLimitSpecified; }
+    private void ResetBlockLimit() { BlockLimitSpecified = false; }
+    
 
-    private ulong _block = default(ulong);
+    private ulong? _block;
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"block", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Block
     {
-      get { return _block; }
+      get { return _block?? default(ulong); }
       set { _block = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockSpecified
+    {
+      get { return _block != null; }
+      set { if (value == (_block== null)) _block = value ? Block : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlock() { return BlockSpecified; }
+    private void ResetBlock() { BlockSpecified = false; }
+    
 
-    private ulong _blockSoft = default(ulong);
+    private ulong? _blockSoft;
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"block_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong BlockSoft
     {
-      get { return _blockSoft; }
+      get { return _blockSoft?? default(ulong); }
       set { _blockSoft = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockSoftSpecified
+    {
+      get { return _blockSoft != null; }
+      set { if (value == (_blockSoft== null)) _blockSoft = value ? BlockSoft : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlockSoft() { return BlockSoftSpecified; }
+    private void ResetBlockSoft() { BlockSoftSpecified = false; }
+    
 
-    private ulong _blockHard = default(ulong);
+    private ulong? _blockHard;
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"block_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong BlockHard
     {
-      get { return _blockHard; }
+      get { return _blockHard?? default(ulong); }
       set { _blockHard = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BlockHardSpecified
+    {
+      get { return _blockHard != null; }
+      set { if (value == (_blockHard== null)) _blockHard = value ? BlockHard : (ulong?)null; }
+    }
+    private bool ShouldSerializeBlockHard() { return BlockHardSpecified; }
+    private void ResetBlockHard() { BlockHardSpecified = false; }
+    
 
-    private ulong _inodeLimit = default(ulong);
+    private ulong? _inodeLimit;
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"inode_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InodeLimit
     {
-      get { return _inodeLimit; }
+      get { return _inodeLimit?? default(ulong); }
       set { _inodeLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeLimitSpecified
+    {
+      get { return _inodeLimit != null; }
+      set { if (value == (_inodeLimit== null)) _inodeLimit = value ? InodeLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeInodeLimit() { return InodeLimitSpecified; }
+    private void ResetInodeLimit() { InodeLimitSpecified = false; }
+    
 
-    private ulong _inode = default(ulong);
+    private ulong? _inode;
     [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"inode", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Inode
     {
-      get { return _inode; }
+      get { return _inode?? default(ulong); }
       set { _inode = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeSpecified
+    {
+      get { return _inode != null; }
+      set { if (value == (_inode== null)) _inode = value ? Inode : (ulong?)null; }
+    }
+    private bool ShouldSerializeInode() { return InodeSpecified; }
+    private void ResetInode() { InodeSpecified = false; }
+    
 
-    private ulong _inodeSoft = default(ulong);
+    private ulong? _inodeSoft;
     [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"inode_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InodeSoft
     {
-      get { return _inodeSoft; }
+      get { return _inodeSoft?? default(ulong); }
       set { _inodeSoft = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeSoftSpecified
+    {
+      get { return _inodeSoft != null; }
+      set { if (value == (_inodeSoft== null)) _inodeSoft = value ? InodeSoft : (ulong?)null; }
+    }
+    private bool ShouldSerializeInodeSoft() { return InodeSoftSpecified; }
+    private void ResetInodeSoft() { InodeSoftSpecified = false; }
+    
 
-    private ulong _inodeHard = default(ulong);
+    private ulong? _inodeHard;
     [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"inode_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong InodeHard
     {
-      get { return _inodeHard; }
+      get { return _inodeHard?? default(ulong); }
       set { _inodeHard = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool InodeHardSpecified
+    {
+      get { return _inodeHard != null; }
+      set { if (value == (_inodeHard== null)) _inodeHard = value ? InodeHard : (ulong?)null; }
+    }
+    private bool ShouldSerializeInodeHard() { return InodeHardSpecified; }
+    private void ResetInodeHard() { InodeHardSpecified = false; }
+    
 
-    private ulong _byteLimit = default(ulong);
+    private ulong? _byteLimit;
     [global::ProtoBuf.ProtoMember(30, IsRequired = false, Name=@"byte_limit", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ByteLimit
     {
-      get { return _byteLimit; }
+      get { return _byteLimit?? default(ulong); }
       set { _byteLimit = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteLimitSpecified
+    {
+      get { return _byteLimit != null; }
+      set { if (value == (_byteLimit== null)) _byteLimit = value ? ByteLimit : (ulong?)null; }
+    }
+    private bool ShouldSerializeByteLimit() { return ByteLimitSpecified; }
+    private void ResetByteLimit() { ByteLimitSpecified = false; }
+    
 
-    private ulong _byte = default(ulong);
+    private ulong? _byte;
     [global::ProtoBuf.ProtoMember(31, IsRequired = false, Name=@"byte", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Byte
     {
-      get { return _byte; }
+      get { return _byte?? default(ulong); }
       set { _byte = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteSpecified
+    {
+      get { return _byte != null; }
+      set { if (value == (_byte== null)) _byte = value ? Byte : (ulong?)null; }
+    }
+    private bool ShouldSerializeByte() { return ByteSpecified; }
+    private void ResetByte() { ByteSpecified = false; }
+    
 
-    private ulong _byteSoft = default(ulong);
+    private ulong? _byteSoft;
     [global::ProtoBuf.ProtoMember(32, IsRequired = false, Name=@"byte_soft", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ByteSoft
     {
-      get { return _byteSoft; }
+      get { return _byteSoft?? default(ulong); }
       set { _byteSoft = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteSoftSpecified
+    {
+      get { return _byteSoft != null; }
+      set { if (value == (_byteSoft== null)) _byteSoft = value ? ByteSoft : (ulong?)null; }
+    }
+    private bool ShouldSerializeByteSoft() { return ByteSoftSpecified; }
+    private void ResetByteSoft() { ByteSoftSpecified = false; }
+    
 
-    private ulong _byteHard = default(ulong);
+    private ulong? _byteHard;
     [global::ProtoBuf.ProtoMember(33, IsRequired = false, Name=@"byte_hard", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong ByteHard
     {
-      get { return _byteHard; }
+      get { return _byteHard?? default(ulong); }
       set { _byteHard = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ByteHardSpecified
+    {
+      get { return _byteHard != null; }
+      set { if (value == (_byteHard== null)) _byteHard = value ? ByteHard : (ulong?)null; }
+    }
+    private bool ShouldSerializeByteHard() { return ByteHardSpecified; }
+    private void ResetByteHard() { ByteHardSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1151,14 +1801,23 @@ namespace IronFoundry.Warden.Protocol
       set { _handle = value; }
     }
 
-    private ulong _limitInBytes = default(ulong);
+    private ulong? _limitInBytes;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"limit_in_bytes", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong LimitInBytes
     {
-      get { return _limitInBytes; }
+      get { return _limitInBytes?? default(ulong); }
       set { _limitInBytes = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool LimitInBytesSpecified
+    {
+      get { return _limitInBytes != null; }
+      set { if (value == (_limitInBytes== null)) _limitInBytes = value ? LimitInBytes : (ulong?)null; }
+    }
+    private bool ShouldSerializeLimitInBytes() { return LimitInBytesSpecified; }
+    private void ResetLimitInBytes() { LimitInBytesSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1170,14 +1829,23 @@ namespace IronFoundry.Warden.Protocol
     public LimitMemoryResponse() {}
     
 
-    private ulong _limitInBytes = default(ulong);
+    private ulong? _limitInBytes;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"limit_in_bytes", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong LimitInBytes
     {
-      get { return _limitInBytes; }
+      get { return _limitInBytes?? default(ulong); }
       set { _limitInBytes = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool LimitInBytesSpecified
+    {
+      get { return _limitInBytes != null; }
+      set { if (value == (_limitInBytes== null)) _limitInBytes = value ? LimitInBytes : (ulong?)null; }
+    }
+    private bool ShouldSerializeLimitInBytes() { return LimitInBytesSpecified; }
+    private void ResetLimitInBytes() { LimitInBytesSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1218,32 +1886,59 @@ namespace IronFoundry.Warden.Protocol
     public LinkResponse() {}
     
 
-    private uint _exitStatus = default(uint);
+    private uint? _exitStatus;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint ExitStatus
     {
-      get { return _exitStatus; }
+      get { return _exitStatus?? default(uint); }
       set { _exitStatus = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ExitStatusSpecified
+    {
+      get { return _exitStatus != null; }
+      set { if (value == (_exitStatus== null)) _exitStatus = value ? ExitStatus : (uint?)null; }
+    }
+    private bool ShouldSerializeExitStatus() { return ExitStatusSpecified; }
+    private void ResetExitStatus() { ExitStatusSpecified = false; }
+    
 
-    private string _stdout = "";
+    private string _stdout;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"stdout", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Stdout
     {
-      get { return _stdout; }
+      get { return _stdout?? ""; }
       set { _stdout = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool StdoutSpecified
+    {
+      get { return _stdout != null; }
+      set { if (value == (_stdout== null)) _stdout = value ? Stdout : (string)null; }
+    }
+    private bool ShouldSerializeStdout() { return StdoutSpecified; }
+    private void ResetStdout() { StdoutSpecified = false; }
+    
 
-    private string _stderr = "";
+    private string _stderr;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"stderr", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Stderr
     {
-      get { return _stderr; }
+      get { return _stderr?? ""; }
       set { _stderr = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool StderrSpecified
+    {
+      get { return _stderr != null; }
+      set { if (value == (_stderr== null)) _stderr = value ? Stderr : (string)null; }
+    }
+    private bool ShouldSerializeStderr() { return StderrSpecified; }
+    private void ResetStderr() { StderrSpecified = false; }
+    
 
     private IronFoundry.Warden.Protocol.InfoResponse _info = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"info", DataFormat = global::ProtoBuf.DataFormat.Default)]
@@ -1399,23 +2094,41 @@ namespace IronFoundry.Warden.Protocol
       set { _handle = value; }
     }
 
-    private uint _hostPort = default(uint);
+    private uint? _hostPort;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"host_port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint HostPort
     {
-      get { return _hostPort; }
+      get { return _hostPort?? default(uint); }
       set { _hostPort = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool HostPortSpecified
+    {
+      get { return _hostPort != null; }
+      set { if (value == (_hostPort== null)) _hostPort = value ? HostPort : (uint?)null; }
+    }
+    private bool ShouldSerializeHostPort() { return HostPortSpecified; }
+    private void ResetHostPort() { HostPortSpecified = false; }
+    
 
-    private uint _containerPort = default(uint);
+    private uint? _containerPort;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"container_port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint ContainerPort
     {
-      get { return _containerPort; }
+      get { return _containerPort?? default(uint); }
       set { _containerPort = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ContainerPortSpecified
+    {
+      get { return _containerPort != null; }
+      set { if (value == (_containerPort== null)) _containerPort = value ? ContainerPort : (uint?)null; }
+    }
+    private bool ShouldSerializeContainerPort() { return ContainerPortSpecified; }
+    private void ResetContainerPort() { ContainerPortSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1463,23 +2176,41 @@ namespace IronFoundry.Warden.Protocol
       set { _handle = value; }
     }
 
-    private string _network = "";
+    private string _network;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"network", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Network
     {
-      get { return _network; }
+      get { return _network?? ""; }
       set { _network = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool NetworkSpecified
+    {
+      get { return _network != null; }
+      set { if (value == (_network== null)) _network = value ? Network : (string)null; }
+    }
+    private bool ShouldSerializeNetwork() { return NetworkSpecified; }
+    private void ResetNetwork() { NetworkSpecified = false; }
+    
 
-    private uint _port = default(uint);
+    private uint? _port;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"port", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint Port
     {
-      get { return _port; }
+      get { return _port?? default(uint); }
       set { _port = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool PortSpecified
+    {
+      get { return _port != null; }
+      set { if (value == (_port== null)) _port = value ? Port : (uint?)null; }
+    }
+    private bool ShouldSerializePort() { return PortSpecified; }
+    private void ResetPort() { PortSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1531,140 +2262,275 @@ namespace IronFoundry.Warden.Protocol
     public ResourceLimits() {}
     
 
-    private ulong _as = default(ulong);
+    private ulong? _as;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"as", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong As
     {
-      get { return _as; }
+      get { return _as?? default(ulong); }
       set { _as = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool AsSpecified
+    {
+      get { return _as != null; }
+      set { if (value == (_as== null)) _as = value ? As : (ulong?)null; }
+    }
+    private bool ShouldSerializeAs() { return AsSpecified; }
+    private void ResetAs() { AsSpecified = false; }
+    
 
-    private ulong _core = default(ulong);
+    private ulong? _core;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"core", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Core
     {
-      get { return _core; }
+      get { return _core?? default(ulong); }
       set { _core = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool CoreSpecified
+    {
+      get { return _core != null; }
+      set { if (value == (_core== null)) _core = value ? Core : (ulong?)null; }
+    }
+    private bool ShouldSerializeCore() { return CoreSpecified; }
+    private void ResetCore() { CoreSpecified = false; }
+    
 
-    private ulong _cpu = default(ulong);
+    private ulong? _cpu;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"cpu", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Cpu
     {
-      get { return _cpu; }
+      get { return _cpu?? default(ulong); }
       set { _cpu = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool CpuSpecified
+    {
+      get { return _cpu != null; }
+      set { if (value == (_cpu== null)) _cpu = value ? Cpu : (ulong?)null; }
+    }
+    private bool ShouldSerializeCpu() { return CpuSpecified; }
+    private void ResetCpu() { CpuSpecified = false; }
+    
 
-    private ulong _data = default(ulong);
+    private ulong? _data;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Data
     {
-      get { return _data; }
+      get { return _data?? default(ulong); }
       set { _data = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool DataSpecified
+    {
+      get { return _data != null; }
+      set { if (value == (_data== null)) _data = value ? Data : (ulong?)null; }
+    }
+    private bool ShouldSerializeData() { return DataSpecified; }
+    private void ResetData() { DataSpecified = false; }
+    
 
-    private ulong _fsize = default(ulong);
+    private ulong? _fsize;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"fsize", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Fsize
     {
-      get { return _fsize; }
+      get { return _fsize?? default(ulong); }
       set { _fsize = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool FsizeSpecified
+    {
+      get { return _fsize != null; }
+      set { if (value == (_fsize== null)) _fsize = value ? Fsize : (ulong?)null; }
+    }
+    private bool ShouldSerializeFsize() { return FsizeSpecified; }
+    private void ResetFsize() { FsizeSpecified = false; }
+    
 
-    private ulong _locks = default(ulong);
+    private ulong? _locks;
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"locks", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Locks
     {
-      get { return _locks; }
+      get { return _locks?? default(ulong); }
       set { _locks = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool LocksSpecified
+    {
+      get { return _locks != null; }
+      set { if (value == (_locks== null)) _locks = value ? Locks : (ulong?)null; }
+    }
+    private bool ShouldSerializeLocks() { return LocksSpecified; }
+    private void ResetLocks() { LocksSpecified = false; }
+    
 
-    private ulong _memlock = default(ulong);
+    private ulong? _memlock;
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"memlock", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Memlock
     {
-      get { return _memlock; }
+      get { return _memlock?? default(ulong); }
       set { _memlock = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool MemlockSpecified
+    {
+      get { return _memlock != null; }
+      set { if (value == (_memlock== null)) _memlock = value ? Memlock : (ulong?)null; }
+    }
+    private bool ShouldSerializeMemlock() { return MemlockSpecified; }
+    private void ResetMemlock() { MemlockSpecified = false; }
+    
 
-    private ulong _msgqueue = default(ulong);
+    private ulong? _msgqueue;
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"msgqueue", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Msgqueue
     {
-      get { return _msgqueue; }
+      get { return _msgqueue?? default(ulong); }
       set { _msgqueue = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool MsgqueueSpecified
+    {
+      get { return _msgqueue != null; }
+      set { if (value == (_msgqueue== null)) _msgqueue = value ? Msgqueue : (ulong?)null; }
+    }
+    private bool ShouldSerializeMsgqueue() { return MsgqueueSpecified; }
+    private void ResetMsgqueue() { MsgqueueSpecified = false; }
+    
 
-    private ulong _nice = default(ulong);
+    private ulong? _nice;
     [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"nice", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Nice
     {
-      get { return _nice; }
+      get { return _nice?? default(ulong); }
       set { _nice = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool NiceSpecified
+    {
+      get { return _nice != null; }
+      set { if (value == (_nice== null)) _nice = value ? Nice : (ulong?)null; }
+    }
+    private bool ShouldSerializeNice() { return NiceSpecified; }
+    private void ResetNice() { NiceSpecified = false; }
+    
 
-    private ulong _nofile = default(ulong);
+    private ulong? _nofile;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"nofile", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Nofile
     {
-      get { return _nofile; }
+      get { return _nofile?? default(ulong); }
       set { _nofile = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool NofileSpecified
+    {
+      get { return _nofile != null; }
+      set { if (value == (_nofile== null)) _nofile = value ? Nofile : (ulong?)null; }
+    }
+    private bool ShouldSerializeNofile() { return NofileSpecified; }
+    private void ResetNofile() { NofileSpecified = false; }
+    
 
-    private ulong _nproc = default(ulong);
+    private ulong? _nproc;
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"nproc", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Nproc
     {
-      get { return _nproc; }
+      get { return _nproc?? default(ulong); }
       set { _nproc = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool NprocSpecified
+    {
+      get { return _nproc != null; }
+      set { if (value == (_nproc== null)) _nproc = value ? Nproc : (ulong?)null; }
+    }
+    private bool ShouldSerializeNproc() { return NprocSpecified; }
+    private void ResetNproc() { NprocSpecified = false; }
+    
 
-    private ulong _rss = default(ulong);
+    private ulong? _rss;
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"rss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Rss
     {
-      get { return _rss; }
+      get { return _rss?? default(ulong); }
       set { _rss = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool RssSpecified
+    {
+      get { return _rss != null; }
+      set { if (value == (_rss== null)) _rss = value ? Rss : (ulong?)null; }
+    }
+    private bool ShouldSerializeRss() { return RssSpecified; }
+    private void ResetRss() { RssSpecified = false; }
+    
 
-    private ulong _rtprio = default(ulong);
+    private ulong? _rtprio;
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"rtprio", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Rtprio
     {
-      get { return _rtprio; }
+      get { return _rtprio?? default(ulong); }
       set { _rtprio = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool RtprioSpecified
+    {
+      get { return _rtprio != null; }
+      set { if (value == (_rtprio== null)) _rtprio = value ? Rtprio : (ulong?)null; }
+    }
+    private bool ShouldSerializeRtprio() { return RtprioSpecified; }
+    private void ResetRtprio() { RtprioSpecified = false; }
+    
 
-    private ulong _sigpending = default(ulong);
+    private ulong? _sigpending;
     [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"sigpending", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Sigpending
     {
-      get { return _sigpending; }
+      get { return _sigpending?? default(ulong); }
       set { _sigpending = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool SigpendingSpecified
+    {
+      get { return _sigpending != null; }
+      set { if (value == (_sigpending== null)) _sigpending = value ? Sigpending : (ulong?)null; }
+    }
+    private bool ShouldSerializeSigpending() { return SigpendingSpecified; }
+    private void ResetSigpending() { SigpendingSpecified = false; }
+    
 
-    private ulong _stack = default(ulong);
+    private ulong? _stack;
     [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"stack", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
     public ulong Stack
     {
-      get { return _stack; }
+      get { return _stack?? default(ulong); }
       set { _stack = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool StackSpecified
+    {
+      get { return _stack != null; }
+      set { if (value == (_stack== null)) _stack = value ? Stack : (ulong?)null; }
+    }
+    private bool ShouldSerializeStack() { return StackSpecified; }
+    private void ResetStack() { StackSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1696,14 +2562,23 @@ namespace IronFoundry.Warden.Protocol
       set { _script = value; }
     }
 
-    private bool _privileged = (bool)false;
+    private bool? _privileged;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"privileged", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue((bool)false)]
     public bool Privileged
     {
-      get { return _privileged; }
+      get { return _privileged?? (bool)false; }
       set { _privileged = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool PrivilegedSpecified
+    {
+      get { return _privileged != null; }
+      set { if (value == (_privileged== null)) _privileged = value ? Privileged : (bool?)null; }
+    }
+    private bool ShouldSerializePrivileged() { return PrivilegedSpecified; }
+    private void ResetPrivileged() { PrivilegedSpecified = false; }
+    
 
     private IronFoundry.Warden.Protocol.ResourceLimits _rlimits = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"rlimits", DataFormat = global::ProtoBuf.DataFormat.Default)]
@@ -1723,31 +2598,60 @@ namespace IronFoundry.Warden.Protocol
   {
     public RunResponse() {}
     
-    private uint _exitStatus;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+
+    private uint? _exitStatus;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public uint ExitStatus
     {
-      get { return _exitStatus; }
+      get { return _exitStatus?? default(uint); }
       set { _exitStatus = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ExitStatusSpecified
+    {
+      get { return _exitStatus != null; }
+      set { if (value == (_exitStatus== null)) _exitStatus = value ? ExitStatus : (uint?)null; }
+    }
+    private bool ShouldSerializeExitStatus() { return ExitStatusSpecified; }
+    private void ResetExitStatus() { ExitStatusSpecified = false; }
+    
 
-    private string _stdout = "";
+    private string _stdout;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"stdout", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Stdout
     {
-      get { return _stdout; }
+      get { return _stdout?? ""; }
       set { _stdout = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool StdoutSpecified
+    {
+      get { return _stdout != null; }
+      set { if (value == (_stdout== null)) _stdout = value ? Stdout : (string)null; }
+    }
+    private bool ShouldSerializeStdout() { return StdoutSpecified; }
+    private void ResetStdout() { StdoutSpecified = false; }
+    
 
-    private string _stderr = "";
+    private string _stderr;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"stderr", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Stderr
     {
-      get { return _stderr; }
+      get { return _stderr?? ""; }
       set { _stderr = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool StderrSpecified
+    {
+      get { return _stderr != null; }
+      set { if (value == (_stderr== null)) _stderr = value ? Stderr : (string)null; }
+    }
+    private bool ShouldSerializeStderr() { return StderrSpecified; }
+    private void ResetStderr() { StderrSpecified = false; }
+    
 
     private IronFoundry.Warden.Protocol.InfoResponse _info = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"info", DataFormat = global::ProtoBuf.DataFormat.Default)]
@@ -1788,14 +2692,23 @@ namespace IronFoundry.Warden.Protocol
       set { _script = value; }
     }
 
-    private bool _privileged = (bool)false;
+    private bool? _privileged;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"privileged", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue((bool)false)]
     public bool Privileged
     {
-      get { return _privileged; }
+      get { return _privileged?? (bool)false; }
       set { _privileged = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool PrivilegedSpecified
+    {
+      get { return _privileged != null; }
+      set { if (value == (_privileged== null)) _privileged = value ? Privileged : (bool?)null; }
+    }
+    private bool ShouldSerializePrivileged() { return PrivilegedSpecified; }
+    private void ResetPrivileged() { PrivilegedSpecified = false; }
+    
 
     private IronFoundry.Warden.Protocol.ResourceLimits _rlimits = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"rlimits", DataFormat = global::ProtoBuf.DataFormat.Default)]
@@ -1845,23 +2758,41 @@ namespace IronFoundry.Warden.Protocol
       set { _handle = value; }
     }
 
-    private bool _background = (bool)false;
+    private bool? _background;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"background", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue((bool)false)]
     public bool Background
     {
-      get { return _background; }
+      get { return _background?? (bool)false; }
       set { _background = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool BackgroundSpecified
+    {
+      get { return _background != null; }
+      set { if (value == (_background== null)) _background = value ? Background : (bool?)null; }
+    }
+    private bool ShouldSerializeBackground() { return BackgroundSpecified; }
+    private void ResetBackground() { BackgroundSpecified = false; }
+    
 
-    private bool _kill = (bool)false;
+    private bool? _kill;
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"kill", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue((bool)false)]
     public bool Kill
     {
-      get { return _kill; }
+      get { return _kill?? (bool)false; }
       set { _kill = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool KillSpecified
+    {
+      get { return _kill != null; }
+      set { if (value == (_kill== null)) _kill = value ? Kill : (bool?)null; }
+    }
+    private bool ShouldSerializeKill() { return KillSpecified; }
+    private void ResetKill() { KillSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1912,32 +2843,59 @@ namespace IronFoundry.Warden.Protocol
     public StreamResponse() {}
     
 
-    private string _name = "";
+    private string _name;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Name
     {
-      get { return _name; }
+      get { return _name?? ""; }
       set { _name = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool NameSpecified
+    {
+      get { return _name != null; }
+      set { if (value == (_name== null)) _name = value ? Name : (string)null; }
+    }
+    private bool ShouldSerializeName() { return NameSpecified; }
+    private void ResetName() { NameSpecified = false; }
+    
 
-    private string _data = "";
+    private string _data;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
     public string Data
     {
-      get { return _data; }
+      get { return _data?? ""; }
       set { _data = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool DataSpecified
+    {
+      get { return _data != null; }
+      set { if (value == (_data== null)) _data = value ? Data : (string)null; }
+    }
+    private bool ShouldSerializeData() { return DataSpecified; }
+    private void ResetData() { DataSpecified = false; }
+    
 
-    private uint _exitStatus = default(uint);
+    private uint? _exitStatus;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"exit_status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint ExitStatus
     {
-      get { return _exitStatus; }
+      get { return _exitStatus?? default(uint); }
       set { _exitStatus = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool ExitStatusSpecified
+    {
+      get { return _exitStatus != null; }
+      set { if (value == (_exitStatus== null)) _exitStatus = value ? ExitStatus : (uint?)null; }
+    }
+    private bool ShouldSerializeExitStatus() { return ExitStatusSpecified; }
+    private void ResetExitStatus() { ExitStatusSpecified = false; }
+    
 
     private IronFoundry.Warden.Protocol.InfoResponse _info = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"info", DataFormat = global::ProtoBuf.DataFormat.Default)]
