@@ -19,7 +19,6 @@
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly CancellationToken cancellationToken;
 
-        private readonly ServiceHelper serviceHelper = new ServiceHelper();
         private readonly IContainerManager containerManager;
         private readonly IJobManager jobManager;
 
@@ -49,7 +48,7 @@
                 return;
             }
 
-            serviceHelper.OnStart();
+            Statics.OnServiceStart();
 
             var endpoint = new IPEndPoint(IPAddress.Loopback, 4444); // TODO configurable port
             var listener = new TcpListener(endpoint); // lib/dea/task.rb, 66

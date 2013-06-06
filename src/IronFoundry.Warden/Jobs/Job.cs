@@ -25,7 +25,19 @@
 
         public async void Run()
         {
-            result = await runnable.RunAsync();
+            try
+            {
+                result = await runnable.RunAsync();
+            }
+            catch (Exception ex)
+            {
+                result = new JobExceptionResult(ex);
+            }
+        }
+
+        public void Cancel()
+        {
+            runnable.Cancel();
         }
 
         public bool IsCompleted

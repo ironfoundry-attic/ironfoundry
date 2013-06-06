@@ -69,6 +69,9 @@
     <Compile Include="Jobs\IJobRunnable.cs" />
     <Compile Include="Jobs\IJobStatus.cs" />
     <Compile Include="Jobs\Job.cs" />
+    <Compile Include="Jobs\JobExceptionResult.cs" />
+    <Compile Include="Run\PathCommand.cs" />
+    <Compile Include="Run\TouchCommand.cs" />
     <Compile Include="Run\TaskCommandStatus.cs" />
     <Compile Include="Run\MkdirCommand.cs" />
     <Compile Include="Run\TaskCommandDTO.cs" />
@@ -93,7 +96,7 @@
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Run\TaskRunner.cs" />
-    <Compile Include="Utilities\ServiceHelper.cs" />
+    <Compile Include="Utilities\Statics.cs" />
     <Compile Include="WardenException.cs" />
     <Compile Include="Server\Buffer.cs" />
   </ItemGroup>

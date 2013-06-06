@@ -5,6 +5,7 @@
     public interface IJobRunnable
     {
         IJobResult Run();
+        void Cancel();
         Task<IJobResult> RunAsync();
         IJobStatus Status { get; }
     }

@@ -53,6 +53,21 @@
             }
         }
 
+        public void RemoveJob(uint jobId)
+        {
+            try
+            {
+                rwlock.EnterWriteLock();
+                Job j = jobs[jobId];
+                j.Cancel();
+                jobs.Remove(jobId);
+            }
+            finally
+            {
+                rwlock.ExitWriteLock();
+            }
+        }
+
         private uint GetNextJobID()
         {
             ++jobIds;

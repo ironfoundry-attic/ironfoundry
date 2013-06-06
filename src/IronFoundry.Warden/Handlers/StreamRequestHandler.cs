@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
+    using System.Collections.Generic;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
@@ -33,49 +34,61 @@
         {
             log.Trace("Handle: '{0}' JobId: '{1}''", request.Handle, request.JobId);
 
-            string responseData = String.Empty;
-            string responseName = JobDataSource.stdout.ToString();
-            uint? exitStatus = null;
-            InfoResponse info = infoBuilder.GetInfoResponseFor(request.Handle);
+            StreamResponse streamResponse = null;
 
             var job = jobManager.GetJob(request.JobId);
-
             if (job == null)
             {
-                responseData = String.Format("Error! Expected to find job with ID '{0}' but could not.", request.JobId);
-                responseName = JobDataSource.stderr.ToString();
-                exitStatus = 1;
+                streamResponse = GetErrorResponse("Error! Expected to find job with ID '{0}' but could not.", request.JobId);
             }
             else
             {
                 IJobStatus status = job.Status;
-                if (status != null)
+                if (status == null)
                 {
-                    responseData = status.Data;
-                    responseName = status.DataSource.ToString();
+                    jobManager.RemoveJob(request.JobId);
+                    streamResponse = GetErrorResponse("Error! Could not get status for job with ID '{0}'", request.JobId);
+                }
+                else
+                {
+                    streamResponse = new StreamResponse
+                    {
+                        Data = status.Data,
+                        Name = status.DataSource.ToString()
+                    };
+
                     if (status.ExitStatus.HasValue)
                     {
                         unchecked
                         {
-                            exitStatus = (uint)status.ExitStatus.Value;
+                            streamResponse.ExitStatus = (uint)status.ExitStatus.Value;
                         }
                     }
                 }
             }
 
-            var response = new StreamResponse
-            {
-                Data = responseData,
-                Name = responseName,
-                Info = info
-            };
+            InfoResponse info = infoBuilder.GetInfoResponseFor(request.Handle);
+            streamResponse.Info = info;
+            return streamResponse;
+        }
 
-            if (exitStatus.HasValue)
+        private static StreamResponse GetErrorResponse(string fmt, params object[] args)
+        {
+            if (fmt.IsNullOrWhiteSpace())
             {
-                response.ExitStatus = exitStatus.Value;
+                throw new ArgumentNullException("fmt");
+            }
+            if (args.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException("args");
             }
 
-            return response;
+            return new StreamResponse
+            {
+                Data = String.Format(fmt, args),
+                Name = JobDataSource.stderr.ToString(),
+                ExitStatus = 1,
+            };
         }
     }
 }

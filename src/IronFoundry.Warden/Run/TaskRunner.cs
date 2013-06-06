@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
@@ -12,6 +13,8 @@
 
     public class TaskRunner : IJobRunnable
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+
         private readonly Container container;
         private readonly ITaskRequest request;
         private readonly TaskCommandDTO[] commands;
@@ -70,7 +73,12 @@
         public Task<IJobResult> RunAsync()
         {
             runningAsync = true;
-            return Task.Factory.StartNew<IJobResult>(Run);
+            return Task.Factory.StartNew<IJobResult>(Run, cts.Token);
+        }
+
+        public void Cancel()
+        {
+            cts.Cancel();
         }
 
         public IJobResult Run()
@@ -87,6 +95,11 @@
 
             foreach (TaskCommandDTO cmd in commands)
             {
+                if (cts.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
                 try
                 {

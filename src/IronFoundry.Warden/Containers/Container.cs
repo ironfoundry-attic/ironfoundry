@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Warden.Containers
 {
+    using System;
     using System.Threading;
 
     public abstract class Container
@@ -28,9 +29,22 @@
             get { return handle; }
         }
 
-        public string Path
+        public string ContainerPath
         {
             get { return directory.ToString(); }
+        }
+
+        public string PathWithin(string path)
+        {
+            string pathTmp = path.Trim();
+            if (pathTmp.StartsWith("@ROOT@"))
+            {
+                return pathTmp.Replace("@ROOT@", this.ContainerPath).ToWinPathString();
+            }
+            else
+            {
+                return pathTmp;
+            }
         }
 
         public void Destroy()

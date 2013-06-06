@@ -34,7 +34,7 @@
                 throw new ArgumentNullException("container");
             }
             var hostIp = Utility.GetLocalIPAddress().ToString();
-            return new InfoResponse(hostIp, hostIp, container.Path);
+            return new InfoResponse(hostIp, hostIp, container.ContainerPath);
         }
     }
 }
