@@ -1,12 +1,14 @@
 ﻿namespace IronFoundry.Warden.Jobs
 {
+    using System;
     using System.Threading.Tasks;
 
     public interface IJobRunnable
     {
         IJobResult Run();
+        Task RunAsync();
         void Cancel();
-        Task<IJobResult> RunAsync();
         IJobStatus Status { get; }
+        event EventHandler<JobStatusEventArgs> JobStatusAvailable;
     }
 }

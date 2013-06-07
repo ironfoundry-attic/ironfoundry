@@ -1,15 +1,11 @@
-﻿namespace IronFoundry.Warden.Server
+﻿namespace IronFoundry.Warden.Protocol
 {
     using System;
     using System.IO;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Protocol;
-    using NLog;
     using ProtoBuf;
 
     public class MessageUnwrapper
     {
-        private readonly Logger log = LogManager.GetCurrentClassLogger(); 
         private readonly Message message;
 
         public MessageUnwrapper(Message message)
@@ -35,7 +31,7 @@
                     break;
                 case Message.Type.Create:
                     var createRequest = Deserialize<CreateRequest>(message.Payload);
-                    createRequest.Rootfs = ContainerType.Console.ToString(); // TODO TODO TODO
+                    createRequest.Rootfs = "Console"; // ironfoundry TODO TODO TODO
                     request = createRequest;
                     break;
                 case Message.Type.Destroy:

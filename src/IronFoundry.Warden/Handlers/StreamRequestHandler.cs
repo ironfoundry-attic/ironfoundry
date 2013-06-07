@@ -2,19 +2,20 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
-    public class StreamRequestHandler : RequestHandler, IStreamingHandler
+    public class StreamRequestHandler : RequestHandler, IStreamingHandler, IJobListener
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly IJobManager jobManager;
         private readonly StreamRequest request;
         private readonly InfoBuilder infoBuilder;
 
-        private bool complete = false;
+        private MessageWriter messageWriter;
 
         public StreamRequestHandler(IContainerManager containerManager, IJobManager jobManager, Request request)
             : base(request)
@@ -32,9 +33,42 @@
             this.request = (StreamRequest)request;
         }
 
-        public bool Complete
+        public void ObserveStatus(IJobStatus jobStatus)
         {
-            get { return complete; }
+            if (messageWriter == null)
+            {
+                throw new InvalidOperationException("messageWriter can not be null when job status observed.");
+            }
+            StreamResponse response = ToStreamResponse(jobStatus);
+            messageWriter.Write(response);
+        }
+
+        public StreamResponse Handle(MessageWriter messageWriter, CancellationToken cancellationToken)
+        {
+            if (messageWriter == null)
+            {
+                throw new ArgumentNullException("messageWriter");
+            }
+            if (cancellationToken == null)
+            {
+                throw new ArgumentNullException("cancellationToken");
+            }
+
+            this.messageWriter = messageWriter;
+
+            log.Trace("HandleAsync: '{0}' JobId: '{1}''", request.Handle, request.JobId);
+
+            StreamResponse streamResponse = null;
+
+            Job job = GetJobById(ref streamResponse);
+            if (job != null)
+            {
+                job.AttachListener(this);
+                job.Listen();
+                streamResponse = new StreamResponse { ExitStatus = 0, Data = "TODO FINAL RESPONSE", Name = "stdout" };
+            }
+
+            return streamResponse;
         }
 
         public override Response Handle()
@@ -42,42 +76,63 @@
             log.Trace("Handle: '{0}' JobId: '{1}''", request.Handle, request.JobId);
 
             StreamResponse streamResponse = null;
-
-            var job = jobManager.GetJob(request.JobId);
-            if (job == null)
-            {
-                streamResponse = GetErrorResponse(true, "Error! Expected to find job with ID '{0}' but could not.", request.JobId);
-                complete = true;
-            }
-            else
+            Job job = GetJobById(ref streamResponse);
+            if (job != null)
             {
                 IJobStatus status = job.Status;
                 if (status == null)
                 {
-                    // TODO: should this even get sent back?
-                    streamResponse = GetErrorResponse(false, "Warning: could not get status for job with ID '{0}'", request.JobId);
+                    log.Warn("Could not get status for job with ID '{0}'", request.JobId);
                 }
                 else
                 {
-                    streamResponse = new StreamResponse
-                    {
-                        Data = status.Data,
-                        Name = status.DataSource.ToString()
-                    };
-
-                    if (status.ExitStatus.HasValue)
-                    {
-                        unchecked
-                        {
-                            streamResponse.ExitStatus = (uint)status.ExitStatus.Value;
-                        }
-                        complete = true;
-                    }
+                    streamResponse = ToStreamResponse(status);
                 }
             }
 
-            InfoResponse info = infoBuilder.GetInfoResponseFor(request.Handle);
-            streamResponse.Info = info;
+            if (streamResponse != null)
+            {
+                InfoResponse info = infoBuilder.GetInfoResponseFor(request.Handle);
+                streamResponse.Info = info;
+            }
+            return streamResponse;
+        }
+
+        private Job GetJobById(ref StreamResponse streamResponse)
+        {
+            Job job = jobManager.GetJob(request.JobId);
+            if (job == null)
+            {
+                streamResponse = GetErrorResponse(true, "Error! Expected to find job with ID '{0}' but could not.", request.JobId);
+            }
+            return job;
+        }
+
+        private static StreamResponse ToStreamResponse(IJobResult result)
+        {
+            unchecked
+            {
+                return new StreamResponse
+                {
+                    ExitStatus = (uint)result.ExitCode
+                };
+            }
+        }
+
+        private static StreamResponse ToStreamResponse(IJobStatus status)
+        {
+            var streamResponse = new StreamResponse
+            {
+                Data = status.Data,
+                Name = status.DataSource.ToString()
+            };
+            if (status.ExitStatus.HasValue)
+            {
+                unchecked
+                {
+                    streamResponse.ExitStatus = (uint)status.ExitStatus.Value;
+                }
+            }
             return streamResponse;
         }
 

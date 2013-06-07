@@ -1,7 +1,9 @@
 ﻿namespace IronFoundry.Warden.Containers
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
+    using IronFoundry.Warden.Utilities;
 
     public abstract class Container
     {
@@ -34,6 +36,25 @@
             get { return directory.ToString(); }
         }
 
+        public IEnumerable<string> ConvertToPathsWithin(string[] arguments)
+        {
+            foreach (string arg in arguments)
+            {
+                string rv = null;
+
+                if (arg.Contains("@ROOT@"))
+                {
+                    rv = arg.Replace("@ROOT@", this.ContainerPath).ToWinPathString();
+                }
+                else
+                {
+                    rv = arg;
+                }
+
+                yield return rv;
+            }
+        }
+
         public string ConvertToPathWithin(string path)
         {
             string pathTmp = path.Trim();
@@ -45,6 +66,11 @@
             {
                 return pathTmp;
             }
+        }
+
+        public TempFile TempFileInContainer(string extension)
+        {
+            return new TempFile(this.ContainerPath, extension);
         }
 
         public void Destroy()

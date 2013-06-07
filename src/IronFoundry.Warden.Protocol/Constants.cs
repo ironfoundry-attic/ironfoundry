@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Warden
+﻿namespace IronFoundry.Warden.Protocol
 {
     public static class Constants
     {

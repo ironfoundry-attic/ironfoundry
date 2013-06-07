@@ -1,7 +1,10 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
+    using System.Threading;
+    using IronFoundry.Warden.Protocol;
+
     public interface IStreamingHandler
     {
-        bool Complete { get; }
+        StreamResponse Handle(MessageWriter messageWriter, CancellationToken cancellationToken);
     }
 }

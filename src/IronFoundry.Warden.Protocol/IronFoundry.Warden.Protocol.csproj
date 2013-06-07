@@ -39,46 +39,51 @@
     <Compile Include="..\shared\ExtensionMethods.cs">
       <Link>ExtensionMethods.cs</Link>
     </Compile>
+    <Compile Include="Constants.cs" />
     <Compile Include="ITaskRequest.cs" />
-    <Compile Include="StreamRequest.cs" />
-    <Compile Include="StreamResponse.cs" />
-    <Compile Include="StopRequest.cs" />
-    <Compile Include="StopResponse.cs" />
-    <Compile Include="SpawnRequest.cs" />
-    <Compile Include="SpawnResponse.cs" />
-    <Compile Include="RunRequest.cs" />
-    <Compile Include="RunResponse.cs" />
-    <Compile Include="NetOutRequest.cs" />
-    <Compile Include="NetOutResponse.cs" />
-    <Compile Include="NetInRequest.cs" />
-    <Compile Include="NetInResponse.cs" />
-    <Compile Include="ListRequest.cs" />
-    <Compile Include="ListResponse.cs" />
-    <Compile Include="LinkRequest.cs" />
-    <Compile Include="LinkResponse.cs" />
-    <Compile Include="LimitMemoryRequest.cs" />
-    <Compile Include="LimitMemoryResponse.cs" />
-    <Compile Include="LimitDiskRequest.cs" />
-    <Compile Include="LimitDiskResponse.cs" />
-    <Compile Include="LimitBandwidthRequest.cs" />
-    <Compile Include="LimitBandwidthResponse.cs" />
-    <Compile Include="InfoRequest.cs" />
-    <Compile Include="InfoResponse.cs" />
-    <Compile Include="DestroyRequest.cs" />
-    <Compile Include="DestroyResponse.cs" />
-    <Compile Include="CreateRequest.cs" />
-    <Compile Include="CreateResponse.cs" />
-    <Compile Include="CopyOutRequest.cs" />
-    <Compile Include="CopyOutResponse.cs" />
-    <Compile Include="CopyInRequest.cs" />
-    <Compile Include="CopyInResponse.cs" />
-    <Compile Include="EchoRequest.cs" />
-    <Compile Include="EchoResponse.cs" />
-    <Compile Include="ErrorResponse.cs" />
-    <Compile Include="PingResponse.cs" />
+    <Compile Include="MessageUnwrapper.cs" />
+    <Compile Include="MessageWriter.cs" />
+    <Compile Include="Messages\StreamRequest.cs" />
+    <Compile Include="Messages\StreamResponse.cs" />
+    <Compile Include="Messages\StopRequest.cs" />
+    <Compile Include="Messages\StopResponse.cs" />
+    <Compile Include="Messages\SpawnRequest.cs" />
+    <Compile Include="Messages\SpawnResponse.cs" />
+    <Compile Include="Messages\RunRequest.cs" />
+    <Compile Include="Messages\RunResponse.cs" />
+    <Compile Include="Messages\NetOutRequest.cs" />
+    <Compile Include="Messages\NetOutResponse.cs" />
+    <Compile Include="Messages\NetInRequest.cs" />
+    <Compile Include="Messages\NetInResponse.cs" />
+    <Compile Include="Messages\ListRequest.cs" />
+    <Compile Include="Messages\ListResponse.cs" />
+    <Compile Include="Messages\LinkRequest.cs" />
+    <Compile Include="Messages\LinkResponse.cs" />
+    <Compile Include="Messages\LimitMemoryRequest.cs" />
+    <Compile Include="Messages\LimitMemoryResponse.cs" />
+    <Compile Include="Messages\LimitDiskRequest.cs" />
+    <Compile Include="Messages\LimitDiskResponse.cs" />
+    <Compile Include="Messages\LimitBandwidthRequest.cs" />
+    <Compile Include="Messages\LimitBandwidthResponse.cs" />
+    <Compile Include="Messages\InfoRequest.cs" />
+    <Compile Include="Messages\InfoResponse.cs" />
+    <Compile Include="Messages\DestroyRequest.cs" />
+    <Compile Include="Messages\DestroyResponse.cs" />
+    <Compile Include="Messages\CreateRequest.cs" />
+    <Compile Include="Messages\CreateResponse.cs" />
+    <Compile Include="Messages\CopyOutRequest.cs" />
+    <Compile Include="Messages\CopyOutResponse.cs" />
+    <Compile Include="Messages\CopyInRequest.cs" />
+    <Compile Include="Messages\CopyInResponse.cs" />
+    <Compile Include="Messages\EchoRequest.cs" />
+    <Compile Include="Messages\EchoResponse.cs" />
+    <Compile Include="Messages\ErrorResponse.cs" />
+    <Compile Include="Messages\PingResponse.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="Messages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResponseWrapper.cs" />
+    <Compile Include="WardenException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="protobuf-net, Version=2.0.0.621, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
@@ -92,7 +97,7 @@
     <Compile Include="Response.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PingRequest.cs" />
+    <Compile Include="Messages\PingRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

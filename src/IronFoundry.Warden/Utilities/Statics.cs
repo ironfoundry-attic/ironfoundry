@@ -16,6 +16,11 @@
         private static readonly IContainerManager containerManager = new ContainerManager();
         private static readonly IJobManager jobManager = new JobManager();
 
+        public static WardenConfig WardenConfig
+        {
+            get { return wardenConfig; }
+        }
+
         public static CancellationTokenSource CancellationTokenSource
         {
             get { return cts; }

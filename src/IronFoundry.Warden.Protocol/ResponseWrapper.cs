@@ -1,15 +1,11 @@
-﻿namespace IronFoundry.Warden.Server
+﻿namespace IronFoundry.Warden.Protocol
 {
     using System;
     using System.IO;
-    using IronFoundry.Warden.Protocol;
-    using NLog;
     using ProtoBuf;
 
     public class ResponseWrapper
     {
-        private readonly Logger log = LogManager.GetCurrentClassLogger(); 
-
         private readonly Response response;
 
         public ResponseWrapper(Response response)
