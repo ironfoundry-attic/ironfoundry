@@ -61,38 +61,76 @@ namespace IronFoundry.Warden.IisHost.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&apos;1.0&apos; encoding=&apos;UTF-8&apos; ?&gt;
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--
+        ///
+        ///    IIS configuration sections.
+        ///
+        ///    For schema documentation, see
+        ///    %windir%\system32\inetsrv\config\schema\IIS_schema.xml.
+        ///    
+        ///    Please make a backup of this file before making any changes to it.
+        ///
+        ///--&gt;
+        ///
         ///&lt;configuration&gt;
+        ///
         ///    &lt;configSections&gt;
-        ///        &lt;sectionGroup name=&apos;system.applicationHost&apos;&gt;
-        ///            &lt;section name=&apos;applicationPools&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;listenerAdapters&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;log&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;sites&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;webLimits&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///        &lt;/sect [rest of string was truncated]&quot;;.
+        ///        &lt;sectionGroup name=&quot;system.applicationHost&quot;&gt;
+        ///            &lt;section name=&quot;applicationPools&quot; allowDefinition=&quot;AppHostOnly&quot; overrideModeDefault=&quot;Deny&quot; /&gt;
+        ///            &lt;section name=&quot;configHistory&quot; all [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string AppHostAspNet {
+        internal static string applicationhost {
             get {
-                return ResourceManager.GetString("AppHostAspNet", resourceCulture);
+                return ResourceManager.GetString("applicationhost", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&apos;1.0&apos; encoding=&apos;UTF-8&apos; ?&gt;
-        ///&lt;configuration&gt;
+        ///   Looks up a localized string similar to &lt;configuration&gt;
+        ///
         ///    &lt;configSections&gt;
-        ///        &lt;sectionGroup name=&apos;system.applicationHost&apos;&gt;
-        ///            &lt;section name=&apos;applicationPools&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;listenerAdapters&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;log&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;sites&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///            &lt;section name=&apos;webLimits&apos; allowDefinition=&apos;AppHostOnly&apos; /&gt;
-        ///        &lt;/sect [rest of string was truncated]&quot;;.
+        ///        &lt;section name=&quot;configurationRedirection&quot; /&gt;
+        ///    &lt;/configSections&gt;
+        ///
+        ///    &lt;configProtectedData&gt;
+        ///        &lt;providers&gt;
+        ///            &lt;add name=&quot;IISRsaProvider&quot; type=&quot;&quot; description=&quot;Uses RsaCryptoServiceProvider to encrypt and decrypt&quot; keyContainerName=&quot;iisConfigurationKey&quot; cspProviderName=&quot;&quot; useMachineContainer=&quot;true&quot; useOAEP=&quot;false&quot; /&gt;
+        ///        &lt;/providers&gt;
+        ///    &lt;/configProtectedData&gt;
+        ///
+        ///    &lt;configurationRedirection /&gt;
+        ///    &lt;!--&lt;configurationRedirection enable [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string AppHostStaticFiles {
+        internal static string redirection {
             get {
-                return ResourceManager.GetString("AppHostStaticFiles", resourceCulture);
+                return ResourceManager.GetString("redirection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--
+        ///
+        ///    IIS configuration sections.
+        ///
+        ///    For schema documentation, see
+        ///    %windir%\system32\inetsrv\config\schema\IIS_schema.xml.
+        ///    
+        ///    Please make a backup of this file before making any changes to it.
+        ///
+        ///--&gt;
+        ///
+        ///&lt;configuration&gt;
+        ///
+        ///    &lt;configSections&gt;
+        ///        &lt;sectionGroup name=&quot;system.applicationHost&quot;&gt;
+        ///            &lt;section name=&quot;applicationPools&quot; allowDefinition=&quot;AppHostOnly&quot; overrideModeDefault=&quot;Deny&quot; /&gt;
+        ///            &lt;section name=&quot;configHistory&quot; all [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string v2_0AppHost {
+            get {
+                return ResourceManager.GetString("v2_0AppHost", resourceCulture);
             }
         }
     }

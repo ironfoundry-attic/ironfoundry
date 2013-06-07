@@ -118,10 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="AppHostAspNet" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AppHostAspNet.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="applicationhost" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\applicationhost.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="AppHostStaticFiles" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AppHostStaticFiles.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="redirection" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\redirection.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="v2_0AppHost" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\v2.0AppHost.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

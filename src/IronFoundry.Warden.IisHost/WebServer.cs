@@ -2,33 +2,19 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text;
-    using System.IO;
     using System.Runtime.InteropServices;
-    using Properties;
 
+    // Ref: http://msdn.microsoft.com/en-us/library/ms689327%28v=vs.90%29.aspx
     internal class WebServer : IDisposable
     {
-        private readonly string appHostConfigPath;
-        private readonly string rootWebConfigPath;
+        private readonly ConfigSettings configSettings;
 
-        public WebServer(string physicalPath, uint port, uint siteId, string frameworkPath)
+        public WebServer(ConfigSettings configSettings)
         {
-            string appPoolName = "AppPool" + port.ToString();
-            appHostConfigPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName() + ".config");
-            rootWebConfigPath = Environment.ExpandEnvironmentVariables(Path.Combine(frameworkPath, @"config\web.config"));
-
-            string appHostContent = Resources.AppHostAspNet;
-            //string appHostContent = Resources.AppHostStaticFiles;
-
-            File.WriteAllText(appHostConfigPath,
-                String.Format(appHostContent,
-                              port,
-                              physicalPath,
-                              frameworkPath,
-                              siteId,
-                              appPoolName));
+            this.configSettings = configSettings;
         }
 
         public void Dispose()
@@ -40,7 +26,7 @@
         {
             if (!HostableWebCore.IsActivated)
             {
-                HostableWebCore.Activate(appHostConfigPath, rootWebConfigPath, Guid.NewGuid().ToString());
+                HostableWebCore.Activate(configSettings.AppConfigPath, configSettings.RootWebConfigPath, Guid.NewGuid().ToString());
             }
         }
 
@@ -70,13 +56,19 @@
 
             static HostableWebCore()
             {
-               // Load the library and get the function pointers for the WebCore entry points
-                IntPtr hwc = NativeMethods.LoadLibrary(Environment.ExpandEnvironmentVariables(HWCPath));
+                var hostableWebCorePath = Environment.ExpandEnvironmentVariables(HWCPath);
+                if (!File.Exists(hostableWebCorePath))
+                {
+                    throw new FileNotFoundException("Unable to locate hostable web core library, ensure IIS 7+ is installed", hostableWebCorePath);
+                }
 
-                IntPtr procaddr = NativeMethods.GetProcAddress(hwc, "WebCoreActivate");
+                // Load the library and get the function pointers for the WebCore entry points
+                IntPtr hwc = HWCInterop.LoadLibrary(hostableWebCorePath);
+
+                IntPtr procaddr = HWCInterop.GetProcAddress(hwc, "WebCoreActivate");
                 WebCoreActivate = (FnWebCoreActivate) Marshal.GetDelegateForFunctionPointer(procaddr, typeof(FnWebCoreActivate));
 
-                procaddr = NativeMethods.GetProcAddress(hwc, "WebCoreShutdown");
+                procaddr = HWCInterop.GetProcAddress(hwc, "WebCoreShutdown");
                 WebCoreShutdown = (FnWebCoreShutdown) Marshal.GetDelegateForFunctionPointer(procaddr, typeof(FnWebCoreShutdown));
             }
 
@@ -99,7 +91,7 @@
                 int result = WebCoreActivate(appHostConfig, rootWebConfig, instanceName);
                 if (result != 0)
                 {
-                    Marshal.ThrowExceptionForHR(result);
+                    throw new WebCoreActivationException(result);
                 }
 
                 _isActivated = true;
@@ -117,13 +109,22 @@
                 }
             }
 
-            private static class NativeMethods
+            private static class HWCInterop
             {
                 [DllImport("kernel32.dll", SetLastError = true)]
                 internal static extern IntPtr LoadLibrary(String dllname);
 
                 [DllImport("kernel32.dll", SetLastError = true)]
                 internal static extern IntPtr GetProcAddress(IntPtr hModule, String procname);
+
+                //[DllImport(@"%program files(x86)%\system32\inetsrv\hwebcore.dll")]
+                //public static extern int WebCoreActivate(
+                //    [In, MarshalAs(UnmanagedType.LPWStr)] string appHostConfigPath,    // Required
+                //    [In, MarshalAs(UnmanagedType.LPWStr)] string rootWebConfigPath,    // Optional
+                //    [In, MarshalAs(UnmanagedType.LPWStr)] string instanceName);        // Required
+
+                //[DllImport(@"%windir%\system32\inetsrv\hwebcore.dll")]
+                //public static extern int WebCoreShutdown(bool immediate);
             }
         }
         #endregion

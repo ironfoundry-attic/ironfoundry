@@ -42,26 +42,41 @@ namespace IronFoundry.Warden.IisHost
                     Environment.Exit(1);
                 }
 
-                var runtimePath = @"%windir%\Microsoft.Net\Framework\v4.0.30319\";
-                switch (options.RuntimeVersion)
+                //using (var configGenerator = new ConfigGenerator(options.WebRoot))
+                var configGenerator = new ConfigGenerator(options.WebRoot);
                 {
-                    case "2":
-                    case "2.0":
-                        runtimePath = @"%windir%\Microsoft.Net\Framework\v2.0.50727\";
-                    break;
-                }
+                    ConfigSettings settings;
+                    switch (options.RuntimeVersion)
+                    {
+                        case "2":
+                        case "2.0":
+                            settings = configGenerator.Create(
+                                options.Port,
+                                Constants.FrameworkPaths.TwoDotZeroWebConfig,
+                                Constants.RuntimeVersion.VersionTwoDotZero,
+                                Constants.PipelineMode.Integrated);
+                            break;
+                        default:
+                            settings = configGenerator.Create(
+                                options.Port,
+                                Constants.FrameworkPaths.FourDotZeroWebConfig,
+                                Constants.RuntimeVersion.VersionFourDotZero,
+                                Constants.PipelineMode.Integrated);
+                            break;
+                    }
 
-                log.Info("starting web server instance...");
-                using (var webServer = new WebServer(options.WebRoot, options.Port, options.WebsiteId, runtimePath))
-                {
-                    webServer.Start();
-                    Console.WriteLine("Server Started.... press CTRL + C to stop");
+                    log.Info("starting web server instance...");
+                    using (var webServer = new WebServer(settings))
+                    {
+                        webServer.Start();
+                        Console.WriteLine("Server Started.... press CTRL + C to stop");
 
-                    StartInBrowser(options);
+                        StartInBrowser(options);
 
-                    exitLatch.WaitOne();
-                    Console.WriteLine("Server shutting down, please wait...");
-                    webServer.Stop();
+                        exitLatch.WaitOne();
+                        Console.WriteLine("Server shutting down, please wait...");
+                        webServer.Stop();
+                    }
                 }
             }
             catch (Exception ex)
@@ -101,9 +116,6 @@ namespace IronFoundry.Warden.IisHost
 
         [Option('v', "runtimeVersion", Required = false, DefaultValue = "4.0", HelpText = "AppPool runtime version: 2.0 or 4.0")]
         public string RuntimeVersion { get; set; }
-
-        [Option('i', "websiteId", Required = false, DefaultValue = (uint)1, HelpText = "The ID for the IIS website.")]
-        public uint WebsiteId { get; set; }
 
         [Option('b', "startInBrowser", Required = false, DefaultValue = true, HelpText = "Specify true to start a browser pointing to the site.")]
         public bool StartInBrowser { get; set; }
