@@ -34,7 +34,7 @@
             get { return directory.ToString(); }
         }
 
-        public string PathWithin(string path)
+        public string ConvertToPathWithin(string path)
         {
             string pathTmp = path.Trim();
             if (pathTmp.StartsWith("@ROOT@"))

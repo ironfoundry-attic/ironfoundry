@@ -60,6 +60,7 @@
     <Compile Include="Handlers\DestroyRequestHandler.cs" />
     <Compile Include="Handlers\EchoRequestHandler.cs" />
     <Compile Include="Handlers\InfoRequestHandler.cs" />
+    <Compile Include="Handlers\IStreamingHandler.cs" />
     <Compile Include="Handlers\LimitBandwidthRequestHandler.cs" />
     <Compile Include="Handlers\LimitDiskRequestHandler.cs" />
     <Compile Include="Handlers\LimitMemoryRequestHandler.cs" />
@@ -70,14 +71,21 @@
     <Compile Include="Jobs\IJobStatus.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobExceptionResult.cs" />
-    <Compile Include="Run\PathCommand.cs" />
-    <Compile Include="Run\TouchCommand.cs" />
-    <Compile Include="Run\TaskCommandStatus.cs" />
-    <Compile Include="Run\MkdirCommand.cs" />
-    <Compile Include="Run\TaskCommandDTO.cs" />
-    <Compile Include="Run\TaskCommand.cs" />
-    <Compile Include="Run\TaskCommandFactory.cs" />
-    <Compile Include="Run\TaskCommandResult.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Tasks\UnzipCommand.cs" />
+    <Compile Include="Tasks\PathCommand.cs" />
+    <Compile Include="Tasks\PowershellCommand.cs" />
+    <Compile Include="Tasks\TouchCommand.cs" />
+    <Compile Include="Tasks\TaskCommandStatus.cs" />
+    <Compile Include="Tasks\MkdirCommand.cs" />
+    <Compile Include="Tasks\TaskCommandDTO.cs" />
+    <Compile Include="Tasks\TaskCommand.cs" />
+    <Compile Include="Tasks\TaskCommandFactory.cs" />
+    <Compile Include="Tasks\TaskCommandResult.cs" />
     <Compile Include="Handlers\TaskRequestHandler.cs" />
     <Compile Include="Jobs\IJobManager.cs" />
     <Compile Include="Jobs\JobManager.cs" />
@@ -95,7 +103,7 @@
     <Compile Include="Handlers\StreamRequestHandler.cs" />
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
-    <Compile Include="Run\TaskRunner.cs" />
+    <Compile Include="Tasks\TaskRunner.cs" />
     <Compile Include="Utilities\Statics.cs" />
     <Compile Include="WardenException.cs" />
     <Compile Include="Server\Buffer.cs" />
@@ -124,11 +132,17 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

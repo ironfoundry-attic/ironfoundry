@@ -4,7 +4,7 @@
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
-    using IronFoundry.Warden.Run;
+    using IronFoundry.Warden.Tasks;
 
     public abstract class TaskRequestHandler : RequestHandler
     {

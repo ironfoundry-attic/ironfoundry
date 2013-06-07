@@ -108,18 +108,14 @@
                                         break;
                                     }
 
-                                    Message response = HandleRequest(request);
-                                    if (response != null)
-                                    {
-                                        ++messageCount;
-                                    }
-
-                                    if (!client.Connected)
-                                    {
-                                        break;
-                                    }
-
-                                    WriteMessage(response, ns);
+                                    HandleRequest(request, response =>
+                                        {
+                                            if (response != null)
+                                            {
+                                                ++messageCount;
+                                            }
+                                            WriteMessage(response, ns);
+                                        });
                                 }
                             }
                             catch (Exception ex)
@@ -180,7 +176,7 @@
             s.WriteByte(Constants.LF);
         }
 
-        private Message HandleRequest(Message msg)
+        private void HandleRequest(Message msg, Action<Message> responseWriter)
         {
             log.Trace("HandleRequest: '{0}'", msg.MessageType.ToString());
 
@@ -190,10 +186,23 @@
             var factory = new RequestHandlerFactory(containerManager, jobManager, msg.MessageType, request);
             RequestHandler handler = factory.GetHandler();
 
-            Response response;
+            Response response = null;
             try
             {
-                response = handler.Handle();
+                var streamingHandler = handler as IStreamingHandler;
+                if (streamingHandler != null)
+                {
+                    while (!(streamingHandler.Complete || cancellationToken.IsCancellationRequested))
+                    {
+                        response = handler.Handle();
+                        var wrapper = new ResponseWrapper(response);
+                        responseWriter(wrapper.GetMessage());
+                    }
+                }
+                else
+                {
+                    response = handler.Handle();
+                }
             }
             catch (Exception ex)
             {
@@ -208,8 +217,8 @@
                 }
             }
 
-            var wrapper = new ResponseWrapper(response);
-            return wrapper.GetMessage();
+            var lastWrapper = new ResponseWrapper(response);
+            responseWriter(lastWrapper.GetMessage());
         }
 
         private void HandleSocketException(Exception ex)

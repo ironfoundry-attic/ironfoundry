@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Warden.Run
+﻿namespace IronFoundry.Warden.Tasks
 {
     using System;
     using IronFoundry.Warden.Containers;
@@ -24,6 +24,15 @@
             {
                 case "mkdir" :
                     command =  new MkdirCommand(container, arguments);
+                    break;
+                case "touch" :
+                    command =  new TouchCommand(container, arguments);
+                    break;
+                case "ps1" :
+                    command =  new PowershellCommand(container, arguments);
+                    break;
+                case "unzip" :
+                    command =  new UnzipCommand(container, arguments);
                     break;
                 default :
                     throw new InvalidOperationException(String.Format("Unknown script command: '{0}'", commandName));

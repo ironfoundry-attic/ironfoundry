@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Warden.Run
+﻿namespace IronFoundry.Warden.Tasks
 {
     using IronFoundry.Warden.Jobs;
 

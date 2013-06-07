@@ -7,12 +7,14 @@
     using IronFoundry.Warden.Protocol;
     using NLog;
 
-    public class StreamRequestHandler : RequestHandler
+    public class StreamRequestHandler : RequestHandler, IStreamingHandler
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly IJobManager jobManager;
         private readonly StreamRequest request;
         private readonly InfoBuilder infoBuilder;
+
+        private bool complete = false;
 
         public StreamRequestHandler(IContainerManager containerManager, IJobManager jobManager, Request request)
             : base(request)
@@ -30,6 +32,11 @@
             this.request = (StreamRequest)request;
         }
 
+        public bool Complete
+        {
+            get { return complete; }
+        }
+
         public override Response Handle()
         {
             log.Trace("Handle: '{0}' JobId: '{1}''", request.Handle, request.JobId);
@@ -39,15 +46,16 @@
             var job = jobManager.GetJob(request.JobId);
             if (job == null)
             {
-                streamResponse = GetErrorResponse("Error! Expected to find job with ID '{0}' but could not.", request.JobId);
+                streamResponse = GetErrorResponse(true, "Error! Expected to find job with ID '{0}' but could not.", request.JobId);
+                complete = true;
             }
             else
             {
                 IJobStatus status = job.Status;
                 if (status == null)
                 {
-                    jobManager.RemoveJob(request.JobId);
-                    streamResponse = GetErrorResponse("Error! Could not get status for job with ID '{0}'", request.JobId);
+                    // TODO: should this even get sent back?
+                    streamResponse = GetErrorResponse(false, "Warning: could not get status for job with ID '{0}'", request.JobId);
                 }
                 else
                 {
@@ -63,6 +71,7 @@
                         {
                             streamResponse.ExitStatus = (uint)status.ExitStatus.Value;
                         }
+                        complete = true;
                     }
                 }
             }
@@ -72,23 +81,30 @@
             return streamResponse;
         }
 
-        private static StreamResponse GetErrorResponse(string fmt, params object[] args)
+        private static StreamResponse GetErrorResponse(bool errorExitStatus, string fmt, params object[] args)
         {
             if (fmt.IsNullOrWhiteSpace())
             {
                 throw new ArgumentNullException("fmt");
             }
+
             if (args.IsNullOrEmpty())
             {
                 throw new ArgumentNullException("args");
             }
 
-            return new StreamResponse
+            var response = new StreamResponse
             {
                 Data = String.Format(fmt, args),
                 Name = JobDataSource.stderr.ToString(),
-                ExitStatus = 1,
             };
+
+            if (errorExitStatus)
+            {
+                response.ExitStatus = 1;
+            }
+
+            return response;
         }
     }
 }

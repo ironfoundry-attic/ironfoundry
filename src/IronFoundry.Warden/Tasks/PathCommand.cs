@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using IronFoundry.Warden.Containers;
 
-namespace IronFoundry.Warden.Run
+namespace IronFoundry.Warden.Tasks
 {
     public abstract class PathCommand : TaskCommand
     {
@@ -25,7 +25,7 @@ namespace IronFoundry.Warden.Run
             {
                 try
                 {
-                    string pathInContainer = container.PathWithin(file);
+                    string pathInContainer = container.ConvertToPathWithin(file);
                     ProcessPathInContainer(pathInContainer, output);
                 }
                 catch (Exception ex)
