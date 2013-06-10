@@ -20,10 +20,10 @@
         private readonly Container container;
         private readonly ITaskRequest request;
         private readonly TaskCommandDTO[] commands;
-        private readonly ConcurrentQueue<TaskCommandResult> results = new ConcurrentQueue<TaskCommandResult>();
+
+        private ConcurrentQueue<TaskCommandStatus> jobStatusQueue;
 
         private bool runningAsync = false;
-        private bool commandsCompleted = false;
 
         public TaskRunner(Container container, ITaskRequest request)
         {
@@ -51,32 +51,28 @@
             }
         }
 
-        public event EventHandler<JobStatusEventArgs> JobStatusAvailable;
-
-        public IJobStatus Status
+        public IEnumerable<IJobStatus> Status
         {
             get
             {
-                TaskCommandResult toProcess = null;
-                if (results.TryDequeue(out toProcess))
+                var statusList = new List<IJobStatus>();
+
+                TaskCommandStatus status;
+                while (jobStatusQueue.TryDequeue(out status))
                 {
-                    int? exitCode = null;
-                    if (commandsCompleted)
-                    {
-                        exitCode = toProcess.ExitCode;
-                    }
-                    return new TaskCommandStatus(exitCode, toProcess.Stdout, toProcess.Stderr);
+                    statusList.Add(status);
                 }
-                else
-                {
-                    return null;
-                }
+
+                return statusList;
             }
         }
 
-        public Task RunAsync()
+        public event EventHandler<JobStatusEventArgs> JobStatusAvailable;
+
+        public Task<IJobResult> RunAsync()
         {
             runningAsync = true;
+            jobStatusQueue = new ConcurrentQueue<TaskCommandStatus>();
             return DoRunAsync();
         }
 
@@ -87,8 +83,6 @@
 
         public IJobResult Run()
         {
-            IJobResult jobResult = null;
-
             // TODO
             if (request.Privileged == false)
             {
@@ -96,7 +90,7 @@
             }
 
             var commandFactory = new TaskCommandFactory(container);
-
+            var results = new List<TaskCommandResult>();
             foreach (TaskCommandDTO cmd in commands)
             {
                 if (cts.IsCancellationRequested)
@@ -108,26 +102,19 @@
                 try
                 {
                     TaskCommandResult result = taskCommand.Execute();
-                    results.Enqueue(result);
+                    results.Add(result);
                 }
                 catch (Exception ex)
                 {
-                    results.Enqueue(new TaskCommandResult(1, null, ex.Message));
+                    results.Add(new TaskCommandResult(1, null, ex.Message));
                     break;
                 }
             }
 
-            commandsCompleted = true;
-
-            if (!runningAsync)
-            {
-                jobResult = FlattenResults();
-            }
-
-            return jobResult;
+            return FlattenResults(results);
         }
 
-        private Task DoRunAsync()
+        private async Task<IJobResult> DoRunAsync()
         {
             // TODO
             if (request.Privileged == false)
@@ -136,9 +123,7 @@
             }
 
             var commandFactory = new TaskCommandFactory(container);
-
-            var taskCommands = new List<TaskCommand>();
-            var tasks = new List<Task>();
+            var results = new List<TaskCommandResult>();
             foreach (TaskCommandDTO cmd in commands)
             {
                 if (cts.IsCancellationRequested)
@@ -147,82 +132,73 @@
                 }
 
                 TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
-                taskCommand.ResultAvailable += taskCommand_ResultAvailable;
 
-                taskCommands.Add(taskCommand);
-                var asyncTask = taskCommand.ExecuteAsync();
-                tasks.Add(taskCommand.ExecuteAsync());
+                try
+                {
+                    if (runningAsync && taskCommand.CanExecuteAsync)
+                    {
+                        var asyncTaskCommand = (AsyncTaskCommand)taskCommand;
+                        asyncTaskCommand.StatusAvailable += asyncTaskCommand_StatusAvailable;
+
+                        TaskCommandResult result = await asyncTaskCommand.ExecuteAsync();
+
+                        asyncTaskCommand.StatusAvailable -= asyncTaskCommand_StatusAvailable;
+                        results.Add(result);
+                    }
+                    else
+                    {
+                        TaskCommandResult result = taskCommand.Execute();
+                        results.Add(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    results.Add(new TaskCommandResult(1, null, ex.Message));
+                    break;
+                }
             }
 
-            return Task.WhenAll(tasks).ContinueWith((task) =>
-                {
-                    foreach (var tc in taskCommands)
-                    {
-                        tc.ResultAvailable -= taskCommand_ResultAvailable;
-                    }
-                });
+            return FlattenResults(results);
         }
 
-        private void taskCommand_ResultAvailable(object sender, TaskCommandResultEventArgs e)
+        private void asyncTaskCommand_StatusAvailable(object sender, TaskCommandStatusEventArgs e)
         {
-            if (!runningAsync)
+            TaskCommandStatus status = e.Status;
+            if (status == null)
             {
-                throw new InvalidOperationException("Trying to raise event in non-async mode!");
+                throw new InvalidOperationException("status");
             }
-
-            TaskCommandResult result = e.Result;
 
             if (JobStatusAvailable == null)
             {
-                log.Trace("taskCommand_ResultAvailable enqueuing '{0}'", result.GetType());
-                results.Enqueue(result); // TODO: what if too many results??
+                log.Trace("asyncTaskCommand_StatusAvailable enqueuing '{0}'", status.Data);
+                jobStatusQueue.Enqueue(status); // TODO: what if too much status?
             }
             else
             {
-                IJobStatus jobStatus = ToStatusWithEnqueued(result);
-                log.Trace("taskCommand_ResultAvailable raising event '{0}'", jobStatus.Data);
-                JobStatusAvailable(this, new JobStatusEventArgs(jobStatus));
+                jobStatusQueue.Enqueue(status);
+                TaskCommandStatus queued;
+                while ((!jobStatusQueue.IsEmpty) && jobStatusQueue.TryDequeue(out queued))
+                {
+                    log.Trace("asyncTaskCommand_StatusAvailable raising event '{0}'", status.Data);
+                    JobStatusAvailable(this, new JobStatusEventArgs(status));
+                }
             }
         }
 
-        private IJobStatus ToStatusWithEnqueued(TaskCommandResult taskCommandResult)
-        {
-            if (taskCommandResult == null)
-            {
-                throw new ArgumentNullException("taskCommandResult");
-            }
-
-            TaskCommandStatus status = null;
-
-            if (results.IsEmpty)
-            {
-                status = new TaskCommandStatus(null, taskCommandResult.Stdout, taskCommandResult.Stderr);
-            }
-            else
-            {
-                results.Enqueue(taskCommandResult);
-                IJobResult flattened = FlattenResults();
-                status = new TaskCommandStatus(null, flattened.Stdout, flattened.Stderr); // TODO: LAST RESULT EXIT CODE
-            }
-
-            return status;
-        }
-
-        private IJobResult FlattenResults()
+        private static IJobResult FlattenResults(IEnumerable<TaskCommandResult> results)
         {
             var stdout = new StringBuilder();
             var stderr = new StringBuilder();
 
             int lastExitCode = 0;
-
-            TaskCommandResult rslt;
-            while (results.TryDequeue(out rslt))
+            foreach (var result in results)
             {
-                stdout.SmartAppendLine(rslt.Stdout);
-                stderr.SmartAppendLine(rslt.Stderr);
-                if (rslt.ExitCode != 0)
+                stdout.SmartAppendLine(result.Stdout);
+                stderr.SmartAppendLine(result.Stderr);
+                if (result.ExitCode != 0)
                 {
-                    lastExitCode = rslt.ExitCode;
+                    lastExitCode = result.ExitCode;
                     break;
                 }
             }

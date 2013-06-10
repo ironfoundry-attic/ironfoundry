@@ -5,14 +5,17 @@
     using System.Diagnostics;
     using System.IO;
     using System.Text;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
 
-    public class PowershellCommand : TaskCommand
+    public class PowershellCommand : AsyncTaskCommand
     {
         private const string powershellArgFmt = "-NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -WindowStyle Hidden -File \"{0}\"";
 
         private readonly StringBuilder stdout = new StringBuilder();
         private readonly StringBuilder stderr = new StringBuilder();
+
+        private bool isAsync = false;
 
         public PowershellCommand(Container container, string[] arguments)
             : base(container, arguments)
@@ -23,29 +26,40 @@
             }
         }
 
+        public override Task<TaskCommandResult> ExecuteAsync()
+        {
+            isAsync = true;
+            return Task.Factory.StartNew<TaskCommandResult>(DoExecute);
+        }
+
         public override TaskCommandResult Execute()
+        {
+            return DoExecute();
+        }
+
+        private TaskCommandResult DoExecute()
         {
             using (var ps1File = container.TempFileInContainer(".ps1"))
             {
                 File.WriteAllLines(ps1File.FullName, container.ConvertToPathsWithin(arguments), Encoding.ASCII);
 
                 string psArgs = String.Format(powershellArgFmt, ps1File.FullName);
-                int exitCode = 0;
+
                 using (var process = new BackgroundProcess(ps1File.DirectoryName, "powershell.exe", psArgs))
                 {
                     process.ErrorDataReceived += process_ErrorDataReceived;
                     process.OutputDataReceived += process_OutputDataReceived;
 
-                    process.StartBackground();
-                    exitCode = process.ExitCode;
+                    process.StartAndWait();
 
                     process.ErrorDataReceived -= process_ErrorDataReceived;
                     process.OutputDataReceived -= process_OutputDataReceived;
-                }
 
-                string sout = stdout.ToString();
-                string serr = stderr.ToString();
-                return new TaskCommandResult(exitCode, sout, serr);
+                    string sout = stdout.ToString();
+                    string serr = stderr.ToString();
+
+                    return new TaskCommandResult(process.ExitCode, sout, serr);
+                }
             }
         }
 
@@ -53,7 +67,15 @@
         {
             if (e.Data != null)
             {
-                stdout.AppendLine(e.Data);
+                if (isAsync)
+                {
+                    string stdoutLine = e.Data + '\n';
+                    OnStatusAvailable(new TaskCommandStatus(null, stdoutLine, null));
+                }
+                else
+                {
+                    stdout.AppendLine(e.Data);
+                }
             }
         }
 
@@ -61,7 +83,15 @@
         {
             if (e.Data != null)
             {
-                stderr.AppendLine(e.Data);
+                if (isAsync)
+                {
+                    string stderrLine = e.Data + '\n';
+                    OnStatusAvailable(new TaskCommandStatus(null, null, stderrLine));
+                }
+                else
+                {
+                    stderr.AppendLine(e.Data);
+                }
             }
         }
     }

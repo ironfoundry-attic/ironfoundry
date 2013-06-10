@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
@@ -33,17 +34,25 @@
             this.request = (StreamRequest)request;
         }
 
-        public void ObserveStatus(IJobStatus jobStatus)
+        public void ListenStatus(IJobStatus jobStatus)
         {
             if (messageWriter == null)
             {
                 throw new InvalidOperationException("messageWriter can not be null when job status observed.");
             }
-            StreamResponse response = ToStreamResponse(jobStatus);
-            messageWriter.Write(response);
+
+            if (jobStatus == null)
+            {
+                log.Warn("Unexpected null job status!");
+            }
+            else
+            {
+                StreamResponse response = ToStreamResponse(jobStatus);
+                messageWriter.Write(response);
+            }
         }
 
-        public StreamResponse Handle(MessageWriter messageWriter, CancellationToken cancellationToken)
+        public async Task<StreamResponse> HandleAsync(MessageWriter messageWriter, CancellationToken cancellationToken)
         {
             if (messageWriter == null)
             {
@@ -60,12 +69,27 @@
 
             StreamResponse streamResponse = null;
 
-            Job job = GetJobById(ref streamResponse);
+            Job job = GetJobById(ref streamResponse); // if job is null, streamResponse is set to error
             if (job != null)
             {
-                job.AttachListener(this);
-                job.Listen();
-                streamResponse = new StreamResponse { ExitStatus = 0, Data = "TODO FINAL RESPONSE", Name = "stdout" };
+                if (job.IsCompleted)
+                {
+                    // TODO grab all saved status output ??? Check with warden in Linux
+                    if (job.Result == null)
+                    {
+                        streamResponse = GetErrorResponse(true, "Error! Job with ID '{0}' is completed but no result is available!", request.JobId);
+                    }
+                    else
+                    {
+                        streamResponse = ToStreamResponse(job.Result);
+                    }
+                }
+                else
+                {
+                    job.AttachListener(this);
+                    IJobResult result = await job.ListenAsync();
+                    streamResponse = StreamResponse.Create(result.ExitCode);
+                }
             }
 
             return streamResponse;
@@ -73,29 +97,7 @@
 
         public override Response Handle()
         {
-            log.Trace("Handle: '{0}' JobId: '{1}''", request.Handle, request.JobId);
-
-            StreamResponse streamResponse = null;
-            Job job = GetJobById(ref streamResponse);
-            if (job != null)
-            {
-                IJobStatus status = job.Status;
-                if (status == null)
-                {
-                    log.Warn("Could not get status for job with ID '{0}'", request.JobId);
-                }
-                else
-                {
-                    streamResponse = ToStreamResponse(status);
-                }
-            }
-
-            if (streamResponse != null)
-            {
-                InfoResponse info = infoBuilder.GetInfoResponseFor(request.Handle);
-                streamResponse.Info = info;
-            }
-            return streamResponse;
+            throw new InvalidOperationException("StreamRequestHandler implements IStreamingHandler so HandleAsync() should be called!");
         }
 
         private Job GetJobById(ref StreamResponse streamResponse)
@@ -110,30 +112,12 @@
 
         private static StreamResponse ToStreamResponse(IJobResult result)
         {
-            unchecked
-            {
-                return new StreamResponse
-                {
-                    ExitStatus = (uint)result.ExitCode
-                };
-            }
+            return StreamResponse.Create(result.ExitCode, result.Stdout, result.Stderr);
         }
 
         private static StreamResponse ToStreamResponse(IJobStatus status)
         {
-            var streamResponse = new StreamResponse
-            {
-                Data = status.Data,
-                Name = status.DataSource.ToString()
-            };
-            if (status.ExitStatus.HasValue)
-            {
-                unchecked
-                {
-                    streamResponse.ExitStatus = (uint)status.ExitStatus.Value;
-                }
-            }
-            return streamResponse;
+            return StreamResponse.Create(status.ExitStatus, status.DataSource.ToString(), status.Data);
         }
 
         private static StreamResponse GetErrorResponse(bool errorExitStatus, string fmt, params object[] args)

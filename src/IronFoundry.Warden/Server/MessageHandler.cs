@@ -41,7 +41,7 @@ namespace IronFoundry.Warden.Server
             this.messageWriter = messageWriter;
         }
 
-        public void Handle(Message message)
+        public async void Handle(Message message)
         {
             if (message == null)
             {
@@ -61,7 +61,7 @@ namespace IronFoundry.Warden.Server
                 var streamingHandler = handler as IStreamingHandler;
                 if (streamingHandler != null)
                 {
-                    Response finalResponse = streamingHandler.Handle(messageWriter, cancellationToken);
+                    Response finalResponse = await streamingHandler.HandleAsync(messageWriter, cancellationToken);
                     if (finalResponse == null)
                     {
                         string errorMessage = String.Format("Null final response from streaming handler '{0}'", streamingHandler.GetType());

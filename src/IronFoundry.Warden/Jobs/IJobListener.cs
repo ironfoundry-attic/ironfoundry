@@ -2,6 +2,6 @@
 {
     public interface IJobListener
     {
-        void ObserveStatus(IJobStatus jobStatus);
+        void ListenStatus(IJobStatus jobStatus);
     }
 }

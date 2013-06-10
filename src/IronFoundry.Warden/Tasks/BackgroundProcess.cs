@@ -40,13 +40,13 @@
             this.EnableRaisingEvents = true;
         }
 
-        public void StartBackground()
+        public void StartAndWait()
         {
             Start();
             BeginErrorReadLine();
             BeginOutputReadLine();
             StandardInput.WriteLine(Environment.NewLine);
-            WaitForExit(); // TODO timeout
+            WaitForExit(); // TODO timeout?
         }
     }
 }

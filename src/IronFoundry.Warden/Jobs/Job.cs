@@ -10,7 +10,7 @@
         private readonly uint jobId;
         private readonly IJobRunnable runnable;
 
-        private Task runnableTask;
+        private Task<IJobResult> runnableTask;
         private IJobListener listener;
         private IJobResult result;
         private bool isCompleted = false;
@@ -34,7 +34,7 @@
             try
             {
                 runnableTask = runnable.RunAsync();
-                await runnableTask;
+                result = await runnableTask;
             }
             catch (Exception ex)
             {
@@ -59,7 +59,7 @@
             this.listener = listener;
         }
 
-        public void Listen()
+        public async Task<IJobResult> ListenAsync()
         {
             if (this.listener == null)
             {
@@ -73,9 +73,16 @@
             try
             {
                 runnable.JobStatusAvailable += runnable_JobStatusAvailable;
+
                 log.Trace("Listen: BEFORE Task.WaitAll(runnabletask:{0})", runnableTask.Id);
-                this.listener.ObserveStatus(this.Status); // Observe saved status
-                Task.WaitAll(runnableTask);
+
+                foreach (IJobStatus jobStatus in runnable.Status)
+                {
+                    runnable_JobStatusAvailable(this, new JobStatusEventArgs(jobStatus));
+                }
+
+                result = await runnableTask;
+
                 log.Trace("Listen: AFTER Task.WaitAll(runnabletask:{0})", runnableTask.Id);
             }
             finally
@@ -83,6 +90,8 @@
                 runnable.JobStatusAvailable -= runnable_JobStatusAvailable;
                 isCompleted = true;
             }
+
+            return result;
         }
 
         public void Cancel()
@@ -93,11 +102,6 @@
         public bool IsCompleted
         {
             get { return isCompleted; }
-        }
-
-        public IJobStatus Status
-        {
-            get { return runnable.Status; }
         }
 
         public IJobResult Result
@@ -112,7 +116,7 @@
                 throw new InvalidOperationException("Must attach listener before calling Listen()");
             }
             log.Trace("JobStatus: '{0}'", e.JobStatus.Data);
-            this.listener.ObserveStatus(e.JobStatus);
+            this.listener.ListenStatus(e.JobStatus);
         }
     }
 }

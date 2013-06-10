@@ -78,8 +78,7 @@
                     }
                     else
                     {
-                        log.Error("Could not parse '{0}' as Int32!", dataLengthStr);
-                        break;
+                        throw new InvalidOperationException(String.Format("Could not parse '{0}' as Int32!", dataLengthStr));
                     }
                 } while (true);
             }
