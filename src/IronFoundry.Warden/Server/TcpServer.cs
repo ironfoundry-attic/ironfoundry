@@ -4,6 +4,7 @@
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
@@ -54,14 +55,14 @@
             {
                 TcpClient client = await listener.AcceptTcpClientAsync();
                 log.Trace("Client connected!");
-                ProcessClient(client);
+                await ProcessClientAsync(client);
             }
 
             log.Debug("Stopping Server.");
             listener.Stop();
         }
 
-        public async void ProcessClient(TcpClient client)
+        public async Task ProcessClientAsync(TcpClient client)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -106,7 +107,7 @@
 
                                     var messageWriter = new MessageWriter(ns);
                                     var messageHandler = new MessageHandler(containerManager, jobManager, cancellationToken, messageWriter);
-                                    messageHandler.Handle(message);
+                                    await messageHandler.HandleAsync(message);
                                     log.Trace("Finished handling message: '{0}'", message.MessageType.ToString());
                                 }
                             }

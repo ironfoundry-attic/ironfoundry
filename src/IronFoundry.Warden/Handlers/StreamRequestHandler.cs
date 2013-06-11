@@ -72,9 +72,16 @@
             Job job = GetJobById(ref streamResponse); // if job is null, streamResponse is set to error
             if (job != null)
             {
+                if (job.HasStatus)
+                {
+                    foreach (IJobStatus status in job.Status)
+                    {
+                        ListenStatus(status);
+                    }
+                }
+
                 if (job.IsCompleted)
                 {
-                    // TODO grab all saved status output ??? Check with warden in Linux
                     if (job.Result == null)
                     {
                         streamResponse = GetErrorResponse(true, "Error! Job with ID '{0}' is completed but no result is available!", request.JobId);

@@ -4,7 +4,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Server;
     using IronFoundry.Warden.Utilities;
     using NLog;

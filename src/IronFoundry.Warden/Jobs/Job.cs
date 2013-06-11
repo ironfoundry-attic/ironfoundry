@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Jobs
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using NLog;
 
@@ -73,17 +74,7 @@
             try
             {
                 runnable.JobStatusAvailable += runnable_JobStatusAvailable;
-
-                log.Trace("Listen: BEFORE Task.WaitAll(runnabletask:{0})", runnableTask.Id);
-
-                foreach (IJobStatus jobStatus in runnable.Status)
-                {
-                    runnable_JobStatusAvailable(this, new JobStatusEventArgs(jobStatus));
-                }
-
                 result = await runnableTask;
-
-                log.Trace("Listen: AFTER Task.WaitAll(runnabletask:{0})", runnableTask.Id);
             }
             finally
             {
@@ -107,6 +98,16 @@
         public IJobResult Result
         {
             get { return result; }
+        }
+
+        public IEnumerable<IJobStatus> Status
+        {
+            get { return runnable.Status; }
+        }
+
+        public bool HasStatus
+        {
+            get { return !runnable.Status.IsNullOrEmpty(); }
         }
 
         private void runnable_JobStatusAvailable(object sender, JobStatusEventArgs e)

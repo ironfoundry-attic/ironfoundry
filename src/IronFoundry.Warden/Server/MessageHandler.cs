@@ -1,13 +1,15 @@
-﻿using System;
-using System.Threading;
-using IronFoundry.Warden.Containers;
-using IronFoundry.Warden.Handlers;
-using IronFoundry.Warden.Jobs;
-using IronFoundry.Warden.Protocol;
-using NLog;
-
-namespace IronFoundry.Warden.Server
+﻿namespace IronFoundry.Warden.Server
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using IronFoundry.Warden.Containers;
+    using IronFoundry.Warden.Handlers;
+    using IronFoundry.Warden.Jobs;
+    using IronFoundry.Warden.Protocol;
+    using IronFoundry.Warden.Utilities;
+    using NLog;
+
     public class MessageHandler
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
@@ -41,7 +43,7 @@ namespace IronFoundry.Warden.Server
             this.messageWriter = messageWriter;
         }
 
-        public async void Handle(Message message)
+        public async Task HandleAsync(Message message)
         {
             if (message == null)
             {
@@ -53,8 +55,18 @@ namespace IronFoundry.Warden.Server
             var unwrapper = new MessageUnwrapper(message);
             Request request = unwrapper.GetRequest();
 
-            var factory = new RequestHandlerFactory(containerManager, jobManager, message.MessageType, request);
-            RequestHandler handler = factory.GetHandler();
+            RequestHandler handler = null;
+            try
+            {
+                var factory = new RequestHandlerFactory(containerManager, jobManager, message.MessageType, request);
+                handler = factory.GetHandler();
+            }
+            catch (Exception ex)
+            {
+                log.ErrorException(ex);
+                messageWriter.Write(new ErrorResponse { Message = ex.Message });
+                return;
+            }
 
             try
             {
@@ -68,7 +80,6 @@ namespace IronFoundry.Warden.Server
                         log.Error(errorMessage);
                         finalResponse = new ErrorResponse { Message = errorMessage };
                     }
-
                     messageWriter.Write(finalResponse);
                 }
                 else
@@ -85,8 +96,7 @@ namespace IronFoundry.Warden.Server
                 }
                 else
                 {
-                    throw new WardenException(
-                        String.Format("Exception in request handler '{0}'", handler.ToString()), ex);
+                    throw new WardenException(String.Format("Exception in request handler '{0}'", handler.ToString()), ex);
                 }
             }
         }
