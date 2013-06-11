@@ -61,6 +61,15 @@ namespace IronFoundry.Warden.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to no such job.
+        /// </summary>
+        internal static string JobRequestHandler_NoSuchJob_Message {
+            get {
+                return ResourceManager.GetString("JobRequestHandler_NoSuchJob_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to unzip: second argument must be a destination directory..
         /// </summary>
         internal static string UnzipCommand_MissingDestDirErrorMessage {

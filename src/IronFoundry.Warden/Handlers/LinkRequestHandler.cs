@@ -1,18 +1,21 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
+    using IronFoundry.Warden.Jobs;
+    using IronFoundry.Warden.Properties;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
-    public class LinkRequestHandler : RequestHandler
+    public class LinkRequestHandler : JobRequestHandler
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly LinkRequest request;
         private readonly InfoBuilder infoBuilder;
 
-        public LinkRequestHandler(IContainerManager containerManager, Request request)
-            : base(request)
+        public LinkRequestHandler(IContainerManager containerManager, IJobManager jobManager, Request request)
+            : base(jobManager, request)
         {
             if (containerManager == null)
             {
@@ -22,17 +25,36 @@
             this.request = (LinkRequest)request;
         }
 
-        public override Response Handle()
+        public async override Task<Response> HandleAsync()
         {
-            // TODO do work!
             log.Trace("Handle: '{0}' JobId: '{1}'", request.Handle, request.JobId);
-            return new LinkResponse
+
+            LinkResponse response = null;
+
+            Job job = jobManager.GetJob(request.JobId);
+            if (job == null)
             {
-                ExitStatus = 0,
-                Stderr = "TODO STDERR",
-                Stdout = "TODO STDOUT",
-                Info = infoBuilder.GetInfoResponseFor(request.Handle)
-            };
+                ResponseData responseData = GetResponseData(true, Resources.JobRequestHandler_NoSuchJob_Message);
+                response = new LinkResponse
+                {
+                    ExitStatus = (uint)responseData.ExitStatus,
+                    Stderr = responseData.Message,
+                };
+            }
+            else
+            {
+                IJobResult result = await job.RunnableTask;
+                response = new LinkResponse
+                {
+                    ExitStatus = (uint)result.ExitCode,
+                    Stderr = result.Stderr,
+                    Stdout = result.Stdout,
+                };
+            }
+
+            response.Info = infoBuilder.GetInfoResponseFor(request.Handle);
+
+            return response;
         }
     }
 }

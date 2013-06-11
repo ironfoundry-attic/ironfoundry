@@ -70,7 +70,7 @@
                     handler = new LimitMemoryRequestHandler(request);
                     break;
                 case Message.Type.Link:
-                    handler = new LinkRequestHandler(containerManager, request);
+                    handler = new LinkRequestHandler(containerManager, jobManager, request);
                     break;
                 case Message.Type.List:
                     handler = new ListRequestHandler(containerManager, request);

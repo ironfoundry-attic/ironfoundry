@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
     using NLog;
@@ -22,7 +23,7 @@
             this.request = (DestroyRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             if (request.Handle.IsNullOrWhiteSpace())
             {
@@ -33,7 +34,7 @@
                 log.Trace("Handle: '{0}'", request.Handle);
                 containerManager.DestroyContainer(new ContainerHandle(request.Handle));
             }
-            return new DestroyResponse();
+            return Task.FromResult<Response>(new DestroyResponse());
         }
     }
 }

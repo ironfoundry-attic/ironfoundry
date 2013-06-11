@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
@@ -14,11 +15,11 @@
             this.request = (CopyInRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             // TODO: do work!
             log.Trace("SrcPath: '{0}' DstPath: '{1}'", request.SrcPath, request.DstPath);
-            return new CopyInResponse();
+            return Task.FromResult<Response>(new CopyInResponse());
         }
     }
 }

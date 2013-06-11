@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
@@ -18,7 +19,7 @@
             this.request = (RunRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
 
@@ -27,13 +28,14 @@
 
             unchecked
             {
-                return new RunResponse
-                {
-                    ExitStatus = (uint)result.ExitCode,
-                    Stdout = result.Stdout,
-                    Stderr = result.Stderr,
-                    Info = infoBuilder.GetInfoResponseFor(request.Handle)
-                };
+                return Task.FromResult<Response>(new RunResponse
+                    {
+                        ExitStatus = (uint)result.ExitCode,
+                        Stdout = result.Stdout,
+                        Stderr = result.Stderr,
+                        Info = infoBuilder.GetInfoResponseFor(request.Handle)
+                    }
+                );
             }
         }
     }

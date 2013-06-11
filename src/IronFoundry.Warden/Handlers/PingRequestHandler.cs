@@ -1,7 +1,8 @@
-﻿using IronFoundry.Warden.Protocol;
-
-namespace IronFoundry.Warden.Handlers
+﻿namespace IronFoundry.Warden.Handlers
 {
+    using System.Threading.Tasks;
+    using IronFoundry.Warden.Protocol;
+
     public class PingRequestHandler : RequestHandler
     {
         private readonly PingRequest request;
@@ -12,9 +13,9 @@ namespace IronFoundry.Warden.Handlers
             this.request = (PingRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
-            return new PingResponse();
+            return Task.FromResult<Response>(new PingResponse());
         }
     }
 }

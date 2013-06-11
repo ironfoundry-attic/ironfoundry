@@ -15,8 +15,6 @@
         private readonly StringBuilder stdout = new StringBuilder();
         private readonly StringBuilder stderr = new StringBuilder();
 
-        private bool isAsync = false;
-
         public PowershellCommand(Container container, string[] arguments)
             : base(container, arguments)
         {
@@ -28,7 +26,6 @@
 
         public override Task<TaskCommandResult> ExecuteAsync()
         {
-            isAsync = true;
             return Task.Factory.StartNew<TaskCommandResult>(DoExecute);
         }
 
@@ -67,15 +64,9 @@
         {
             if (e.Data != null)
             {
-                if (isAsync)
-                {
-                    string stdoutLine = e.Data + '\n';
-                    OnStatusAvailable(new TaskCommandStatus(null, stdoutLine, null));
-                }
-                else
-                {
-                    stdout.AppendLine(e.Data);
-                }
+                stdout.AppendLine(e.Data);
+                string stdoutLine = e.Data + '\n';
+                OnStatusAvailable(new TaskCommandStatus(null, stdoutLine, null));
             }
         }
 
@@ -83,15 +74,9 @@
         {
             if (e.Data != null)
             {
-                if (isAsync)
-                {
-                    string stderrLine = e.Data + '\n';
-                    OnStatusAvailable(new TaskCommandStatus(null, null, stderrLine));
-                }
-                else
-                {
-                    stderr.AppendLine(e.Data);
-                }
+                stderr.AppendLine(e.Data);
+                string stderrLine = e.Data + '\n';
+                OnStatusAvailable(new TaskCommandStatus(null, null, stderrLine));
             }
         }
     }

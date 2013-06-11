@@ -47,6 +47,11 @@
             }
         }
 
+        public Task<IJobResult> RunnableTask
+        {
+            get { return runnableTask; }
+        }
+
         public void AttachListener(IJobListener listener)
         {
             if (listener == null)

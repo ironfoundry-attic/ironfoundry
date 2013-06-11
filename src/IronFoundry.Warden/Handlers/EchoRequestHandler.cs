@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
@@ -14,10 +15,10 @@
             this.request = (EchoRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             log.Trace("Message: '{0}'", request.Message);
-            return new EchoResponse { Message = request.Message };
+            return Task.FromResult<Response>(new EchoResponse { Message = request.Message });
         }
     }
 }

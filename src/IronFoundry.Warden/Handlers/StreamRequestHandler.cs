@@ -1,35 +1,29 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
+    using IronFoundry.Warden.Properties;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
-    public class StreamRequestHandler : RequestHandler, IStreamingHandler, IJobListener
+    public class StreamRequestHandler : JobRequestHandler, IStreamingHandler, IJobListener
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
-        private readonly IJobManager jobManager;
         private readonly StreamRequest request;
         private readonly InfoBuilder infoBuilder;
 
         private MessageWriter messageWriter;
 
         public StreamRequestHandler(IContainerManager containerManager, IJobManager jobManager, Request request)
-            : base(request)
+            : base(jobManager, request)
         {
             if (containerManager == null)
             {
                 throw new ArgumentNullException("containerManager");
             }
-            if (jobManager == null)
-            {
-                throw new ArgumentNullException("jobManager");
-            }
-            this.jobManager = jobManager;
             this.infoBuilder = new InfoBuilder(containerManager);
             this.request = (StreamRequest)request;
         }
@@ -69,7 +63,7 @@
 
             StreamResponse streamResponse = null;
 
-            Job job = GetJobById(ref streamResponse); // if job is null, streamResponse is set to error
+            Job job = GetJobById(request.JobId, ref streamResponse); // if job is null, streamResponse is set to error
             if (job != null)
             {
                 if (job.HasStatus)
@@ -80,22 +74,28 @@
                     }
                 }
 
-                if (job.IsCompleted)
+                try
                 {
-                    if (job.Result == null)
+                    if (job.IsCompleted)
                     {
-                        streamResponse = GetErrorResponse(true, "Error! Job with ID '{0}' is completed but no result is available!\n", request.JobId);
+                        if (job.Result == null)
+                        {
+                            streamResponse = ToStreamResponse(GetResponseData(true, "Error! Job with ID '{0}' is completed but no result is available!\n", request.JobId));
+                        }
+                        else
+                        {
+                            streamResponse = ToStreamResponse(job.Result);
+                        }
                     }
                     else
                     {
-                        streamResponse = ToStreamResponse(job.Result);
+                        job.AttachListener(this);
+                        IJobResult result = await job.ListenAsync();
+                        streamResponse = StreamResponse.Create(result.ExitCode);
                     }
                 }
-                else
+                finally
                 {
-                    job.AttachListener(this);
-                    IJobResult result = await job.ListenAsync();
-                    streamResponse = StreamResponse.Create(result.ExitCode);
                     jobManager.RemoveJob(request.JobId);
                 }
             }
@@ -103,19 +103,39 @@
             return streamResponse;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             throw new InvalidOperationException("StreamRequestHandler implements IStreamingHandler so HandleAsync() should be called!");
         }
 
-        private Job GetJobById(ref StreamResponse streamResponse)
+        /// <summary>
+        /// If job can't be found, streamResponse is set to error
+        /// </summary>
+        private Job GetJobById(uint jobId, ref StreamResponse streamResponse)
         {
-            Job job = jobManager.GetJob(request.JobId);
+            Job job = jobManager.GetJob(jobId);
             if (job == null)
             {
-                streamResponse = GetErrorResponse(true, "no such job\n");
+                streamResponse = ToStreamResponse(GetResponseData(true, Resources.JobRequestHandler_NoSuchJob_Message));
             }
             return job;
+        }
+
+        private static StreamResponse ToStreamResponse(ResponseData responseData)
+        {
+            StreamResponse response = null;
+
+            switch (responseData.ExitStatus)
+            {
+                case 0:
+                    response = StreamResponse.Create(responseData.ExitStatus, responseData.Message, null);
+                    break;
+                default:
+                    response = StreamResponse.Create(responseData.ExitStatus, null, responseData.Message);
+                    break;
+            }
+
+            return response;
         }
 
         private static StreamResponse ToStreamResponse(IJobResult result)
@@ -126,37 +146,6 @@
         private static StreamResponse ToStreamResponse(IJobStatus status)
         {
             return StreamResponse.Create(status.ExitStatus, status.DataSource.ToString(), status.Data);
-        }
-
-        private static StreamResponse GetErrorResponse(bool errorExitStatus, string fmt, params object[] args)
-        {
-            if (fmt.IsNullOrWhiteSpace())
-            {
-                throw new ArgumentNullException("fmt");
-            }
-
-            string responseData = String.Empty;
-            if (args.IsNullOrEmpty())
-            {
-                responseData = fmt;
-            }
-            else
-            {
-                responseData = String.Format(fmt, args);
-            }
-
-            var response = new StreamResponse
-            {
-                Data = responseData,
-                Name = JobDataSource.stderr.ToString(),
-            };
-
-            if (errorExitStatus)
-            {
-                response.ExitStatus = 1;
-            }
-
-            return response;
         }
     }
 }

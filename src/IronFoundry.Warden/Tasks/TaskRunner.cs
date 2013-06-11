@@ -173,7 +173,6 @@
 
             if (JobStatusAvailable == null)
             {
-                // log.Trace("asyncTaskCommand_StatusAvailable enqueuing '{0}'", status.Data);
                 jobStatusQueue.Enqueue(status); // TODO: what if too much status?
             }
             else
@@ -182,7 +181,6 @@
                 TaskCommandStatus queued;
                 while ((!jobStatusQueue.IsEmpty) && jobStatusQueue.TryDequeue(out queued))
                 {
-                    // log.Trace("asyncTaskCommand_StatusAvailable raising event '{0}'", status.Data);
                     JobStatusAvailable(this, new JobStatusEventArgs(status));
                 }
             }

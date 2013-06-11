@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
 
@@ -21,11 +22,11 @@
             this.request = (ListRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             var response =  new ListResponse();
             response.Handles.AddRange(containerManager.Handles.Select(h => (string)h));
-            return response;
+            return Task.FromResult<Response>(response);
         }
     }
 }

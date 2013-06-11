@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
@@ -14,11 +15,11 @@
             this.request = (LimitMemoryRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             // TODO do work!
             log.Trace("Handle: '{0}' LimitInBytes: '{1}'", request.Handle, request.LimitInBytes);
-            return new LimitMemoryResponse { LimitInBytes = 134217728 }; // TODO 128 MB
+            return Task.FromResult<Response>(new LimitMemoryResponse { LimitInBytes = 134217728 }); // TODO 128 MB
         }
     }
 }

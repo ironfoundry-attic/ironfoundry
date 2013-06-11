@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
 
@@ -20,12 +21,12 @@
             this.request = (CreateRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             var factory = new ContainerFactory(request.Rootfs); // TODO: use something other than rootfs
             Container c = factory.CreateContainer();
             containerManager.AddContainer(c);
-            return new CreateResponse { Handle = c.Handle };
+            return Task.FromResult<Response>(new CreateResponse { Handle = c.Handle });
         }
     }
 }

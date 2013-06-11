@@ -26,18 +26,18 @@
         {
             var response = new StreamResponse
                 {
-                    Name       = "stdout", // NB: required!
+                    Name       = Constants.STDOUT_NAME,
                     Data       = String.Empty,
                 };
 
             if (!stdout.IsNullOrEmpty())
             {
-                response.Name = "stdout";
+                response.Name = Constants.STDOUT_NAME;
                 response.Data = stdout;
             }
             else if (!stderr.IsNullOrEmpty())
             {
-                response.Name = "stderr";
+                response.Name = Constants.STDERR_NAME;
                 response.Data = stderr;
             }
 
@@ -55,7 +55,7 @@
             {
                 return new StreamResponse
                     {
-                        Name       = "stdout", // NB: required!
+                        Name       = Constants.STDOUT_NAME, // NB: required!
                         Data       = String.Empty,
                         ExitStatus = (uint)exitCode
                     };

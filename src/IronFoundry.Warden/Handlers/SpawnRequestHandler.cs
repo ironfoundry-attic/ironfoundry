@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Jobs;
     using IronFoundry.Warden.Protocol;
@@ -28,12 +29,12 @@
             this.request = (SpawnRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
             IJobRunnable runnable = base.GetRunnableFor(request);
             uint jobId = jobManager.StartJobFor(runnable); // run async
-            return new SpawnResponse { JobId = jobId };
+            return Task.FromResult<Response>(new SpawnResponse { JobId = jobId });
         }
     }
 }

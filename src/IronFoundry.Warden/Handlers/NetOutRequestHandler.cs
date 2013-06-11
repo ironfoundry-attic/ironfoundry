@@ -1,5 +1,6 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Protocol;
     using NLog;
 
@@ -14,11 +15,11 @@
             this.request = (NetOutRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             // TODO do work!
             log.Trace("Handle: '{0}' Network: '{1}' Port: '{2}'", request.Handle, request.Network, request.Port);
-            return new NetOutResponse();
+            return Task.FromResult<Response>(new NetOutResponse());
         }
     }
 }

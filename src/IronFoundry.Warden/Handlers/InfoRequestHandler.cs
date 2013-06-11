@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
+    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
     using IronFoundry.Warden.Protocol;
     using NLog;
@@ -22,11 +23,11 @@
             this.request = (InfoRequest)request;
         }
 
-        public override Response Handle()
+        public override Task<Response> HandleAsync()
         {
             // TODO do work!
             log.Trace("Handle: '{0}'", request.Handle);
-            return infoBuilder.GetInfoResponseFor(request.Handle);
+            return Task.FromResult<Response>(infoBuilder.GetInfoResponseFor(request.Handle));
         }
     }
 }

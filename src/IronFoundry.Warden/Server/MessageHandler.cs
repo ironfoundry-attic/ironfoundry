@@ -81,10 +81,11 @@
                         finalResponse = new ErrorResponse { Message = errorMessage };
                     }
                     messageWriter.Write(finalResponse);
+                    return;
                 }
                 else
                 {
-                    Response response = handler.Handle();
+                    Response response = await handler.HandleAsync();
                     messageWriter.Write(response);
                 }
             }
