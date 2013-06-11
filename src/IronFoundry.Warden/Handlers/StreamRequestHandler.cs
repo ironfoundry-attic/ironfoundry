@@ -96,6 +96,7 @@
                     job.AttachListener(this);
                     IJobResult result = await job.ListenAsync();
                     streamResponse = StreamResponse.Create(result.ExitCode);
+                    jobManager.RemoveJob(request.JobId);
                 }
             }
 

@@ -1,10 +1,15 @@
 ﻿namespace IronFoundry.Warden.Jobs
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
+    using NLog;
+    using IronFoundry.Warden.Utilities;
 
     public class JobManager : IJobManager
     {
+        private readonly Logger log = LogManager.GetCurrentClassLogger();
+
         private uint jobIds = 0;
 
         private readonly IDictionary<uint, Job> jobs = new Dictionary<uint, Job>();
@@ -64,7 +69,10 @@
             {
                 rwlock.EnterWriteLock();
                 Job j = jobs[jobId];
-                j.Cancel();
+                if (!j.IsCompleted)
+                {
+                    j.Cancel();
+                }
                 jobs.Remove(jobId);
             }
             finally
