@@ -6,8 +6,8 @@
     using System.Data.SqlClient;
     using System.IO;
     using System.Linq;
-    using IronFoundry.Dea.Types;
-    using IronFoundry.Dea.Configuration;
+    using Types;
+    using Configuration;
     using Newtonsoft.Json;
 
     public class ConfigManager : IConfigManager
@@ -21,8 +21,6 @@
 
         public void BindServices(Droplet droplet, Instance instance)
         {
-            string appPath = instance.Staged;
-
             if (false == droplet.Services.IsNullOrEmpty())
             {
                 Configuration c = getConfiguration(instance);

@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Containers
 {
     using System;
+    using System.Net;
     using System.Security.Principal;
     using System.Text.RegularExpressions;
     using IronFoundry.Warden.Utilities;
@@ -11,6 +12,11 @@
         private static readonly Regex uniqueIdValidator = new Regex(@"^\w{8,}$", RegexOptions.CultureInvariant | RegexOptions.Compiled);
         private readonly string uniqueId;
         private readonly string userName;
+
+        public NetworkCredential GetCredential()
+        {
+            return new NetworkCredential(userName, uniqueId);
+        }
 
         public ContainerUser(string uniqueId, bool shouldCreate = false)
         {

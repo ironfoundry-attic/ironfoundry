@@ -6,11 +6,12 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Jobs;
-    using IronFoundry.Warden.Protocol;
+    using Containers;
+    using Jobs;
+    using Protocol;
     using Newtonsoft.Json;
     using NLog;
+    using Utilities.Impersonation;
 
     public class TaskRunner : IJobRunnable
     {
@@ -85,13 +86,8 @@
 
         public IJobResult Run()
         {
-            // TODO
-            if (request.Privileged == false)
-            {
-                // TODO IMPERSONATION!
-            }
-
             var commandFactory = new TaskCommandFactory(container);
+            var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
             foreach (TaskCommandDTO cmd in commands)
             {
@@ -103,7 +99,10 @@
                 TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
                 try
                 {
-                    TaskCommandResult result = taskCommand.Execute();
+                    var task = new Func<TaskCommandResult>(taskCommand.Execute);
+                    TaskCommandResult result = request.Privileged 
+                        ? Impersonator.InvokeImpersonated(credential, task) 
+                        : task();
                     results.Add(result);
                 }
                 catch (Exception ex)
@@ -118,13 +117,8 @@
 
         private async Task<IJobResult> DoRunAsync()
         {
-            // TODO
-            if (request.Privileged == false)
-            {
-                // TODO IMPERSONATION!
-            }
-
             var commandFactory = new TaskCommandFactory(container);
+            var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
             foreach (TaskCommandDTO cmd in commands)
             {
@@ -142,14 +136,20 @@
                         var asyncTaskCommand = (AsyncTaskCommand)taskCommand;
                         asyncTaskCommand.StatusAvailable += asyncTaskCommand_StatusAvailable;
 
-                        TaskCommandResult result = await asyncTaskCommand.ExecuteAsync();
+                        var task = new Func<Task<TaskCommandResult>>(asyncTaskCommand.ExecuteAsync);
+                        TaskCommandResult result = await (request.Privileged
+                            ? Impersonator.InvokeImpersonatedAsync(credential, task)
+                            : task());
 
                         asyncTaskCommand.StatusAvailable -= asyncTaskCommand_StatusAvailable;
                         results.Add(result);
                     }
                     else
                     {
-                        TaskCommandResult result = taskCommand.Execute();
+                        var task = new Func<TaskCommandResult>(taskCommand.Execute);
+                        TaskCommandResult result = request.Privileged
+                            ? Impersonator.InvokeImpersonated(credential, task)
+                            : task();
                         results.Add(result);
                     }
                 }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Threading;
     using IronFoundry.Warden.Utilities;
 
@@ -24,6 +25,11 @@
             this.handle = new ContainerHandle();
             this.user = new ContainerUser(handle, true);
             this.directory = new ContainerDirectory(this.handle, this.user, true);
+        }
+
+        public NetworkCredential GetCredential()
+        {
+            return user.GetCredential();
         }
 
         public ContainerHandle Handle
