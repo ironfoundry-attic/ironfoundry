@@ -74,7 +74,7 @@
             {
                 if (job.HasStatus)
                 {
-                    foreach (IJobStatus status in job.Status)
+                    foreach (IJobStatus status in job.RetrieveStatus())
                     {
                         ListenStatus(status);
                     }
@@ -84,7 +84,7 @@
                 {
                     if (job.Result == null)
                     {
-                        streamResponse = GetErrorResponse(true, "Error! Job with ID '{0}' is completed but no result is available!", request.JobId);
+                        streamResponse = GetErrorResponse(true, "Error! Job with ID '{0}' is completed but no result is available!\n", request.JobId);
                     }
                     else
                     {
@@ -112,7 +112,7 @@
             Job job = jobManager.GetJob(request.JobId);
             if (job == null)
             {
-                streamResponse = GetErrorResponse(true, "Error! Expected to find job with ID '{0}' but could not.", request.JobId);
+                streamResponse = GetErrorResponse(true, "no such job\n");
             }
             return job;
         }
@@ -134,14 +134,19 @@
                 throw new ArgumentNullException("fmt");
             }
 
+            string responseData = String.Empty;
             if (args.IsNullOrEmpty())
             {
-                throw new ArgumentNullException("args");
+                responseData = fmt;
+            }
+            else
+            {
+                responseData = String.Format(fmt, args);
             }
 
             var response = new StreamResponse
             {
-                Data = String.Format(fmt, args),
+                Data = responseData,
                 Name = JobDataSource.stderr.ToString(),
             };
 

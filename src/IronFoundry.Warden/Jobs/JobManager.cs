@@ -18,7 +18,7 @@
                 uint jobId = GetNextJobID();
                 var job = new Job(jobId, runnable);
                 jobs.Add(jobId, job);
-                job.Run();
+                job.RunAsync();
                 return jobId;
             }
             finally
@@ -32,20 +32,25 @@
             try
             {
                 rwlock.EnterUpgradeableReadLock();
-                Job rv = jobs[jobId];
-                if (rv.IsCompleted)
+
+                Job job = null;
+                if (jobs.TryGetValue(jobId, out job))
                 {
-                    try
+                    if (job.IsCompleted)
                     {
-                        rwlock.EnterWriteLock();
-                        jobs.Remove(jobId);
-                    }
-                    finally
-                    {
-                        rwlock.ExitWriteLock();
+                        try
+                        {
+                            rwlock.EnterWriteLock();
+                            jobs.Remove(jobId);
+                        }
+                        finally
+                        {
+                            rwlock.ExitWriteLock();
+                        }
                     }
                 }
-                return rv;
+
+                return job;
             }
             finally
             {

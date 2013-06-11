@@ -30,7 +30,7 @@
             this.runnable = runnable;
         }
 
-        public async void Run()
+        public async void RunAsync()
         {
             try
             {
@@ -100,14 +100,17 @@
             get { return result; }
         }
 
-        public IEnumerable<IJobStatus> Status
-        {
-            get { return runnable.Status; }
-        }
-
         public bool HasStatus
         {
-            get { return !runnable.Status.IsNullOrEmpty(); }
+            get { return runnable.HasStatus; }
+        }
+
+        /// <summary>
+        /// NB: dequeues all the status
+        /// </summary>
+        public IEnumerable<IJobStatus> RetrieveStatus()
+        {
+            return runnable.RetrieveStatus();
         }
 
         private void runnable_JobStatusAvailable(object sender, JobStatusEventArgs e)
@@ -116,7 +119,6 @@
             {
                 throw new InvalidOperationException("Must attach listener before calling Listen()");
             }
-            log.Trace("JobStatus: '{0}'", e.JobStatus.Data);
             this.listener.ListenStatus(e.JobStatus);
         }
     }

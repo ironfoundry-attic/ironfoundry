@@ -32,7 +32,7 @@
             {
                 var response = new ErrorResponse
                 {
-                    Message = wardenException.ResponseMessage,
+                    Message = wardenException.ResponseMessage + "\n",
                     Data = wardenException.StackTrace
                 };
                 messageWriter.Write(response);

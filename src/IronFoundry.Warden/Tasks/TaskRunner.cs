@@ -51,20 +51,22 @@
             }
         }
 
-        public IEnumerable<IJobStatus> Status
+        public bool HasStatus
         {
-            get
+            get { return !jobStatusQueue.IsEmpty; }
+        }
+
+        public IEnumerable<IJobStatus> RetrieveStatus()
+        {
+            var statusList = new List<IJobStatus>();
+
+            TaskCommandStatus status;
+            while (jobStatusQueue.TryDequeue(out status))
             {
-                var statusList = new List<IJobStatus>();
-
-                TaskCommandStatus status;
-                while (jobStatusQueue.TryDequeue(out status))
-                {
-                    statusList.Add(status);
-                }
-
-                return statusList;
+                statusList.Add(status);
             }
+
+            return statusList;
         }
 
         public event EventHandler<JobStatusEventArgs> JobStatusAvailable;
@@ -171,7 +173,7 @@
 
             if (JobStatusAvailable == null)
             {
-                log.Trace("asyncTaskCommand_StatusAvailable enqueuing '{0}'", status.Data);
+                // log.Trace("asyncTaskCommand_StatusAvailable enqueuing '{0}'", status.Data);
                 jobStatusQueue.Enqueue(status); // TODO: what if too much status?
             }
             else
@@ -180,7 +182,7 @@
                 TaskCommandStatus queued;
                 while ((!jobStatusQueue.IsEmpty) && jobStatusQueue.TryDequeue(out queued))
                 {
-                    log.Trace("asyncTaskCommand_StatusAvailable raising event '{0}'", status.Data);
+                    // log.Trace("asyncTaskCommand_StatusAvailable raising event '{0}'", status.Data);
                     JobStatusAvailable(this, new JobStatusEventArgs(status));
                 }
             }

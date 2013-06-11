@@ -24,6 +24,7 @@
         /// <summary>
         /// Dequeues and returns current set of un-observed status.
         /// </summary>
-        IEnumerable<IJobStatus> Status { get; }
+        IEnumerable<IJobStatus> RetrieveStatus();
+        bool HasStatus { get; }
     }
 }
