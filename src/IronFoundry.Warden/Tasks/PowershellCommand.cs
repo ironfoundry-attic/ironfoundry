@@ -64,9 +64,9 @@
         {
             if (e.Data != null)
             {
-                stdout.AppendLine(e.Data);
-                string stdoutLine = e.Data + '\n';
-                OnStatusAvailable(new TaskCommandStatus(null, stdoutLine, null));
+                string outputLine = e.Data + '\n';
+                stdout.Append(outputLine);
+                OnStatusAvailable(new TaskCommandStatus(null, outputLine, null));
             }
         }
 
@@ -74,9 +74,9 @@
         {
             if (e.Data != null)
             {
-                stderr.AppendLine(e.Data);
-                string stderrLine = e.Data + '\n';
-                OnStatusAvailable(new TaskCommandStatus(null, null, stderrLine));
+                string outputLine = e.Data + '\n';
+                stderr.Append(outputLine);
+                OnStatusAvailable(new TaskCommandStatus(null, null, outputLine));
             }
         }
     }
