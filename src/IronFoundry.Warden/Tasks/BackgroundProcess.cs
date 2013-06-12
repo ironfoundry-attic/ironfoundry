@@ -17,6 +17,7 @@
             {
                 throw new ArgumentNullException("workingDirectory");
             }
+
             if (!Directory.Exists(workingDirectory))
             {
                 throw new ArgumentException("workingDirectory must exist.");
@@ -47,13 +48,17 @@
             this.EnableRaisingEvents = true;
         }
 
-        public void StartAndWait()
+        public void StartAndWait(Action<Process> postStartAction)
         {
             Start();
             BeginErrorReadLine();
             BeginOutputReadLine();
             StandardInput.WriteLine(Environment.NewLine);
-            WaitForExit(); // TODO timeout?
+            if (postStartAction != null)
+            {
+                postStartAction(this);
+            }
+            WaitForExit(); // TODO timeout? Don't wait?
         }
     }
 }

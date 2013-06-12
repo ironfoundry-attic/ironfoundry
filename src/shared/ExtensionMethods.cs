@@ -1,7 +1,11 @@
 namespace System
 {
+    using System.Text.RegularExpressions;
+
     internal static class StringExtensionMethods
     {
+        private static readonly Regex backslashCleanup = new Regex(@"\\+", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
         public static bool IsNullOrWhiteSpace(this string argThis)
         {
             return String.IsNullOrWhiteSpace(argThis);
@@ -14,7 +18,7 @@ namespace System
 
         public static string ToWinPathString(this string pathString)
         {
-            return pathString.Replace('/', '\\');
+            return backslashCleanup.Replace(pathString.Replace('/', '\\'), @"\");
         }
     }
 }

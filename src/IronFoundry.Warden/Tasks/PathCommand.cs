@@ -25,12 +25,11 @@
             TaskCommandResult finalResult = null;
             var output = new StringBuilder();
 
-            foreach (string file in arguments)
+            foreach (string path in arguments)
             {
                 try
                 {
-                    string pathInContainer = container.ConvertToPathWithin(file);
-                    ProcessPathInContainer(pathInContainer, output);
+                    ProcessPath(path, output);
                 }
                 catch (Exception ex)
                 {
@@ -48,6 +47,6 @@
             return finalResult;
         }
 
-        protected abstract void ProcessPathInContainer(string pathInContainer, StringBuilder output);
+        protected abstract void ProcessPath(string path, StringBuilder output);
     }
 }

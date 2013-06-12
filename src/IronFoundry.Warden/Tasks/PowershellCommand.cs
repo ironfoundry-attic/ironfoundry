@@ -4,14 +4,15 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using IronFoundry.Warden.Containers;
+    using Containers;
+    using Protocol;
 
     public class PowershellCommand : ProcessCommand
     {
         private const string powershellArgFmt = "-NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -WindowStyle Hidden -File \"{0}\"";
 
-        public PowershellCommand(Container container, string[] arguments, bool shouldImpersonate)
-            : base(container, arguments, shouldImpersonate)
+        public PowershellCommand(Container container, string[] arguments, bool shouldImpersonate, ResourceLimits rlimits)
+            : base(container, arguments, shouldImpersonate, rlimits)
         {
             if (base.arguments.IsNullOrEmpty())
             {

@@ -88,7 +88,7 @@
         {
             bool shouldImpersonate = !request.Privileged;
 
-            var commandFactory = new TaskCommandFactory(container, shouldImpersonate);
+            var commandFactory = new TaskCommandFactory(container, shouldImpersonate, request.Rlimits);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
 
@@ -134,7 +134,7 @@
         {
             bool shouldImpersonate = !request.Privileged;
 
-            var commandFactory = new TaskCommandFactory(container, shouldImpersonate);
+            var commandFactory = new TaskCommandFactory(container, shouldImpersonate, request.Rlimits);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
 
@@ -152,6 +152,7 @@
                     var processCommand = taskCommand as ProcessCommand;
                     if (runningAsync && processCommand != null)
                     {
+                        // NB: ProcessCommands take care of their own impersonation
                         processCommand.StatusAvailable += processCommand_StatusAvailable;
                         try
                         {

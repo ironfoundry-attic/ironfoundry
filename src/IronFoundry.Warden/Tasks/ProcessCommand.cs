@@ -5,8 +5,9 @@
     using System.Net;
     using System.Text;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
+    using Containers;
     using NLog;
+    using Protocol;
 
     public abstract class ProcessCommand : TaskCommand
     {
@@ -14,13 +15,15 @@
         private readonly StringBuilder stderr = new StringBuilder();
 
         private readonly bool shouldImpersonate = false;
+        private readonly ResourceLimits rlimits;
 
         private readonly Logger log = LogManager.GetCurrentClassLogger();
+        public ProcessCommand(Container container, string[] arguments, bool shouldImpersonate, ResourceLimits rlimits)
 
-        public ProcessCommand(Container container, string[] arguments, bool shouldImpersonate)
             : base(container, arguments)
         {
             this.shouldImpersonate = shouldImpersonate;
+            this.rlimits = rlimits;
         }
 
         public override TaskCommandResult Execute()
@@ -49,7 +52,7 @@
                 process.ErrorDataReceived += process_ErrorDataReceived;
                 process.OutputDataReceived += process_OutputDataReceived;
 
-                process.StartAndWait();
+                process.StartAndWait((p) => container.AddProcess(p, rlimits));
 
                 process.ErrorDataReceived -= process_ErrorDataReceived;
                 process.OutputDataReceived -= process_OutputDataReceived;

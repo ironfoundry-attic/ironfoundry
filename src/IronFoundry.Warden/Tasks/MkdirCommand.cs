@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using IronFoundry.Warden.Configuration;
     using IronFoundry.Warden.Containers;
 
     public class MkdirCommand : PathCommand
@@ -18,8 +17,9 @@
             }
         }
 
-        protected override void ProcessPathInContainer(string pathInContainer, StringBuilder output)
+        protected override void ProcessPath(string path, StringBuilder output)
         {
+            string pathInContainer = container.ConvertToPathWithin(path);
             Directory.CreateDirectory(pathInContainer);
             output.AppendFormat("mkdir: created directory '{0}'", pathInContainer).AppendLine();
         }

@@ -15,8 +15,9 @@
         {
         }
 
-        protected override void ProcessPathInContainer(string pathInContainer, StringBuilder output)
+        protected override void ProcessPath(string path, StringBuilder output)
         {
+            string pathInContainer = container.ConvertToPathWithin(path);
             var fi = new FileInfo(pathInContainer);
             if (fi.Exists)
             {

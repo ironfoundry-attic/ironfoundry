@@ -83,6 +83,7 @@
     <Compile Include="Server\MessageHandler.cs" />
     <Compile Include="Server\SocketExceptionHandler.cs" />
     <Compile Include="Tasks\BackgroundProcess.cs" />
+    <Compile Include="Tasks\ReplaceTokensCommand.cs" />
     <Compile Include="Tasks\ProcessCommand.cs" />
     <Compile Include="Tasks\TaskCommandStatusEventArgs.cs" />
     <Compile Include="Tasks\UnzipCommand.cs" />
@@ -111,6 +112,9 @@
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Tasks\WebApplicationCommand.cs" />
     <Compile Include="Utilities\Impersonator.cs" />
+    <Compile Include="Utilities\JobObjects\JobObject.cs" />
+    <Compile Include="Utilities\JobObjects\JobObjectHandle.cs" />
+    <Compile Include="Utilities\JobObjects\NativeMethods.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Tasks\TaskRunner.cs" />
     <Compile Include="Utilities\LoggerExtensionMethods.cs" />
@@ -154,5 +158,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

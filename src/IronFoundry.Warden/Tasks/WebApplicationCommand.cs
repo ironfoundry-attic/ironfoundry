@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using Containers;
+    using Protocol;
 
     public class WebApplicationCommand : ProcessCommand
     {
@@ -13,7 +14,8 @@
         private readonly string port;
         private readonly string runtimeVersion;
 
-        public WebApplicationCommand(Container container, string[] arguments, bool shouldImpersonate) : base(container, arguments, shouldImpersonate)
+        public WebApplicationCommand(Container container, string[] arguments, bool shouldImpersonate, ResourceLimits rlimits)
+            : base(container, arguments, shouldImpersonate, rlimits)
         {
             if (arguments.IsNullOrEmpty())
             {

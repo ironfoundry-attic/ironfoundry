@@ -31,8 +31,11 @@
             }
             else
             {
-                log.Trace("Handle: '{0}'", request.Handle);
+                log.Trace("Destroying container with handle: '{0}'", request.Handle);
+#if DEBUG
+#else
                 containerManager.DestroyContainer(new ContainerHandle(request.Handle));
+#endif
             }
             return Task.FromResult<Response>(new DestroyResponse());
         }

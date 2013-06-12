@@ -2,16 +2,25 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
     using System.Net;
     using System.Threading;
-    using IronFoundry.Warden.Utilities;
+    using NLog;
+    using Protocol;
+    using Utilities;
+    using Utilities.JobObjects;
 
     public abstract class Container
     {
+        private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         private readonly ContainerHandle handle;
         private readonly ContainerUser user;
         private readonly ContainerDirectory directory;
+
+        // http://msdn.microsoft.com/en-us/library/windows/desktop/ms684161(v=vs.85).aspx
+        private readonly JobObject jobObject = new JobObject();
 
         public Container(string handle)
         {
@@ -86,10 +95,39 @@
             {
                 user.Delete();
                 directory.Delete();
+                jobObject.Dispose();
             }
             finally
             {
                 rwlock.ExitWriteLock();
+            }
+        }
+
+        public void AddProcess(Process process, ResourceLimits rlimits)
+        {
+            if (!jobObject.HasProcess(process))
+            {
+                try
+                {
+                    jobObject.AddProcess(process);
+                    if (rlimits != null)
+                    {
+                        jobObject.JobMemoryLimit = rlimits.JobMemoryLimit;
+                        jobObject.JobUserTimeLimit = TimeSpan.FromSeconds(rlimits.Cpu);
+                    }
+                    // TODO
+                    // rlimits.Nice;
+                    // DISK QUOTA!
+                }
+                catch (Win32Exception e)
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                    }
+                    log.WarnException(String.Format("Process with ID {0} could not be added to the job object in container: {1}", process.Id, handle), e);
+                    throw;
+                }
             }
         }
     }

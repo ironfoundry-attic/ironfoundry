@@ -26,7 +26,7 @@
             else
             {
                 this.dataSource = JobDataSource.stdout;
-                this.data = String.Empty; // TODO
+                this.data = String.Empty; // TODO empty or null?
             }
         }
 

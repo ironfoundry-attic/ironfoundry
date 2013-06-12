@@ -42,7 +42,10 @@
 
         public void Dispose()
         {
+#if DEBUG
+#else
             tempFileInfo.Delete();
+#endif
         }
 
         private static FileInfo GetTempFileInfo(string basePath, string extension)

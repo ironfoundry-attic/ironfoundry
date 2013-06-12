@@ -1,6 +1,5 @@
 ﻿namespace IronFoundry.Warden.Protocol
 {
-
     public interface ITaskRequest
     {
         string Handle { get; }
