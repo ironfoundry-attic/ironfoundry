@@ -1,10 +1,8 @@
 ﻿namespace IronFoundry.Warden.Jobs
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading;
     using NLog;
-    using IronFoundry.Warden.Utilities;
 
     public class JobManager : IJobManager
     {
@@ -68,10 +66,14 @@
             try
             {
                 rwlock.EnterWriteLock();
-                Job j = jobs[jobId];
-                if (!j.IsCompleted)
+
+                Job j;
+                if (jobs.TryGetValue(jobId, out j))
                 {
-                    j.Cancel();
+                    if (!j.IsCompleted)
+                    {
+                        j.Cancel();
+                    }
                 }
                 jobs.Remove(jobId);
             }

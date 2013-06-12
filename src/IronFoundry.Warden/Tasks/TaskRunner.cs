@@ -8,9 +8,9 @@
     using System.Threading.Tasks;
     using Containers;
     using Jobs;
-    using Protocol;
     using Newtonsoft.Json;
     using NLog;
+    using Protocol;
     using Utilities.Impersonation;
 
     public class TaskRunner : IJobRunnable
@@ -86,9 +86,12 @@
 
         public IJobResult Run()
         {
-            var commandFactory = new TaskCommandFactory(container);
+            bool shouldImpersonate = !request.Privileged;
+
+            var commandFactory = new TaskCommandFactory(container, shouldImpersonate);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
+
             foreach (TaskCommandDTO cmd in commands)
             {
                 if (cts.IsCancellationRequested)
@@ -99,10 +102,21 @@
                 TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
                 try
                 {
-                    var task = new Func<TaskCommandResult>(taskCommand.Execute);
-                    TaskCommandResult result = request.Privileged 
-                        ? Impersonator.InvokeImpersonated(credential, task) 
-                        : task();
+                    TaskCommandResult result = null;
+
+                    if (taskCommand is ProcessCommand)
+                    {
+                        // NB: ProcessCommands take care of their own impersonation
+                        result = taskCommand.Execute();
+                    }
+                    else
+                    {
+                        using (var context = Impersonator.GetContext(credential, shouldImpersonate))
+                        {
+                            result = taskCommand.Execute();
+                        }
+                    }
+
                     results.Add(result);
                 }
                 catch (Exception ex)
@@ -117,9 +131,12 @@
 
         private async Task<IJobResult> DoRunAsync()
         {
-            var commandFactory = new TaskCommandFactory(container);
+            bool shouldImpersonate = !request.Privileged;
+
+            var commandFactory = new TaskCommandFactory(container, shouldImpersonate);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
+
             foreach (TaskCommandDTO cmd in commands)
             {
                 if (cts.IsCancellationRequested)
@@ -131,26 +148,26 @@
 
                 try
                 {
-                    if (runningAsync && taskCommand.CanExecuteAsync)
+                    var processCommand = taskCommand as ProcessCommand;
+                    if (runningAsync && processCommand != null)
                     {
-                        var asyncTaskCommand = (AsyncTaskCommand)taskCommand;
-                        asyncTaskCommand.StatusAvailable += asyncTaskCommand_StatusAvailable;
-
-                        var task = new Func<Task<TaskCommandResult>>(asyncTaskCommand.ExecuteAsync);
-                        TaskCommandResult result = await (request.Privileged
-                            ? Impersonator.InvokeImpersonatedAsync(credential, task)
-                            : task());
-
-                        asyncTaskCommand.StatusAvailable -= asyncTaskCommand_StatusAvailable;
-                        results.Add(result);
+                        processCommand.StatusAvailable += processCommand_StatusAvailable;
+                        try
+                        {
+                            TaskCommandResult result = await processCommand.ExecuteAsync();
+                            results.Add(result);
+                        }
+                        finally
+                        {
+                            processCommand.StatusAvailable -= processCommand_StatusAvailable;
+                        }
                     }
                     else
                     {
-                        var task = new Func<TaskCommandResult>(taskCommand.Execute);
-                        TaskCommandResult result = request.Privileged
-                            ? Impersonator.InvokeImpersonated(credential, task)
-                            : task();
-                        results.Add(result);
+                        using (var context = Impersonator.GetContext(credential, shouldImpersonate))
+                        {
+                            results.Add(taskCommand.Execute());
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -163,7 +180,7 @@
             return FlattenResults(results);
         }
 
-        private void asyncTaskCommand_StatusAvailable(object sender, TaskCommandStatusEventArgs e)
+        private void processCommand_StatusAvailable(object sender, TaskCommandStatusEventArgs e)
         {
             TaskCommandStatus status = e.Status;
             if (status == null)

@@ -18,11 +18,6 @@
             this.arguments = arguments;
         }
 
-        public virtual bool CanExecuteAsync
-        {
-            get { return false; }
-        }
-
         public abstract TaskCommandResult Execute();
     }
 }

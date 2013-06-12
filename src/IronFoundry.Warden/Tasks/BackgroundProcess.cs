@@ -3,13 +3,14 @@
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Net;
 
     [System.ComponentModel.DesignerCategory("Code")]
     public class BackgroundProcess : Process
     {
         private readonly ProcessStartInfo processStartInfo;
 
-        public BackgroundProcess(string workingDirectory, string executable, string arguments)
+        public BackgroundProcess(string workingDirectory, string executable, string arguments, NetworkCredential credential = null)
             : base()
         {
             if (workingDirectory.IsNullOrWhiteSpace())
@@ -35,6 +36,12 @@
             this.processStartInfo.UseShellExecute        = false;
             this.processStartInfo.WindowStyle            = ProcessWindowStyle.Hidden;
             this.processStartInfo.WorkingDirectory       = workingDirectory;
+
+            if (credential != null)
+            {
+                this.processStartInfo.UserName = credential.UserName;
+                this.processStartInfo.Password = credential.SecurePassword;
+            }
 
             this.StartInfo = this.processStartInfo;
             this.EnableRaisingEvents = true;

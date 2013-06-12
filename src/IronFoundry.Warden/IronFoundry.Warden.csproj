@@ -83,7 +83,7 @@
     <Compile Include="Server\MessageHandler.cs" />
     <Compile Include="Server\SocketExceptionHandler.cs" />
     <Compile Include="Tasks\BackgroundProcess.cs" />
-    <Compile Include="Tasks\AsyncTaskCommand.cs" />
+    <Compile Include="Tasks\ProcessCommand.cs" />
     <Compile Include="Tasks\TaskCommandStatusEventArgs.cs" />
     <Compile Include="Tasks\UnzipCommand.cs" />
     <Compile Include="Tasks\PathCommand.cs" />
@@ -109,10 +109,7 @@
     <Compile Include="Handlers\StopRequestHandler.cs" />
     <Compile Include="Handlers\StreamRequestHandler.cs" />
     <Compile Include="Server\TcpServer.cs" />
-    <Compile Include="Utilities\Impersonation\Constants.cs" />
-    <Compile Include="Utilities\Impersonation\ImpersonationLogonType.cs" />
     <Compile Include="Utilities\Impersonation\Impersonator.cs" />
-    <Compile Include="Utilities\Impersonation\NativeMethods.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Tasks\TaskRunner.cs" />
     <Compile Include="Utilities\LoggerExtensionMethods.cs" />

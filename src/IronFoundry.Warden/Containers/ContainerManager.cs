@@ -31,6 +31,7 @@
             Container retrieved;
             if (!containers.TryGetValue(cHandle, out retrieved))
             {
+                // TODO: throw exception with message that matches ruby warden
                 log.Warn("Expected to find container with handle '{0}'", handle);
             }
             return retrieved;

@@ -6,14 +6,16 @@
     public class TaskCommandFactory
     {
         private readonly Container container;
+        private readonly bool shouldImpersonate;
 
-        public TaskCommandFactory(Container container)
+        public TaskCommandFactory(Container container, bool shouldImpersonate)
         {
             if (container == null)
             {
                 throw new ArgumentNullException("container");
             }
             this.container = container;
+            this.shouldImpersonate = shouldImpersonate;
         }
 
         public TaskCommand Create(string commandName, string[] arguments)
@@ -29,7 +31,7 @@
                     command =  new TouchCommand(container, arguments);
                     break;
                 case "ps1" :
-                    command =  new PowershellCommand(container, arguments);
+                    command =  new PowershellCommand(container, arguments, shouldImpersonate);
                     break;
                 case "unzip" :
                     command =  new UnzipCommand(container, arguments);
