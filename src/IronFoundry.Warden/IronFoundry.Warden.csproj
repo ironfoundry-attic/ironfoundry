@@ -109,10 +109,7 @@
     <Compile Include="Handlers\StopRequestHandler.cs" />
     <Compile Include="Handlers\StreamRequestHandler.cs" />
     <Compile Include="Server\TcpServer.cs" />
-    <Compile Include="Utilities\Impersonation\Constants.cs" />
-    <Compile Include="Utilities\Impersonation\ImpersonationLogonType.cs" />
     <Compile Include="Utilities\Impersonation\Impersonator.cs" />
-    <Compile Include="Utilities\Impersonation\NativeMethods.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Tasks\TaskRunner.cs" />
     <Compile Include="Utilities\LoggerExtensionMethods.cs" />
