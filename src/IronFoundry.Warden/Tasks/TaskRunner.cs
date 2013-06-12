@@ -88,30 +88,41 @@
         {
             bool shouldImpersonate = !request.Privileged;
 
-            var commandFactory = new TaskCommandFactory(container);
+            var commandFactory = new TaskCommandFactory(container, shouldImpersonate);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
 
-            using (var context = Impersonator.GetContext(credential, shouldImpersonate))
+            foreach (TaskCommandDTO cmd in commands)
             {
-                foreach (TaskCommandDTO cmd in commands)
+                if (cts.IsCancellationRequested)
                 {
-                    if (cts.IsCancellationRequested)
+                    break;
+                }
+
+                TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
+                try
+                {
+                    TaskCommandResult result = null;
+
+                    if (taskCommand is ProcessCommand)
                     {
-                        break;
+                        // NB: ProcessCommands take care of their own impersonation
+                        result = taskCommand.Execute();
+                    }
+                    else
+                    {
+                        using (var context = Impersonator.GetContext(credential, shouldImpersonate))
+                        {
+                            result = taskCommand.Execute();
+                        }
                     }
 
-                    TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
-                    try
-                    {
-                        TaskCommandResult result = taskCommand.Execute();
-                        results.Add(result);
-                    }
-                    catch (Exception ex)
-                    {
-                        results.Add(new TaskCommandResult(1, null, ex.Message));
-                        break;
-                    }
+                    results.Add(result);
+                }
+                catch (Exception ex)
+                {
+                    results.Add(new TaskCommandResult(1, null, ex.Message));
+                    break;
                 }
             }
 
@@ -122,54 +133,54 @@
         {
             bool shouldImpersonate = !request.Privileged;
 
-            var commandFactory = new TaskCommandFactory(container);
+            var commandFactory = new TaskCommandFactory(container, shouldImpersonate);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
 
-            using (var context = Impersonator.GetContext(credential, shouldImpersonate))
+            foreach (TaskCommandDTO cmd in commands)
             {
-                foreach (TaskCommandDTO cmd in commands)
+                if (cts.IsCancellationRequested)
                 {
-                    if (cts.IsCancellationRequested)
-                    {
-                        break;
-                    }
+                    break;
+                }
 
-                    TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
+                TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
 
-                    try
+                try
+                {
+                    var processCommand = taskCommand as ProcessCommand;
+                    if (runningAsync && processCommand != null)
                     {
-                        if (runningAsync && taskCommand.CanExecuteAsync)
+                        processCommand.StatusAvailable += processCommand_StatusAvailable;
+                        try
                         {
-                            var asyncTaskCommand = (AsyncTaskCommand)taskCommand;
-                            asyncTaskCommand.StatusAvailable += asyncTaskCommand_StatusAvailable;
-                            try
-                            {
-                                TaskCommandResult result = await asyncTaskCommand.ExecuteAsync();
-                                results.Add(result);
-                            }
-                            finally
-                            {
-                                asyncTaskCommand.StatusAvailable -= asyncTaskCommand_StatusAvailable;
-                            }
+                            TaskCommandResult result = await processCommand.ExecuteAsync();
+                            results.Add(result);
                         }
-                        else
+                        finally
+                        {
+                            processCommand.StatusAvailable -= processCommand_StatusAvailable;
+                        }
+                    }
+                    else
+                    {
+                        using (var context = Impersonator.GetContext(credential, shouldImpersonate))
                         {
                             results.Add(taskCommand.Execute());
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        results.Add(new TaskCommandResult(1, null, ex.Message));
-                        break;
-                    }
+                }
+                catch (Exception ex)
+                {
+                    results.Add(new TaskCommandResult(1, null, ex.Message));
+                    break;
                 }
             }
 
             return FlattenResults(results);
         }
 
-        private void asyncTaskCommand_StatusAvailable(object sender, TaskCommandStatusEventArgs e)
+        private void processCommand_StatusAvailable(object sender, TaskCommandStatusEventArgs e)
         {
             TaskCommandStatus status = e.Status;
             if (status == null)

@@ -83,7 +83,7 @@
     <Compile Include="Server\MessageHandler.cs" />
     <Compile Include="Server\SocketExceptionHandler.cs" />
     <Compile Include="Tasks\BackgroundProcess.cs" />
-    <Compile Include="Tasks\AsyncTaskCommand.cs" />
+    <Compile Include="Tasks\ProcessCommand.cs" />
     <Compile Include="Tasks\TaskCommandStatusEventArgs.cs" />
     <Compile Include="Tasks\UnzipCommand.cs" />
     <Compile Include="Tasks\PathCommand.cs" />
