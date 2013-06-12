@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using System.Threading.Tasks;
     using IronFoundry.Warden.Containers;
 
     public class PowershellCommand : ProcessCommand

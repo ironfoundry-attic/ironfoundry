@@ -37,14 +37,6 @@
 
         protected abstract TaskCommandResult DoExecute();
 
-        protected void OnStatusAvailable(TaskCommandStatus status)
-        {
-            if (StatusAvailable != null)
-            {
-                StatusAvailable(this, new TaskCommandStatusEventArgs(status));
-            }
-        }
-
         protected TaskCommandResult RunProcess(string workingDirectory, string executable, string arguments)
         {
             using (var process = new BackgroundProcess(workingDirectory, executable, arguments, GetImpersonatationCredential()))
@@ -91,6 +83,14 @@
                 string outputLine = e.Data + '\n';
                 stderr.Append(outputLine);
                 OnStatusAvailable(new TaskCommandStatus(null, null, outputLine));
+            }
+        }
+
+        private void OnStatusAvailable(TaskCommandStatus status)
+        {
+            if (StatusAvailable != null)
+            {
+                StatusAvailable(this, new TaskCommandStatusEventArgs(status));
             }
         }
     }

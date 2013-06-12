@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Text;
     using IronFoundry.Warden.Containers;
 
@@ -20,7 +19,7 @@
         public override TaskCommandResult Execute()
         {
 #if DEBUG
-            Debug.WriteLine(String.Format("Impersonating user: '{0}'", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
+            System.Diagnostics.Debug.WriteLine(String.Format("Impersonating user: '{0}'", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
 #endif
 
             TaskCommandResult finalResult = null;
