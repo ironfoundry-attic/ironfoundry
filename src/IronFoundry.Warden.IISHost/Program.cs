@@ -38,41 +38,38 @@
                     Environment.Exit(1);
                 }
 
-                //using (var configGenerator = new ConfigGenerator(options.WebRoot))
+                ConfigSettings settings;
                 var configGenerator = new ConfigGenerator(options.WebRoot);
+                switch (options.RuntimeVersion)
                 {
-                    ConfigSettings settings;
-                    switch (options.RuntimeVersion)
-                    {
-                        case "2":
-                        case "2.0":
-                            settings = configGenerator.Create(
-                                options.Port,
-                                Constants.FrameworkPaths.TwoDotZeroWebConfig,
-                                Constants.RuntimeVersion.VersionTwoDotZero,
-                                Constants.PipelineMode.Integrated);
-                            break;
-                        default:
-                            settings = configGenerator.Create(
-                                options.Port,
-                                Constants.FrameworkPaths.FourDotZeroWebConfig,
-                                Constants.RuntimeVersion.VersionFourDotZero,
-                                Constants.PipelineMode.Integrated);
-                            break;
-                    }
+                    case "2":
+                    case "2.0":
+                        settings = configGenerator.Create(
+                            options.Port,
+                            Constants.FrameworkPaths.TwoDotZeroWebConfig,
+                            Constants.RuntimeVersion.VersionTwoDotZero,
+                            Constants.PipelineMode.Integrated);
+                        break;
+                    default:
+                        settings = configGenerator.Create(
+                            options.Port,
+                            Constants.FrameworkPaths.FourDotZeroWebConfig,
+                            Constants.RuntimeVersion.VersionFourDotZero,
+                            Constants.PipelineMode.Integrated);
+                        break;
+                }
 
-                    log.Info("starting web server instance...");
-                    using (var webServer = new WebServer(settings))
-                    {
-                        webServer.Start();
-                        Console.WriteLine("Server Started.... press CTRL + C to stop");
+                log.Info("starting web server instance...");
+                using (var webServer = new WebServer(settings))
+                {
+                    webServer.Start();
+                    Console.WriteLine("Server Started.... press CTRL + C to stop");
 
-                        StartInBrowser(options);
+                    StartInBrowser(options);
 
-                        exitLatch.WaitOne();
-                        Console.WriteLine("Server shutting down, please wait...");
-                        webServer.Stop();
-                    }
+                    exitLatch.WaitOne();
+                    Console.WriteLine("Server shutting down, please wait...");
+                    webServer.Stop();
                 }
             }
             catch (Exception ex)
@@ -113,7 +110,7 @@
         [Option('v', "runtimeVersion", Required = false, DefaultValue = "4.0", HelpText = "AppPool runtime version: 2.0 or 4.0")]
         public string RuntimeVersion { get; set; }
 
-        [Option('b', "startInBrowser", Required = false, DefaultValue = true, HelpText = "Specify true to start a browser pointing to the site.")]
+        [Option('b', "startInBrowser", Required = false, DefaultValue = false, HelpText = "Specify true to start a browser pointing to the site.")]
         public bool StartInBrowser { get; set; }
 
         [HelpOption]

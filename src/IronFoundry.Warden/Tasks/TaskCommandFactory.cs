@@ -1,7 +1,7 @@
 ﻿namespace IronFoundry.Warden.Tasks
 {
     using System;
-    using IronFoundry.Warden.Containers;
+    using Containers;
 
     public class TaskCommandFactory
     {
@@ -20,27 +20,21 @@
 
         public TaskCommand Create(string commandName, string[] arguments)
         {
-            TaskCommand command = null;
-
             switch (commandName)
             {
                 case "mkdir" :
-                    command =  new MkdirCommand(container, arguments);
-                    break;
+                    return new MkdirCommand(container, arguments);
                 case "touch" :
-                    command =  new TouchCommand(container, arguments);
-                    break;
+                    return new TouchCommand(container, arguments);
                 case "ps1" :
-                    command =  new PowershellCommand(container, arguments, shouldImpersonate);
-                    break;
+                    return new PowershellCommand(container, arguments, shouldImpersonate);
                 case "unzip" :
-                    command =  new UnzipCommand(container, arguments);
-                    break;
+                    return new UnzipCommand(container, arguments);
+                case "iis" :
+                    return new WebApplicationCommand(container, arguments, shouldImpersonate);
                 default :
                     throw new InvalidOperationException(String.Format("Unknown script command: '{0}'", commandName));
             }
-
-            return command;
         }
     }
 }

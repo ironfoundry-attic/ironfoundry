@@ -6,7 +6,7 @@
     using System.Text;
     using System.Xml.Linq;
     using System.Xml.XPath;
-    using IronFoundry.Warden.IISHost.Properties;
+    using Properties;
 
     internal class ConfigSettings
     {
@@ -21,13 +21,12 @@
         private readonly string logsRootPath;
         private readonly string tempPath;
 
-        public ConfigGenerator(string containerRoot)
+        public ConfigGenerator(string webRoot)
         {
-            webRootPath = Path.Combine(containerRoot, "www");
-            configPath = Path.Combine(containerRoot, "config");
-            logsRootPath = Path.Combine(containerRoot, "logs");
-            tempPath = Path.Combine(containerRoot, "temp");
-            
+            webRootPath = webRoot;
+            configPath = Path.Combine(Environment.CurrentDirectory, "config");
+            logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
+            tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
             EnsureDirectories();
         }
 

@@ -9,14 +9,12 @@
 
     public class MkdirCommand : PathCommand
     {
-        private static readonly WardenConfig config = new WardenConfig();
-
         public MkdirCommand(Container container, string[] arguments)
             : base(container, arguments)
         {
             if (base.arguments.IsNullOrEmpty())
             {
-                throw new ArgumentNullException("mkdir command requires at least one argument.");
+                throw new ArgumentException("mkdir command requires at least one argument.");
             }
         }
 

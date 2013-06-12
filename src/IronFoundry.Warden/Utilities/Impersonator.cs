@@ -1,4 +1,9 @@
-﻿namespace IronFoundry.Warden.Utilities.Impersonation
+﻿using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System;
+
+namespace IronFoundry.Warden.Utilities
 {
     using System;
     using System.ComponentModel;
@@ -73,7 +78,7 @@
             }
         }
 
-        private class NativeMethods
+        private static class NativeMethods
         {
             [DllImport("advapi32.dll", SetLastError = true)]
             internal static extern int LogonUser(

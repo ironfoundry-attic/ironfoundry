@@ -11,7 +11,7 @@
     using Newtonsoft.Json;
     using NLog;
     using Protocol;
-    using Utilities.Impersonation;
+    using Utilities;
 
     public class TaskRunner : IJobRunnable
     {
@@ -111,7 +111,7 @@
                     }
                     else
                     {
-                        using (var context = Impersonator.GetContext(credential, shouldImpersonate))
+                        using (Impersonator.GetContext(credential, shouldImpersonate))
                         {
                             result = taskCommand.Execute();
                         }
@@ -164,7 +164,7 @@
                     }
                     else
                     {
-                        using (var context = Impersonator.GetContext(credential, shouldImpersonate))
+                        using (Impersonator.GetContext(credential, shouldImpersonate))
                         {
                             results.Add(taskCommand.Execute());
                         }
