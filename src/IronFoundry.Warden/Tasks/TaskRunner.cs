@@ -121,6 +121,7 @@
                 }
                 catch (Exception ex)
                 {
+                    log.TraceException("Error running command", ex);
                     results.Add(new TaskCommandResult(1, null, ex.Message));
                     break;
                 }

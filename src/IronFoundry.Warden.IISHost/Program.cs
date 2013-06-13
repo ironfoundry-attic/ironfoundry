@@ -34,7 +34,6 @@
                 }
                 else
                 {
-                    log.Info(options.Usage());
                     Environment.Exit(1);
                 }
 

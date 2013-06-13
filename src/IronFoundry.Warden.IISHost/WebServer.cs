@@ -6,9 +6,9 @@
     using System.Linq;
     using System.Text;
     using System.Runtime.InteropServices;
-    using IronFoundry.Warden.IISHost;
 
     // Ref: http://msdn.microsoft.com/en-us/library/ms689327%28v=vs.90%29.aspx
+    // May require: // netsh http add urlacl url=http://*:PORT/ user=DOMAIN\user
     internal class WebServer : IDisposable
     {
         private readonly ConfigSettings configSettings;
@@ -74,7 +74,7 @@
             }
 
             /// <summary>
-            /// Specifies if Hostable WebCore ha been activated
+            /// Specifies if Hostable WebCore has been activated
             /// </summary>
             public static bool IsActivated
             {
@@ -117,15 +117,6 @@
 
                 [DllImport("kernel32.dll", SetLastError = true)]
                 internal static extern IntPtr GetProcAddress(IntPtr hModule, String procname);
-
-                //[DllImport(@"%program files(x86)%\system32\inetsrv\hwebcore.dll")]
-                //public static extern int WebCoreActivate(
-                //    [In, MarshalAs(UnmanagedType.LPWStr)] string appHostConfigPath,    // Required
-                //    [In, MarshalAs(UnmanagedType.LPWStr)] string rootWebConfigPath,    // Optional
-                //    [In, MarshalAs(UnmanagedType.LPWStr)] string instanceName);        // Required
-
-                //[DllImport(@"%windir%\system32\inetsrv\hwebcore.dll")]
-                //public static extern int WebCoreShutdown(bool immediate);
             }
         }
         #endregion
