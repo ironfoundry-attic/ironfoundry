@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.IO;
     using NLog;
 
     public class ContainerManager : IContainerManager
@@ -35,6 +36,18 @@
                 log.Warn("Expected to find container with handle '{0}'", handle);
             }
             return retrieved;
+        }
+
+        public void RestoreContainers(string containerRoot)
+        {
+            if (Directory.Exists(containerRoot))
+            {
+                foreach (var dirPath in Directory.GetDirectories(containerRoot))
+                {
+                    var handle = Path.GetFileName(dirPath);
+                    containers.TryAdd(new ContainerHandle(handle), new ConsoleContainer(handle));
+                }
+            }
         }
 
         public void DestroyContainer(ContainerHandle handle)

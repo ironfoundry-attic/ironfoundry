@@ -7,6 +7,7 @@
     {
         void DestroyContainer(ContainerHandle handle);
         void AddContainer(Container container);
+        void RestoreContainers(string containerRoot);
         IEnumerable<ContainerHandle> Handles { get; }
         Container GetContainer(string handle);
     }
