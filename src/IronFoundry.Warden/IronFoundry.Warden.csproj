@@ -53,6 +53,8 @@
     <Compile Include="Containers\IContainerManager.cs" />
     <Compile Include="Containers\IISContainer.cs" />
     <Compile Include="Containers\InfoBuilder.cs" />
+    <Compile Include="Handlers\ContainerRequestHandler.cs" />
+    <Compile Include="Handlers\CopyRequestHandler.cs" />
     <Compile Include="Handlers\CopyInRequestHandler.cs" />
     <Compile Include="Handlers\CopyOutRequestHandler.cs" />
     <Compile Include="Handlers\CreateRequestHandler.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Tasks\BackgroundProcess.cs" />
     <Compile Include="Tasks\ReplaceTokensCommand.cs" />
     <Compile Include="Tasks\ProcessCommand.cs" />
+    <Compile Include="Tasks\TarCommand.cs" />
     <Compile Include="Tasks\TaskCommandStatusEventArgs.cs" />
     <Compile Include="Tasks\UnzipCommand.cs" />
     <Compile Include="Tasks\PathCommand.cs" />
@@ -133,6 +136,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.5.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -146,7 +152,6 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
-    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>

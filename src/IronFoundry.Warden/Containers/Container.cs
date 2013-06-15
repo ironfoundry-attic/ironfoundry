@@ -105,7 +105,7 @@
 
         public void AddProcess(Process process, ResourceLimits rlimits)
         {
-            if (!jobObject.HasProcess(process))
+            if (!jobObject.HasProcess(process) && !process.HasExited)
             {
                 try
                 {
@@ -121,12 +121,11 @@
                 }
                 catch (Win32Exception e)
                 {
-                    if (!process.HasExited)
-                    {
-                        process.Kill();
-                    }
-                    log.WarnException(String.Format("Process with ID {0} could not be added to the job object in container: {1}", process.Id, handle), e);
-                    throw;
+                    // TODO
+                    log.WarnException(
+                        String.Format("Error adding PID {0} to job object in container '{1}'. Error code: '{2}' Native error code: '{3}'",
+                            process.Id, handle, e.ErrorCode, e.NativeErrorCode),
+                        e);
                 }
             }
         }

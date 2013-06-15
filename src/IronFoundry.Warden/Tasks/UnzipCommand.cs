@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.IO.Compression;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Properties;
+    using Containers;
+    using ICSharpCode.SharpZipLib.Zip;
+    using Properties;
 
     public class UnzipCommand : TaskCommand
     {
@@ -49,7 +49,8 @@
                 destDir.Create();
             }
 
-            ZipFile.ExtractToDirectory(zipFile.FullName, destDir.FullName);
+            var fastZip = new FastZip();
+            fastZip.ExtractZip(zipFile.FullName, destDir.FullName, null);
 
             return new TaskCommandResult(0, String.Format("Extracted '{0}' to '{1}'", zipFile.FullName, destDir.FullName), null);
         }

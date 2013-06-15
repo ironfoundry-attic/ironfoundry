@@ -9,6 +9,7 @@
     using NLog.Targets;
     using Topshelf;
 
+    // http://stackoverflow.com/questions/227187/uac-need-for-console-application
     static class Program
     {
         const string ServiceName = "ironfoundry.warden";

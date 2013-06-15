@@ -700,7 +700,6 @@ namespace IronFoundry.Warden.Utilities.JobObjects
                 throw new ArgumentNullException("process");
             }
 
-            // TODO: race condition ... process may have exited by now.
             this.AddProcess(process.Handle);
         }
 

@@ -1,23 +1,18 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Jobs;
-    using IronFoundry.Warden.Protocol;
-    using IronFoundry.Warden.Tasks;
+    using Containers;
+    using Jobs;
+    using Protocol;
+    using Tasks;
 
-    public abstract class TaskRequestHandler : RequestHandler
+    public abstract class TaskRequestHandler : ContainerRequestHandler
     {
         protected readonly IContainerManager containerManager;
 
         public TaskRequestHandler(IContainerManager containerManager, Request request)
-            : base(request)
+            : base(containerManager, request)
         {
-            if (containerManager == null)
-            {
-                throw new ArgumentNullException("containerManager");
-            }
-            this.containerManager = containerManager;
         }
 
         protected IJobRunnable GetRunnableFor(ITaskRequest request)
@@ -27,7 +22,7 @@
                 throw new ArgumentNullException("request");
             }
 
-            Container container = containerManager.GetContainer(request.Handle);
+            Container container = GetContainer();
             return new TaskRunner(container, request);
         }
     }

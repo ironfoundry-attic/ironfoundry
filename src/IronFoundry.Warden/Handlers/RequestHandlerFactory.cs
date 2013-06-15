@@ -43,10 +43,10 @@
             switch (requestType)
             {
                 case Message.Type.CopyIn:
-                    handler = new CopyInRequestHandler(request);
+                    handler = new CopyInRequestHandler(containerManager, request);
                     break;
                 case Message.Type.CopyOut:
-                    handler = new CopyOutRequestHandler(request);
+                    handler = new CopyOutRequestHandler(containerManager, request);
                     break;
                 case Message.Type.Create:
                     handler = new CreateRequestHandler(containerManager, request);

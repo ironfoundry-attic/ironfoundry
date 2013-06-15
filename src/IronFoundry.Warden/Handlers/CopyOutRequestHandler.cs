@@ -1,25 +1,13 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
-    using System.Threading.Tasks;
-    using IronFoundry.Warden.Protocol;
-    using NLog;
+    using Containers;
+    using Protocol;
 
-    public class CopyOutRequestHandler : RequestHandler
+    public class CopyOutRequestHandler : CopyRequestHandler
     {
-        private readonly Logger log = LogManager.GetCurrentClassLogger();
-        private readonly CopyOutRequest request;
-
-        public CopyOutRequestHandler(Request request)
-            : base(request)
+        public CopyOutRequestHandler(IContainerManager containerManager, Request request)
+            : base(containerManager, request, new CopyOutResponse())
         {
-            this.request = (CopyOutRequest)request;
-        }
-
-        public override Task<Response> HandleAsync()
-        {
-            // TODO: do work!
-            log.Trace("SrcPath: '{0}' DstPath: '{1}'", request.SrcPath, request.DstPath);
-            return Task.FromResult<Response>(new CopyOutResponse());
         }
     }
 }

@@ -24,6 +24,12 @@
         {
             using (var ps1File = container.TempFileInContainer(".ps1"))
             {
+#if DEBUG
+                if (arguments[0].Contains("DEBUGGER"))
+                {
+                    // System.Diagnostics.Debugger.Break();
+                }
+#endif
                 File.WriteAllLines(ps1File.FullName, container.ConvertToPathsWithin(arguments), Encoding.ASCII);
                 string psArgs = String.Format(powershellArgFmt, ps1File.FullName);
                 return base.RunProcess(ps1File.DirectoryName, "powershell.exe", psArgs);

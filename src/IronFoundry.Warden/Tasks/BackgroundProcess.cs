@@ -58,7 +58,7 @@
             {
                 postStartAction(this);
             }
-            WaitForExit(); // TODO timeout? Don't wait?
+            WaitForExit(); // TODO timeout?
         }
     }
 }

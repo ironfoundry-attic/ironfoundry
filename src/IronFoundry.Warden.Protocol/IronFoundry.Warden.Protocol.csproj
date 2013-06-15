@@ -40,7 +40,9 @@
       <Link>ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
+    <Compile Include="IContainerRequest.cs" />
     <Compile Include="ITaskRequest.cs" />
+    <Compile Include="Messages\ICopyRequest.cs" />
     <Compile Include="Messages\ResourceLimits.cs" />
     <Compile Include="MessageUnwrapper.cs" />
     <Compile Include="MessageWriter.cs" />

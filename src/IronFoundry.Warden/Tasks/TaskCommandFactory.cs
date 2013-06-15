@@ -33,6 +33,8 @@
                     return new PowershellCommand(container, arguments, shouldImpersonate, rlimits);
                 case "replace-tokens" :
                     return new ReplaceTokensCommand(container, arguments);
+                case "tar" :
+                    return new TarCommand(container, arguments);
                 case "touch" :
                     return new TouchCommand(container, arguments);
                 case "unzip" :

@@ -1,6 +1,6 @@
 ﻿namespace IronFoundry.Warden.Protocol
 {
-    public partial class CopyInRequest : Request
+    public partial class CopyInRequest : Request, ICopyRequest
     {
     }
 }
