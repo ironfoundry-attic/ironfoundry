@@ -8,31 +8,43 @@
 
     public class TarCommand : TaskCommand
     {
+        private const string CurrentDirectory = ".";
         private static readonly char[] trimChars = new[] { '/' };
-        private readonly string sourceDirectory;
-        private readonly string targetFile;
+        private readonly string command;
+        private readonly string directory;
+        private readonly string tarFile;
 
         public TarCommand(Container container, string[] arguments)
             : base(container, arguments)
         {
-            if (arguments.Length != 2)
+            if (arguments.Length != 3)
             {
-                throw new ArgumentException("tar command must have two arguments: source directory and target file name.");
+                throw new ArgumentException("tar command must have three arguments: operation (x or c), directory and file name.");
             }
 
-            this.sourceDirectory = container.ConvertToPathWithin(arguments[0]);
-            if (!Directory.Exists(this.sourceDirectory))
+            this.command = arguments[0];
+            if (this.command.IsNullOrWhiteSpace() || (!(this.command == "x" || this.command == "c")))
             {
-                throw new ArgumentException(String.Format("tar command: first argument must be directory that exists ('{0}')", this.sourceDirectory));
+                throw new ArgumentException("tar command: first argument must be x (extract) or c (create).");
             }
 
-            if (arguments[1].IsNullOrWhiteSpace())
+            this.directory = container.ConvertToPathWithin(arguments[1]);
+            if (!Directory.Exists(this.directory))
             {
-                throw new ArgumentException("tar command: second argument must be a file name.");
+                throw new ArgumentException(String.Format("tar command: second argument must be directory that exists ('{0}')", this.directory));
+            }
+
+            if (arguments[2].IsNullOrWhiteSpace())
+            {
+                throw new ArgumentException("tar command: third argument must be a file name.");
             }
             else
             {
-                this.targetFile = container.ConvertToPathWithin(arguments[1]);
+                this.tarFile = container.ConvertToPathWithin(arguments[2]);
+                if (this.command == "x" && !File.Exists(this.tarFile))
+                {
+                    throw new ArgumentException("tar command: third argument must be a file name that exists.");
+                }
             }
         }
 
@@ -41,25 +53,52 @@
             string currentDirectory = Directory.GetCurrentDirectory();
             try
             {
-                Directory.SetCurrentDirectory(sourceDirectory);
-                using (var fs = File.OpenWrite(targetFile))
+                Directory.SetCurrentDirectory(directory);
+                switch (command)
                 {
-                    using (var gzipStream = new GZipOutputStream(fs))
-                    {
-                        using (var tarArchive = TarArchive.CreateOutputTarArchive(gzipStream))
-                        {
-                            tarArchive.RootPath = ".";
-                            var tarEntry = TarEntry.CreateEntryFromFile(".");
-                            tarArchive.WriteEntry(tarEntry, true);
-                        }
-                    }
+                    case "c" :
+                        CreateTarArchive();
+                        break;
+                    case "x" :
+                        ExtractTarArchive();
+                        break;
                 }
             }
             finally
             {
                 Directory.SetCurrentDirectory(currentDirectory);
             }
-            return new TaskCommandResult(0, String.Format("tar: '{0}' -> '{1}'", sourceDirectory, targetFile), null); 
+            return new TaskCommandResult(0, String.Format("tar: '{0}' -> '{1}'", directory, tarFile), null); 
+        }
+
+        private void CreateTarArchive()
+        {
+            using (var fs = File.OpenWrite(tarFile))
+            {
+                using (var gzipStream = new GZipOutputStream(fs))
+                {
+                    using (var tarArchive = TarArchive.CreateOutputTarArchive(gzipStream))
+                    {
+                        tarArchive.RootPath = CurrentDirectory;
+                        var tarEntry = TarEntry.CreateEntryFromFile(CurrentDirectory);
+                        tarArchive.WriteEntry(tarEntry, true);
+                    }
+                }
+            }
+        }
+
+        private void ExtractTarArchive()
+        {
+            using (var fs = File.OpenRead(tarFile))
+            {
+                using (var gzipStream = new GZipInputStream(fs))
+                {
+                    using (var tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
+                    {
+                        tarArchive.ExtractContents(CurrentDirectory);
+                    }
+                }
+            }
         }
     }
 }

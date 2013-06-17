@@ -4,6 +4,7 @@
     using System.IO;
     using System.Threading.Tasks;
     using Containers;
+    using Microsoft.VisualBasic.FileIO;
     using NLog;
     using Protocol;
 
@@ -35,11 +36,20 @@
             log.Trace("SrcPath: '{0}' DstPath: '{1}'", request.SrcPath, request.DstPath);
 
             Container container = GetContainer();
-            string sourcePath = container.ConvertToPathWithin(request.SrcPath);
-            string destinationPath = container.ConvertToPathWithin(request.DstPath);
 
+            string sourcePath = container.ConvertToPathWithin(request.SrcPath);
+            var sourceAttrs = File.GetAttributes(sourcePath);
+            bool sourceIsDir = sourceAttrs.HasFlag(FileAttributes.Directory);
+
+            string destinationPath = container.ConvertToPathWithin(request.DstPath);
             var destinationAttrs = File.GetAttributes(destinationPath);
-            if (destinationAttrs.HasFlag(FileAttributes.Directory))
+            bool destinationIsDir = destinationAttrs.HasFlag(FileAttributes.Directory);
+
+            if (sourceIsDir && destinationIsDir)
+            {
+                FileSystem.CopyDirectory(sourcePath, destinationPath);
+            }
+            else if (!sourceIsDir && destinationIsDir)
             {
                 var fileName = Path.GetFileName(sourcePath);
                 File.Copy(sourcePath, Path.Combine(destinationPath, fileName), true);
