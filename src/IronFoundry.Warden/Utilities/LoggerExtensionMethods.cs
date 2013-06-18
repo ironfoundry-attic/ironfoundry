@@ -9,5 +9,10 @@
         {
             logger.LogException(LogLevel.Error, String.Empty, exception);
         }
+
+        public static void WarnException(this Logger logger, Exception exception)
+        {
+            logger.LogException(LogLevel.Warn, String.Empty, exception);
+        }
     }
 }

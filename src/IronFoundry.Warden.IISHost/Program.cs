@@ -1,22 +1,41 @@
 ﻿namespace IronFoundry.Warden.IISHost
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
+    using System.IO;
     using System.Threading;
-    using NLog;
-    using System.Text;
     using CommandLine;
     using CommandLine.Text;
+    using NLog;
 
     internal static class Program
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly ManualResetEvent exitLatch = new ManualResetEvent(false);
+        private static readonly FileSystemWatcher fileSystemWatcher;
+
+        static Program()
+        {
+            string workingDirectory =  Directory.GetCurrentDirectory();
+            fileSystemWatcher = new FileSystemWatcher(workingDirectory);
+            fileSystemWatcher.Created += fileSystemWatcher_Created;
+            fileSystemWatcher.EnableRaisingEvents = true;
+        }
+
+        private static void fileSystemWatcher_Created(object sender, FileSystemEventArgs e)
+        {
+            if (e.ChangeType == WatcherChangeTypes.Created)
+            {
+                string lcName = e.Name.ToLowerInvariant().Trim();
+                if (lcName == "iishost_stop")
+                {
+                    exitLatch.Set();
+                }
+            }
+        }
 
         private static void Main(string[] args)
         {
-            var exitLatch = new ManualResetEvent(false);
             Console.CancelKeyPress += (s, e) =>
             {
                 e.Cancel = true;
@@ -70,14 +89,15 @@
                     Console.WriteLine("Server shutting down, please wait...");
                     webServer.Stop();
                 }
+
+                if (File.Exists("iishost_stop"))
+                {
+                    File.Delete("iishost_stop");
+                }
             }
             catch (Exception ex)
             {
                 log.ErrorException("Error on startup.", ex);
-                if (Environment.UserInteractive)
-                {
-                    Console.ReadLine();
-                }
                 Environment.Exit(2);
             }
         }
@@ -100,11 +120,22 @@
 
     internal class Options
     {
+        private string webRoot;
+
+        internal Options()
+        {
+            this.webRoot = Directory.GetCurrentDirectory();
+        }
+
         [Option('p', "port", Required = true, HelpText = "The port for the IIS website.")]
         public uint Port { get; set; }
 
-        [Option('r', "webroot", Required = true, HelpText = "The local webroot path for website.")]
-        public string WebRoot { get; set; }
+        [Option('r', "webroot", Required = false, HelpText = "The local webroot path for website.")]
+        public string WebRoot
+        {
+            get { return webRoot; }
+            set { webRoot = value; }
+        }
 
         [Option('v', "runtimeVersion", Required = false, DefaultValue = "4.0", HelpText = "AppPool runtime version: 2.0 or 4.0")]
         public string RuntimeVersion { get; set; }

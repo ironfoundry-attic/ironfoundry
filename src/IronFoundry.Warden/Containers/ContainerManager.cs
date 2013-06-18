@@ -45,9 +45,14 @@
                 foreach (var dirPath in Directory.GetDirectories(containerRoot))
                 {
                     var handle = Path.GetFileName(dirPath);
-                    containers.TryAdd(new ContainerHandle(handle), new ConsoleContainer(handle));
+                    containers.TryAdd(new ContainerHandle(handle), new Container(handle));
                 }
             }
+        }
+
+        public void DestroyContainer(Container container)
+        {
+            DestroyContainer(container.Handle);
         }
 
         public void DestroyContainer(ContainerHandle handle)

@@ -1,6 +1,6 @@
 ﻿namespace IronFoundry.Warden.Protocol
 {
-    public partial class LinkRequest : Request
+    public partial class LinkRequest : Request, IContainerRequest
     {
     }
 }

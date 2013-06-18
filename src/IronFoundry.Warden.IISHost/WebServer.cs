@@ -1,10 +1,7 @@
 ﻿namespace IronFoundry.Warden.IISHost
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
     using System.Runtime.InteropServices;
 
     // Ref: http://msdn.microsoft.com/en-us/library/ms689327%28v=vs.90%29.aspx

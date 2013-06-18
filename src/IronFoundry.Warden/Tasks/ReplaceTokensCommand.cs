@@ -20,14 +20,14 @@
         public ReplaceTokensCommand(Container container, string[] arguments)
             : base(container, arguments)
         {
-            tokenReplacer = (line) => line.Replace("@ROOT@", container.ContainerPath).ToWinPathString();
+            tokenReplacer = (line) => line.Replace("@ROOT@", container.Directory).ToWinPathString();
         }
 
         protected override void ProcessPath(string path, StringBuilder output)
         {
             if (File.Exists(path))
             {
-                using (var tempFile = new TempFile(container.ContainerPath))
+                using (var tempFile = new TempFile(container.Directory))
                 {
                     var lines = File.ReadLines(path, Encoding.ASCII);
                     File.WriteAllLines(tempFile.FullName, lines.Select(tokenReplacer), Encoding.ASCII);

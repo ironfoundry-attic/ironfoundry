@@ -23,10 +23,15 @@
 
         public ConfigGenerator(string webRoot)
         {
-            webRootPath = webRoot;
-            configPath = Path.Combine(Environment.CurrentDirectory, "config");
-            logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
-            tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
+            if (webRoot.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentNullException("webRoot");
+            }
+            this.webRootPath = webRoot;
+
+            this.configPath = Path.Combine(Environment.CurrentDirectory, "config");
+            this.logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
+            this.tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
             EnsureDirectories();
         }
 

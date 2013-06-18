@@ -11,7 +11,7 @@
     using Utilities;
     using Utilities.JobObjects;
 
-    public abstract class Container
+    public class Container
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
@@ -22,11 +22,15 @@
         // http://msdn.microsoft.com/en-us/library/windows/desktop/ms684161(v=vs.85).aspx
         private readonly JobObject jobObject = new JobObject();
 
+        private ContainerPort port;
+        private ContainerState state;
+
         public Container(string handle)
         {
             this.handle = new ContainerHandle(handle);
             this.user = new ContainerUser(handle);
             this.directory = new ContainerDirectory(this.handle, this.user);
+            this.state = ContainerState.Born;
         }
 
         public Container()
@@ -34,6 +38,7 @@
             this.handle = new ContainerHandle();
             this.user = new ContainerUser(handle, true);
             this.directory = new ContainerDirectory(this.handle, this.user, true);
+            this.state = ContainerState.Born;
         }
 
         public NetworkCredential GetCredential()
@@ -46,9 +51,48 @@
             get { return handle; }
         }
 
-        public string ContainerPath
+        public ContainerUser User
         {
-            get { return directory.ToString(); }
+            get { return user; }
+        }
+
+        public ContainerState State
+        {
+            get { return state; }
+        }
+
+        public ContainerDirectory Directory
+        {
+            get { return directory; }
+        }
+
+        public void AfterCreate()
+        {
+            this.state = ContainerState.Active;
+        }
+
+        public void Stop()
+        {
+            jobObject.TerminateProcesses(0);
+        }
+
+        public void AfterStop()
+        {
+            this.state = ContainerState.Stopped;
+        }
+
+        public ContainerPort ReservePort(ushort suggestedPort)
+        {
+            rwlock.EnterWriteLock();
+            try
+            {
+                this.port = new ContainerPort(suggestedPort, this.user);
+                return this.port;
+            }
+            finally
+            {
+                rwlock.ExitWriteLock();
+            }
         }
 
         public IEnumerable<string> ConvertToPathsWithin(string[] arguments)
@@ -59,7 +103,7 @@
 
                 if (arg.Contains("@ROOT@"))
                 {
-                    rv = arg.Replace("@ROOT@", this.ContainerPath).ToWinPathString();
+                    rv = arg.Replace("@ROOT@", this.Directory).ToWinPathString();
                 }
                 else
                 {
@@ -75,7 +119,7 @@
             string pathTmp = path.Trim();
             if (pathTmp.StartsWith("@ROOT@"))
             {
-                return pathTmp.Replace("@ROOT@", this.ContainerPath).ToWinPathString();
+                return pathTmp.Replace("@ROOT@", this.Directory).ToWinPathString();
             }
             else
             {
@@ -85,7 +129,7 @@
 
         public TempFile TempFileInContainer(string extension)
         {
-            return new TempFile(this.ContainerPath, extension);
+            return new TempFile(this.Directory, extension);
         }
 
         public void Destroy()
@@ -95,7 +139,12 @@
             {
                 user.Delete();
                 directory.Delete();
+                if (port != null)
+                {
+                    port.Delete();
+                }
                 jobObject.Dispose();
+                this.state = ContainerState.Destroyed;
             }
             finally
             {

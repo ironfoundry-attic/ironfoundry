@@ -3,8 +3,8 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Protocol;
+    using Containers;
+    using Protocol;
 
     public class ListRequestHandler : RequestHandler
     {

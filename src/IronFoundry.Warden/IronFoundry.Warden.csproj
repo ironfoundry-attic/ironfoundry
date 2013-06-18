@@ -43,15 +43,13 @@
     <Compile Include="Configuration\WardenConfig.cs" />
     <Compile Include="Configuration\WardenSection.cs" />
     <Compile Include="Containers\Container.cs" />
-    <Compile Include="Containers\ConsoleContainer.cs" />
     <Compile Include="Containers\ContainerDirectory.cs" />
     <Compile Include="Containers\ContainerHandle.cs" />
-    <Compile Include="Containers\ContainerFactory.cs" />
     <Compile Include="Containers\ContainerManager.cs" />
-    <Compile Include="Containers\ContainerType.cs" />
+    <Compile Include="Containers\ContainerPort.cs" />
     <Compile Include="Containers\ContainerUser.cs" />
+    <Compile Include="Containers\ContainerState.cs" />
     <Compile Include="Containers\IContainerManager.cs" />
-    <Compile Include="Containers\IISContainer.cs" />
     <Compile Include="Containers\InfoBuilder.cs" />
     <Compile Include="Handlers\ContainerRequestHandler.cs" />
     <Compile Include="Handlers\CopyRequestHandler.cs" />
@@ -84,7 +82,7 @@
     <Compile Include="Server\WardenExceptionHandler.cs" />
     <Compile Include="Server\MessageHandler.cs" />
     <Compile Include="Server\SocketExceptionHandler.cs" />
-    <Compile Include="Tasks\BackgroundProcess.cs" />
+    <Compile Include="Utilities\BackgroundProcess.cs" />
     <Compile Include="Tasks\ReplaceTokensCommand.cs" />
     <Compile Include="Tasks\ProcessCommand.cs" />
     <Compile Include="Tasks\TarCommand.cs" />
@@ -115,21 +113,19 @@
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Tasks\WebApplicationCommand.cs" />
     <Compile Include="Utilities\Impersonator.cs" />
+    <Compile Include="Utilities\IPUtilities.cs" />
     <Compile Include="Utilities\JobObjects\JobObject.cs" />
     <Compile Include="Utilities\JobObjects\JobObjectHandle.cs" />
     <Compile Include="Utilities\JobObjects\NativeMethods.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Tasks\TaskRunner.cs" />
+    <Compile Include="Utilities\LocalTcpPortManager.cs" />
     <Compile Include="Utilities\LoggerExtensionMethods.cs" />
     <Compile Include="Utilities\Statics.cs" />
     <Compile Include="Utilities\TempFile.cs" />
     <Compile Include="Server\Buffer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IronFoundry.Misc\IronFoundry.Misc.csproj">
-      <Project>{e2b80fe5-34a9-4faf-b638-8c6b744f9f1f}</Project>
-      <Name>IronFoundry.Misc</Name>
-    </ProjectReference>
     <ProjectReference Include="..\IronFoundry.Warden.Protocol\IronFoundry.Warden.Protocol.csproj">
       <Project>{ddd0537b-4afe-4beb-bf30-4df0a5367a18}</Project>
       <Name>IronFoundry.Warden.Protocol</Name>

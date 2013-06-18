@@ -1,15 +1,16 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
     using System;
-    using IronFoundry.Warden.Jobs;
-    using IronFoundry.Warden.Protocol;
+    using Containers;
+    using Jobs;
+    using Protocol;
 
-    public abstract class JobRequestHandler : RequestHandler
+    public abstract class JobRequestHandler : ContainerRequestHandler
     {
         protected readonly IJobManager jobManager;
 
-        public JobRequestHandler(IJobManager jobManager, Request request)
-            : base(request)
+        public JobRequestHandler(IContainerManager containerManager, IJobManager jobManager, Request request)
+            : base(containerManager, request)
         {
             if (jobManager == null)
             {

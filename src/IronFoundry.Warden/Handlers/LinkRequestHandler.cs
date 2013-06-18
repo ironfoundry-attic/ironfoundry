@@ -1,27 +1,20 @@
 ﻿namespace IronFoundry.Warden.Handlers
 {
-    using System;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Jobs;
-    using IronFoundry.Warden.Properties;
-    using IronFoundry.Warden.Protocol;
+    using Containers;
+    using Jobs;
     using NLog;
+    using Properties;
+    using Protocol;
 
     public class LinkRequestHandler : JobRequestHandler
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly LinkRequest request;
-        private readonly InfoBuilder infoBuilder;
 
         public LinkRequestHandler(IContainerManager containerManager, IJobManager jobManager, Request request)
-            : base(jobManager, request)
+            : base(containerManager, jobManager, request)
         {
-            if (containerManager == null)
-            {
-                throw new ArgumentNullException("containerManager");
-            }
-            this.infoBuilder = new InfoBuilder(containerManager);
             this.request = (LinkRequest)request;
         }
 
@@ -52,7 +45,7 @@
                 };
             }
 
-            response.Info = infoBuilder.GetInfoResponseFor(request.Handle);
+            response.Info = BuildInfoResponse();
 
             return response;
         }

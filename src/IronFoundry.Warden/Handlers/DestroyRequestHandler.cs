@@ -2,24 +2,19 @@
 {
     using System;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Protocol;
+    using Containers;
     using NLog;
+    using Protocol;
+    using Utilities;
 
-    public class DestroyRequestHandler : RequestHandler
+    public class DestroyRequestHandler : ContainerRequestHandler
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
-        private readonly IContainerManager containerManager;
         private readonly DestroyRequest request;
 
         public DestroyRequestHandler(IContainerManager containerManager, Request request)
-            : base(request)
+            : base(containerManager, request)
         {
-            if (containerManager == null)
-            {
-                throw new ArgumentNullException("containerManager");
-            }
-            this.containerManager = containerManager;
             this.request = (DestroyRequest)request;
         }
 
@@ -32,12 +27,29 @@
             else
             {
                 log.Trace("Destroying container with handle: '{0}'", request.Handle);
-#if DEBUG
-#else
-                containerManager.DestroyContainer(new ContainerHandle(request.Handle));
-#endif
+
+                // return Task.FromResult<Response>(new DestroyResponse());
+                return Task.Factory.StartNew<Response>(() =>
+                    {
+                        Container container = GetContainer();
+                        if (container.State != ContainerState.Stopped)
+                        {
+                            try
+                            {
+                                var stopRequest = new StopRequest { Handle = request.Handle };
+                                var stopRequestHandler = new StopRequestHandler(containerManager, stopRequest);
+                                var stopTask = stopRequestHandler.HandleAsync();
+                                Response stopResponse = stopTask.Result;
+                            }
+                            catch (Exception ex)
+                            {
+                                log.WarnException(ex);
+                            }
+                        }
+                        containerManager.DestroyContainer(container);
+                        return new DestroyResponse();
+                    });
             }
-            return Task.FromResult<Response>(new DestroyResponse());
         }
     }
 }

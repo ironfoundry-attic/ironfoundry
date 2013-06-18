@@ -6,8 +6,8 @@
 
     public abstract class ContainerRequestHandler : RequestHandler
     {
-        private readonly IContainerManager containerManager;
-        private readonly IContainerRequest containerRequest;
+        protected readonly IContainerManager containerManager;
+        protected readonly IContainerRequest containerRequest;
 
         public ContainerRequestHandler(IContainerManager containerManager, Request request)
             : base(request)
@@ -24,6 +24,14 @@
         protected Container GetContainer()
         {
             return containerManager.GetContainer(containerRequest.Handle);
+        }
+
+        protected InfoResponse BuildInfoResponse()
+        {
+            // TODO complete info
+            Container container = GetContainer();
+            var infoBuilder = new InfoBuilder(container);
+            return infoBuilder.GetInfoResponse();
         }
     }
 }

@@ -31,6 +31,11 @@
             containerDirectory.Delete(true);
         }
 
+        public static implicit operator string(ContainerDirectory containerDirectory)
+        {
+            return containerDirectory.ToString();
+        }
+
         public override string ToString()
         {
             return containerDirectory.FullName;

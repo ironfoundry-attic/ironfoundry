@@ -76,7 +76,7 @@
                     handler = new ListRequestHandler(containerManager, request);
                     break;
                 case Message.Type.NetIn:
-                    handler = new NetInRequestHandler(request);
+                    handler = new NetInRequestHandler(containerManager, request);
                     break;
                 case Message.Type.NetOut:
                     handler = new NetOutRequestHandler(request);
@@ -91,7 +91,7 @@
                     handler = new SpawnRequestHandler(containerManager, jobManager, request);
                     break;
                 case Message.Type.Stop:
-                    handler = new StopRequestHandler(request);
+                    handler = new StopRequestHandler(containerManager, request);
                     break;
                 case Message.Type.Stream:
                     handler = new StreamRequestHandler(containerManager, jobManager, request);

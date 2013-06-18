@@ -8,6 +8,7 @@
     using Containers;
     using NLog;
     using Protocol;
+    using Utilities;
 
     public abstract class ProcessCommand : TaskCommand
     {
@@ -52,7 +53,7 @@
                 process.ErrorDataReceived += process_ErrorDataReceived;
                 process.OutputDataReceived += process_OutputDataReceived;
 
-                process.StartAndWait((p) => container.AddProcess(p, rlimits));
+                process.StartAndWait(asyncOutput: true, postStartAction: (p) => container.AddProcess(p, rlimits));
 
                 process.ErrorDataReceived -= process_ErrorDataReceived;
                 process.OutputDataReceived -= process_OutputDataReceived;

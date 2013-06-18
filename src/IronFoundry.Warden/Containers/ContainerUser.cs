@@ -10,6 +10,7 @@
     {
         private const string userPrefix = "warden_";
         private static readonly Regex uniqueIdValidator = new Regex(@"^\w{8,}$", RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
         private readonly string uniqueId;
         private readonly string userName;
 
@@ -61,8 +62,17 @@
             get { return new NTAccount(userName); }
         }
 
+        public static implicit operator string(ContainerUser containerUser)
+        {
+            return containerUser.userName;
+        }
+
         public static bool operator ==(ContainerUser x, ContainerUser y)
         {
+            if (Object.ReferenceEquals(x, null))
+            {
+                return Object.ReferenceEquals(y, null);
+            }
             return x.Equals(y);
         }
 

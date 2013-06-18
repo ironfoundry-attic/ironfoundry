@@ -1,4 +1,4 @@
-﻿namespace IronFoundry.Warden.Tasks
+﻿namespace IronFoundry.Warden.Utilities
 {
     using System;
     using System.Diagnostics;
@@ -48,16 +48,23 @@
             this.EnableRaisingEvents = true;
         }
 
-        public void StartAndWait(Action<Process> postStartAction)
+        public void StartAndWait(bool asyncOutput, Action<Process> postStartAction = null)
         {
             Start();
-            BeginErrorReadLine();
-            BeginOutputReadLine();
+
+            if (asyncOutput)
+            {
+                BeginErrorReadLine();
+                BeginOutputReadLine();
+            }
+
             StandardInput.WriteLine(Environment.NewLine);
+
             if (postStartAction != null)
             {
                 postStartAction(this);
             }
+
             WaitForExit(); // TODO timeout?
         }
     }

@@ -13,18 +13,12 @@
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly StreamRequest request;
-        private readonly InfoBuilder infoBuilder;
 
         private MessageWriter messageWriter;
 
         public StreamRequestHandler(IContainerManager containerManager, IJobManager jobManager, Request request)
-            : base(jobManager, request)
+            : base(containerManager, jobManager, request)
         {
-            if (containerManager == null)
-            {
-                throw new ArgumentNullException("containerManager");
-            }
-            this.infoBuilder = new InfoBuilder(containerManager);
             this.request = (StreamRequest)request;
         }
 

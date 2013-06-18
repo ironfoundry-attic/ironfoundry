@@ -8,8 +8,6 @@
 
     public abstract class TaskRequestHandler : ContainerRequestHandler
     {
-        protected readonly IContainerManager containerManager;
-
         public TaskRequestHandler(IContainerManager containerManager, Request request)
             : base(containerManager, request)
         {

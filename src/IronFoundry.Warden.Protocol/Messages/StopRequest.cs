@@ -1,6 +1,6 @@
 ﻿namespace IronFoundry.Warden.Protocol
 {
-    public partial class StopRequest : Request
+    public partial class StopRequest : Request, IContainerRequest
     {
     }
 }
