@@ -43,7 +43,7 @@
             this.messageWriter = messageWriter;
         }
 
-        public async Task HandleAsync(Message message)
+        public async Task Handle(Message message)
         {
             if (message == null)
             {
@@ -100,6 +100,7 @@
                     throw new WardenException(String.Format("Exception in request handler '{0}'", handler.ToString()), ex);
                 }
             }
+            log.Trace("Finished handling message: '{0}'", message.MessageType.ToString());
         }
     }
 }

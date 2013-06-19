@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Server
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
@@ -49,13 +50,15 @@
 
             var endpoint = new IPEndPoint(IPAddress.Loopback, 4444); // TODO configurable port
             var listener = new TcpListener(endpoint); // lib/dea/task.rb, 66
+            listener.Server.NoDelay = true;
             listener.Start();
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 TcpClient client = await listener.AcceptTcpClientAsync();
-                log.Trace("Client connected!");
+                log.Trace("Client connected.");
                 await ProcessClientAsync(client);
+                log.Trace("Client disconnected.");
             }
 
             log.Debug("Stopping Server.");
@@ -71,6 +74,7 @@
 
             log.Trace("ProcessClient START {0}", client.GetHashCode());
             uint messageCount = 0;
+            bool connected = true;
 
             using (client)
             {
@@ -85,11 +89,15 @@
                             {
                                 do
                                 {
+                                    log.Trace("BEFORE ReadAsync");
                                     int bytes = await ns.ReadAsync(byteBuffer, 0, byteBuffer.Length);
+                                    log.Trace("AFTER ReadAsync '{0}'", bytes);
                                     if (bytes == 0)
                                     {
                                         // Still there?
-                                        ns.Write(Constants.CRLF, 0, 2); 
+                                        // ns.Write(Constants.CRLF, 0, 2); 
+                                        connected = false;
+                                        break;
                                     }
                                     else
                                     {
@@ -98,17 +106,31 @@
                                 }
                                 while (ns.DataAvailable && !cancellationToken.IsCancellationRequested);
 
-                                foreach (Message message in buffer.GetMessages())
+                                if (!connected)
                                 {
-                                    if (!client.Connected)
-                                    {
-                                        break;
-                                    }
+                                    break;
+                                }
 
-                                    var messageWriter = new MessageWriter(ns);
-                                    var messageHandler = new MessageHandler(containerManager, jobManager, cancellationToken, messageWriter);
-                                    await messageHandler.HandleAsync(message);
-                                    log.Trace("Finished handling message: '{0}'", message.MessageType.ToString());
+                                IEnumerable<Message> messages = buffer.GetMessages();
+                                if (!messages.IsNullOrEmpty())
+                                {
+                                    Task.Run(() =>
+                                        {
+                                            var tasks = new List<Task>();
+                                            foreach (Message message in messages)
+                                            {
+                                                if (!client.Connected)
+                                                {
+                                                    break;
+                                                }
+
+                                                var messageWriter = new MessageWriter(ns);
+                                                var messageHandler = new MessageHandler(containerManager, jobManager, cancellationToken, messageWriter);
+                                                tasks.Add(messageHandler.Handle(message));
+                                            }
+                                            Task.WaitAll(tasks.ToArray());
+                                            log.Trace("Message tasks completed - '{0}'", tasks.Count);
+                                        });
                                 }
                             }
                             catch (Exception exception)

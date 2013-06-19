@@ -41,13 +41,15 @@
             int payloadLen = responsePayload.Length;
             var payloadLenBytes = Encoding.ASCII.GetBytes(payloadLen.ToString());
 
-            destination.Write(payloadLenBytes, 0, payloadLenBytes.Length);
-            destination.WriteByte(Constants.CR);
-            destination.WriteByte(Constants.LF);
-            destination.Write(responsePayload, 0, responsePayload.Length);
-            destination.WriteByte(Constants.CR);  
-            destination.WriteByte(Constants.LF);
-            destination.Flush();
+            lock (destination)
+            {
+                destination.Write(payloadLenBytes, 0, payloadLenBytes.Length);
+                destination.WriteByte(Constants.CR);
+                destination.WriteByte(Constants.LF);
+                destination.Write(responsePayload, 0, responsePayload.Length);
+                destination.WriteByte(Constants.CR);
+                destination.WriteByte(Constants.LF);
+            }
         }
     }
 }

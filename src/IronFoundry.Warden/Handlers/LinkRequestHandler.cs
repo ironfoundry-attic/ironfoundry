@@ -18,36 +18,39 @@
             this.request = (LinkRequest)request;
         }
 
-        public async override Task<Response> HandleAsync()
+        public override Task<Response> HandleAsync()
         {
             log.Trace("Handle: '{0}' JobId: '{1}'", request.Handle, request.JobId);
 
-            LinkResponse response = null;
-
-            Job job = jobManager.GetJob(request.JobId);
-            if (job == null)
-            {
-                ResponseData responseData = GetResponseData(true, Resources.JobRequestHandler_NoSuchJob_Message);
-                response = new LinkResponse
+            return Task.Factory.StartNew<Response>(() =>
                 {
-                    ExitStatus = (uint)responseData.ExitStatus,
-                    Stderr = responseData.Message,
-                };
-            }
-            else
-            {
-                IJobResult result = await job.RunnableTask;
-                response = new LinkResponse
-                {
-                    ExitStatus = (uint)result.ExitCode,
-                    Stderr = result.Stderr,
-                    Stdout = result.Stdout,
-                };
-            }
+                    LinkResponse response = null;
 
-            response.Info = BuildInfoResponse();
+                    Job job = jobManager.GetJob(request.JobId);
+                    if (job == null)
+                    {
+                        ResponseData responseData = GetResponseData(true, Resources.JobRequestHandler_NoSuchJob_Message);
+                        response = new LinkResponse
+                        {
+                            ExitStatus = (uint)responseData.ExitStatus,
+                            Stderr = responseData.Message,
+                        };
+                    }
+                    else
+                    {
+                        IJobResult result = job.RunnableTask.Result;
+                        response = new LinkResponse
+                        {
+                            ExitStatus = (uint)result.ExitCode,
+                            Stderr = result.Stderr,
+                            Stdout = result.Stdout,
+                        };
+                    }
 
-            return response;
+                    response.Info = BuildInfoResponse();
+
+                    return response;
+                });
         }
     }
 }
