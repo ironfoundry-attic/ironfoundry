@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.IO;
     using NLog;
+    using Utilities;
 
     public class ContainerManager : IContainerManager
     {
@@ -45,7 +46,16 @@
                 foreach (var dirPath in Directory.GetDirectories(containerRoot))
                 {
                     var handle = Path.GetFileName(dirPath);
-                    containers.TryAdd(new ContainerHandle(handle), new Container(handle));
+                    try
+                    {
+                        var container = new Container(handle);
+                        containers.TryAdd(container.Handle, container);
+                    }
+                    catch (Exception ex)
+                    {
+                        Container.CleanUp(handle);
+                        log.ErrorException(ex);
+                    }
                 }
             }
         }

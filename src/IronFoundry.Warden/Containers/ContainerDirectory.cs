@@ -31,6 +31,16 @@
             containerDirectory.Delete(true);
         }
 
+        public static void CleanUp(string handle)
+        {
+            try
+            {
+                var items = GetContainerDirectoryInfo(new ContainerHandle(handle));
+                Directory.Delete(items.Item2, true);
+            }
+            catch { }
+        }
+
         public static implicit operator string(ContainerDirectory containerDirectory)
         {
             return containerDirectory.ToString();

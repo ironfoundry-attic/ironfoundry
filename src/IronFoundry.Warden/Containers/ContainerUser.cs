@@ -29,7 +29,7 @@
 
             if (uniqueIdValidator.IsMatch(uniqueId))
             {
-                this.userName = userPrefix + uniqueId;
+                this.userName = CreateUserName(uniqueId);
             }
             else
             {
@@ -49,6 +49,16 @@
                     throw new ArgumentException(String.Format("Could not find user '{0}'", this.userName));
                 }
             }
+        }
+
+        public static void CleanUp(string uniqueId)
+        {
+            try
+            {
+                var principalManager = new LocalPrincipalManager();
+                principalManager.DeleteUser(CreateUserName(uniqueId));
+            }
+            catch { }
         }
 
         public void Delete()
@@ -109,6 +119,11 @@
             }
 
             return this.GetHashCode() == other.GetHashCode();
+        }
+
+        private static string CreateUserName(string uniqueId)
+        {
+            return String.Concat(userPrefix, uniqueId);
         }
     }
 }

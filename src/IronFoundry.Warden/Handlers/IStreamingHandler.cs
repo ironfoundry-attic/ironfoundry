@@ -2,7 +2,8 @@
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Protocol;
+    using Protocol;
+    using Utilities;
 
     public interface IStreamingHandler
     {

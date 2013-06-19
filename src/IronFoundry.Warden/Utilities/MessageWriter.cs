@@ -1,15 +1,18 @@
-﻿namespace IronFoundry.Warden.Protocol
+﻿namespace IronFoundry.Warden.Utilities
 {
     using System;
     using System.IO;
+    using System.Net.Sockets;
     using System.Text;
+    using System.Threading.Tasks;
     using ProtoBuf;
+    using Protocol;
 
     public class MessageWriter
     {
-        private readonly Stream destination;
+        private readonly NetworkStream destination;
 
-        public MessageWriter(Stream destination)
+        public MessageWriter(NetworkStream destination)
         {
             if (destination == null)
             {
@@ -22,12 +25,13 @@
             this.destination = destination;
         }
 
-        public void Write(Response response)
+        public Task WriteAsync(Response response)
         {
             if (response == null)
             {
                 throw new ArgumentNullException("response");
             }
+
             var wrapper = new ResponseWrapper(response);
             Message message = wrapper.GetMessage();
 
@@ -41,15 +45,18 @@
             int payloadLen = responsePayload.Length;
             var payloadLenBytes = Encoding.ASCII.GetBytes(payloadLen.ToString());
 
-            lock (destination)
+            byte[] responseBytes = null;
+            using (var ms = new MemoryStream())
             {
-                destination.Write(payloadLenBytes, 0, payloadLenBytes.Length);
-                destination.WriteByte(Constants.CR);
-                destination.WriteByte(Constants.LF);
-                destination.Write(responsePayload, 0, responsePayload.Length);
-                destination.WriteByte(Constants.CR);
-                destination.WriteByte(Constants.LF);
+                ms.Write(payloadLenBytes, 0, payloadLenBytes.Length);
+                ms.WriteByte(Constants.CR);
+                ms.WriteByte(Constants.LF);
+                ms.Write(responsePayload, 0, responsePayload.Length);
+                ms.WriteByte(Constants.CR);
+                ms.WriteByte(Constants.LF);
+                responseBytes = ms.ToArray();
             }
+            return destination.WriteAsync(responseBytes, 0, responseBytes.Length);
         }
     }
 }

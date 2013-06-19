@@ -6,11 +6,10 @@
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Jobs;
-    using IronFoundry.Warden.Protocol;
-    using IronFoundry.Warden.Utilities;
+    using Containers;
+    using Jobs;
     using NLog;
+    using Utilities;
 
     public class TcpServer
     {
@@ -20,140 +19,112 @@
         private readonly IContainerManager containerManager;
         private readonly IJobManager jobManager;
 
+        private readonly IPEndPoint endpoint;
+        private readonly TcpListener listener;
+
+        private readonly List<WardenClient> wardenClients = new List<WardenClient>();
+        private readonly Dictionary<WardenClient, Task> wardenClientProcessMessageTasks = new Dictionary<WardenClient, Task>();
+
+        private Task clientListenTask;
+
         public TcpServer(IContainerManager containerManager, IJobManager jobManager, CancellationToken cancellationToken)
         {
             if (containerManager == null)
             {
                 throw new ArgumentNullException("containerManager");
             }
+            this.containerManager = containerManager;
+
             if (jobManager == null)
             {
                 throw new ArgumentNullException("jobManager");
             }
+            this.jobManager = jobManager;
+
             if (cancellationToken == null)
             {
                 throw new ArgumentNullException("cancellationToken");
             }
-            this.containerManager = containerManager;
-            this.jobManager = jobManager;
             this.cancellationToken = cancellationToken;
+
+            this.endpoint = new IPEndPoint(IPAddress.Loopback, 4444); // TODO configurable port
+            this.listener = new TcpListener(endpoint); // lib/dea/task.rb, 66
+            this.listener.Server.NoDelay = true;
         }
 
-        public async void RunServer()
+        public Exception ClientListenException
+        {
+            get { return clientListenTask.Exception; }
+        }
+
+        public void Run()
+        {
+            Statics.OnServiceStart();
+
+            listener.Start();
+
+            clientListenTask = ListenForClients();
+        }
+
+        private async Task ListenForClients()
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
 
-            Statics.OnServiceStart();
-
-            var endpoint = new IPEndPoint(IPAddress.Loopback, 4444); // TODO configurable port
-            var listener = new TcpListener(endpoint); // lib/dea/task.rb, 66
-            listener.Server.NoDelay = true;
-            listener.Start();
-
             while (!cancellationToken.IsCancellationRequested)
             {
                 TcpClient client = await listener.AcceptTcpClientAsync();
-                log.Trace("Client connected.");
-                await ProcessClientAsync(client);
-                log.Trace("Client disconnected.");
+                ClientConnected(client);
             }
 
             log.Debug("Stopping Server.");
             listener.Stop();
         }
 
-        public async Task ProcessClientAsync(TcpClient client)
+        public void ClientConnected(TcpClient client)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
 
-            log.Trace("ProcessClient START {0}", client.GetHashCode());
-            uint messageCount = 0;
-            bool connected = true;
+            var wardenClient = new WardenClient(client, containerManager, jobManager, cancellationToken);
+            wardenClient.ClientDisconnected += wardenClient_ClientDisconnected;
 
-            using (client)
+            // Save the Resulting task from ReceiveInput as a Task so
+            // we can check for any unhandled exceptions that may have occured
+            wardenClientProcessMessageTasks.Add(wardenClient, wardenClient.ProcessMessages());
+
+            wardenClients.Add(wardenClient);
+            log.Trace("Client {0} Connected", wardenClient.ID);
+        }
+
+        private void wardenClient_ClientDisconnected(WardenClient wardenClient)
+        {
+            try
             {
-                using (var buffer = new Buffer())
+                wardenClient.ClientDisconnected -= wardenClient_ClientDisconnected;
+
+                Task clientReadTask;
+                if (wardenClientProcessMessageTasks.TryGetValue(wardenClient, out clientReadTask))
                 {
-                    using (NetworkStream ns = client.GetStream())
+                    if (clientReadTask.Exception != null)
                     {
-                        var byteBuffer = new byte[client.ReceiveBufferSize];
-                        while (client.Connected && !cancellationToken.IsCancellationRequested) // TODO: graceful cancel
-                        {
-                            try
-                            {
-                                do
-                                {
-                                    log.Trace("BEFORE ReadAsync");
-                                    int bytes = await ns.ReadAsync(byteBuffer, 0, byteBuffer.Length);
-                                    log.Trace("AFTER ReadAsync '{0}'", bytes);
-                                    if (bytes == 0)
-                                    {
-                                        // Still there?
-                                        // ns.Write(Constants.CRLF, 0, 2); 
-                                        connected = false;
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        buffer.Push(byteBuffer, bytes);
-                                    }
-                                }
-                                while (ns.DataAvailable && !cancellationToken.IsCancellationRequested);
-
-                                if (!connected)
-                                {
-                                    break;
-                                }
-
-                                IEnumerable<Message> messages = buffer.GetMessages();
-                                if (!messages.IsNullOrEmpty())
-                                {
-                                    Task.Run(() =>
-                                        {
-                                            var tasks = new List<Task>();
-                                            foreach (Message message in messages)
-                                            {
-                                                if (!client.Connected)
-                                                {
-                                                    break;
-                                                }
-
-                                                var messageWriter = new MessageWriter(ns);
-                                                var messageHandler = new MessageHandler(containerManager, jobManager, cancellationToken, messageWriter);
-                                                tasks.Add(messageHandler.Handle(message));
-                                            }
-                                            Task.WaitAll(tasks.ToArray());
-                                            log.Trace("Message tasks completed - '{0}'", tasks.Count);
-                                        });
-                                }
-                            }
-                            catch (Exception exception)
-                            {
-                                var socketExceptionHandler = new SocketExceptionHandler(exception);
-                                if (!socketExceptionHandler.Handle())
-                                {
-                                    var messageWriter = new MessageWriter(ns);
-                                    var wardenExceptionHandler = new WardenExceptionHandler(exception, messageWriter);
-                                    if (!wardenExceptionHandler.Handle())
-                                    {
-                                        log.ErrorException(exception);
-                                    }
-                                }
-                            }
-                        }
+                        var flattened = clientReadTask.Exception.Flatten();
+                        log.WarnException(String.Format("Client '{0}' exceptions!", wardenClient.ID), flattened);
                     }
                 }
 
-                client.Close();
+                wardenClient.Dispose();
+            }
+            catch (Exception ex)
+            {
+                log.ErrorException(ex);
             }
 
-            log.Trace("ProcessClient STOP Message count: '{0}'", messageCount);
+            log.Trace("Client {0} disconnected", wardenClient.ID);
         }
     }
 }

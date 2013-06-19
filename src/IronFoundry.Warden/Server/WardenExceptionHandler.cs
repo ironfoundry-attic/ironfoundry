@@ -1,7 +1,9 @@
 ﻿namespace IronFoundry.Warden.Server
 {
     using System;
-    using IronFoundry.Warden.Protocol;
+    using System.Threading.Tasks;
+    using Protocol;
+    using Utilities;
 
     public class WardenExceptionHandler
     {
@@ -23,7 +25,7 @@
             this.messageWriter = messageWriter;
         }
 
-        public bool Handle()
+        public async Task<bool> HandleAsync()
         {
             bool handled = false;
 
@@ -35,7 +37,7 @@
                     Message = wardenException.ResponseMessage + "\n",
                     Data = wardenException.StackTrace
                 };
-                messageWriter.Write(response);
+                await messageWriter.WriteAsync(response);
                 handled = true;
             }
 

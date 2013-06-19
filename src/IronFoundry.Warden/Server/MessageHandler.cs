@@ -56,6 +56,7 @@
             Request request = unwrapper.GetRequest();
 
             RequestHandler handler = null;
+            ErrorResponse errorResponse = null;
             try
             {
                 var factory = new RequestHandlerFactory(containerManager, jobManager, message.MessageType, request);
@@ -64,7 +65,12 @@
             catch (Exception ex)
             {
                 log.ErrorException(ex);
-                messageWriter.Write(new ErrorResponse { Message = ex.Message });
+                errorResponse = new ErrorResponse { Message = ex.Message };
+            }
+
+            if (errorResponse != null)
+            {
+                await messageWriter.WriteAsync(errorResponse);
                 return;
             }
 
@@ -80,13 +86,13 @@
                         log.Error(errorMessage);
                         finalResponse = new ErrorResponse { Message = errorMessage };
                     }
-                    messageWriter.Write(finalResponse);
+                    await messageWriter.WriteAsync(finalResponse);
                     return;
                 }
                 else
                 {
                     Response response = await handler.HandleAsync();
-                    messageWriter.Write(response);
+                    await messageWriter.WriteAsync(response);
                 }
             }
             catch (Exception ex)

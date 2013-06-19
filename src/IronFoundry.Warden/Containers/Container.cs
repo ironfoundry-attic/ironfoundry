@@ -20,7 +20,8 @@
         private readonly ContainerDirectory directory;
 
         // http://msdn.microsoft.com/en-us/library/windows/desktop/ms684161(v=vs.85).aspx
-        private readonly JobObject jobObject = new JobObject();
+        private readonly JobObject jobObject;
+        private readonly Dictionary<int, Process> processes = new Dictionary<int, Process>();
 
         private ContainerPort port;
         private ContainerState state;
@@ -31,6 +32,8 @@
             this.user = new ContainerUser(handle);
             this.directory = new ContainerDirectory(this.handle, this.user);
             this.state = ContainerState.Born;
+
+            this.jobObject = GetJobObject(handle);
         }
 
         public Container()
@@ -39,6 +42,8 @@
             this.user = new ContainerUser(handle, true);
             this.directory = new ContainerDirectory(this.handle, this.user, true);
             this.state = ContainerState.Born;
+
+            this.jobObject = GetJobObject(handle);
         }
 
         public NetworkCredential GetCredential()
@@ -73,7 +78,7 @@
 
         public void Stop()
         {
-            jobObject.TerminateProcesses(0);
+            KillProcesses();
         }
 
         public void AfterStop()
@@ -132,18 +137,31 @@
             return new TempFile(this.Directory, extension);
         }
 
+        public static void CleanUp(string handle)
+        {
+            ContainerUser.CleanUp(handle);
+            ContainerDirectory.CleanUp(handle);
+            ContainerPort.CleanUp(handle);
+        }
+
         public void Destroy()
         {
             rwlock.EnterWriteLock();
             try
             {
                 user.Delete();
+
                 directory.Delete();
+
                 if (port != null)
                 {
                     port.Delete();
                 }
+
+                KillProcesses();
+
                 jobObject.Dispose();
+
                 this.state = ContainerState.Destroyed;
             }
             finally
@@ -154,29 +172,69 @@
 
         public void AddProcess(Process process, ResourceLimits rlimits)
         {
-            if (!jobObject.HasProcess(process) && !process.HasExited)
+            try
+            {
+                rwlock.EnterWriteLock();
+
+                if (!process.HasExited)
+                {
+                    processes.Add(process.Id, process);
+
+                    if (!jobObject.HasProcess(process))
+                    {
+                        try
+                        {
+                            jobObject.AddProcess(process);
+                            if (rlimits != null)
+                            {
+                                jobObject.JobMemoryLimit = rlimits.JobMemoryLimit;
+                                jobObject.JobUserTimeLimit = TimeSpan.FromSeconds(rlimits.Cpu);
+                            }
+                            // TODO
+                            // rlimits.Nice;
+                            // DISK QUOTA!
+                        }
+                        catch (Win32Exception e)
+                        {
+                            log.ErrorException(
+                                String.Format("Error adding PID {0} to job object in container '{1}'. Error code: '{2}' Native error code: '{3}' HasExited: '{4}'",
+                                    process.Id, handle, e.ErrorCode, e.NativeErrorCode, process.HasExited),
+                                e);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                rwlock.ExitWriteLock();
+            }
+        }
+
+        private void KillProcesses()
+        {
+            jobObject.TerminateProcesses(0);
+            // TODO once job objects are working, we shouldn't need this.
+            var processList = processes.Values.ToListOrNull();
+            foreach (Process process in processList)
             {
                 try
                 {
-                    jobObject.AddProcess(process);
-                    if (rlimits != null)
+                    processes.Remove(process.Id);
+                    if (!process.HasExited)
                     {
-                        jobObject.JobMemoryLimit = rlimits.JobMemoryLimit;
-                        jobObject.JobUserTimeLimit = TimeSpan.FromSeconds(rlimits.Cpu);
+                        process.Kill();
                     }
-                    // TODO
-                    // rlimits.Nice;
-                    // DISK QUOTA!
                 }
-                catch (Win32Exception e)
-                {
-                    // TODO
-                    log.WarnException(
-                        String.Format("Error adding PID {0} to job object in container '{1}'. Error code: '{2}' Native error code: '{3}'",
-                            process.Id, handle, e.ErrorCode, e.NativeErrorCode),
-                        e);
-                }
+                catch { }
             }
+        }
+
+        private static JobObject GetJobObject(string jobObjectName)
+        {
+            var jobObject = new JobObject(jobObjectName);
+            jobObject.DieOnUnhandledException = true;
+            jobObject.KillProcessesOnJobClose = true;
+            return jobObject;
         }
     }
 }

@@ -118,13 +118,13 @@
             return runnable.RetrieveStatus();
         }
 
-        private void runnable_JobStatusAvailable(object sender, JobStatusEventArgs e)
+        private async void runnable_JobStatusAvailable(object sender, JobStatusEventArgs e)
         {
             if (this.listener == null)
             {
                 throw new InvalidOperationException("Must attach listener before calling Listen()");
             }
-            this.listener.ListenStatus(e.JobStatus);
+            await listener.ListenStatusAsync(e.JobStatus);
         }
     }
 }

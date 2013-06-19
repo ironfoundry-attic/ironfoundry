@@ -1,7 +1,9 @@
 ﻿namespace IronFoundry.Warden.Jobs
 {
+    using System.Threading.Tasks;
+
     public interface IJobListener
     {
-        void ListenStatus(IJobStatus jobStatus);
+        Task ListenStatusAsync(IJobStatus jobStatus);
     }
 }

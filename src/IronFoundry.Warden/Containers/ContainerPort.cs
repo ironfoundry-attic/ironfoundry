@@ -19,6 +19,11 @@
             localTcpPortManager.ReleaseLocalPort(port);
         }
 
+        public static void CleanUp(string handle)
+        {
+            // TODO
+        }
+
         public static implicit operator string(ContainerPort containerPort)
         {
             return containerPort.port.ToString();

@@ -3,11 +3,13 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Jobs;
-    using IronFoundry.Warden.Properties;
-    using IronFoundry.Warden.Protocol;
+    using Containers;
+    using Jobs;
+    using Properties;
+    using Protocol;
+    using Utilities;
     using NLog;
+    using System.Collections.Generic;
 
     public class StreamRequestHandler : JobRequestHandler, IStreamingHandler, IJobListener
     {
@@ -22,8 +24,10 @@
             this.request = (StreamRequest)request;
         }
 
-        public void ListenStatus(IJobStatus jobStatus)
+        public Task ListenStatusAsync(IJobStatus jobStatus)
         {
+            Task rv = null;
+
             if (messageWriter == null)
             {
                 throw new InvalidOperationException("messageWriter can not be null when job status observed.");
@@ -36,8 +40,10 @@
             else
             {
                 StreamResponse response = ToStreamResponse(jobStatus);
-                messageWriter.Write(response);
+                rv = messageWriter.WriteAsync(response);
             }
+
+            return rv;
         }
 
         public async Task<StreamResponse> HandleAsync(MessageWriter messageWriter, CancellationToken cancellationToken)
@@ -62,10 +68,12 @@
             {
                 if (job.HasStatus)
                 {
+                    var awaitables = new List<Task>();
                     foreach (IJobStatus status in job.RetrieveStatus())
                     {
-                        ListenStatus(status);
+                        awaitables.Add(ListenStatusAsync(status));
                     }
+                    await Task.WhenAll(awaitables);
                 }
 
                 try

@@ -3,11 +3,11 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using IronFoundry.Warden.Containers;
-    using IronFoundry.Warden.Server;
-    using IronFoundry.Warden.Utilities;
+    using Containers;
     using NLog;
+    using Server;
     using Topshelf;
+    using Utilities;
 
     public class WinService : ServiceControl
     {
@@ -22,7 +22,7 @@
             this.cancellationTokenSource = Statics.CancellationTokenSource;
             this.containerManager = Statics.ContainerManager;
             this.wardenServer = new TcpServer(containerManager, Statics.JobManager, cancellationTokenSource.Token);
-            this.wardenServerTask = new Task(wardenServer.RunServer, cancellationTokenSource.Token);
+            this.wardenServerTask = new Task(wardenServer.Run, cancellationTokenSource.Token);
         }
 
         public bool Start(HostControl hostControl)
@@ -36,13 +36,21 @@
             try
             {
                 cancellationTokenSource.Cancel();
+
                 Task.WaitAll(new[] { wardenServerTask }, (int)TimeSpan.FromSeconds(25).TotalMilliseconds);
+
+                if (wardenServer.ClientListenException != null)
+                {
+                    log.ErrorException(wardenServer.ClientListenException);
+                }
+
                 containerManager.Dispose();
             }
             catch (Exception ex)
             {
-                log.InfoException(ex.Message, ex);
+                log.ErrorException(ex);
             }
+
             return true;
         }
     }
