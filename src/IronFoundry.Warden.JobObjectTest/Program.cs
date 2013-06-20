@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using CommandLine;
     using CommandLine.Text;
+    using IronFoundry.Warden.Utilities;
     using NLog;
     using Tasks;
     using Utilities.JobObjects;
@@ -48,7 +49,7 @@
                 process.OutputDataReceived += (s, e) => { if (e.Data != null) Console.WriteLine(e.Data); };
 
                 log.Trace("Starting test process...");
-                process.StartAndWait(postStartAction);
+                process.StartAndWait(false, postStartAction);
 
                 log.Trace("Process ended with exit code: {0}", process.ExitCode);
             }
