@@ -30,12 +30,12 @@
 
             this.processStartInfo                        = new ProcessStartInfo(executable);
             this.processStartInfo.Arguments              = arguments;
+            this.processStartInfo.LoadUserProfile        = false;
             this.processStartInfo.CreateNoWindow         = true;
+            this.processStartInfo.UseShellExecute        = false;
             this.processStartInfo.RedirectStandardInput  = true;
             this.processStartInfo.RedirectStandardOutput = true;
             this.processStartInfo.RedirectStandardError  = true;
-            this.processStartInfo.UseShellExecute        = false;
-            this.processStartInfo.WindowStyle            = ProcessWindowStyle.Hidden;
             this.processStartInfo.WorkingDirectory       = workingDirectory;
 
             if (credential != null)

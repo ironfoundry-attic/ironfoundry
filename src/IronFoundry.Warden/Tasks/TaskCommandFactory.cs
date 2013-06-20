@@ -25,6 +25,8 @@
         {
             switch (commandName)
             {
+                case "exe" :
+                    return new ExeCommand(container, arguments, shouldImpersonate, rlimits);
                 case "mkdir" :
                     return new MkdirCommand(container, arguments);
                 case "iis" :

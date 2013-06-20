@@ -86,6 +86,7 @@
     <Compile Include="Server\WardenExceptionHandler.cs" />
     <Compile Include="Server\MessageHandler.cs" />
     <Compile Include="Server\SocketExceptionHandler.cs" />
+    <Compile Include="Tasks\ExeCommand.cs" />
     <Compile Include="Utilities\BackgroundProcess.cs" />
     <Compile Include="Tasks\ReplaceTokensCommand.cs" />
     <Compile Include="Tasks\ProcessCommand.cs" />

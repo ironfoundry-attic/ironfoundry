@@ -180,6 +180,7 @@
                 {
                     processes.Add(process.Id, process);
 
+                    /*
                     if (!jobObject.HasProcess(process))
                     {
                         try
@@ -202,6 +203,7 @@
                                 e);
                         }
                     }
+                     */
                 }
             }
             finally
