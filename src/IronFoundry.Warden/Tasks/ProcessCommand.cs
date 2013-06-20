@@ -32,14 +32,11 @@
             return DoExecute();
         }
 
-        /*
-         * Asynchronous execution
-         */
         public event EventHandler<TaskCommandStatusEventArgs> StatusAvailable;
 
         public Task<TaskCommandResult> ExecuteAsync()
         {
-            return Task.Factory.StartNew<TaskCommandResult>(DoExecute);
+            return Task.Run<TaskCommandResult>(() => DoExecute());
         }
 
         protected abstract TaskCommandResult DoExecute();
@@ -50,20 +47,19 @@
 
             using (var process = new BackgroundProcess(workingDirectory, executable, processArguments, GetImpersonatationCredential()))
             {
-                process.ErrorDataReceived += process_ErrorDataReceived;
-                process.OutputDataReceived += process_OutputDataReceived;
-
-                process.StartAndWait(asyncOutput: true, postStartAction: (p) => container.AddProcess(p, rlimits));
-
-                process.ErrorDataReceived -= process_ErrorDataReceived;
-                process.OutputDataReceived -= process_OutputDataReceived;
-
+                process.Start();
+                /*
+                process.Start(postStartAction: (p) => container.AddProcess(p, rlimits));
+                process.WaitForExit();
                 string sout = stdout.ToString();
                 string serr = stderr.ToString();
+                string sout = process.StdoutStream.ReadToEnd();
+                string serr = process.StderrStream.ReadToEnd();
+                 */
 
                 log.Trace("Process ended with exit code: {0}", process.ExitCode);
 
-                return new TaskCommandResult(process.ExitCode, sout, serr);
+                return new TaskCommandResult(process.ExitCode, String.Empty, String.Empty);
             }
         }
 

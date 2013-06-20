@@ -24,7 +24,7 @@
 
             log.Trace(String.Concat("Command: IronFoundry.Warden.JobObjectTest.exe ", String.Join(" ", args)));
 
-            var executable = "powershell.exe";
+            // var executable = "powershell.exe";
             var arguments = String.Format("Write-Host \"Running as: $(whoami)\"; Get-Date; Sleep {0}; Get-Date", options.DelaySeconds);
             var postStartAction = new Action<Process>(process =>
             {
@@ -42,6 +42,8 @@
                 }
             });
 
+            /*
+             * TODO
             using (var process = new BackgroundProcess(Environment.CurrentDirectory, executable, arguments))
             {
                 process.ErrorDataReceived += (s,e) => { if(e.Data != null) Console.WriteLine(e.Data); };
@@ -52,6 +54,7 @@
 
                 log.Trace("Process ended with exit code: {0}", process.ExitCode);
             }
+             */
 
             Console.WriteLine("Press [\\R\\N] to end");
             Console.ReadLine();

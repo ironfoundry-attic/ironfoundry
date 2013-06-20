@@ -3,9 +3,16 @@
     using System;
     using System.ComponentModel;
     using System.Net;
+    using System.Runtime.InteropServices;
 
     internal static class Utils
     {
+        public static HandleRef GetCurrentProcessRef(object wrapper)
+        {
+            IntPtr currentProcess = NativeMethods.GetCurrentProcess();
+            return new HandleRef(wrapper, currentProcess);
+        }
+
         public static SafeUserTokenHandle LogonAndGetUserPrimaryToken(NetworkCredential credential)
         {
             IntPtr token = IntPtr.Zero;

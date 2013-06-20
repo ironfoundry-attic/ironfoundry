@@ -79,6 +79,10 @@
     <Compile Include="Jobs\JobStatusEventArgs.cs" />
     <Compile Include="PInvoke\CloseHandle.cs" />
     <Compile Include="PInvoke\Constants.cs" />
+    <Compile Include="PInvoke\CreatePipe.cs" />
+    <Compile Include="PInvoke\CreateProcess.cs" />
+    <Compile Include="PInvoke\DuplicateHandle.cs" />
+    <Compile Include="PInvoke\GetCurrentProcess.cs" />
     <Compile Include="PInvoke\JobObjectStructs.cs" />
     <Compile Include="PInvoke\JobObjectMethods.cs" />
     <Compile Include="PInvoke\DuplicateTokenEx.cs" />
@@ -87,12 +91,17 @@
     <Compile Include="PInvoke\GetProcessWindowStation.cs" />
     <Compile Include="PInvoke\GetThreadDesktop.cs" />
     <Compile Include="PInvoke\JobObjectInfoClass.cs" />
-    <Compile Include="PInvoke\LogonUser.cs" />
     <Compile Include="PInvoke\NativeMethods.cs" />
+    <Compile Include="PInvoke\OpenProcess.cs" />
+    <Compile Include="PInvoke\ProcessWaitHandle.cs" />
     <Compile Include="PInvoke\RevertToSelf.cs" />
+    <Compile Include="PInvoke\SafeProcessHandle.cs" />
     <Compile Include="PInvoke\SafeUserTokenHandle.cs" />
     <Compile Include="PInvoke\SecurityAttributes.cs" />
+    <Compile Include="PInvoke\StartupInfo.cs" />
     <Compile Include="PInvoke\Utils.cs" />
+    <Compile Include="PInvoke\ProcessInformation.cs" />
+    <Compile Include="PInvoke\WaitForSingleObject.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -143,20 +152,22 @@
     <Compile Include="Utilities\LocalTcpPortManager.cs" />
     <Compile Include="Utilities\LoggerExtensionMethods.cs" />
     <Compile Include="Utilities\MessageWriter.cs" />
+    <Compile Include="PInvoke\LogonUser.cs" />
     <Compile Include="Utilities\Statics.cs" />
     <Compile Include="Utilities\TempFile.cs" />
     <Compile Include="Server\Buffer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AsproLock\AsproLock.csproj">
+      <Project>{8b240ed4-4766-4ac5-8ecd-5325b9784f67}</Project>
+      <Name>AsproLock</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IronFoundry.Warden.Protocol\IronFoundry.Warden.Protocol.csproj">
       <Project>{ddd0537b-4afe-4beb-bf30-4df0a5367a18}</Project>
       <Name>IronFoundry.Warden.Protocol</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="AsproLock">
-      <HintPath>..\..\lib\AsproLock\AsproLock.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>

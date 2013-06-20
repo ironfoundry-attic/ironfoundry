@@ -27,7 +27,7 @@
                     x.SetDescription("Iron Foundry Warden Service");
                     x.SetDisplayName(ServiceName);
                     x.StartAutomaticallyDelayed();
-                    x.RunAsLocalService();
+                    x.RunAsLocalSystem();
                     x.UseNLog();
                 });
         }

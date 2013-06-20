@@ -188,7 +188,7 @@
 
                 if (!process.HasExited)
                 {
-                    process.Exited += process_Exited;
+                    process.Exited += process_Exited; // TODO not necessary when job objects work
                     processes.Add(process.Id, process);
 
                     if (!jobObject.HasProcess(process))
@@ -222,6 +222,9 @@
             }
         }
 
+        /// <summary>
+        /// TODO not necessary when job objects work
+        /// </summary>
         private void process_Exited(object sender, EventArgs e)
         {
             var process = (Process)sender;

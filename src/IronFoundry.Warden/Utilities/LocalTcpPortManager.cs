@@ -1,6 +1,7 @@
 ﻿namespace IronFoundry.Warden.Utilities
 {
     using System;
+    using System.Diagnostics;
     using NLog;
 
     public class LocalTcpPortManager
@@ -45,14 +46,14 @@
         {
             bool success = false;
 
-            using (var process = new BackgroundProcess(workingDirectory, "netsh.exe", arguments))
+            using (var process = new Process())
             {
-                process.StartAndWait(asyncOutput: false);
-                /*
-                string stdout = process.StandardOutput.ReadToEnd();
-                string stderr = process.StandardError.ReadToEnd();
-                log.Trace("stdout: '{0}' stderr: '{1}'", stdout, stderr);
-                */
+                var startInfo = new ProcessStartInfo("netsh.exe", arguments);
+                startInfo.CreateNoWindow = true;
+                startInfo.UseShellExecute = false;
+                process.StartInfo = startInfo;
+                process.Start();
+                process.WaitForExit();
                 success = process.ExitCode == 0;
             }
 

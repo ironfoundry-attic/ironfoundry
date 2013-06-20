@@ -65,6 +65,7 @@
 
         public void Delete()
         {
+            RemoveDesktopPermission(userName);
             DeleteUser(userName);
         }
 
