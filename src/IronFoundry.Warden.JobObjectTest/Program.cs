@@ -4,10 +4,9 @@
     using System.Diagnostics;
     using CommandLine;
     using CommandLine.Text;
-    using IronFoundry.Warden.Utilities;
+    using Containers;
     using NLog;
-    using Tasks;
-    using Utilities.JobObjects;
+    using Utilities;
 
     class Program
     {

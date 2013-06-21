@@ -136,7 +136,7 @@
     <Compile Include="Utilities\DesktopPermissionManager.cs" />
     <Compile Include="Utilities\Impersonator.cs" />
     <Compile Include="Utilities\IPUtilities.cs" />
-    <Compile Include="Utilities\JobObjects\JobObject.cs" />
+    <Compile Include="Containers\JobObject.cs" />
     <Compile Include="PInvoke\JobObjectHandle.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Tasks\TaskRunner.cs" />

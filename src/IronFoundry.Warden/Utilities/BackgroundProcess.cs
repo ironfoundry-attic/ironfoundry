@@ -8,8 +8,6 @@
     [System.ComponentModel.DesignerCategory("Code")]
     public class BackgroundProcess : Process
     {
-        private readonly ProcessStartInfo processStartInfo;
-
         public BackgroundProcess(string workingDirectory, string executable, string arguments, NetworkCredential credential = null)
             : base()
         {
@@ -28,24 +26,23 @@
                 throw new ArgumentNullException("executable");
             }
 
-            this.processStartInfo                        = new ProcessStartInfo(executable);
-            this.processStartInfo.Arguments              = arguments;
-            this.processStartInfo.LoadUserProfile        = false;
-            this.processStartInfo.CreateNoWindow         = true;
-            this.processStartInfo.UseShellExecute        = false;
-            this.processStartInfo.RedirectStandardInput  = true;
-            this.processStartInfo.RedirectStandardOutput = true;
-            this.processStartInfo.RedirectStandardError  = true;
-            this.processStartInfo.WorkingDirectory       = workingDirectory;
+            StartInfo.FileName               = executable;
+            StartInfo.Arguments              = arguments;
+            StartInfo.LoadUserProfile        = false;
+            StartInfo.CreateNoWindow         = true;
+            StartInfo.UseShellExecute        = false;
+            StartInfo.RedirectStandardInput  = true;
+            StartInfo.RedirectStandardOutput = true;
+            StartInfo.RedirectStandardError  = true;
+            StartInfo.WorkingDirectory       = workingDirectory;
 
             if (credential != null)
             {
-                this.processStartInfo.UserName = credential.UserName;
-                this.processStartInfo.Password = credential.SecurePassword;
+                StartInfo.UserName = credential.UserName;
+                StartInfo.Password = credential.SecurePassword;
             }
 
-            this.StartInfo = this.processStartInfo;
-            this.EnableRaisingEvents = true;
+            EnableRaisingEvents = true;
         }
 
         public void StartAndWait(bool asyncOutput, Action<Process> postStartAction = null)

@@ -1,11 +1,11 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="JobObject.cs" company="Uhuru Software, Inc.">
+// <copyright company="Uhuru Software, Inc.">
 // Copyright (c) 2011 Uhuru Software, Inc., All Rights Reserved
 // </copyright>
 // Modified by Iron Foundry project from the original.
 // -----------------------------------------------------------------------
 
-namespace IronFoundry.Warden.Utilities.JobObjects
+namespace IronFoundry.Warden.Containers
 {
     using System;
     using System.Collections.Generic;

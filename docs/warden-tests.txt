@@ -1,1 +1,2 @@
 run --handle 16vitn5mcmq --script '[{"cmd":"exe","args":["cmd","/c whoami >> C:\\tmp\\whoami.out"]}]'
+run --handle 16vitn5mcmq --script '[{"cmd":"ps1","args":["$c=0","while($c -lt 10){","++$c","$me=$(whoami)","Write-Host \"$c : $me\"","Start-Sleep -s 1","}"]}]'

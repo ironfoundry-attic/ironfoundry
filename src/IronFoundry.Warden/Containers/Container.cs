@@ -2,13 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Net;
     using System.Threading;
     using NLog;
     using Protocol;
     using Utilities;
-    using Utilities.JobObjects;
 
     public class Container
     {
@@ -18,6 +18,7 @@
         private readonly ContainerUser user;
         private readonly ContainerDirectory directory;
 
+        // http://blogs.msdn.com/b/alejacma/archive/2012/08/19/10280416.aspx
         // http://msdn.microsoft.com/en-us/library/windows/desktop/ms684161(v=vs.85).aspx
         private readonly JobObject jobObject;
         private readonly Dictionary<int, Process> processes = new Dictionary<int, Process>();
@@ -187,38 +188,45 @@
 
                 if (!process.HasExited)
                 {
+                    process.Exited += process_Exited;
                     processes.Add(process.Id, process);
 
-                    /*
                     if (!jobObject.HasProcess(process))
                     {
                         try
                         {
                             jobObject.AddProcess(process);
+                            /*
+                             * TODO
                             if (rlimits != null)
                             {
                                 jobObject.JobMemoryLimit = rlimits.JobMemoryLimit;
                                 jobObject.JobUserTimeLimit = TimeSpan.FromSeconds(rlimits.Cpu);
                             }
-                            // TODO
                             // rlimits.Nice;
                             // DISK QUOTA!
+                             */
                         }
                         catch (Win32Exception e)
                         {
                             log.ErrorException(
                                 String.Format("Error adding PID {0} to job object in container '{1}'. Error code: '{2}' Native error code: '{3}' HasExited: '{4}'",
-                                    process.Id, handle, e.ErrorCode, e.NativeErrorCode, process.HasExited),
-                                e);
+                                    process.Id, handle, e.ErrorCode, e.NativeErrorCode, process.HasExited), e);
                         }
                     }
-                     */
                 }
             }
             finally
             {
                 rwlock.ExitWriteLock();
             }
+        }
+
+        private void process_Exited(object sender, EventArgs e)
+        {
+            var process = (Process)sender;
+            process.Exited -= process_Exited;
+            log.Trace("Container process exited PID '{0}' exit code '{1}'", process.Id, process.ExitCode);
         }
 
         private void KillProcesses()
@@ -243,6 +251,7 @@
         private static JobObject GetJobObject(string jobObjectName)
         {
             var jobObject = new JobObject(jobObjectName);
+            jobObject.ActiveProcessesLimit = 64;
             jobObject.DieOnUnhandledException = true;
             jobObject.KillProcessesOnJobClose = true;
             return jobObject;
