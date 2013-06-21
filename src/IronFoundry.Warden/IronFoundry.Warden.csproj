@@ -77,6 +77,22 @@
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobExceptionResult.cs" />
     <Compile Include="Jobs\JobStatusEventArgs.cs" />
+    <Compile Include="PInvoke\CloseHandle.cs" />
+    <Compile Include="PInvoke\Constants.cs" />
+    <Compile Include="PInvoke\JobObjectStructs.cs" />
+    <Compile Include="PInvoke\JobObjectMethods.cs" />
+    <Compile Include="PInvoke\DuplicateTokenEx.cs" />
+    <Compile Include="PInvoke\Enums.cs" />
+    <Compile Include="PInvoke\GetCurrentThreadId.cs" />
+    <Compile Include="PInvoke\GetProcessWindowStation.cs" />
+    <Compile Include="PInvoke\GetThreadDesktop.cs" />
+    <Compile Include="PInvoke\JobObjectInfoClass.cs" />
+    <Compile Include="PInvoke\LogonUser.cs" />
+    <Compile Include="PInvoke\NativeMethods.cs" />
+    <Compile Include="PInvoke\RevertToSelf.cs" />
+    <Compile Include="PInvoke\SafeUserTokenHandle.cs" />
+    <Compile Include="PInvoke\SecurityAttributes.cs" />
+    <Compile Include="PInvoke\Utils.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -117,11 +133,11 @@
     <Compile Include="Handlers\StreamRequestHandler.cs" />
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Tasks\WebApplicationCommand.cs" />
+    <Compile Include="Utilities\DesktopPermissionManager.cs" />
     <Compile Include="Utilities\Impersonator.cs" />
     <Compile Include="Utilities\IPUtilities.cs" />
     <Compile Include="Utilities\JobObjects\JobObject.cs" />
-    <Compile Include="Utilities\JobObjects\JobObjectHandle.cs" />
-    <Compile Include="Utilities\JobObjects\NativeMethods.cs" />
+    <Compile Include="PInvoke\JobObjectHandle.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Tasks\TaskRunner.cs" />
     <Compile Include="Utilities\LocalTcpPortManager.cs" />
@@ -138,6 +154,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="AsproLock">
+      <HintPath>..\..\lib\AsproLock\AsproLock.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>

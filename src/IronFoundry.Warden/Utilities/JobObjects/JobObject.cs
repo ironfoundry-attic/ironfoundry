@@ -13,6 +13,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
     using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Security.Permissions;
+    using PInvoke;
 
     /// <summary>
     /// Is a class that manages a Windows Job Object. Job Objects allows to group a number of processes and
@@ -25,7 +26,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// <summary>
         /// The Windows Handle
         /// </summary>
-        private JobObjectHandle jobHandle;
+        private NativeMethods.JobObjectHandle jobHandle;
 
         /// <summary>
         /// Flag to kill processes on job close.

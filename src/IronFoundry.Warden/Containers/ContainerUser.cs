@@ -2,7 +2,6 @@
 {
     using System;
     using System.Net;
-    using System.Security.Principal;
     using System.Text.RegularExpressions;
     using IronFoundry.Warden.Utilities;
 
@@ -49,27 +48,24 @@
                     throw new ArgumentException(String.Format("Could not find user '{0}'", this.userName));
                 }
             }
+
+            AddDesktopPermission(this.userName);
         }
 
         public static void CleanUp(string uniqueId)
         {
             try
             {
-                var principalManager = new LocalPrincipalManager();
-                principalManager.DeleteUser(CreateUserName(uniqueId));
+                string userName = CreateUserName(uniqueId);
+                DeleteUser(userName);
+                RemoveDesktopPermission(userName);
             }
             catch { }
         }
 
         public void Delete()
         {
-            var principalManager = new LocalPrincipalManager();
-            principalManager.DeleteUser(this.userName);
-        }
-
-        public IdentityReference Identity
-        {
-            get { return new NTAccount(userName); }
+            DeleteUser(userName);
         }
 
         public static implicit operator string(ContainerUser containerUser)
@@ -119,6 +115,30 @@
             }
 
             return this.GetHashCode() == other.GetHashCode();
+        }
+
+        private static void AddDesktopPermission(string userName)
+        {
+            if (Environment.UserInteractive == false)
+            {
+                var desktopPermissionManager = new DesktopPermissionManager(userName);
+                desktopPermissionManager.AddDesktopPermission();
+            }
+        }
+
+        private static void DeleteUser(string userName)
+        {
+            var principalManager = new LocalPrincipalManager();
+            principalManager.DeleteUser(userName);
+        }
+
+        private static void RemoveDesktopPermission(string userName)
+        {
+            if (Environment.UserInteractive == false)
+            {
+                var desktopPermissionManager = new DesktopPermissionManager(userName);
+                desktopPermissionManager.RemoveDesktopPermission();
+            }
         }
 
         private static string CreateUserName(string uniqueId)

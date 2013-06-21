@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Net;
     using System.Threading;
@@ -26,12 +25,22 @@
         private ContainerPort port;
         private ContainerState state;
 
-        public Container(string handle)
+        public Container(string handle, ContainerState containerState)
         {
+            if (handle.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentNullException("handle");
+            }
             this.handle = new ContainerHandle(handle);
+
+            if (containerState == null)
+            {
+                throw new ArgumentNullException("containerState");
+            }
+            this.state = containerState;
+
             this.user = new ContainerUser(handle);
             this.directory = new ContainerDirectory(this.handle, this.user);
-            this.state = ContainerState.Born;
 
             this.jobObject = GetJobObject(handle);
         }
@@ -39,7 +48,7 @@
         public Container()
         {
             this.handle = new ContainerHandle();
-            this.user = new ContainerUser(handle, true);
+            this.user = new ContainerUser(handle, shouldCreate: true);
             this.directory = new ContainerDirectory(this.handle, this.user, true);
             this.state = ContainerState.Born;
 

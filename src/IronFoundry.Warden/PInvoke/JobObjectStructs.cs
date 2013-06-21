@@ -1,125 +1,22 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="NativeMethods.cs" company="Uhuru Software, Inc.">
+// <copyright company="Uhuru Software, Inc.">
 // Copyright (c) 2011 Uhuru Software, Inc., All Rights Reserved
 // </copyright>
 // Modified by Iron Foundry project from the original.
 // -----------------------------------------------------------------------
 
-namespace IronFoundry.Warden.Utilities.JobObjects
+namespace IronFoundry.Warden.PInvoke
 {
     using System;
     using System.Runtime.InteropServices;
-    using System.Security;
 
-    /// <summary>
-    /// Job Objects Windows API native methods.
-    /// </summary>
-    [SuppressUnmanagedCodeSecurity]
-    internal static class NativeMethods
+    internal partial class NativeMethods
     {
-        /// <summary>
-        /// Used for calling the Win API
-        /// </summary>
-        internal enum JobObjectInfoClass
-        {
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_BASIC_ACCOUNTING_INFORMATION structure.
-            /// </summary>
-            JobObjectBasicAccountingInformation = 1,
-
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION structure.
-            /// </summary>
-            JobObjectBasicAndIoAccountingInformation = 8,
-
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_BASIC_LIMIT_INFORMATION structure.
-            /// </summary>
-            JobObjectBasicLimitInformation = 2,
-
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_BASIC_PROCESS_ID_LIST structure.
-            /// </summary>
-            JobObjectBasicProcessIdList = 3,
-
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_BASIC_UI_RESTRICTIONS structure.
-            /// </summary>
-            JobObjectBasicUIRestrictions = 4,
-
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_END_OF_JOB_TIME_INFORMATION structure.
-            /// </summary>
-            JobObjectEndOfJobTimeInformation = 6,
-
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_EXTENDED_LIMIT_INFORMATION structure.
-            /// </summary>
-            JobObjectExtendedLimitInformation = 9,
-
-            /// <summary>
-            /// The lpJobObjectInfo parameter is a pointer to a JOBOBJECT_ASSOCIATE_COMPLETION_PORT structure.
-            /// </summary>
-            JobObjectAssociateCompletionPortInformation = 7,
-        }
-
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern JobObjectHandle CreateJobObject(IntPtr lpJobAttributes, string lpName);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool IsProcessInJob(IntPtr Process, JobObjectHandle hJob, [MarshalAs(UnmanagedType.Bool)] out bool Result);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetInformationJobObject(JobObjectHandle hJob, JobObjectInfoClass JobObjectInfoClass, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool QueryInformationJobObject(JobObjectHandle hJob, JobObjectInfoClass JobObjectInformationClass, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength, IntPtr lpReturnLength);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool AssignProcessToJobObject(JobObjectHandle hJob, IntPtr hProcess);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool TerminateJobObject(JobObjectHandle hJob, uint uExitCode);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern JobObjectHandle OpenJobObject(uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, string lpName);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseHandle(IntPtr hHandle);
-
-        /// <summary>
-        /// The SECURITY_ATTRIBUTES structure contains the security descriptor for an object and specifies whether the handle retrieved by specifying this structure is inheritable.
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct SECURITY_ATTRIBUTES
-        {
-            /// <summary>
-            /// Length of the structure.
-            /// </summary>
-            public int Length;
-
-            /// <summary>
-            /// Security Descriptor
-            /// </summary>
-            public IntPtr SecurityDescriptor;
-
-            /// <summary>
-            /// Child process inheritance.
-            /// </summary>
-            public int InheritHandle;
-        }
-
         /// <summary>
         /// Contains basic and extended limit information for a job object.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct JOBOBJECT_BASIC_LIMIT_INFORMATION
+        public struct JOBOBJECT_BASIC_LIMIT_INFORMATION
         {
             /// <summary>
             /// JOB_OBJECT_LIMIT_ACTIVE_PROCESS Windows API constant.
@@ -246,7 +143,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// JOBOBJECT_BASIC_UI_RESTRICTIONS Windows API structure.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct JOBOBJECT_BASIC_UI_RESTRICTIONS
+        public struct JOBOBJECT_BASIC_UI_RESTRICTIONS
         {
             /// <summary>
             /// UI Restrictions class.
@@ -258,7 +155,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// JOBOBJECT_CPU_RATE_CONTROL_INFORMATION Windows API structure.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
+        public struct JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
         {
             /// <summary>
             /// Control Flags.
@@ -275,7 +172,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// JOBOBJECT_EXTENDED_LIMIT_INFORMATION Windows API structure.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+        public struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
         {
             /// <summary>
             /// BasicLimitInformation Windows API structure member.
@@ -312,7 +209,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// IO_COUNTERS Windows API structure.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct IO_COUNTERS
+        public struct IO_COUNTERS
         {
             /// <summary>
             /// ReadOperationCount Windows API structure member.
@@ -349,7 +246,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// JOBOBJECT_BASIC_ACCOUNTING_INFORMATION Windows API structure.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct JOBOBJECT_BASIC_ACCOUNTING_INFORMATION
+        public struct JOBOBJECT_BASIC_ACCOUNTING_INFORMATION
         {
             /// <summary>
             /// TotalUserTime Windows API structure member.
@@ -395,7 +292,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// <summary>
         /// JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION Windows API structure.
         /// </summary>
-        internal struct JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION
+        public struct JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION
         {
             /// <summary>
             /// BasicInfo Windows API structure member.
@@ -411,7 +308,7 @@ namespace IronFoundry.Warden.Utilities.JobObjects
         /// <summary>
         /// JOBOBJECT_BASIC_PROCESS_ID_LIST Windows API structure.
         /// </summary>
-        internal struct JOBOBJECT_BASIC_PROCESS_ID_LIST
+        public struct JOBOBJECT_BASIC_PROCESS_ID_LIST
         {
             /// <summary>
             /// The maximum number of processes that are allocated when querying Windows API. 
