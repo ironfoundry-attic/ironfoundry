@@ -41,7 +41,7 @@
                 port = (ushort)request.HostPort;
             }
 
-            return Task.Factory.StartNew<Response>(() =>
+            return Task.Run<Response>(() =>
                 {
                     Container container = GetContainer();
                     ushort reservedPort = container.ReservePort(port);

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Net;
     using System.Threading;
@@ -17,11 +16,7 @@
         private readonly ContainerHandle handle;
         private readonly ContainerUser user;
         private readonly ContainerDirectory directory;
-
-        // http://blogs.msdn.com/b/alejacma/archive/2012/08/19/10280416.aspx
-        // http://msdn.microsoft.com/en-us/library/windows/desktop/ms684161(v=vs.85).aspx
-        private readonly JobObject jobObject;
-        private readonly Dictionary<int, Process> processes = new Dictionary<int, Process>();
+        private readonly ProcessManager processManager;
 
         private ContainerPort port;
         private ContainerState state;
@@ -43,7 +38,7 @@
             this.user = new ContainerUser(handle);
             this.directory = new ContainerDirectory(this.handle, this.user);
 
-            this.jobObject = GetJobObject(handle);
+            this.processManager = new ProcessManager(this.user);
         }
 
         public Container()
@@ -53,7 +48,7 @@
             this.directory = new ContainerDirectory(this.handle, this.user, true);
             this.state = ContainerState.Born;
 
-            this.jobObject = GetJobObject(handle);
+            this.processManager = new ProcessManager(this.user);
         }
 
         public NetworkCredential GetCredential()
@@ -88,7 +83,7 @@
 
         public void Stop()
         {
-            KillProcesses();
+            processManager.StopProcesses();
         }
 
         public void AfterStop()
@@ -98,16 +93,32 @@
 
         public ContainerPort ReservePort(ushort suggestedPort)
         {
-            rwlock.EnterWriteLock();
+            rwlock.EnterUpgradeableReadLock();
             try
             {
-                this.port = new ContainerPort(suggestedPort, this.user);
-                return this.port;
+                if (port == null)
+                {
+                    rwlock.EnterWriteLock();
+                    try
+                    {
+                        port = new ContainerPort(suggestedPort, this.user);
+                    }
+                    finally
+                    {
+                        rwlock.ExitWriteLock();
+                    }
+                }
+                else
+                {
+                    log.Trace("Container '{0}' already assigned port '{1}'", handle, port);
+                }
             }
             finally
             {
-                rwlock.ExitWriteLock();
+                rwlock.ExitUpgradeableReadLock();
             }
+
+            return port;
         }
 
         public IEnumerable<string> ConvertToPathsWithin(string[] arguments)
@@ -151,7 +162,7 @@
         {
             ContainerUser.CleanUp(handle);
             ContainerDirectory.CleanUp(handle);
-            ContainerPort.CleanUp(handle);
+            ContainerPort.CleanUp(handle, 0); // TODO
         }
 
         public void Destroy()
@@ -168,9 +179,7 @@
                     port.Delete();
                 }
 
-                KillProcesses();
-
-                jobObject.Dispose();
+                processManager.StopProcesses();
 
                 this.state = ContainerState.Destroyed;
             }
@@ -182,79 +191,7 @@
 
         public void AddProcess(Process process, ResourceLimits rlimits)
         {
-            try
-            {
-                rwlock.EnterWriteLock();
-
-                if (!process.HasExited)
-                {
-                    process.Exited += process_Exited;
-                    processes.Add(process.Id, process);
-
-                    if (!jobObject.HasProcess(process))
-                    {
-                        try
-                        {
-                            jobObject.AddProcess(process);
-                            /*
-                             * TODO
-                            if (rlimits != null)
-                            {
-                                jobObject.JobMemoryLimit = rlimits.JobMemoryLimit;
-                                jobObject.JobUserTimeLimit = TimeSpan.FromSeconds(rlimits.Cpu);
-                            }
-                            // rlimits.Nice;
-                            // DISK QUOTA!
-                             */
-                        }
-                        catch (Win32Exception e)
-                        {
-                            log.ErrorException(
-                                String.Format("Error adding PID {0} to job object in container '{1}'. Error code: '{2}' Native error code: '{3}' HasExited: '{4}'",
-                                    process.Id, handle, e.ErrorCode, e.NativeErrorCode, process.HasExited), e);
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                rwlock.ExitWriteLock();
-            }
-        }
-
-        private void process_Exited(object sender, EventArgs e)
-        {
-            var process = (Process)sender;
-            process.Exited -= process_Exited;
-            log.Trace("Container process exited PID '{0}' exit code '{1}'", process.Id, process.ExitCode);
-        }
-
-        private void KillProcesses()
-        {
-            jobObject.TerminateProcesses(0);
-            // TODO once job objects are working, we shouldn't need this.
-            var processList = processes.Values.ToListOrNull();
-            foreach (Process process in processList)
-            {
-                try
-                {
-                    processes.Remove(process.Id);
-                    if (!process.HasExited)
-                    {
-                        process.Kill();
-                    }
-                }
-                catch { }
-            }
-        }
-
-        private static JobObject GetJobObject(string jobObjectName)
-        {
-            var jobObject = new JobObject(jobObjectName);
-            jobObject.ActiveProcessesLimit = 64;
-            jobObject.DieOnUnhandledException = true;
-            jobObject.KillProcessesOnJobClose = true;
-            return jobObject;
+            processManager.AddProcess(process);
         }
     }
 }

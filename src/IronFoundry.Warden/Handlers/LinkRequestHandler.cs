@@ -22,7 +22,7 @@
         {
             log.Trace("Handle: '{0}' JobId: '{1}'", request.Handle, request.JobId);
 
-            return Task.Factory.StartNew<Response>(() =>
+            return Task.Run<Response>(() =>
                 {
                     LinkResponse response = null;
 

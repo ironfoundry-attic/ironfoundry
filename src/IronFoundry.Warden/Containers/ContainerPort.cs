@@ -19,9 +19,10 @@
             localTcpPortManager.ReleaseLocalPort(port);
         }
 
-        public static void CleanUp(string handle)
+        public static void CleanUp(string handle, ushort port)
         {
             // TODO
+            // We'll have to store the port in the snapshot file.
         }
 
         public static implicit operator string(ContainerPort containerPort)
