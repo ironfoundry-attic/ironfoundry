@@ -39,7 +39,7 @@
 
         public Task<TaskCommandResult> ExecuteAsync()
         {
-            return Task.Factory.StartNew<TaskCommandResult>(DoExecute);
+            return Task.Run<TaskCommandResult>((Func<TaskCommandResult>)DoExecute);
         }
 
         protected abstract TaskCommandResult DoExecute();

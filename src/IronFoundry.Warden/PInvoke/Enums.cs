@@ -38,5 +38,18 @@
             TokenPrimary       = 1, 
             TokenImpersonation = 2
         } 
+
+        public enum SidNameUse : uint
+        {
+            SidTypeUser = 1,
+            SidTypeGroup,
+            SidTypeDomain,
+            SidTypeAlias,
+            SidTypeWellKnownGroup,
+            SidTypeDeletedAccount,
+            SidTypeInvalid,
+            SidTypeUnknown,
+            SidTypeComputer
+        }
     }
 }
