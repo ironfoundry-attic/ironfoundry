@@ -32,25 +32,10 @@
             configPath = Path.Combine(Environment.CurrentDirectory, "config");
             logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
             tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
-            EnsureDirectories();
-        }
 
-        private void EnsureDirectories()
-        {
-            if (!Directory.Exists(configPath))
-            {
-                Directory.CreateDirectory(configPath);
-            }
-
-            if (!Directory.Exists(logsRootPath))
-            {
-                Directory.CreateDirectory(logsRootPath);
-            }
-
-            if (!Directory.Exists(tempPath))
-            {
-                Directory.CreateDirectory(tempPath);
-            }
+            EnsureDirectory(configPath);
+            EnsureDirectory(logsRootPath);
+            EnsureDirectory(tempPath);
         }
 
         /// <summary>
@@ -87,8 +72,13 @@
             appHostConfig.AddToElement(Constants.ConfigXPath.AppPools, BuildApplicationPool(appPoolName, runtimeVersion, pipelineMode, clrConfigPath));
 
             // logging paths
-            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/logFile", "directory", Path.Combine(logsRootPath, "IIS"));
-            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/traceFailedRequestsLogging", "directory", Path.Combine(logsRootPath, "TraceLogFiles"));
+            var iisLogDir = Path.Combine(logsRootPath, "IIS");
+            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/logFile", "directory", iisLogDir);
+            EnsureDirectory(iisLogDir);
+
+            var traceLogDir = Path.Combine(logsRootPath, "TraceLogFiles");
+            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/traceFailedRequestsLogging", "directory", traceLogDir);
+            EnsureDirectory(traceLogDir);
 
             // add the site and settings to the app host config
             appHostConfig.AddToElement(Constants.ConfigXPath.Sites, BuildSiteElement("IronFoundrySite", webRootPath, appPoolName, port));
@@ -97,11 +87,24 @@
             appHostConfig.SetValue(Constants.ConfigXPath.Sites + "/virtualDirectoryDefaults", "allowSubDirConfig", true);
 
             // temp paths
-            appHostConfig.SetValue(Constants.ConfigXPath.WebServer + "/httpCompression", "directory", Path.Combine(tempPath, "IIS Temporary Compressed Files"));
-            appHostConfig.SetValue(Constants.ConfigXPath.LocationSpecific.SystemDotWeb + "/compilation", "tempDirectory", Path.Combine(tempPath, "Temporary ASP.NET Files"));
+            var tempCompFilesDir = Path.Combine(tempPath, "IIS Temporary Compressed Files");
+            appHostConfig.SetValue(Constants.ConfigXPath.WebServer + "/httpCompression", "directory", tempCompFilesDir);
+            EnsureDirectory(tempCompFilesDir);
+
+            var tempAspFilesDir = Path.Combine(tempPath, "Temporary ASP.NET Files");
+            appHostConfig.SetValue(Constants.ConfigXPath.LocationSpecific.SystemDotWeb + "/compilation", "tempDirectory", tempAspFilesDir);
+            EnsureDirectory(tempAspFilesDir);
 
             appHostConfig.Save(settings.AppConfigPath);
             return settings;
+        }
+
+        private void EnsureDirectory(string directory)
+        {
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
         }
 
         protected virtual XElement BuildApplicationPool(string name, string runtimeVersion, string pipelineMode, string configFile)
