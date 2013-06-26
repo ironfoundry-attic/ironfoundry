@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Reflection;
     using System.Security.Cryptography;
     using System.Text;
     using System.Xml.Linq;
@@ -29,9 +30,10 @@
             }
             webRootPath = webRoot;
 
-            configPath = Path.Combine(Environment.CurrentDirectory, "config");
-            logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
-            tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            configPath = Path.Combine(baseDirectory, "config");
+            logsRootPath = Path.Combine(baseDirectory, "log");
+            tempPath = Path.Combine(baseDirectory, "tmp");
 
             EnsureDirectory(configPath);
             EnsureDirectory(logsRootPath);
@@ -54,10 +56,11 @@
                 AppConfigPath = Path.Combine(configPath, "applicationHost.config")
             };
 
-            var clrConfigPath = Path.Combine(configPath, "aspnet.config");
-            var redirectConfigPath = Path.Combine(configPath, "redirection.config");
+            var clrConfigPath = Path.Combine(configPath, "aspnet.config"); // TODO: might need to just -> runtime version aspnet.config file
+            var redirectConfigPath = Path.Combine(configPath, "redirection.config"); // TODO: might need to just -> runtime version redirection.config file
 
             File.WriteAllText(redirectConfigPath, Resources.redirection);
+            File.WriteAllText(clrConfigPath, Resources.aspnet);
             File.WriteAllText(settings.AppConfigPath, runtimeVersion == Constants.RuntimeVersion.VersionFourDotZero ? Resources.applicationhost : Resources.v2_0AppHost);
 
             // TODO: Randomize AES Session Keys??
