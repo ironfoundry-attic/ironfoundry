@@ -9,14 +9,14 @@
 
         public ContainerPort(ushort suggestedPort, ContainerUser user)
         {
-            var localTcpPortManager = new LocalTcpPortManager();
-            this.port = localTcpPortManager.ReserveLocalPort(suggestedPort, user);
+            var localTcpPortManager = new LocalTcpPortManager(suggestedPort, user);
+            this.port = localTcpPortManager.ReserveLocalPort();
         }
 
-        public void Delete()
+        public void Delete(ContainerUser user)
         {
-            var localTcpPortManager = new LocalTcpPortManager();
-            localTcpPortManager.ReleaseLocalPort(port);
+            var localTcpPortManager = new LocalTcpPortManager(port, user);
+            localTcpPortManager.ReleaseLocalPort();
         }
 
         public static void CleanUp(string handle, ushort port)

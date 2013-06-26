@@ -81,7 +81,14 @@
         {
             var process = (Process)sender;
             process.Exited -= process_Exited;
+
             log.Trace("Process exited PID '{0}' exit code '{1}'", process.Id, process.ExitCode);
+
+            Process removed;
+            if (!processes.TryRemove(process.Id, out removed))
+            {
+                log.Error("Could not remove process '{0}' from collection!", process.Id);
+            }
         }
     }
 }

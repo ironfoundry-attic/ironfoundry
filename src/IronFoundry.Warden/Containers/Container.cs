@@ -170,16 +170,16 @@
             rwlock.EnterWriteLock();
             try
             {
-                user.Delete();
-
-                directory.Delete();
+                processManager.StopProcesses(); // NB: do this first to unlock files.
 
                 if (port != null)
                 {
-                    port.Delete();
+                    port.Delete(user);
                 }
 
-                processManager.StopProcesses();
+                user.Delete();
+
+                directory.Delete();
 
                 this.state = ContainerState.Destroyed;
             }

@@ -91,6 +91,7 @@
     <Compile Include="PInvoke\GetThreadDesktop.cs" />
     <Compile Include="PInvoke\LogonUser.cs" />
     <Compile Include="PInvoke\NativeMethods.cs" />
+    <Compile Include="Utilities\FirewallManager.cs" />
     <Compile Include="Utilities\ProcessExtensionMethods.cs" />
     <Compile Include="PInvoke\RevertToSelf.cs" />
     <Compile Include="PInvoke\SafeUserTokenHandle.cs" />
@@ -187,6 +188,16 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <COMReference Include="NetFwTypeLib">
+      <Guid>{58FBCF7C-E7A9-467C-80B3-FC65E8FCCA08}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

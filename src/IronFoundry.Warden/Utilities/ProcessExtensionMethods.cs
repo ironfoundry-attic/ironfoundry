@@ -47,6 +47,7 @@
             return userName;
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         private static byte[] GetProcessSidBytes(Process targetProcess)
         {
             IntPtr tokenHandle = IntPtr.Zero;
@@ -58,9 +59,21 @@
                 {
                     processHandle = targetProcess.Handle;
                 }
+                catch (InvalidOperationException ex)
+                {
+                    string lcMessage = ex.Message.ToLowerInvariant();
+                    if (lcMessage.Contains("exited"))
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 catch (Win32Exception ex)
                 {
-                    if (ex.NativeErrorCode == NativeMethods.Constants.ERROR_ACCESS_DENIED)
+                    if (ex.NativeErrorCode == NativeMethods.Constants.ERROR_ACCESS_DENIED || targetProcess.HasExited)
                     {
                         return null;
                     }
