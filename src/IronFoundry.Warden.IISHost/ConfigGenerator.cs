@@ -27,11 +27,11 @@
             {
                 throw new ArgumentNullException("webRoot");
             }
-            webRootPath = webRoot;
+            this.webRootPath = webRoot;
 
-            configPath = Path.Combine(Environment.CurrentDirectory, "config");
-            logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
-            tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
+            this.configPath = Path.Combine(Environment.CurrentDirectory, "config");
+            this.logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
+            this.tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
             EnsureDirectories();
         }
 
@@ -98,7 +98,6 @@
 
             // temp paths
             appHostConfig.SetValue(Constants.ConfigXPath.WebServer + "/httpCompression", "directory", Path.Combine(tempPath, "IIS Temporary Compressed Files"));
-            appHostConfig.SetValue(Constants.ConfigXPath.LocationSpecific.SystemDotWeb + "/compilation", "tempDirectory", Path.Combine(tempPath, "Temporary ASP.NET Files"));
 
             appHostConfig.Save(settings.AppConfigPath);
             return settings;
