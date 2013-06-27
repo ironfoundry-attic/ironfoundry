@@ -2,11 +2,11 @@
 {
     using System;
     using System.IO;
-    using System.Reflection;
     using System.Security.Cryptography;
     using System.Text;
     using System.Xml.Linq;
     using System.Xml.XPath;
+    using NLog;
     using Properties;
 
     internal class ConfigSettings
@@ -17,6 +17,7 @@
 
     internal class ConfigGenerator : IDisposable
     {
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly string configPath;
         private readonly string webRootPath;
         private readonly string logsRootPath;
@@ -28,9 +29,12 @@
             {
                 throw new ArgumentNullException("webRoot");
             }
-            webRootPath = webRoot;
+            this.webRootPath = webRoot;
 
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            log.Trace("Base directory: '{0}'", baseDirectory);
+
             configPath = Path.Combine(baseDirectory, "config");
             logsRootPath = Path.Combine(baseDirectory, "log");
             tempPath = Path.Combine(baseDirectory, "tmp");
@@ -48,7 +52,7 @@
         /// <param name="runtimeVersion">One of the <see><cref>Constants.RuntimeVersion</cref></see> values.</param>
         /// <param name="pipelineMode">One of the <see><cref>Constants.PipelineMode</cref></see> values.</param>
         /// <returns></returns>
-        public ConfigSettings Create(uint port, string rootWebConfigPath, string runtimeVersion, string pipelineMode)
+        public ConfigSettings Create(uint port, string rootWebConfigPath, string runtimeVersion, string pipelineMode, string userName, string password)
         {
             var settings = new ConfigSettings
             {
@@ -72,7 +76,8 @@
             // set the application pools config files
             var appPoolName = "AppPool" + port;
             appHostConfig.XPathSelectElement(Constants.ConfigXPath.AppPools).RemoveNodes();
-            appHostConfig.AddToElement(Constants.ConfigXPath.AppPools, BuildApplicationPool(appPoolName, runtimeVersion, pipelineMode, clrConfigPath));
+            appHostConfig.AddToElement(Constants.ConfigXPath.AppPools,
+                BuildApplicationPool(appPoolName, runtimeVersion, pipelineMode, clrConfigPath, userName, password));
 
             // logging paths
             var iisLogDir = Path.Combine(logsRootPath, "IIS");
@@ -89,15 +94,6 @@
             appHostConfig.SetValue(Constants.ConfigXPath.Sites + "/applicationDefaults", "applicationPool", appPoolName);
             appHostConfig.SetValue(Constants.ConfigXPath.Sites + "/virtualDirectoryDefaults", "allowSubDirConfig", true);
 
-            // temp paths
-            var tempCompFilesDir = Path.Combine(tempPath, "IIS Temporary Compressed Files");
-            appHostConfig.SetValue(Constants.ConfigXPath.WebServer + "/httpCompression", "directory", tempCompFilesDir);
-            EnsureDirectory(tempCompFilesDir);
-
-            var tempAspFilesDir = Path.Combine(tempPath, "Temporary ASP.NET Files");
-            appHostConfig.SetValue(Constants.ConfigXPath.LocationSpecific.SystemDotWeb + "/compilation", "tempDirectory", tempAspFilesDir);
-            EnsureDirectory(tempAspFilesDir);
-
             appHostConfig.Save(settings.AppConfigPath);
             return settings;
         }
@@ -110,7 +106,10 @@
             }
         }
 
-        protected virtual XElement BuildApplicationPool(string name, string runtimeVersion, string pipelineMode, string configFile)
+        protected virtual XElement BuildApplicationPool(
+            string name, string runtimeVersion,
+            string pipelineMode, string configFile,
+            string userName, string password)
         {
             var pool = new XElement("add");
             pool.Add(new XAttribute("name", name));
@@ -118,6 +117,18 @@
             pool.Add(new XAttribute("managedPipelineMode", pipelineMode));
             pool.Add(new XAttribute("CLRConfigFile", configFile));
             pool.Add(new XAttribute("autoStart", true));
+            pool.Add(new XAttribute("startMode", "AlwaysRunning"));
+
+            if (!(userName.IsNullOrWhiteSpace() || password.IsNullOrWhiteSpace()))
+            {
+                var processModel = new XElement("processModel");
+                processModel.Add(new XAttribute("identityType", "SpecificUser"));
+                processModel.Add(new XAttribute("userName", userName));
+                processModel.Add(new XAttribute("password", password));
+                processModel.Add(new XAttribute("manualGroupMembership", "true"));
+                pool.Add(processModel);
+            }
+
             return pool;
         }
 
