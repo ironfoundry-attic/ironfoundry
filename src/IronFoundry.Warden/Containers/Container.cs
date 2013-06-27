@@ -39,6 +39,11 @@
             this.directory = new ContainerDirectory(this.handle, this.user);
 
             this.processManager = new ProcessManager(this.user);
+
+            if (this.state == ContainerState.Active)
+            {
+                this.RestoreProcesses();
+            }
         }
 
         public Container()
@@ -177,9 +182,9 @@
                     port.Delete(user);
                 }
 
-                user.Delete();
-
                 directory.Delete();
+
+                user.Delete();
 
                 this.state = ContainerState.Destroyed;
             }
@@ -192,6 +197,11 @@
         public void AddProcess(Process process, ResourceLimits rlimits)
         {
             processManager.AddProcess(process);
+        }
+
+        private void RestoreProcesses()
+        {
+            processManager.RestoreProcesses();
         }
     }
 }

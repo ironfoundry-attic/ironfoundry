@@ -91,6 +91,7 @@
     <Compile Include="PInvoke\GetThreadDesktop.cs" />
     <Compile Include="PInvoke\LogonUser.cs" />
     <Compile Include="PInvoke\NativeMethods.cs" />
+    <Compile Include="Utilities\LoggedIEnumerableExtensionMethods.cs" />
     <Compile Include="Utilities\FirewallManager.cs" />
     <Compile Include="Utilities\ProcessExtensionMethods.cs" />
     <Compile Include="PInvoke\RevertToSelf.cs" />

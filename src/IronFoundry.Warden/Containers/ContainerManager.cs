@@ -43,6 +43,8 @@
         {
             if (Directory.Exists(containerRoot))
             {
+                // TODO: use snapshot rather than directories
+                // when using separate container.exe check for that process' existence
                 foreach (var dirPath in Directory.GetDirectories(containerRoot))
                 {
                     var handle = Path.GetFileName(dirPath);
