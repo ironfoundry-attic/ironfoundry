@@ -15,5 +15,10 @@
         {
             get { return configSection.ContainerBasePath; }
         }
+
+        public uint TcpPort
+        {
+            get { return configSection.TcpPort; }
+        }
     }
 }

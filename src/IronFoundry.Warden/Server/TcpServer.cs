@@ -27,7 +27,7 @@
 
         private Task clientListenTask;
 
-        public TcpServer(IContainerManager containerManager, IJobManager jobManager, CancellationToken cancellationToken)
+        public TcpServer(IContainerManager containerManager, IJobManager jobManager, uint tcpPort, CancellationToken cancellationToken)
         {
             if (containerManager == null)
             {
@@ -47,7 +47,12 @@
             }
             this.cancellationToken = cancellationToken;
 
-            this.endpoint = new IPEndPoint(IPAddress.Loopback, 4444); // TODO configurable port
+            if (tcpPort < 1025 || tcpPort > 65535)
+            {
+                throw new ArgumentOutOfRangeException("tcpPort", tcpPort, "TCP port must be within IANA specifications of 1025 to 65535");
+            }
+
+            this.endpoint = new IPEndPoint(IPAddress.Loopback, (int)tcpPort);
             this.listener = new TcpListener(endpoint); // lib/dea/task.rb, 66
             this.listener.Server.NoDelay = true;
         }

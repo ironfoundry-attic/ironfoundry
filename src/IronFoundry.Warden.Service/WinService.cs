@@ -21,7 +21,7 @@
         {
             this.cancellationTokenSource = Statics.CancellationTokenSource;
             this.containerManager = Statics.ContainerManager;
-            this.wardenServer = new TcpServer(containerManager, Statics.JobManager, cancellationTokenSource.Token);
+            this.wardenServer = new TcpServer(containerManager, Statics.JobManager, Statics.WardenConfig.TcpPort, cancellationTokenSource.Token);
             this.wardenServerTask = new Task(wardenServer.Run, cancellationTokenSource.Token);
         }
 

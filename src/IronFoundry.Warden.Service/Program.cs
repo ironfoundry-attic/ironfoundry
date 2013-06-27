@@ -5,15 +5,10 @@
     using NLog;
     using Topshelf;
 
-    // http://stackoverflow.com/questions/227187/uac-need-for-console-application
     static class Program
     {
         const string ServiceName = "ironfoundry.warden";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        static readonly LogLevel[] allLogLevels = new[] {
-            LogLevel.Fatal, LogLevel.Error, LogLevel.Warn,
-            LogLevel.Info, LogLevel.Debug, LogLevel.Trace
-        };
 
         static void Main(string[] args)
         {

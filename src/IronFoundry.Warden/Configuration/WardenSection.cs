@@ -6,16 +6,32 @@
     {
         public const string SectionName = "warden-server";
 
-        [ConfigurationProperty("container-basepath", DefaultValue = "C:\\IronFoundry\\warden\\containers", IsRequired = false)]
+        private const string ContainerBasePathPropName = "container-basepath";
+        private const string TcpPortPropName = "tcp-port";
+
+        [ConfigurationProperty(ContainerBasePathPropName, DefaultValue = "C:\\IronFoundry\\warden\\containers", IsRequired = false)]
         public string ContainerBasePath
         {
             get
             {
-                return (string)this["container-basepath"];
+                return (string)this[ContainerBasePathPropName];
             }
             set
             {
-                this["container-basepath"] = value;
+                this[ContainerBasePathPropName] = value;
+            }
+        }
+
+        [ConfigurationProperty(TcpPortPropName, DefaultValue = 4444, IsRequired = false)]
+        public uint TcpPort
+        {
+            get
+            {
+                return (uint)this[TcpPortPropName];
+            }
+            set
+            {
+                this[TcpPortPropName] = value;
             }
         }
     }
