@@ -29,6 +29,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
+    <Content Include="..\wixshared\IronFoundryShared.wxi">
+      <Link>IronFoundryShared.wxi</Link>
+    </Content>
     <Content Include="Banner.bmp" />
     <None Include="README_wixproj.txt" />
     <Content Include="ServiceConfigDialog.wxi" />
