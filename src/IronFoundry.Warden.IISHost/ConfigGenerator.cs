@@ -6,6 +6,7 @@
     using System.Text;
     using System.Xml.Linq;
     using System.Xml.XPath;
+    using NLog;
     using Properties;
 
     internal class ConfigSettings
@@ -16,6 +17,7 @@
 
     internal class ConfigGenerator : IDisposable
     {
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly string configPath;
         private readonly string webRootPath;
         private readonly string logsRootPath;
@@ -29,28 +31,17 @@
             }
             this.webRootPath = webRoot;
 
-            this.configPath = Path.Combine(Environment.CurrentDirectory, "config");
-            this.logsRootPath = Path.Combine(Environment.CurrentDirectory, "log");
-            this.tempPath = Path.Combine(Environment.CurrentDirectory, "tmp");
-            EnsureDirectories();
-        }
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-        private void EnsureDirectories()
-        {
-            if (!Directory.Exists(configPath))
-            {
-                Directory.CreateDirectory(configPath);
-            }
+            log.Trace("Base directory: '{0}'", baseDirectory);
 
-            if (!Directory.Exists(logsRootPath))
-            {
-                Directory.CreateDirectory(logsRootPath);
-            }
+            configPath = Path.Combine(baseDirectory, "config");
+            logsRootPath = Path.Combine(baseDirectory, "log");
+            tempPath = Path.Combine(baseDirectory, "tmp");
 
-            if (!Directory.Exists(tempPath))
-            {
-                Directory.CreateDirectory(tempPath);
-            }
+            EnsureDirectory(configPath);
+            EnsureDirectory(logsRootPath);
+            EnsureDirectory(tempPath);
         }
 
         /// <summary>
@@ -69,10 +60,11 @@
                 AppConfigPath = Path.Combine(configPath, "applicationHost.config")
             };
 
-            var clrConfigPath = Path.Combine(configPath, "aspnet.config");
-            var redirectConfigPath = Path.Combine(configPath, "redirection.config");
+            var clrConfigPath = Path.Combine(configPath, "aspnet.config"); // TODO: might need to just -> runtime version aspnet.config file
+            var redirectConfigPath = Path.Combine(configPath, "redirection.config"); // TODO: might need to just -> runtime version redirection.config file
 
             File.WriteAllText(redirectConfigPath, Resources.redirection);
+            File.WriteAllText(clrConfigPath, Resources.aspnet);
             File.WriteAllText(settings.AppConfigPath, runtimeVersion == Constants.RuntimeVersion.VersionFourDotZero ? Resources.applicationhost : Resources.v2_0AppHost);
 
             // TODO: Randomize AES Session Keys??
@@ -87,8 +79,13 @@
             appHostConfig.AddToElement(Constants.ConfigXPath.AppPools, BuildApplicationPool(appPoolName, runtimeVersion, pipelineMode, clrConfigPath));
 
             // logging paths
-            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/logFile", "directory", Path.Combine(logsRootPath, "IIS"));
-            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/traceFailedRequestsLogging", "directory", Path.Combine(logsRootPath, "TraceLogFiles"));
+            var iisLogDir = Path.Combine(logsRootPath, "IIS");
+            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/logFile", "directory", iisLogDir);
+            EnsureDirectory(iisLogDir);
+
+            var traceLogDir = Path.Combine(logsRootPath, "TraceLogFiles");
+            appHostConfig.SetValue(Constants.ConfigXPath.SiteDefaults + "/traceFailedRequestsLogging", "directory", traceLogDir);
+            EnsureDirectory(traceLogDir);
 
             // add the site and settings to the app host config
             appHostConfig.AddToElement(Constants.ConfigXPath.Sites, BuildSiteElement("IronFoundrySite", webRootPath, appPoolName, port));
@@ -97,10 +94,27 @@
             appHostConfig.SetValue(Constants.ConfigXPath.Sites + "/virtualDirectoryDefaults", "allowSubDirConfig", true);
 
             // temp paths
-            appHostConfig.SetValue(Constants.ConfigXPath.WebServer + "/httpCompression", "directory", Path.Combine(tempPath, "IIS Temporary Compressed Files"));
+            var tempCompFilesDir = Path.Combine(tempPath, "iis_temporary_compressed_files");
+            appHostConfig.SetValue(Constants.ConfigXPath.WebServer + "/httpCompression", "directory", tempCompFilesDir);
+            EnsureDirectory(tempCompFilesDir);
+
+            /*
+             * NB: not allowed in applicationHost.config, only in Web.config in IIS 8
+            var tempAspFilesDir = Path.Combine(tempPath, "Temporary ASP.NET Files");
+            appHostConfig.SetValue(Constants.ConfigXPath.LocationSpecific.SystemDotWeb + "/compilation", "tempDirectory", tempAspFilesDir);
+            EnsureDirectory(tempAspFilesDir);
+             */
 
             appHostConfig.Save(settings.AppConfigPath);
             return settings;
+        }
+
+        private void EnsureDirectory(string directory)
+        {
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
         }
 
         protected virtual XElement BuildApplicationPool(string name, string runtimeVersion, string pipelineMode, string configFile)

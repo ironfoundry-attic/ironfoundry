@@ -17,12 +17,13 @@ So root web.config passed to WebcoreActivate cannot have properties which are on
 
  Notes:
  -----------------------------------------------------
- - On Windows 7, you can only use .net 2.0 runtime version.
+ - On Windows 7, you can only use .net 2.0 runtime version
+(read above for explanation, this is hostable web core limitation).
  
  given the following args:
   -p 8869 -r d:\container -v 2.0 -b true
 
   It expects your web app to live in: d:\container\www
-  It will create logs in d:\container\logs
+  It will create log in d:\container\log
   It will create config in d:\container\config
-  It will create temp in d:\container\temp
+  It will create temp in d:\container\tmp

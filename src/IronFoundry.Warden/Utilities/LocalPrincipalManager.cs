@@ -3,9 +3,12 @@
     using System;
     using System.DirectoryServices;
     using System.DirectoryServices.AccountManagement;
+    using System.Security.Principal;
 
     public class LocalPrincipalManager
     {
+        private const string IIS_IUSRS_SID = "S-1-5-32-568";
+        private const string IIS_IUSRS_NAME = "IIS_IUSRS";
         private readonly string directoryPath = String.Format("WinNT://{0}", Environment.MachineName);
 
         public string FindUser(string userName)
@@ -37,6 +40,12 @@
                 user.DisplayName = "Warden User " + userName;
                 user.Save();
                 rvUserName = user.SamAccountName;
+
+                var groupQuery = new GroupPrincipal(context, IIS_IUSRS_NAME);
+                var searcher = new PrincipalSearcher(groupQuery);
+                var group = searcher.FindOne() as GroupPrincipal;
+                group.Members.Add(user);
+                group.Save();
             }
 
             return rvUserName;
