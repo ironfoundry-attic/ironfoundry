@@ -7,8 +7,9 @@
 
     public class LocalPrincipalManager
     {
-        private const string IIS_IUSRS_SID = "S-1-5-32-568";
+        // IIS_IUSRS_SID = "S-1-5-32-568";
         private const string IIS_IUSRS_NAME = "IIS_IUSRS";
+
         private readonly string directoryPath = String.Format("WinNT://{0}", Environment.MachineName);
 
         public string FindUser(string userName)
