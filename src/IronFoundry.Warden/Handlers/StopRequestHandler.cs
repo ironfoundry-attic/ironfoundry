@@ -18,7 +18,7 @@
 
         public override Task<Response> HandleAsync()
         {
-            return Task.Factory.StartNew<Response>(() =>
+            return Task.Run<Response>(() =>
                 {
                     // before
                     log.Trace("Handle: '{0}' Background: '{1}' Kill: '{2}'", request.Handle, request.Background, request.Kill);

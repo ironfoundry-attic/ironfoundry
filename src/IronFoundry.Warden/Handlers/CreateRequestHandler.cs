@@ -16,7 +16,7 @@
 
         public override Task<Response> HandleAsync()
         {
-            return Task.Factory.StartNew<Response>(() =>
+            return Task.Run<Response>(() =>
                 {
                     // before
 

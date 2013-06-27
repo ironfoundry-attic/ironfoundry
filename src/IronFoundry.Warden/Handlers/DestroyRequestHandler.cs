@@ -28,8 +28,7 @@
             {
                 log.Trace("Destroying container with handle: '{0}'", request.Handle);
 
-                // return Task.FromResult<Response>(new DestroyResponse());
-                return Task.Factory.StartNew<Response>(() =>
+                return Task.Run<Response>(() =>
                     {
                         Container container = GetContainer();
                         if (container.State != ContainerState.Stopped)

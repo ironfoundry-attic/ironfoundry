@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net;
+    using System.Security.Principal;
     using System.Text.RegularExpressions;
     using IronFoundry.Warden.Utilities;
 
@@ -50,6 +51,16 @@
             }
 
             AddDesktopPermission(this.userName);
+        }
+
+        public string SID
+        {
+            get
+            {
+                var ntAccount = new NTAccount(userName);
+                var securityIdentifier = (SecurityIdentifier)ntAccount.Translate(typeof(SecurityIdentifier));
+                return securityIdentifier.ToString();
+            }
         }
 
         public static void CleanUp(string uniqueId)

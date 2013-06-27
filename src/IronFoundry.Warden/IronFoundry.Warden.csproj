@@ -79,16 +79,21 @@
     <Compile Include="Jobs\JobStatusEventArgs.cs" />
     <Compile Include="PInvoke\CloseHandle.cs" />
     <Compile Include="PInvoke\Constants.cs" />
-    <Compile Include="PInvoke\JobObjectStructs.cs" />
-    <Compile Include="PInvoke\JobObjectMethods.cs" />
+    <Compile Include="PInvoke\Structs.cs" />
+    <Compile Include="PInvoke\LookupAccountSid.cs" />
+    <Compile Include="PInvoke\GetTokenInformation.cs" />
+    <Compile Include="PInvoke\OpenProcessToken.cs" />
     <Compile Include="PInvoke\DuplicateTokenEx.cs" />
     <Compile Include="PInvoke\Enums.cs" />
     <Compile Include="PInvoke\GetCurrentThreadId.cs" />
+    <Compile Include="PInvoke\GetLengthSid.cs" />
     <Compile Include="PInvoke\GetProcessWindowStation.cs" />
     <Compile Include="PInvoke\GetThreadDesktop.cs" />
-    <Compile Include="PInvoke\JobObjectInfoClass.cs" />
     <Compile Include="PInvoke\LogonUser.cs" />
     <Compile Include="PInvoke\NativeMethods.cs" />
+    <Compile Include="Utilities\LoggedIEnumerableExtensionMethods.cs" />
+    <Compile Include="Utilities\FirewallManager.cs" />
+    <Compile Include="Utilities\ProcessExtensionMethods.cs" />
     <Compile Include="PInvoke\RevertToSelf.cs" />
     <Compile Include="PInvoke\SafeUserTokenHandle.cs" />
     <Compile Include="PInvoke\SecurityAttributes.cs" />
@@ -136,13 +141,12 @@
     <Compile Include="Utilities\DesktopPermissionManager.cs" />
     <Compile Include="Utilities\Impersonator.cs" />
     <Compile Include="Utilities\IPUtilities.cs" />
-    <Compile Include="Containers\JobObject.cs" />
-    <Compile Include="PInvoke\JobObjectHandle.cs" />
     <Compile Include="Utilities\LocalPrincipalManager.cs" />
     <Compile Include="Tasks\TaskRunner.cs" />
     <Compile Include="Utilities\LocalTcpPortManager.cs" />
     <Compile Include="Utilities\LoggerExtensionMethods.cs" />
     <Compile Include="Utilities\MessageWriter.cs" />
+    <Compile Include="Utilities\ProcessManager.cs" />
     <Compile Include="Utilities\Statics.cs" />
     <Compile Include="Utilities\TempFile.cs" />
     <Compile Include="Server\Buffer.cs" />
@@ -185,6 +189,16 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <COMReference Include="NetFwTypeLib">
+      <Guid>{58FBCF7C-E7A9-467C-80B3-FC65E8FCCA08}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

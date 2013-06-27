@@ -66,14 +66,14 @@
                             options.Port,
                             Constants.FrameworkPaths.TwoDotZeroWebConfig,
                             Constants.RuntimeVersion.VersionTwoDotZero,
-                            Constants.PipelineMode.Integrated);
+                            Constants.PipelineMode.Integrated, options.UserName, options.Password);
                         break;
                     default:
                         settings = configGenerator.Create(
                             options.Port,
                             Constants.FrameworkPaths.FourDotZeroWebConfig,
                             Constants.RuntimeVersion.VersionFourDotZero,
-                            Constants.PipelineMode.Integrated);
+                            Constants.PipelineMode.Integrated, options.UserName, options.Password);
                         break;
                 }
 
@@ -142,6 +142,12 @@
 
         [Option('b', "startInBrowser", Required = false, DefaultValue = false, HelpText = "Specify true to start a browser pointing to the site.")]
         public bool StartInBrowser { get; set; }
+
+        [Option('u', "username", Required = false, HelpText = "Application pool user name.")]
+        public string UserName { get; set; }
+
+        [Option('w', "password", Required = false, HelpText = "Application pool user password.")]
+        public string Password { get; set; }
 
         [HelpOption]
         public string Usage()

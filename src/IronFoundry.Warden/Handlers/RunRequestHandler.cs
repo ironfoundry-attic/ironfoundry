@@ -23,7 +23,7 @@
 
             IJobRunnable runnable = base.GetRunnableFor(request);
 
-            return Task.Factory.StartNew<Response>(() =>
+            return Task.Run<Response>(() =>
                 {
                     IJobResult result = runnable.Run(); // run synchronously
                     return new RunResponse

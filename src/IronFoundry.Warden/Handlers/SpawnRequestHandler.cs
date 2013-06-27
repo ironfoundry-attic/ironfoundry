@@ -32,7 +32,7 @@
         public override Task<Response> HandleAsync()
         {
             log.Trace("Handle: '{0}' Script: '{1}'", request.Handle, request.Script);
-            return Task.Factory.StartNew<Response>(() =>
+            return Task.Run<Response>(() =>
                 {
                     IJobRunnable runnable = base.GetRunnableFor(request);
                     uint jobId = jobManager.StartJobFor(runnable); // run async
