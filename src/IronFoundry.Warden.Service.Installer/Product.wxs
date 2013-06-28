@@ -47,9 +47,7 @@
       InstallScope="perMachine"
       Languages="1033"
       Compressed="yes"
-      Platform="$(sys.BUILDARCH)"
-      Manufacturer="$(var.Manufacturer)"
-      />
+      Manufacturer="$(var.Manufacturer)" />
 
     <!-- Add Remove Programs Properties -->
     <Property Id="ARPHELPLINK" Value="http://www.ironfoundry.org" />
@@ -128,10 +126,10 @@
 
               <Component Id="PerProductRegistryKey" Guid="{3F24719A-C649-4E81-951D-6BD52F97D927}" Win64="$(var.WIN64.COMPONENTS)">
                 <Condition><![CDATA[ALLUSERS = 1]]></Condition>
-                <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
-                  <RegistryKey Action="create" Key="Iron Foundry">
+                <RegistryKey Root="HKLM" Key="SOFTWARE">
+                  <RegistryKey Key="Iron Foundry" ForceCreateOnInstall="yes">
                     <Permission User="Administrators" GenericRead="yes" Read="yes" GenericWrite="yes" Write="yes" TakeOwnership="yes" />
-                    <RegistryKey Action="createAndRemoveOnUninstall" Key="$(var.ShortProductName)">
+                    <RegistryKey Key="$(var.ShortProductName)">
                       <RegistryValue Value="[ProductVersion]" Type="string" KeyPath="yes"/>
                     </RegistryKey>
                   </RegistryKey>
@@ -139,13 +137,13 @@
               </Component>
 
               <Component Id="InstallDirRegKey" Guid="{A4ADE97C-F7E0-4166-8F53-0474C7EC098E}" Win64="$(var.WIN64.COMPONENTS)">
-                <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
+                <RegistryKey Root="HKLM" Key="$(var.RootRegistryPath)">
                   <RegistryValue Name="INSTALLDIR" Value="[INSTALLDIR]" Type="string" KeyPath="yes"/>
                 </RegistryKey>
               </Component>
 
               <Component Id="ProductCodeRegKey" Guid="{DA5BBC57-2FF1-42D5-A1E0-3708F940A838}" Win64="$(var.WIN64.COMPONENTS)">
-                <RegistryKey Root="HKLM" Action="none" Key="$(var.RootRegistryPath)">
+                <RegistryKey Root="HKLM" Key="$(var.RootRegistryPath)">
                   <RegistryValue Name="ProductCode" Value="[ProductCode]" Type="string" KeyPath="yes"/>
                 </RegistryKey>
               </Component>
@@ -162,7 +160,7 @@
                               Arguments="/x [ProductCode]"/>
                     <RemoveFolder Id="ApplicationProgramsFolderUninstall" On="uninstall" />
                     <RemoveFolder Id="ProgramMenuFolderUninstall" On="uninstall" />
-                    <RegistryKey Root="HKCU" Action="none" Key="$(var.RootRegistryPath)">
+                    <RegistryKey Root="HKCU" Key="$(var.RootRegistryPath)">
                       <RegistryValue Type="integer" Name="UninstallShortcut" Value="1" KeyPath="yes" />
                     </RegistryKey>
                   </Component>
@@ -187,7 +185,7 @@
               </Component>
 
               <Component Id="ServiceConfigKeys" Guid="{F524E952-9832-4CAC-BA98-0F977820D1C4}" Win64="$(var.WIN64.COMPONENTS)">
-                <RegistryKey Id="ServiceConfigKey" Action="createAndRemoveOnUninstall" Key="$(var.RootRegistryPath)" Root="HKLM">
+                <RegistryKey Key="$(var.RootRegistryPath)" Root="HKLM">
                   <RegistryValue Id="regContainerBasePath" Name="NatsHost" Value="[CONTAINERBASEPATH]" Type="string"/>
                   <RegistryValue Id="regTcpPort" Name="NatsPort" Value="[TCPPORT]" Type="string"/>
                 </RegistryKey>
@@ -247,7 +245,7 @@
                                 Remove="uninstall"
                                 Name="ironfoundry.warden"
                                 Wait="yes" />
-                <RegistryKey Id="ServiceNameKey" Action="createAndRemoveOnUninstall" Key="$(var.RootRegistryPath)" Root="HKLM">
+                <RegistryKey Key="$(var.RootRegistryPath)" Root="HKLM">
                   <RegistryValue Id="SERVICENAME" Name="ServiceName" Value="[SERVICENAME]" Type="string" />
                 </RegistryKey>
               </Component>

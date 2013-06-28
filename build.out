@@ -1,0 +1,219 @@
+Build started 6/27/2013 5:25:19 PM.
+     1>Project "C:\proj\cf\ironfoundry\dotnet\build\build.proj" on node 1 (Default target(s)).
+     1>Project "C:\proj\cf\ironfoundry\dotnet\build\build.proj" (1) is building "C:\proj\cf\ironfoundry\dotnet\build\package-restore.targets" (2) on node 1 (RestorePackages target(s)).
+     2>RestorePackages:
+         Restoring packages from NuGet...
+         Creating directory "C:\Users\lbakken\AppData\Local\Temp\kb4pgq4m.x05\".
+         "C:\proj\cf\ironfoundry\dotnet\build\nuget.exe" install "C:\Users\lbakken\AppData\Local\Temp\kb4pgq4m.x05\packages.config" -o "C:\proj\cf\ironfoundry\dotnet\build\..\packages" -source "https://nuget.org/api/v2/" -solutionDir "C:\proj\cf\ironfoundry\dotnet\build\..\ "
+         All packages listed in packages.config are already installed.
+         Removing directory "C:\Users\lbakken\AppData\Local\Temp\kb4pgq4m.x05\".
+     2>Done Building Project "C:\proj\cf\ironfoundry\dotnet\build\package-restore.targets" (RestorePackages target(s)).
+     1>SetVersion:
+         BuildVersion: 0.0.0
+         BuildCommit: DevLocal
+       SetInternalProperties:
+         BuildIsPrivate: True
+         BuildBranch: DevLocal
+         BuildVersion: 0.0.0
+         BuildCommit: DevLocal
+         NuGetVersion: 0.0.0-DevLocal
+     1>Project "C:\proj\cf\ironfoundry\dotnet\build\build.proj" (1) is building "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) on node 1 (Build target(s)).
+     3>ValidateSolutionConfiguration:
+         Building solution configuration "Release|x64".
+       ValidateProjects:
+         The project "IronFoundry.Test" is not selected for building in solution configuration "Release|x64".
+         The project "IronFoundry.Bosh.Test" is not selected for building in solution configuration "Release|x64".
+         The project "IronFoundry.Warden.Test" is not selected for building in solution configuration "Release|x64".
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry\IronFoundry.csproj" (4) on node 1 (default targets).
+     4>ResolveAssemblyReferences:
+         A TargetFramework profile exclusion list will be generated.
+       CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry\bin\Release\IronFoundry.dll
+     4>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry\IronFoundry.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service\IronFoundry.Warden.Service.csproj" (10) on node 1 (default targets).
+    10>Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service\IronFoundry.Warden.Service.csproj" (10) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Protocol\IronFoundry.Warden.Protocol.csproj" (13) on node 1 (default targets).
+    13>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Misc\IronFoundry.Misc.csproj" (11) on node 3 (default targets).
+    11>CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+    13>CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Warden.Protocol -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Protocol\bin\Release\IronFoundry.Warden.Protocol.dll
+    13>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Protocol\IronFoundry.Warden.Protocol.csproj" (default targets).
+    11>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh.Monit\IronFoundry.Bosh.Monit.csproj" (14) on node 4 (default targets).
+    14>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+    11>CopyFilesToOutputDirectory:
+         IronFoundry.Misc -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Misc\bin\Release\IronFoundry.Misc.dll
+    14>CopyFilesToOutputDirectory:
+         IronFoundry.Bosh.Monit -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh.Monit\bin\Release\IronFoundry.Bosh.Monit.dll
+    11>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Misc\IronFoundry.Misc.csproj" (default targets).
+    14>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh.Monit\IronFoundry.Bosh.Monit.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.IISHost\IronFoundry.Warden.IISHost.csproj" (16) on node 2 (default targets).
+    16>CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       _CopyAppConfigFile:
+       Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Warden.IISHost -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.IISHost\bin\Release\iishost.exe
+    16>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.IISHost\IronFoundry.Warden.IISHost.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Ui.Controls\IronFoundry.Ui.Controls.csproj" (19) on node 7 (default targets).
+    19>ResolveAssemblyReferences:
+         A TargetFramework profile exclusion list will be generated.
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Nats\IronFoundry.Nats.csproj" (8) on node 2 (default targets).
+     8>CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Nats -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Nats\bin\Release\IronFoundry.Nats.dll
+     8>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Nats\IronFoundry.Nats.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh\IronFoundry.Bosh.csproj" (5) on node 1 (default targets).
+     5>CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Bosh -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh\bin\Release\IronFoundry.Bosh.dll
+     5>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh\IronFoundry.Bosh.csproj" (default targets).
+    19>MainResourcesGeneration:
+       Skipping target "MainResourcesGeneration" because all output files are up-to-date with respect to the input files.
+       CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh.Service\IronFoundry.Bosh.Service.csproj" (7) on node 1 (default targets).
+     7>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+    19>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+     7>_CopyOutOfDateSourceItemsToOutputDirectoryAlways:
+         Copying file from "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh.Service\CloudFoundrySmall.ico" to "bin\Release\CloudFoundrySmall.ico".
+       _CopyAppConfigFile:
+       Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Bosh.Service -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh.Service\bin\Release\IronFoundry.Bosh.Service.exe
+     7>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Bosh.Service\IronFoundry.Bosh.Service.csproj" (default targets).
+    19>_CopyAppConfigFile:
+       Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Ui.Controls -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Ui.Controls\bin\Release\IronFoundry.Ui.Controls.dll
+    19>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Ui.Controls\IronFoundry.Ui.Controls.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.CloudFoundryExplorer\IronFoundry.CloudFoundryExplorer.csproj" (18) on node 8 (default targets).
+    18>ResolveAssemblyReferences:
+         A TargetFramework profile exclusion list will be generated.
+    10>Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service\IronFoundry.Warden.Service.csproj" (10) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden\IronFoundry.Warden.csproj" (15) on node 5 (default targets).
+    15>CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Warden -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden\bin\Release\IronFoundry.Warden.dll
+    15>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden\IronFoundry.Warden.csproj" (default targets).
+    18>CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       _CopyOutOfDateSourceItemsToOutputDirectoryAlways:
+         Copying file from "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.CloudFoundryExplorer\CloudFoundrySmall.ico" to "bin\Release\CloudFoundrySmall.ico".
+       _CopyAppConfigFile:
+       Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.CloudFoundryExplorer -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.CloudFoundryExplorer\bin\Release\CloudFoundryExplorer.exe
+    18>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.CloudFoundryExplorer\IronFoundry.CloudFoundryExplorer.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.CloudFoundryExplorer.Installer\IronFoundry.CloudFoundryExplorer.Installer.wixproj" (6) on node 4 (default targets).
+     6>Compile:
+       Skipping target "Compile" because all output files are up-to-date with respect to the input files.
+       Link:
+       Skipping target "Link" because all output files are up-to-date with respect to the input files.
+     6>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.CloudFoundryExplorer.Installer\IronFoundry.CloudFoundryExplorer.Installer.wixproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea\IronFoundry.Dea.csproj" (9) on node 5 (default targets).
+     9>CoreResGen:
+         No resources are out of date with respect to their source files. Skipping resource generation.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Dea -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea\bin\Release\IronFoundry.Dea.dll
+     9>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea\IronFoundry.Dea.csproj" (default targets).
+    10>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       _CopyOutOfDateSourceItemsToOutputDirectoryAlways:
+         Copying file from "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service\CloudFoundrySmall.ico" to "bin\Release\CloudFoundrySmall.ico".
+       _CopyAppConfigFile:
+       Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Warden.Service -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service\bin\Release\IronFoundry.Warden.Service.exe
+    10>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service\IronFoundry.Warden.Service.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service\IronFoundry.Dea.Service.csproj" (12) on node 6 (default targets).
+    12>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service.Installer\IronFoundry.Warden.Service.Installer.wixproj" (17) on node 6 (default targets).
+    17>Compile:
+       Skipping target "Compile" because all output files are up-to-date with respect to the input files.
+       Link:
+       Skipping target "Link" because all output files are up-to-date with respect to the input files.
+    17>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Warden.Service.Installer\IronFoundry.Warden.Service.Installer.wixproj" (default targets).
+    12>_CopyOutOfDateSourceItemsToOutputDirectoryAlways:
+         Copying file from "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service\CloudFoundrySmall.ico" to "bin\Release\CloudFoundrySmall.ico".
+       _CopyAppConfigFile:
+       Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         IronFoundry.Dea.Service -> C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service\bin\Release\IronFoundry.Dea.Service.exe
+    12>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service\IronFoundry.Dea.Service.csproj" (default targets).
+     3>Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (3) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service.Installer\IronFoundry.Dea.Service.Installer.wixproj.metaproj" (20) on node 1 (default targets).
+    20>Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service.Installer\IronFoundry.Dea.Service.Installer.wixproj.metaproj" (20) is building "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service.Installer\IronFoundry.Dea.Service.Installer.wixproj" (21) on node 3 (default targets).
+    21>Compile:
+       Skipping target "Compile" because all output files are up-to-date with respect to the input files.
+       Link:
+       Skipping target "Link" because all output files are up-to-date with respect to the input files.
+    21>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service.Installer\IronFoundry.Dea.Service.Installer.wixproj" (default targets).
+    20>Done Building Project "C:\proj\cf\ironfoundry\dotnet\src\IronFoundry.Dea.Service.Installer\IronFoundry.Dea.Service.Installer.wixproj.metaproj" (default targets).
+     3>Done Building Project "C:\proj\cf\ironfoundry\dotnet\IronFoundry.sln" (Build target(s)).
+     1>Test:
+         
+         Test Assembly: 
+         There are no unit tests!
+     1>Done Building Project "C:\proj\cf\ironfoundry\dotnet\build\build.proj" (Default target(s)).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.54
+
+*** BUILD SUCCESSFUL ***
+
