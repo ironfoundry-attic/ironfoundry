@@ -17,15 +17,19 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DefineConstants>Debug;PLATFORM=x86;VERSION=1.0.0.0</DefineConstants>
+    <CompilerAdditionalOptions>-arch x86</CompilerAdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineConstants>$([MSBuild]::Unescape($(WixValues)))</DefineConstants>
+    <CompilerAdditionalOptions>-arch x86</CompilerAdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DefineConstants>Debug;PLATFORM=x64;VERSION=1.1.0.0</DefineConstants>
+    <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DefineConstants>$([MSBuild]::Unescape($(WixValues)))</DefineConstants>
+    <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />

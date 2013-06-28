@@ -1,8 +1,8 @@
 <Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Component Id="IronFoundryRegKey" Guid="{BB5917B4-6CDF-4B35-B58B-DE3C472C5C31}" Win64="$(var.WIN64.COMPONENTS)">
     <Condition><![CDATA[ALLUSERS = 1]]></Condition>
-      <RegistryKey Root="HKLM" Action="none" Key="SOFTWARE">
-        <RegistryKey Action="createAndRemoveOnUninstall" Key="Iron Foundry">
+      <RegistryKey Root="HKLM" Key="SOFTWARE">
+        <RegistryKey Key="Iron Foundry">
           <RegistryValue Value="Iron Foundry" Type="string" KeyPath="yes"/>
         </RegistryKey>
       </RegistryKey>
