@@ -10,6 +10,7 @@
   <?endif?>
 
   <?define var.SVCBUILDDIR = $(var.IronFoundry.Warden.Service.TargetDir)?>
+  <?define var.CABUILDDIR =  $(var.IronFoundry.Warden.Service.InstallerCA.TargetDir) ?>
 
   <?if $(sys.BUILDARCH) = x64?>
     <?define SEARCH.WIN64.REG = 'yes' ?>
@@ -177,17 +178,23 @@
                 <util:XmlFile Id="Config.XmlFile.1" Sequence="1" Action="setValue"
                     File="[#IronFoundry.Warden.Service.exe.config]"
                     ElementPath="/configuration/warden-server/@container-basepath"
-                    Value="[CONTAINERBASEPATH]"/>
+                    Value="[CONTAINER_BASE_PATH]"/>
                 <util:XmlFile Id="Config.XmlFile.2" Sequence="2" Action="setValue"
                     File="[#IronFoundry.Warden.Service.exe.config]"
                     ElementPath="/configuration/warden-server/@tcp-port"
-                    Value="[TCPPORT]"/>
+                    Value="[TCP_PORT]"/>
+              </Component>
+
+              <Component Id="WindowsServiceUser" Guid="{711B420B-96B9-43C7-B89E-B67C26877D40}" Win64="$(var.WIN64.COMPONENTS)">
+                  <Condition><![CDATA[SERVICE_CREDENTIALS_USER <> "LocalSystem"]]></Condition>
+                  <util:User Id="UpdateUserLogonAsService" RemoveOnUninstall="no" UpdateIfExists="yes" CreateUser="no" Name="[SERVICE_CREDENTIALS_USER]" LogonAsService="yes" />
+                  <CreateFolder/>
               </Component>
 
               <Component Id="ServiceConfigKeys" Guid="{F524E952-9832-4CAC-BA98-0F977820D1C4}" Win64="$(var.WIN64.COMPONENTS)">
                 <RegistryKey Key="$(var.RootRegistryPath)" Root="HKLM">
-                  <RegistryValue Id="regContainerBasePath" Name="NatsHost" Value="[CONTAINERBASEPATH]" Type="string"/>
-                  <RegistryValue Id="regTcpPort" Name="NatsPort" Value="[TCPPORT]" Type="string"/>
+                  <RegistryValue Id="regContainerBasePath" Name="NatsHost" Value="[CONTAINER_BASE_PATH]" Type="string"/>
+                  <RegistryValue Id="regTcpPort" Name="NatsPort" Value="[TCP_PORT]" Type="string"/>
                 </RegistryKey>
               </Component>
 
@@ -230,7 +237,8 @@
                                 DisplayName="[SERVICENAME]"
                                 Description="$(var.ProductName) Service"
                                 Start="auto"
-                                Account="LocalSystem"
+                                Account="[SERVICE_CREDENTIALS_USER]"
+                                Password="[SERVICE_CREDENTIALS_PASSWORD]"
                                 ErrorControl="ignore"
                                 Interactive="no">
                                 <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"
@@ -258,17 +266,27 @@
     </Directory>
 
     <!-- START (Configuration Settings) -->
-    <Property Id="CONTAINERBASEPATH" Secure="yes" Value="C:\IronFoundry\Warden\Containers">
+    <Property Id="CONTAINER_BASE_PATH" Secure="yes" Value="C:\IronFoundry\Warden\Containers">
       <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regContainerBaseDirectory" Name="ContainerBaseDirectory"/>
     </Property>
-    <Property Id="TCPPORT" Secure="yes" Value="4444">
+    <Property Id="TCP_PORT" Secure="yes" Value="4444">
       <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regTcpPort" Name="TcpPort" />
     </Property>
+    <Property Id="SERVICE_CREDENTIALS_USER" Value="Administrator" />
+    <Property Id="SERVICE_CREDENTIALS_PASSWORD" Admin="yes" Hidden="yes" />
+    <Property Id="CREDENTIALS_VALID" Value="1" />
+    <Property Id="CONTAINER_PATH_VALID" Value="1" />
+    <Property Id="TCP_PORT_VALID" Value="1" />
     <!-- END (Configuration Settings) -->
 
     <!-- Define variables that the ServiceConfigDlg uses -->
-    <WixVariable Id="ServiceConfigContainerBaseDirProperty" Value="CONTAINERBASEPATH"/>
-    <WixVariable Id="ServiceConfigTcpPortProperty" Value="TCPPORT"/>
+    <WixVariable Id="ServiceContainerBaseDirProperty" Value="CONTAINER_BASE_PATH"/>
+    <WixVariable Id="ServiceTcpPortProperty" Value="TCP_PORT"/>
+    <WixVariable Id="ServiceCredentialsUserProperty" Value="SERVICE_CREDENTIALS_USER" />
+    <WixVariable Id="ServiceCredentialsPasswordProperty" Value="SERVICE_CREDENTIALS_PASSWORD" />
+    <WixVariable Id="CredentialsValidProperty" Value="CREDENTIALS_VALID" />
+    <WixVariable Id="ContainerPathValidProperty" Value="CONTAINER_PATH_VALID" />
+    <WixVariable Id="TcpPortValidProperty" Value="TCP_PORT_VALID" />
 
     <!-- START (User Interface) Reference: http://wix.sourceforge.net/manual-wix3/WixUI_dialog_library.htm -->
     <WixVariable Id="WixUIBannerBmp"  Value="Banner.bmp" />
@@ -277,12 +295,14 @@
     <WixVariable Id="WixUISupportPerUser" Value="0" />
 
     <Property Id="WIXUI_FEATURETREE" Value="$(var.ProductName) Service"/>
+
     <UIRef Id="WixUI_Common" />
 
     <UI>
       <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
       <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
       <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" />
+      <TextStyle Id="Red8" FaceName="Tahoma" Size="8" Red="255" Green="0" Blue="0" />
 
       <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
       <Property Id="WixUI_Mode"    Value="FeatureTree" />
@@ -298,6 +318,7 @@
 
       <!-- Service Config Dialog -->
       <?include ServiceConfigDialog.wxi?>
+      <?include ServiceConfigDialog_Validation.wxi?>
 
       <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
       <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
@@ -311,7 +332,29 @@
 
       <Publish Dialog="ServiceConfigDlg" Control="Back" Event="NewDialog" Order="1" Value="CustomizeDlg"><![CDATA[NOT WixUI_InstallMode = "Repair"]]></Publish>
       <Publish Dialog="ServiceConfigDlg" Control="Back" Event="NewDialog" Order="2" Value="MaintenanceTypeDlg"><![CDATA[Installed AND WixUI_InstallMode = "Repair"]]></Publish>
-      <Publish Dialog="ServiceConfigDlg" Control="Next" Event="NewDialog" Order="1" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="ServiceConfigDlg" Control="Browse" Event="DoAction" Value="OpenFolderBrowser" Order="1">1</Publish>
+      <Publish Dialog="ServiceConfigDlg" Control="Browse" Property="CONTAINER_BASE_PATH" Value="[CONTAINER_BASE_PATH]" Order="2">1</Publish>
+      <Publish Dialog="ServiceConfigDlg" Control="Next" Event="DoAction" Order="1" Value="ValidateCredentials">1</Publish>
+      <Publish Dialog="ServiceConfigDlg" Control="Next" Event="DoAction" Order="2" Value="ValidateSettings">1</Publish>
+      <Publish Dialog="ServiceConfigDlg" Control="Next" Event="NewDialog" Order="2" Value="ServiceValidationDlg">
+          <![CDATA[CREDENTIALS_VALID = "0" OR CONTAINER_PATH_VALID = "0" OR TCP_PORT_VALID = "0"]]>
+      </Publish>
+      <Publish Dialog="ServiceConfigDlg" Control="Next" Event="NewDialog" Order="3" Value="VerifyReadyDlg">
+          <![CDATA[CREDENTIALS_VALID = "1" AND CONTAINER_PATH_VALID = "1" AND TCP_PORT_VALID = "1"]]>
+      </Publish>
+
+      <Publish Dialog="ServiceValidationDlg" Control="Back" Event="NewDialog" Order="1" Value="CustomizeDlg"><![CDATA[NOT WixUI_InstallMode = "Repair"]]></Publish>
+      <Publish Dialog="ServiceValidationDlg" Control="Back" Event="NewDialog" Order="2" Value="MaintenanceTypeDlg"><![CDATA[Installed AND WixUI_InstallMode = "Repair"]]></Publish>
+      <Publish Dialog="ServiceValidationDlg" Control="Browse" Event="DoAction" Value="OpenFolderBrowser" Order="1">1</Publish>
+      <Publish Dialog="ServiceValidationDlg" Control="Browse" Property="CONTAINER_BASE_PATH" Value="[CONTAINER_BASE_PATH]" Order="2">1</Publish>
+      <Publish Dialog="ServiceValidationDlg" Control="Next" Event="DoAction" Order="1" Value="ValidateCredentials">1</Publish>
+      <Publish Dialog="ServiceValidationDlg" Control="Next" Event="DoAction" Order="2" Value="ValidateSettings">1</Publish>
+      <Publish Dialog="ServiceValidationDlg" Control="Next" Event="NewDialog" Order="2" Value="ServiceConfigDlg">
+          <![CDATA[CREDENTIALS_VALID = "0" OR CONTAINER_PATH_VALID = "0" OR TCP_PORT_VALID = "0"]]>
+      </Publish>
+      <Publish Dialog="ServiceValidationDlg" Control="Next" Event="NewDialog" Order="3" Value="VerifyReadyDlg">
+          <![CDATA[CREDENTIALS_VALID = "1" AND CONTAINER_PATH_VALID = "1" AND TCP_PORT_VALID = "1"]]>
+      </Publish>
 
       <Publish Dialog="VerifyReadyDlg" Control="Back" Order="1" Value="MaintenanceTypeDlg" Event="NewDialog"><![CDATA[WixUI_InstallMode = "Remove"]]></Publish>
       <Publish Dialog="VerifyReadyDlg" Control="Back" Order="2" Value="ServiceConfigDlg" Event="NewDialog"><![CDATA[NOT WixUI_InstallMode = "Remove"]]></Publish>
@@ -324,7 +367,14 @@
       <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="1">1</Publish>
     </UI>
     <!-- END (User Interface) -->
-    
+
+    <!-- START (Custom Actions) -->
+    <Binary Id="InstallerCA.dll" SourceFile="$(var.CABUILDDIR)IronFoundry.Warden.Service.InstallerCA.CA.dll" />
+    <CustomAction Id="ValidateCredentials" BinaryKey="InstallerCA.dll" DllEntry="ValidateCredentials" Execute="immediate" />
+    <CustomAction Id="ValidateSettings" BinaryKey="InstallerCA.dll" DllEntry="ValidateSettings" Execute="immediate" />
+    <CustomAction Id="OpenFolderBrowser" BinaryKey="InstallerCA.dll" DllEntry="OpenFolderBrowser" Execute="immediate" />
+    <!-- END (Custom Actions) -->
+
     <ComponentGroup Id="CommonComponents">
       <ComponentRef Id="InstallDirRegKey" Primary="yes"/>
       <ComponentRef Id="PerProductRegistryKey" Primary="yes"/>
@@ -338,6 +388,7 @@
       <ComponentRef Id="IronFoundry.Warden.Service" Primary="yes" />
       <ComponentRef Id="IronFoundry.Warden.Service.exe.config" Primary="yes"/>
       <ComponentRef Id="ServiceConfigKeys" Primary="yes"/>
+      <ComponentRef Id="WindowsServiceUser" Primary="yes"/>
       <ComponentRef Id="UninstallShortcut" Primary="yes"/>
       <ComponentRef Id="ProductCodeRegKey" Primary="yes"/>
     </ComponentGroup>
