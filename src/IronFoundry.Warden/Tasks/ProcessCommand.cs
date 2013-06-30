@@ -53,7 +53,12 @@
                 process.ErrorDataReceived += process_ErrorDataReceived;
                 process.OutputDataReceived += process_OutputDataReceived;
 
-                process.StartAndWait(asyncOutput: true, postStartAction: (p) => container.AddProcess(p, rlimits));
+                Action<Process> postStartAction = (Process p) =>
+                    {
+                        log.Trace("Process ID: '{0}'", p.Id);
+                        container.AddProcess(p, rlimits);
+                    };
+                process.StartAndWait(asyncOutput: true, postStartAction: postStartAction);
 
                 process.ErrorDataReceived -= process_ErrorDataReceived;
                 process.OutputDataReceived -= process_OutputDataReceived;

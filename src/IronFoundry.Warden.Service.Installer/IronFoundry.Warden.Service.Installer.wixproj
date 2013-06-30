@@ -6,8 +6,8 @@
     <ProductVersion>3.7</ProductVersion>
     <ProjectGuid>c6b70c35-b493-4801-b22a-c4ceb119817f</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName Condition="'$(Platform)' == 'x86'">IronFoundry.Dea.Service.x86</OutputName>
-    <OutputName Condition="'$(Platform)' == 'x64'">IronFoundry.Dea.Service.x64</OutputName>
+    <OutputName Condition="'$(Platform)' == 'x86'">IronFoundry.Warden.Service.x86</OutputName>
+    <OutputName Condition="'$(Platform)' == 'x64'">IronFoundry.Warden.Service.x64</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>

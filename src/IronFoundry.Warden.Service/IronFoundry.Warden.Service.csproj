@@ -38,9 +38,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup />
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Compile Include="..\shared\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
@@ -54,9 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
