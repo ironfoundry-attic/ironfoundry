@@ -73,7 +73,7 @@
 
         private void CreateTarArchive()
         {
-            using (var fs = File.OpenWrite(tarFile))
+            using (var fs = File.Open(tarFile, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             {
                 using (var gzipStream = new GZipOutputStream(fs))
                 {
@@ -89,7 +89,7 @@
 
         private void ExtractTarArchive()
         {
-            using (var fs = File.OpenRead(tarFile))
+            using (var fs = File.Open(tarFile, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 using (var gzipStream = new GZipInputStream(fs))
                 {

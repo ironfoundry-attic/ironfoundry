@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading.Tasks;
     using NLog;
     using Utilities;
 
@@ -43,23 +44,45 @@
         {
             if (Directory.Exists(containerRoot))
             {
-                // TODO: use snapshot rather than directories
-                // when using separate container.exe check for that process' existence
-                foreach (var dirPath in Directory.GetDirectories(containerRoot))
-                {
-                    var handle = Path.GetFileName(dirPath);
-                    try
+                Task.Run(() =>
                     {
-                        var container = new Container(handle, ContainerState.Active);
-                        containers.TryAdd(container.Handle, container);
-                    }
-                    catch (Exception ex)
-                    {
-                        Container.CleanUp(handle);
-                        log.ErrorException(ex);
-                    }
-                }
+                        // TODO: use snapshot rather than directories
+                        // when using separate container.exe check for that process' existence
+                        foreach (var dirPath in Directory.GetDirectories(containerRoot))
+                        {
+                            var handle = Path.GetFileName(dirPath);
+                            try
+                            {
+                                var container = new Container(handle, ContainerState.Active);
+                                containers.TryAdd(container.Handle, container);
+                            }
+                            catch (Exception ex)
+                            {
+                                Container.CleanUp(handle);
+                                log.ErrorException(ex);
+                            }
+                        }
+
+                        try
+                        {
+                            RemoveEmptyContainers(); // TODO is this really what we should do on startup?
+                        }
+                        catch (Exception ex)
+                        {
+                            log.ErrorException(ex);
+                        }
+                    });
             }
+        }
+
+        private void RemoveEmptyContainers()
+        {
+            containers.Values.Foreach(log, (c) => !c.HasProcesses,
+                (c) =>
+                {
+                    log.Info("Destroying stale container '{0}'", c.Handle);
+                    DestroyContainer(c);
+                });
         }
 
         public void DestroyContainer(Container container)

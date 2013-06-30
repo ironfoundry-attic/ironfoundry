@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace IronFoundry.Warden.Service.InstallerCA.Win32
 {
@@ -33,7 +30,8 @@ namespace IronFoundry.Warden.Service.InstallerCA.Win32
 
             try
             {
-                if (Win32.LogonUser(userName, null, password, logonType, provider, out userTokenHandle))
+                var parsedData = ParseUserName(userName);
+                if (Win32.LogonUser(parsedData.Item1, parsedData.Item2, password, logonType, provider, out userTokenHandle))
                 {
                     return true;
                 }
@@ -52,6 +50,27 @@ namespace IronFoundry.Warden.Service.InstallerCA.Win32
                     userTokenHandle.Close();
                 }
             }
+        }
+
+        public static Tuple<string, string> ParseUserName(string input)
+        {
+            string userName = null;
+            string domain = null;
+
+            int delimiterIdx = input.IndexOf('\\');
+            if (delimiterIdx > -1)
+            {
+                domain = input.Substring(0, delimiterIdx);
+                int skipIdx = delimiterIdx + 1;
+                userName = input.Substring(skipIdx, input.Length - skipIdx);
+            }
+            else
+            {
+                userName = input;
+                domain = null;
+            }
+
+            return new Tuple<string, string>(userName, domain);
         }
 
         private static class Win32

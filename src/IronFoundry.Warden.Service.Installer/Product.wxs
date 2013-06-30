@@ -77,6 +77,7 @@
         Key="$(var.RootRegistryPath)" />
     </Property>
 
+    <!-- NOTE: this name is defined in Constants.cs in IronFoundry.Warden.Service project as is 'ironfoundry.warden' -->
     <Property Id="SERVICENAME" Value="$(var.ProductName) Service">
       <RegistrySearch
         Id="RegSERVICENAME"
@@ -198,10 +199,11 @@
                 </RegistryKey>
               </Component>
 
-              <Component Id="IronFoundry.Warden.Service" Guid="{8F773322-7413-4E30-A609-B41BF9FDB04A}" Win64="$(var.WIN64.COMPONENTS)">
+              <Component Id="IronFoundry.Warden.Service" Guid="{8F773322-7413-4E30-A609-B41BF9FDB04A}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="no">
                 <File Id="IronFoundry.Warden.Service.exe"
                       Name="IronFoundry.Warden.Service.exe"
-                      Source="$(var.SVCBUILDDIR)IronFoundry.Warden.Service.exe" />
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Warden.Service.exe"
+                      KeyPath="yes" />
                 <File Id="IronFoundry.Warden.Service.pdb"
                       Name="IronFoundry.Warden.Service.pdb"
                       Source="$(var.SVCBUILDDIR)IronFoundry.Warden.Service.pdb" />
@@ -229,7 +231,11 @@
                 <File Id="Topshelf.dll"
                       Name="Topshelf.dll"
                       Source="$(var.SVCBUILDDIR)Topshelf.dll" />
+                <File Id="Topshelf.NLog.dll"
+                      Name="Topshelf.NLog.dll"
+                      Source="$(var.SVCBUILDDIR)Topshelf.NLog.dll" />
 
+                <!-- NB: Name="ironfoundry.warden" MUST MATCH name in Topshelf config and WinServiceInstaller -->
                 <ServiceInstall Id="IronFoundry.Warden.Service.ServiceInstaller"
                                 Type="ownProcess"
                                 Vital="yes"

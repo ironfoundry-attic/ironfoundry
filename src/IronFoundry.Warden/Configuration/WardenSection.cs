@@ -22,12 +22,12 @@
             }
         }
 
-        [ConfigurationProperty(TcpPortPropName, DefaultValue = 4444, IsRequired = false)]
-        public uint TcpPort
+        [ConfigurationProperty(TcpPortPropName, DefaultValue = ((ushort)4444), IsRequired = false)]
+        public ushort TcpPort
         {
             get
             {
-                return (uint)this[TcpPortPropName];
+                return (ushort)this[TcpPortPropName];
             }
             set
             {

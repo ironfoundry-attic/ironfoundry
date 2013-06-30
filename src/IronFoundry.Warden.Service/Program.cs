@@ -7,7 +7,6 @@
 
     static class Program
     {
-        const string ServiceName = "ironfoundry.warden";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         static void Main(string[] args)
@@ -19,8 +18,10 @@
             HostFactory.Run(x =>
                 {
                     x.Service<WinService>();
-                    x.SetDescription("Iron Foundry Warden Service");
-                    x.SetDisplayName(ServiceName);
+                    x.SetDescription(Constants.DisplayName);
+                    x.SetDisplayName(Constants.DisplayName);
+                    // NB: very important, must match installer
+                    x.SetServiceName(Constants.ServiceName);
                     x.StartAutomaticallyDelayed();
                     x.RunAsPrompt();
                     x.UseNLog();
