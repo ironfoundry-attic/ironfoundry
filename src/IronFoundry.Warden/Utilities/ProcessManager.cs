@@ -1,11 +1,8 @@
 ﻿namespace IronFoundry.Warden.Utilities
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Concurrent;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using Containers;
     using NLog;
@@ -31,6 +28,11 @@
                     string processUser = process.GetUserName();
                     return processUser == containerUser && !process.HasExited;
                 };
+        }
+
+        public bool HasProcesses
+        {
+            get { return processes.Count > 0; }
         }
 
         public void AddProcess(Process process)

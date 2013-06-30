@@ -16,7 +16,7 @@
             get { return configSection.ContainerBasePath; }
         }
 
-        public uint TcpPort
+        public ushort TcpPort
         {
             get { return configSection.TcpPort; }
         }

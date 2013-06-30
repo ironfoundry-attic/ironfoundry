@@ -81,9 +81,25 @@
             get { return directory; }
         }
 
+        public bool HasProcesses
+        {
+            get
+            {
+                rwlock.EnterReadLock();
+                try
+                {
+                    return processManager.HasProcesses;
+                }
+                finally
+                {
+                    rwlock.ExitReadLock();
+                }
+            }
+        }
+
         public void AfterCreate()
         {
-            this.state = ContainerState.Active;
+            ChangeState(ContainerState.Active);
         }
 
         public void Stop()
@@ -93,7 +109,7 @@
 
         public void AfterStop()
         {
-            this.state = ContainerState.Stopped;
+            ChangeState(ContainerState.Stopped);
         }
 
         public ContainerPort ReservePort(ushort suggestedPort)
@@ -202,6 +218,19 @@
         private void RestoreProcesses()
         {
             processManager.RestoreProcesses();
+        }
+
+        private void ChangeState(ContainerState containerState)
+        {
+            rwlock.EnterWriteLock();
+            try
+            {
+                this.state = containerState;
+            }
+            finally
+            {
+                rwlock.ExitWriteLock();
+            }
         }
     }
 }
