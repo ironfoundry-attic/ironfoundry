@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Deployment.WindowsInstaller;
 
 namespace IronFoundry.Warden.Service.InstallerCA
@@ -31,6 +29,12 @@ namespace IronFoundry.Warden.Service.InstallerCA
 
             var userName = session[ServiceCredentialsUserPropertyName];
             var password = session[ServiceCredentialsPasswordPropertyName];
+
+            if (!userName.Contains('\\'))
+            {
+                userName = Environment.MachineName + "\\" + userName;
+                session[ServiceCredentialsUserPropertyName] = userName;
+            }
 
             var valid = new LogonUser(new SessionLogger(session)).ValidateCredentials(userName, password);
             session[CredentialsValidPropertyName] = valid ? "1" : "0";
