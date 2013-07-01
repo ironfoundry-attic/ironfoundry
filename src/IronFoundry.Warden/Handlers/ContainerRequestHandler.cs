@@ -29,9 +29,20 @@
         protected InfoResponse BuildInfoResponse()
         {
             // TODO complete info
+            InfoResponse infoResponse = null;
+
             Container container = GetContainer();
-            var infoBuilder = new InfoBuilder(container);
-            return infoBuilder.GetInfoResponse();
+            if (container == null)
+            {
+                infoResponse = new InfoResponse();
+            }
+            else
+            {
+                var infoBuilder = new InfoBuilder(container);
+                infoResponse = infoBuilder.GetInfoResponse();
+            }
+
+            return infoResponse;
         }
     }
 }
