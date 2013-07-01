@@ -40,6 +40,12 @@
                 user.DisplayName = "Warden User " + userName;
                 user.Save();
                 rvUserName = user.SamAccountName;
+
+                var groupQuery = new GroupPrincipal(context, IIS_IUSRS_NAME);
+                var searcher = new PrincipalSearcher(groupQuery);
+                var iisUsersGroup = searcher.FindOne() as GroupPrincipal;
+                iisUsersGroup.Members.Add(user);
+                iisUsersGroup.Save();
             }
 
             return rvUserName;

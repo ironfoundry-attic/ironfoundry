@@ -143,12 +143,8 @@
                     if (exToHandle != null)
                     {
                         var messageWriter = new MessageWriter(networkStream);
-                        var wardenExceptionHandler = new WardenExceptionHandler(exToHandle, messageWriter);
-                        bool handled = await wardenExceptionHandler.HandleAsync();
-                        if (!handled)
-                        {
-                            log.ErrorException(exToHandle);
-                        }
+                        var wardenExceptionHandler = new WardenExceptionHandler(log, exToHandle, messageWriter);
+                        await wardenExceptionHandler.HandleAsync();
                     }
                 }
 

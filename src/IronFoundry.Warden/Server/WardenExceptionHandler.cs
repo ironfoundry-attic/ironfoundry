@@ -2,16 +2,24 @@
 {
     using System;
     using System.Threading.Tasks;
+    using NLog;
     using Protocol;
     using Utilities;
 
     public class WardenExceptionHandler
     {
+        private readonly Logger log;
         private readonly Exception exception;
         private readonly MessageWriter messageWriter;
 
-        public WardenExceptionHandler(Exception exception, MessageWriter messageWriter)
+        public WardenExceptionHandler(Logger log, Exception exception, MessageWriter messageWriter)
         {
+            if (log == null)
+            {
+                throw new ArgumentNullException("log");
+            }
+            this.log = log;
+
             if (exception == null)
             {
                 throw new ArgumentNullException("exception");
@@ -25,9 +33,9 @@
             this.messageWriter = messageWriter;
         }
 
-        public async Task<bool> HandleAsync()
+        public async Task HandleAsync()
         {
-            bool handled = false;
+            log.ErrorException(exception);
 
             var wardenException = exception as WardenException;
             if (wardenException != null)
@@ -38,10 +46,7 @@
                     Data = wardenException.StackTrace
                 };
                 await messageWriter.WriteAsync(response);
-                handled = true;
             }
-
-            return handled;
         }
     }
 }
