@@ -11,3 +11,16 @@ Installing .NET Warden Service
   * Create dedicated user in `Administrators` group to run Warden service as. Admin user is required due to the fact that the Warden service creates unprivileged user accounts for containers.
     `NT AUTHORITY\Local Service` does not have these permissions. `Local System` can not be used due to the fact that the service uses the `CreateProcessWithLogonW` API call to run subprocesses.
   * Set `powershell` execution policy to `RemoteSigned`. Don't forget to also set 32-bit powershell here `C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe` (may not be required)
+ 
+Be sure to update your Cloud Controller's `config/stacks.yml` to recognize the `mswin-clr` stack:
+
+```
+vagrant@precise64:/vagrant$ cat cloud_controller_ng/config/stacks.yml 
+default: lucid64
+
+stacks:
+  - name: lucid64
+    description: Ubuntu Lucid 64-bit
+  - name: mswin-clr
+    description: Microsoft .NET / Windows 64-bit
+```
