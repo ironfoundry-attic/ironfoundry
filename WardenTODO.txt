@@ -1,0 +1,3 @@
+3) Wire up the ProcessCommand.RunProcess -> deploy and start the PisoSvc and pass it command to start a process
+4) Wire up client and server configs to use dynamic endpoint configuration (via code vs config file)
+5) Wire up the disk quota manager when we create the container user (if that even makes sense)

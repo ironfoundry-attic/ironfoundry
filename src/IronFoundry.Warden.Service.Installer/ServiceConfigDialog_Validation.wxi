@@ -32,7 +32,10 @@
     <Control Id="ServiceUserNameText" Type="Text" X="41" Y="176" Width="46" Height="10" Text="&amp;Username:" TabSkip="yes" />
     <Control Id="ServiceUserNameBox" Type="Edit" X="98" Y="174" Width="170" Height="15" Property="!(wix.ServiceCredentialsUserProperty)" TabSkip="no" />
     <Control Id="ServicePasswordText" Type="Text" X="41" Y="195" Width="45" Height="10" Text="&amp;Password:" TabSkip="yes" />
-    <Control Id="ServicePasswordBox" Type="Edit" X="98" Y="193" Width="170" Height="15" Password="yes" TabSkip="no" Property="!(wix.ServiceCredentialsPasswordProperty)" />
+    <Control Id="ServicePasswordBox" Type="Edit" X="98" Y="193" Width="170" Height="15" Password="yes" TabSkip="no" Property="!(wix.ServiceCredentialsPasswordProperty)">
+      <Condition Action="disable"><![CDATA[!(wix.ServiceCredentialsUserProperty) = "LocalSystem"]]></Condition>
+      <Condition Action="enable"><![CDATA[!(wix.ServiceCredentialsUserProperty) <> "LocalSystem"]]></Condition>
+    </Control>
     <Control Id="ValidatorText" Type="Text" X="98" Y="210" Width="200" Height="10" Text="{\Red8}Invalid user name or password." Property="!(wix.CredentialsValidProperty)" >
       <Condition Action="show"><![CDATA[!(wix.CredentialsValidProperty) = "0"]]></Condition>
       <Condition Action="hide"><![CDATA[!(wix.CredentialsValidProperty) = "1"]]></Condition>
@@ -43,9 +46,21 @@
     <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
     <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
       <Condition Action="disable">
-          <![CDATA[ !(wix.ServiceTcpPortProperty) = "" OR !(wix.ServiceContainerBaseDirProperty) = "" OR !(wix.ServiceCredentialsUserProperty) = "" OR !(wix.ServiceCredentialsPasswordProperty) = "" ]]></Condition>
+          <![CDATA[
+            !(wix.ServiceTcpPortProperty) = "" OR !(wix.ServiceContainerBaseDirProperty) = "" OR !(wix.ServiceCredentialsUserProperty) = "" OR (
+                (!(wix.ServiceCredentialsPasswordProperty) =  "" AND !(wix.ServiceCredentialsUserProperty) <> "LocalSystem") OR
+                (!(wix.ServiceCredentialsPasswordProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) =  "LocalSystem")
+             )
+          ]]>
+      </Condition>
       <Condition Action="enable">
-          <![CDATA[ !(wix.ServiceTcpPortProperty) <> "" AND !(wix.ServiceContainerBaseDirProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) <> "" AND !(wix.ServiceCredentialsPasswordProperty) <> ""]]></Condition>
+          <![CDATA[
+            !(wix.ServiceTcpPortProperty) <> "" AND !(wix.ServiceContainerBaseDirProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) <> "" AND (
+                (!(wix.ServiceCredentialsPasswordProperty) =  "" AND !(wix.ServiceCredentialsUserProperty) =  "LocalSystem") OR
+                (!(wix.ServiceCredentialsPasswordProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) <> "LocalSystem")
+            )
+          ]]>
+      </Condition>
     </Control>
     <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
       <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>

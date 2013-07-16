@@ -11,6 +11,7 @@
 
   <?define var.SVCBUILDDIR = $(var.IronFoundry.Warden.Service.TargetDir)?>
   <?define var.CABUILDDIR =  $(var.IronFoundry.Warden.Service.InstallerCA.TargetDir) ?>
+  <?define var.PISOBUILDDIR =  $(var.IronFoundry.Warden.ProcessIsolationService.TargetDir) ?>
 
   <?if $(sys.BUILDARCH) = x64?>
     <?define SEARCH.WIN64.REG = 'yes' ?>
@@ -171,6 +172,29 @@
               <!-- END (StartMenu Shortcuts) -->
 
               <!-- START (Windows Service) -->
+              <Directory Id="PisoSvcDirectory" Name="PisoSvc">
+                <Component Id="IronFoundry.Warden.ProcessIsolationService" Guid="{C0E2BDB5-B26E-4201-96F7-7135600C2FDE}" Win64="$(var.WIN64.COMPONENTS)" KeyPath="no">
+                  <CreateFolder />
+                  <RemoveFolder Id="PisoSvcDirRemove" On="uninstall" />
+                  <File Id="IronFoundry.Warden.ProcessIsolationService.exe"
+                    Name="PisoSvc.exe"
+                    Source="$(var.PISOBUILDDIR)IronFoundry.Warden.ProcessIsolationService.exe"
+                    KeyPath="yes" />
+                  <File Id="IronFoundry.Warden.ProcessIsolationService.pdb"
+                    Name="PisoSvc.pdb"
+                    Source="$(var.PISOBUILDDIR)IronFoundry.Warden.ProcessIsolationService.pdb" />
+                  <File Id="IronFoundry.Warden.ProcessIsolationService.exe.config"
+                    Name="PisoSvc.exe.config"
+                    Source="$(var.PISOBUILDDIR)IronFoundry.Warden.ProcessIsolationService.exe.config" />
+                  <File Id="IronFoundry.Warden.ProcessIsolation.dll"
+                    Name="IronFoundry.Warden.ProcessIsolation.dll"
+                    Source="$(var.PISOBUILDDIR)IronFoundry.Warden.ProcessIsolation.dll" />
+                  <!--<File Id="NLog.dll.PisoSvc"
+                    Name="NLog.dll"
+                    Source="$(var.PISOBUILDDIR)NLog.dll" />-->
+                </Component>
+              </Directory>
+
               <Component Id="IronFoundry.Warden.Service.exe.config" Guid="{753F821E-2467-4BC6-A887-3D6EB042A9C8}" Win64="$(var.WIN64.COMPONENTS)">
                 <File Id="IronFoundry.Warden.Service.exe.config"
                       Name="IronFoundry.Warden.Service.exe.config"
@@ -194,8 +218,8 @@
 
               <Component Id="ServiceConfigKeys" Guid="{F524E952-9832-4CAC-BA98-0F977820D1C4}" Win64="$(var.WIN64.COMPONENTS)">
                 <RegistryKey Key="$(var.RootRegistryPath)" Root="HKLM">
-                  <RegistryValue Id="regContainerBasePath" Name="NatsHost" Value="[CONTAINER_BASE_PATH]" Type="string"/>
-                  <RegistryValue Id="regTcpPort" Name="NatsPort" Value="[TCP_PORT]" Type="string"/>
+                  <RegistryValue Id="regContainerBasePath" Name="ContainerBasePath" Value="[CONTAINER_BASE_PATH]" Type="string"/>
+                  <RegistryValue Id="regTcpPort" Name="TcpPort" Value="[TCP_PORT]" Type="string"/>
                 </RegistryKey>
               </Component>
 
@@ -290,7 +314,7 @@
     <Property Id="TCP_PORT" Secure="yes" Value="4444">
       <RegistrySearch Root="HKLM" Type="raw" Key="$(var.RootRegistryPath)" Id="regTcpPort" Name="TcpPort" />
     </Property>
-    <Property Id="SERVICE_CREDENTIALS_USER" Value="Administrator" />
+    <Property Id="SERVICE_CREDENTIALS_USER" Value="LocalSystem" />
     <Property Id="SERVICE_CREDENTIALS_PASSWORD" Admin="yes" Hidden="yes" />
     <Property Id="CREDENTIALS_VALID" Value="1" />
     <Property Id="CONTAINER_PATH_VALID" Value="1" />
@@ -405,6 +429,7 @@
     <ComponentGroup Id="WardenServiceComponents">
       <ComponentRef Id="IronFoundry.Warden.Service" Primary="yes" />
       <ComponentRef Id="IronFoundry.Warden.Service.exe.config" Primary="yes"/>
+      <ComponentRef Id="IronFoundry.Warden.ProcessIsolationService" Primary="yes"/>
       <ComponentRef Id="ServiceConfigKeys" Primary="yes"/>
       <ComponentRef Id="WindowsServiceUser" Primary="yes"/>
       <ComponentRef Id="UninstallShortcut" Primary="yes"/>
