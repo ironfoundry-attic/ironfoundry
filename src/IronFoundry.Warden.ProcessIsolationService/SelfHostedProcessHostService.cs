@@ -4,18 +4,19 @@
     using System.ServiceModel;
     using System.ServiceProcess;
     using NLog;
+    using ProcessIsolation;
     using ProcessIsolation.Service;
 
     [System.ComponentModel.DesignerCategory(@"Code")]
-    public class SelfHostJobObjectService : ServiceBase
+    public class SelfHostedProcessHostService : ServiceBase
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         private ServiceHost serviceHost;
 
-        public void StartService()
+        public void StartService(string[] args)
         {
-            OnStart(null);
+            OnStart(args);
         }
 
         public void StopService()
@@ -28,8 +29,13 @@
             try
             {
                 log.Info("Starting service...");
-                var instance = new JobObjectService();
+
+                var binding = IpcEndpointConfig.Binding();
+                var address = IpcEndpointConfig.ServiceAddress(args.Length > 0 ? args[0] : null);
+
+                var instance = new ProcessHostService();
                 serviceHost = new ServiceHost(instance);
+                serviceHost.AddServiceEndpoint(typeof(IProcessHostService), binding, address);
                 serviceHost.Open();
             }
             catch (Exception ex)

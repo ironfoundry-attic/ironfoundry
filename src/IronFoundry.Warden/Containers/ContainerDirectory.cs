@@ -9,6 +9,8 @@
     {
         private readonly DirectoryInfo containerDirectory;
 
+        public string Path { get { return containerDirectory.FullName; }}
+
         public ContainerDirectory(ContainerHandle handle, ContainerUser user, bool shouldCreate = false)
         {
             if (handle == null)
@@ -85,7 +87,7 @@
             var config = new WardenConfig();
 
             string containerBasePath = config.ContainerBasePath;
-            string containerDirectory = Path.Combine(containerBasePath, handle);
+            string containerDirectory = System.IO.Path.Combine(containerBasePath, handle);
 
             return new Tuple<DirectoryInfo, string>(new DirectoryInfo(containerBasePath), containerDirectory);
         }

@@ -33,5 +33,22 @@
                 }
             }
         }
+
+        public static T Try<T>(this object obj, Func<T> function, Func<T> errorReturnValue, Action<Exception> onError = null)
+        {
+            try
+            {
+                return function();
+            }
+            catch(Exception ex)
+            {
+                if (onError != null)
+                {
+                    onError(ex);
+                }
+
+                return errorReturnValue();
+            }
+        }
     }
 }

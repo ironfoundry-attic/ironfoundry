@@ -23,8 +23,7 @@
         private readonly TaskCommandDTO[] commands;
 
         private ConcurrentQueue<TaskCommandStatus> jobStatusQueue;
-
-        private bool runningAsync = false;
+        private bool runningAsync;
 
         public TaskRunner(Container container, ITaskRequest request)
         {
@@ -42,7 +41,7 @@
 
             if (this.request.Script.IsNullOrWhiteSpace())
             {
-                throw new ArgumentNullException("request.Script can't be empty.");
+                throw new ArgumentException("request.Script is required.");
             }
 
             commands = JsonConvert.DeserializeObject<TaskCommandDTO[]>(request.Script);
@@ -88,7 +87,7 @@
         {
             bool shouldImpersonate = !request.Privileged;
 
-            var commandFactory = new TaskCommandFactory(container, shouldImpersonate, request.Rlimits);
+            var commandFactory = new TaskCommandFactory(container, request.Rlimits);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
 
@@ -102,7 +101,7 @@
                 TaskCommand taskCommand = commandFactory.Create(cmd.Command, cmd.Args);
                 try
                 {
-                    TaskCommandResult result = null;
+                    TaskCommandResult result;
 
                     if (taskCommand is ProcessCommand)
                     {
@@ -134,7 +133,7 @@
         {
             bool shouldImpersonate = !request.Privileged;
 
-            var commandFactory = new TaskCommandFactory(container, shouldImpersonate, request.Rlimits);
+            var commandFactory = new TaskCommandFactory(container, request.Rlimits);
             var credential = container.GetCredential();
             var results = new List<TaskCommandResult>();
 

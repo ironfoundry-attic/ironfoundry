@@ -15,15 +15,15 @@
 #if DEBUG // only allow command line service run in debug build.
             if (Environment.UserInteractive)
             {
-                var service = new SelfHostJobObjectService();
-                service.StartService();
+                var service = new SelfHostedProcessHostService();
+                service.StartService(args);
                 Console.WriteLine(@"Hit [Enter] key to stop service...");
                 Console.ReadLine();
                 service.StopService();
             }
             else
 #endif
-                ServiceBase.Run(new[] { new SelfHostJobObjectService() });
+                ServiceBase.Run(new[] { new SelfHostedProcessHostService() });
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

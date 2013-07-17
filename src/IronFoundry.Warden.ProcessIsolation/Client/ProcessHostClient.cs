@@ -9,23 +9,23 @@
     using NLog;
     using Service;
 
-    public class JobObjectClient : IJobObjectClient, IDisposable
+    public class ProcessHostClient : IProcessHostClient, IDisposable
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         private readonly Mutex serviceMutex = new Mutex();
 
-        protected virtual IJobObjectService ServiceInstance { get; set; }
+        protected virtual IProcessHostService ServiceInstance { get; set; }
         protected virtual ICommunicationObject ServiceChannel { get; set; }
-        protected virtual ChannelFactory<IJobObjectService> Factory { get; set; }
+        protected virtual ChannelFactory<IProcessHostService> Factory { get; set; }
         protected virtual InstanceContext Context { get; set; }
 
-        private JobObjectServiceClientCallback callback;
-        private readonly string configurationName;
-
-        public JobObjectClient(string configurationName)
+        private ProcessHostClientCallback callback;
+        private readonly string uniquePipeName;
+        
+        public ProcessHostClient(string uniquePipeName)
         {
-            this.configurationName = configurationName;
+            this.uniquePipeName = uniquePipeName;
         }
 
         private static int GetCurrentProcessID()
@@ -33,46 +33,52 @@
             return Process.GetCurrentProcess().Id;
         }
 
-        #region IJobObjectClient implementation
-        public event EventHandler<EventArgs<string>> OutputReceived;
-        public event EventHandler<EventArgs<string>> ErrorReceived;
-        public event EventHandler<EventArgs<int>> ProcessExited;
+        #region IProcessHostClient implementation
+        public event EventHandler<ProcessEventArgs<string>> OutputReceived;
+        public event EventHandler<ProcessEventArgs<string>> ErrorReceived;
+        public event EventHandler<ProcessEventArgs<int>> ProcessExited;
         public event EventHandler<EventArgs<string>> ServiceMessageReceived;
 
         public void Register()
         {
-            RegisterJobClient(GetCurrentProcessID());
+            RegisterClient(GetCurrentProcessID());
         }
 
         public void Unregister()
         {
-            UnregisterJobClient(GetCurrentProcessID());
+            UnregisterClient(GetCurrentProcessID());
         }
         #endregion
 
-        #region IJobObjectService implementation (Service Proxy)
-        public void RegisterJobClient(int processID)
+        #region IProcessHostService implementation (Service Proxy)
+        public void RegisterClient(int processID)
         {
-            log.Trace("Client Call: RegisterJobClient({0})", processID);
-            GetChannel().RegisterJobClient(processID);
+            log.Trace("Client Call: RegisterClient({0})", processID);
+            GetChannel().RegisterClient(processID);
         }
 
-        public void UnregisterJobClient(int processID)
+        public void UnregisterClient(int processID)
         {
-            log.Trace("Client Call: UnregisterJobClient({0})", processID);
-            GetChannel().UnregisterJobClient(processID);
+            log.Trace("Client Call: UnregisterClient({0})", processID);
+            GetChannel().UnregisterClient(processID);
         }
 
-        public void SetJobLimits(JobObjectLimits limits)
+        public void SetProcessLimits(int processID, ResourceLimits limits)
+        {
+            log.Trace("Client Call: SetProcessLimits({0})", processID);
+            GetChannel().SetProcessLimits(processID, limits);
+        }
+
+        public void SetJobLimits(ResourceLimits limits)
         {
             log.Trace("Client Call: SetJobLimits");
             GetChannel().SetJobLimits(limits);
         }
 
-        public void StartProcess(string fileName, string workingDirectory, string args)
+        public int StartProcess(string fileName, string workingDirectory, string args)
         {
             log.Trace("Client Call: StartProcess");
-            GetChannel().StartProcess(fileName, workingDirectory, args);
+            return GetChannel().StartProcess(fileName, workingDirectory, args);
         }
 
         public void StopProcess(int processID)
@@ -90,7 +96,7 @@
         #endregion
 
         #region Channel Management
-        private IJobObjectService GetChannel()
+        private IProcessHostService GetChannel()
         {
             serviceMutex.WaitOne();
 
@@ -119,7 +125,7 @@
 
             try
             {
-                callback = new JobObjectServiceClientCallback();
+                callback = new ProcessHostClientCallback();
                 callback.OnError += ErrorReceived;
                 callback.OnOutput += OutputReceived;
                 callback.OnProcessExited += ProcessExited;
@@ -128,7 +134,10 @@
                 Context = new InstanceContext(callback);
                 HookFaultEvents(Context);
 
-                Factory = new DuplexChannelFactory<IJobObjectService>(Context, configurationName);
+                var binding = IpcEndpointConfig.Binding();
+                var endpoint = IpcEndpointConfig.ClientAddress(uniquePipeName);
+
+                Factory = new DuplexChannelFactory<IProcessHostService>(Context, binding, endpoint);
                 HookFaultEvents(Factory);
 
                 ServiceInstance = Factory.CreateChannel();
@@ -164,9 +173,9 @@
                 CleanupCommunicationObject(Context);
                 Context = null;
 
+                ServiceInstance = null;
                 CleanupCommunicationObject(ServiceChannel);
                 ServiceChannel = null;
-                ServiceInstance = null;
 
                 CleanupCommunicationObject(Factory);
                 Factory = null;

@@ -1,6 +1,6 @@
 ﻿namespace IronFoundry.Warden.ProcessIsolation.Service
 {
-    public class JobObjectLimits
+    public class ResourceLimits
     {
         /// <summary>
         /// The maximum amount of memory allowed to be allocated to a job or its processes, in Megabytes.

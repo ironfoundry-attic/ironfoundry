@@ -7,17 +7,15 @@
     public class TaskCommandFactory
     {
         private readonly Container container;
-        private readonly bool shouldImpersonate;
         private readonly ResourceLimits rlimits;
 
-        public TaskCommandFactory(Container container, bool shouldImpersonate, ResourceLimits rlimits)
+        public TaskCommandFactory(Container container, ResourceLimits rlimits)
         {
             if (container == null)
             {
                 throw new ArgumentNullException("container");
             }
             this.container = container;
-            this.shouldImpersonate = shouldImpersonate;
             this.rlimits = rlimits;
         }
 
@@ -26,13 +24,13 @@
             switch (commandName)
             {
                 case "exe" :
-                    return new ExeCommand(container, arguments, shouldImpersonate, rlimits);
+                    return new ExeCommand(container, arguments, rlimits);
                 case "mkdir" :
                     return new MkdirCommand(container, arguments);
                 case "iis" :
-                    return new WebApplicationCommand(container, arguments, shouldImpersonate, rlimits);
+                    return new WebApplicationCommand(container, arguments, rlimits);
                 case "ps1" :
-                    return new PowershellCommand(container, arguments, shouldImpersonate, rlimits);
+                    return new PowershellCommand(container, arguments, rlimits);
                 case "replace-tokens" :
                     return new ReplaceTokensCommand(container, arguments);
                 case "tar" :

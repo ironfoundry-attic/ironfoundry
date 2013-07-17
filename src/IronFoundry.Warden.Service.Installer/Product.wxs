@@ -243,6 +243,12 @@
                 <File Id="IronFoundry.Warden.Protocol.pdb"
                       Name="IronFoundry.Warden.Protocol.pdb"
                       Source="$(var.SVCBUILDDIR)IronFoundry.Warden.Protocol.pdb" />
+                <File Id="IronFoundry.Warden.ProcessIsolation.dll.Service"
+                      Name="IronFoundry.Warden.ProcessIsolation.dll"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Warden.ProcessIsolation.dll" />
+                <File Id="IronFoundry.Warden.ProcessIsolation.pdb.Service"
+                      Name="IronFoundry.Warden.ProcessIsolation.pdb"
+                      Source="$(var.SVCBUILDDIR)IronFoundry.Warden.ProcessIsolation.pdb" />
                 <File Id="AsproLock.dll"
                       Name="AsproLock.dll"
                       Source="$(var.SVCBUILDDIR)AsproLock.dll" />

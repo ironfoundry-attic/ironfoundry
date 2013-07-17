@@ -1,29 +1,25 @@
 ﻿namespace IronFoundry.Warden.Tasks
 {
     using System;
-    using System.Diagnostics;
-    using System.Net;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using Containers;
     using NLog;
     using Protocol;
-    using Utilities;
 
     public abstract class ProcessCommand : TaskCommand
     {
+        private readonly ManualResetEventSlim processExitLatch = new ManualResetEventSlim();
         private readonly StringBuilder stdout = new StringBuilder();
         private readonly StringBuilder stderr = new StringBuilder();
 
-        private readonly bool shouldImpersonate = false;
         private readonly ResourceLimits rlimits;
 
         private readonly Logger log = LogManager.GetCurrentClassLogger();
-        public ProcessCommand(Container container, string[] arguments, bool shouldImpersonate, ResourceLimits rlimits)
 
-            : base(container, arguments)
+        protected ProcessCommand(Container container, string[] arguments, ResourceLimits rlimits) : base(container, arguments)
         {
-            this.shouldImpersonate = shouldImpersonate;
             this.rlimits = rlimits;
         }
 
@@ -39,64 +35,52 @@
 
         public Task<TaskCommandResult> ExecuteAsync()
         {
-            return Task.Run<TaskCommandResult>((Func<TaskCommandResult>)DoExecute);
+            return Task.Run((Func<TaskCommandResult>)DoExecute);
         }
 
         protected abstract TaskCommandResult DoExecute();
 
         protected TaskCommandResult RunProcess(string workingDirectory, string executable, string processArguments)
         {
-            log.Trace("Running process{0}: {1} {2}", shouldImpersonate ? " (as warden user)" : String.Empty,  executable, processArguments);
+            log.Trace("Starting process: {0} {1}", executable, processArguments);
 
-            using (var process = new BackgroundProcess(workingDirectory, executable, processArguments, GetImpersonatationCredential()))
+            int exitCode = -1;
+            int pid = container.StartProcess(executable, workingDirectory, processArguments, rlimits,
+                ProcessOutputReceived, 
+                ProcessErrorReceived,
+                ec => {
+                    exitCode = ec;
+                    processExitLatch.Set();
+                });
+
+            if (pid > 0)
             {
-                process.ErrorDataReceived += process_ErrorDataReceived;
-                process.OutputDataReceived += process_OutputDataReceived;
+                log.Trace("Started Process ID: '{0}'", pid);
+                processExitLatch.Wait();
 
-                Action<Process> postStartAction = (Process p) =>
-                    {
-                        log.Trace("Process ID: '{0}'", p.Id);
-                        container.AddProcess(p, rlimits);
-                    };
-                process.StartAndWait(asyncOutput: true, postStartAction: postStartAction);
-
-                process.ErrorDataReceived -= process_ErrorDataReceived;
-                process.OutputDataReceived -= process_OutputDataReceived;
-
-                string sout = stdout.ToString();
-                string serr = stderr.ToString();
-
-                log.Trace("Process ended with exit code: {0}", process.ExitCode);
-
-                return new TaskCommandResult(process.ExitCode, sout, serr);
+                return new TaskCommandResult(exitCode, stdout.ToString(), stderr.ToString());
+            }
+            else
+            {
+                throw new Exception("Unable to start the specified process");
             }
         }
 
-        private NetworkCredential GetImpersonatationCredential()
+        private void ProcessOutputReceived(string output)
         {
-            NetworkCredential impersonationCredential = null;
-            if (shouldImpersonate)
+            if (output != null)
             {
-                impersonationCredential = container.GetCredential();
-            }
-            return impersonationCredential;
-        }
-
-        private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data != null)
-            {
-                string outputLine = e.Data + '\n';
+                string outputLine = output + '\n';
                 stdout.Append(outputLine);
                 OnStatusAvailable(new TaskCommandStatus(null, outputLine, null));
             }
         }
 
-        private void process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private void ProcessErrorReceived(string error)
         {
-            if (e.Data != null)
+            if (error != null)
             {
-                string outputLine = e.Data + '\n';
+                string outputLine = error + '\n';
                 stderr.Append(outputLine);
                 OnStatusAvailable(new TaskCommandStatus(null, null, outputLine));
             }

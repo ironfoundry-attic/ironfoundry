@@ -11,8 +11,8 @@
     {
         private const string powershellArgFmt = "-NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File \"{0}\"";
 
-        public PowershellCommand(Container container, string[] arguments, bool shouldImpersonate, ResourceLimits rlimits)
-            : base(container, arguments, shouldImpersonate, rlimits)
+        public PowershellCommand(Container container, string[] arguments, ResourceLimits rlimits)
+            : base(container, arguments, rlimits)
         {
             if (base.arguments.IsNullOrEmpty())
             {

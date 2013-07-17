@@ -2,12 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
+    using System.IO;
     using System.Net;
     using System.Threading;
     using NLog;
+    using ProcessIsolation.Client;
+    using ProcessIsolation.Service;
     using Protocol;
     using Utilities;
+    using ResourceLimits = ProcessIsolation.Service.ResourceLimits;
 
     public class Container
     {
@@ -16,7 +19,9 @@
         private readonly ContainerHandle handle;
         private readonly ContainerUser user;
         private readonly ContainerDirectory directory;
-        private readonly ProcessManager processManager;
+        private readonly ContainerProcessIORouter processIORouter;
+        private readonly ProcessHostManager processHostManager;
+        private readonly IProcessHostClient processHostClient;
 
         private ContainerPort port;
         private ContainerState state;
@@ -33,27 +38,40 @@
             {
                 throw new ArgumentNullException("containerState");
             }
-            this.state = containerState;
+            state = containerState;
 
-            this.user = new ContainerUser(handle);
-            this.directory = new ContainerDirectory(this.handle, this.user);
+            user = new ContainerUser(handle);
+            directory = new ContainerDirectory(this.handle, user);
 
-            this.processManager = new ProcessManager(this.user);
+            processHostManager = CreateProcessHostManager();
+            processHostClient = new ProcessHostClient(this.handle.ToString());
+            processIORouter = new ContainerProcessIORouter(processHostClient);
 
-            if (this.state == ContainerState.Active)
+            if (state == ContainerState.Active)
             {
-                this.RestoreProcesses();
+                RestoreProcesses();
             }
         }
 
         public Container()
         {
-            this.handle = new ContainerHandle();
-            this.user = new ContainerUser(handle, shouldCreate: true);
-            this.directory = new ContainerDirectory(this.handle, this.user, true);
-            this.state = ContainerState.Born;
+            handle = new ContainerHandle();
+            user = new ContainerUser(handle, shouldCreate: true);
+            directory = new ContainerDirectory(handle, user, true);
+            state = ContainerState.Born;
 
-            this.processManager = new ProcessManager(this.user);
+            processHostManager = CreateProcessHostManager();
+            processHostClient = new ProcessHostClient(this.handle.ToString());
+            processIORouter = new ContainerProcessIORouter(processHostClient);
+        }
+
+        private ProcessHostManager CreateProcessHostManager()
+        {
+            // note: for debug build, the IF.Warden.ProcessIsolationService output is post build event copied (and renamed)
+            //       to the IF.Warden.Service output directory /PisoSvc/PisoSvc.exe
+            // note: the warden service installer does this as well
+            var hostDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PisoSvc");
+            return new ProcessHostManager(hostDirectory, directory.Path, "pisosvc.exe", handle, GetCredential());
         }
 
         public NetworkCredential GetCredential()
@@ -88,7 +106,8 @@
                 rwlock.EnterReadLock();
                 try
                 {
-                    return processManager.HasProcesses;
+                    processHostClient.Register();
+                    return processHostClient.ListProcesses().Count > 0;
                 }
                 finally
                 {
@@ -104,7 +123,11 @@
 
         public void Stop()
         {
-            processManager.StopProcesses();
+            processHostClient.Register();
+            foreach (var process in processHostClient.ListProcesses())
+            {
+                processHostClient.StopProcess(process.ID);
+            }
         }
 
         public void AfterStop()
@@ -181,6 +204,7 @@
 
         public static void CleanUp(string handle)
         {
+            ProcessHostManager.Cleanup(handle, new ContainerDirectory(new ContainerHandle(handle), null).ToString());
             ContainerUser.CleanUp(handle);
             ContainerDirectory.CleanUp(handle);
             ContainerPort.CleanUp(handle, 0); // TODO
@@ -188,18 +212,28 @@
 
         public void Destroy()
         {
+            // TODO: fix this so that one cleanup doesn't screw the rest of them by throwing - BGH
             rwlock.EnterWriteLock();
             try
             {
-                processManager.StopProcesses(); // NB: do this first to unlock files.
-
+                if (processIORouter != null)
+                {
+                    processIORouter.Dispose();
+                }
+                if (processHostClient != null)
+                {
+                    processHostClient.Unregister();
+                }
+                if (processHostManager != null)
+                {
+                    processHostManager.Dispose();
+                }
                 if (port != null)
                 {
                     port.Delete(user);
                 }
 
                 directory.Delete();
-
                 user.Delete();
 
                 this.state = ContainerState.Destroyed;
@@ -210,14 +244,28 @@
             }
         }
 
-        public void AddProcess(Process process, ResourceLimits rlimits)
+        public int StartProcess(string fileName, string workingDirectory, string args, Protocol.ResourceLimits resourceLimits,
+            Action<string> onOutput, Action<string> onError, Action<int> onExit)
         {
-            processManager.AddProcess(process);
+            processHostClient.Register();
+            var pid = processHostClient.StartProcess(fileName, workingDirectory, args);
+            processIORouter.AddProcessIO(pid, onOutput, onError, onExit);
+            processHostClient.SetProcessLimits(pid, new ResourceLimits { MemoryMB = (uint)resourceLimits.JobMemoryLimit });
+            return pid;
         }
 
         private void RestoreProcesses()
         {
-            processManager.RestoreProcesses();
+            processHostManager.RunService();
+            processHostClient.Register();
+
+            // TODO: the way the system is architected (ProcessCommand handles the IO vs passing through)
+            // there is no way to restore the async IO, so we basically wire up the processes again for tracking
+            // purposes but no async IO will happen.  Need to investigate a better solution for this.
+            //foreach (var process in processHostClient.ListProcesses())
+            //{
+            //    processIORouter.AddProcessIO(process.ID, onOutput, onError, onExit);
+            //}
         }
 
         private void ChangeState(ContainerState containerState)

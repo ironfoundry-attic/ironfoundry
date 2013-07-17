@@ -45,14 +45,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundProcess.cs" />
-    <Compile Include="Client\IJobObjectClient.cs" />
-    <Compile Include="Client\JobObjectClient.cs" />
-    <Compile Include="Client\JobObjectServiceClientCallback.cs" />
+    <Compile Include="Client\IProcessHostClient.cs" />
+    <Compile Include="Client\ProcessHostClient.cs" />
+    <Compile Include="Client\ProcessHostClientCallback.cs" />
     <Compile Include="Client\ProcessEventArgs.cs" />
     <Compile Include="Client\ProcessHostManager.cs" />
     <Compile Include="DiskQuota\DiskQuotaInfo.cs" />
     <Compile Include="DiskQuota\DiskQuotaManager.cs" />
     <Compile Include="DiskQuota\IDiskQuotaManager.cs" />
+    <Compile Include="IpcEndpointConfig.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="EventLogger.cs" />
     <Compile Include="Native\CloseHandle.cs" />
@@ -66,10 +67,10 @@
     <Compile Include="ProcessExtensions.cs" />
     <Compile Include="ProcessInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service\IJobObjectService.cs" />
-    <Compile Include="Service\IJobObjectServiceCallback.cs" />
-    <Compile Include="Service\JobObjectLimits.cs" />
-    <Compile Include="Service\JobObjectService.cs" />
+    <Compile Include="Service\IProcessHostService.cs" />
+    <Compile Include="Service\IProcessHostClientCallback.cs" />
+    <Compile Include="Service\ResourceLimits.cs" />
+    <Compile Include="Service\ProcessHostService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

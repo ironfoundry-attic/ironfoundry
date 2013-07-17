@@ -2,16 +2,16 @@
 {
     using System.ServiceModel;
 
-    public interface IJobObjectServiceCallback
+    public interface IProcessHostClientCallback
     {
         [OperationContract(IsOneWay = true)]
-        void ProcessErrorReceived(string error);
+        void ProcessErrorReceived(int pid, string error);
 
         [OperationContract(IsOneWay = true)]
-        void ProcessOutputReceived(string output);
+        void ProcessOutputReceived(int pid, string output);
 
         [OperationContract(IsOneWay = true)]
-        void ProcessExit(int exitCode);
+        void ProcessExit(int pid, int exitCode);
 
         [OperationContract(IsOneWay = true)]
         void ServiceMessageReceived(string message);

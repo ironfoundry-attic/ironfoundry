@@ -10,24 +10,24 @@
     using Native;
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    public class JobObjectService : IJobObjectService, IDisposable
+    public class ProcessHostService : IProcessHostService, IDisposable
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        private static readonly Dictionary<int, IJobObjectServiceCallback> clients = new Dictionary<int, IJobObjectServiceCallback>();
-        private readonly JobObject jobObject = new JobObject(Environment.UserName);
-        private readonly List<Process> processes = new List<Process>();
+        private static readonly Dictionary<int, IProcessHostClientCallback> clients = new Dictionary<int, IProcessHostClientCallback>();
+        private readonly JobObject parentJobObject = new JobObject(Environment.UserName);
+        private readonly List<JobProcess> childProcesses = new List<JobProcess>();
 
-        public JobObjectService()
+        public ProcessHostService()
         {
-            jobObject.KillProcessesOnJobClose = true;
+            parentJobObject.KillProcessesOnJobClose = true;
         }
 
         #region Client Management
-        public void RegisterJobClient(int processID)
+        public void RegisterClient(int processID)
         {
             log.Info("Registering client process {0}...", processID);
 
-            var callback = OperationContext.Current.GetCallbackChannel<IJobObjectServiceCallback>();
+            var callback = OperationContext.Current.GetCallbackChannel<IProcessHostClientCallback>();
 
             lock (clients)
             {
@@ -46,7 +46,7 @@
             }
         }
 
-        public void UnregisterJobClient(int processID)
+        public void UnregisterClient(int processID)
         {
             lock (clients)
             {
@@ -97,7 +97,7 @@
             return true;
         }
 
-        private static void CloseCallbackChannel(IJobObjectServiceCallback callback)
+        private static void CloseCallbackChannel(IProcessHostClientCallback callback)
         {
             var channel = callback as ICommunicationObject;
             if (channel != null)
@@ -123,49 +123,77 @@
         #endregion
 
         // ref: http://msdn.microsoft.com/en-us/library/windows/desktop/ms684141(v=vs.85).aspx
-        public void SetJobLimits(JobObjectLimits limits)
+        public void SetProcessLimits(int processID, ResourceLimits limits)
         {
             try
             {
-                jobObject.JobMemoryLimit = limits.MemoryMB * 1024 * 1024;
-                jobObject.JobCpuLimit = limits.CpuPercent;
+                var processJob = childProcesses.FirstOrDefault(pbj => pbj.Process.Id == processID);
+                if (processJob != null)
+                {
+                    processJob.JobObject.JobMemoryLimit = limits.MemoryMB * 1024 * 1024;
+                    processJob.JobObject.JobCpuLimit = limits.CpuPercent;
+                }
             }
             catch (Exception ex)
             {
                 log.ErrorException("Error setting job limits", ex);
-                //MulticastClientNotify(NotifyServiceMessage, String.Format("Unable to set job limits: {0}", ex));
                 MulticastClientNotify(NotifyServiceMessage, String.Format("Unable to set job limits: {0}", ex.Message));
             }
         }
 
-        public void StartProcess(string fileName, string workingDirectory, string args)
+        public void SetJobLimits(ResourceLimits limits)
         {
             try
             {
+                parentJobObject.JobMemoryLimit = limits.MemoryMB * 1024 * 1024;
+                parentJobObject.JobCpuLimit = limits.CpuPercent;
+            }
+            catch (Exception ex)
+            {
+                log.ErrorException("Error setting job limits", ex);
+                MulticastClientNotify(NotifyServiceMessage, String.Format("Unable to set job limits: {0}", ex.Message));
+            }
+        }
+
+        public int StartProcess(string fileName, string workingDirectory, string args)
+        {
+            int pid = -1;
+
+            try
+            {
                 var process = new BackgroundProcess(workingDirectory, fileName, args);
-                processes.Add(process);
                 process.StartInfo.LoadUserProfile = true;
                 process.ErrorDataReceived += ProcessOnErrorDataReceived;
                 process.OutputDataReceived += ProcessOnOutputDataReceived;
                 process.Exited += ProcessOnExited;
                 process.Start();
+
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
 
-                jobObject.AddProcess(process);
+                pid = process.Id;
+                var jobProcess = new JobProcess
+                {
+                    JobObject = new JobObject(String.Concat(Environment.UserName, "_", pid.ToString())),
+                    Process = process
+                };
+                parentJobObject.AddProcess(process); // add to parent job object first
+                jobProcess.JobObject.AddProcess(process); // add to child job to create hierarchy
             }
             catch (Exception ex)
             {
                 log.ErrorException("Unable to start process", ex);
                 MulticastClientNotify(NotifyServiceMessage, String.Format("Unable to start process {0}: {1}", fileName, ex.Message));
-                MulticastClientNotify(NotifyProcessExited, -1);
+                MulticastClientNotify(NotifyProcessExited, pid, -1);
             }
+
+            return pid;
         }
 
         public void StopProcess(int processID)
         {
-            var process = processes.FirstOrDefault(p => p.Id == processID);
-            if (process == null)
+            var processJob = childProcesses.FirstOrDefault(p => p.Process.Id == processID);
+            if (processJob == null)
             {
                 MulticastClientNotify(NotifyServiceMessage, String.Format("Process ID {0} is not controlled by this job.", processID));
             }
@@ -173,7 +201,10 @@
             {
                 try
                 {
-                    process.Kill();
+                    if (!processJob.Process.HasExited)
+                    {
+                        processJob.Process.Kill();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -187,7 +218,7 @@
         {
             try
             {
-                return processes.Select(p => new ProcessInfo
+                return childProcesses.Select(pbj => pbj.Process).Select(p => new ProcessInfo
                 {
                     ID = p.Id,
                     Name = p.ProcessName
@@ -209,42 +240,49 @@
                 process.ErrorDataReceived -= ProcessOnErrorDataReceived;
                 process.OutputDataReceived -= ProcessOnOutputDataReceived;
                 process.Exited -= ProcessOnExited;
-                MulticastClientNotify(NotifyProcessExited, process.ExitCode);
-                processes.Remove(process);
+                MulticastClientNotify(NotifyProcessExited, process.Id, process.ExitCode);
+                childProcesses.RemoveAll(pbj => pbj.Process.Id == process.Id);
             }
+        }
+
+        private int GetPID(Process process)
+        {
+            return process == null ? -1 : process.Id;
         }
 
         private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
         {
-            MulticastClientNotify(NotifyOutputReceived, dataReceivedEventArgs.Data);
+            var pid = GetPID(sender as Process);
+            MulticastClientNotify(NotifyOutputReceived, pid, dataReceivedEventArgs.Data);
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
         {
-            MulticastClientNotify(NotifyErrorReceived, dataReceivedEventArgs.Data);
+            var pid = GetPID(sender as Process);
+            MulticastClientNotify(NotifyErrorReceived, pid, dataReceivedEventArgs.Data);
         }
 
-        private static void NotifyServiceMessage(IJobObjectServiceCallback callback, string message)
+        private static void NotifyServiceMessage(IProcessHostClientCallback callback, string message)
         {
             callback.ServiceMessageReceived(message);
         }
 
-        private static void NotifyOutputReceived(IJobObjectServiceCallback callback, string output)
+        private static void NotifyOutputReceived(IProcessHostClientCallback callback, int pid, string output)
         {
-            callback.ProcessOutputReceived(output);
+            callback.ProcessOutputReceived(pid, output);
         }
 
-        private static void NotifyErrorReceived(IJobObjectServiceCallback callback, string error)
+        private static void NotifyErrorReceived(IProcessHostClientCallback callback, int pid, string error)
         {
-            callback.ProcessErrorReceived(error);
+            callback.ProcessErrorReceived(pid, error);
         }
 
-        private static void NotifyProcessExited(IJobObjectServiceCallback callback, int exitCode)
+        private static void NotifyProcessExited(IProcessHostClientCallback callback, int pid, int exitCode)
         {
-            callback.ProcessExit(exitCode);
+            callback.ProcessExit(pid, exitCode);
         }
 
-        private void MulticastClientNotify<T>(Action<IJobObjectServiceCallback, T> action, T arg)
+        private void MulticastClientNotify<T>(Action<IProcessHostClientCallback, T> action, T arg)
         {
             var invalidClients = new List<int>();
 
@@ -266,9 +304,31 @@
             }
         }
 
+        private void MulticastClientNotify<T>(Action<IProcessHostClientCallback, int, T> action, int pid, T arg)
+        {
+            var invalidClients = new List<int>();
+
+            lock (clients)
+            {
+                Parallel.ForEach(clients.Keys, key =>
+                {
+                    try
+                    {
+                        action(clients[key], pid, arg);
+                    }
+                    catch (Exception)
+                    {
+                        invalidClients.Add(key); // consume it and mark client as invalid
+                    }
+                });
+
+                invalidClients.All(RemoveAndClose);
+            }
+        }
+
         public void Dispose()
         {
-            foreach (var process in processes)
+            foreach (var process in childProcesses.Select(pbj => pbj.Process))
             {
                 try
                 {
@@ -284,10 +344,16 @@
                 }
             }
 
-            if (jobObject != null)
+            if (parentJobObject != null)
             {
-                jobObject.Dispose();
+                parentJobObject.Dispose();
             }
+        }
+
+        private class JobProcess
+        {
+            public Process Process { get; set; }
+            public JobObject JobObject { get; set; }
         }
     }
 }

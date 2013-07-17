@@ -2,17 +2,13 @@
 {
     using System;
 
-    public class ProcessEventArgs : EventArgs
+    public class ProcessEventArgs<T> : EventArgs<T>
     {
-        public string StdOut { get; set; }
-        public string StdError { get; set; }
-        public int ExitCode { get; set; }
+        public int ProcessId { get; set; }
 
-        public ProcessEventArgs(string stdOut, string stdError, int exitCode)
+        public ProcessEventArgs(int processId, T value) : base(value)
         {
-            StdOut = stdOut;
-            StdError = stdError;
-            ExitCode = exitCode;
+            ProcessId = processId;
         }
     }
 }

@@ -76,6 +76,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IronFoundry.Warden.ProcessIsolation\IronFoundry.Warden.ProcessIsolation.csproj">
+      <Project>{a9eb7d2b-142d-45b1-9a98-878556a9910e}</Project>
+      <Name>IronFoundry.Warden.ProcessIsolation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IronFoundry.Warden.Protocol\IronFoundry.Warden.Protocol.csproj">
       <Project>{ddd0537b-4afe-4beb-bf30-4df0a5367a18}</Project>
       <Name>IronFoundry.Warden.Protocol</Name>
@@ -128,6 +132,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY /Y /I "$(SolutionDir)src\IronFoundry.Warden.ProcessIsolationService\bin\$(ConfigurationName)\*.*" "$(TargetDir)PisoSvc"</PostBuildEvent>
+    <PostBuildEvent>DEL "$(TargetDir)PisoSvc\*.*" /Q /F
+XCOPY /Y /I "$(SolutionDir)src\IronFoundry.Warden.ProcessIsolationService\bin\$(ConfigurationName)\*.*" "$(TargetDir)PisoSvc"
+powershell -command "&amp;{ Get-ChildItem '$(TargetDir)PisoSvc' | Rename-Item -newname { $_.Name -replace 'IronFoundry.Warden.ProcessIsolationService','PisoSvc' } }"</PostBuildEvent>
   </PropertyGroup>
 </Project>

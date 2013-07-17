@@ -3,20 +3,23 @@
     using System.Collections.Generic;
     using System.ServiceModel;
 
-    [ServiceContract(CallbackContract = typeof(IJobObjectServiceCallback), SessionMode = SessionMode.Required)]
-    public interface IJobObjectService
+    [ServiceContract(CallbackContract = typeof(IProcessHostClientCallback), SessionMode = SessionMode.Required)]
+    public interface IProcessHostService
     {
         [OperationContract(IsOneWay = true, IsInitiating = true)]
-        void RegisterJobClient(int processID);
+        void RegisterClient(int processID);
 
         [OperationContract(IsOneWay = true, IsTerminating = true)]
-        void UnregisterJobClient(int processID);
+        void UnregisterClient(int processID);
 
         [OperationContract(IsInitiating = false, IsTerminating = false)]
-        void SetJobLimits(JobObjectLimits limits);
+        void SetProcessLimits(int processID, ResourceLimits limits);
 
         [OperationContract(IsInitiating = false, IsTerminating = false)]
-        void StartProcess(string fileName, string workingDirectory, string args);
+        void SetJobLimits(ResourceLimits limits);
+
+        [OperationContract(IsInitiating = false, IsTerminating = false)]
+        int StartProcess(string fileName, string workingDirectory, string args);
 
         [OperationContract(IsInitiating = false, IsTerminating = false)]
         void StopProcess(int processID);

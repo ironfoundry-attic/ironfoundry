@@ -20,7 +20,8 @@
         private readonly string processHostTargetDirectory;
         private readonly NetworkCredential credential;
 
-        public ProcessHostManager(string processHostDirectory, string containerDirectory, string exeFileName, string serviceName, NetworkCredential credential)
+        public ProcessHostManager(string processHostDirectory, string containerDirectory, string exeFileName, string serviceName, NetworkCredential credential) 
+            : this(serviceName, containerDirectory)
         {
             if (!Directory.Exists(processHostDirectory))
             {
@@ -34,6 +35,11 @@
             }
             this.exeFileName = exeFileName;
 
+            this.credential = credential;
+        }
+
+        private ProcessHostManager(string serviceName, string containerDirectory)
+        {
             if (string.IsNullOrWhiteSpace(serviceName))
             {
                 throw new ArgumentException("Service name must be specified", "serviceName");
@@ -46,8 +52,6 @@
             }
             this.containerDirectory = containerDirectory;
             this.processHostTargetDirectory = Path.Combine(containerDirectory, "processhost");
-
-            this.credential = credential;
         }
 
         private void CopyExecutableToHostTargetDirectory()
@@ -82,13 +86,35 @@
             }
         }
 
+        public static void Cleanup(string serviceName, string containerDirectory)
+        {
+            using (new ProcessHostManager(serviceName, containerDirectory))
+            {
+                log.Info("Cleaning up process host {0} installed in {1}.", serviceName, containerDirectory);
+            }
+        }
+
+        /// <summary>
+        /// Ensures that the specified service is installed and in a running state.
+        /// </summary>
         public void RunService()
         {
             try
             {
-                CopyExecutableToHostTargetDirectory();
-                InstallService();
-                StartService();
+                if (ServiceInstalled())
+                {
+                    log.Trace("Service '{0}' already installed, skipping.", serviceName);
+                }
+                else
+                {
+                    CopyExecutableToHostTargetDirectory();
+                    InstallService();
+                }
+
+                if (!ServiceRunning())
+                {
+                    StartService();
+                }
             }
             catch (Exception ex)
             {
@@ -134,12 +160,6 @@
 
         private void InstallService()
         {
-            if (ServiceExists())
-            {
-                log.Trace("Service '{0}' already installed, skipping.", serviceName);
-                return;
-            }
-
             log.Trace("Installing windows service {0}", serviceName);
             var binPath = Path.Combine(processHostTargetDirectory, exeFileName);
 
@@ -156,7 +176,7 @@
 
         private void UninstallService()
         {
-            if (!ServiceExists())
+            if (!ServiceInstalled())
             {
                 log.Trace("Service '{0}' doesn't exist, skipping uninstall.", serviceName);
                 return;
@@ -168,17 +188,15 @@
             this.Try(RunServiceCommand, cmdArgs, ex => log.ErrorException(String.Format("Error running: sc.exe {0}", cmdArgs), ex));
         }
 
-        private bool ServiceExists()
+        private bool ServiceInstalled()
         {
-            try
-            {
-                var result = ExecServiceCommand(String.Format("queryex {0}", serviceName), false);
-                return result.ExitCode != 1060; // this sorta works except when a svc is marked for delete (reboot required perhaps?)
-            }
-            catch
-            {
-                return false;
-            }
+            // this sorta works except when a svc is marked for delete (which means it wasn't cleaned up proper)
+            return this.Try(() => ExecServiceCommand(String.Format("queryex {0}", serviceName), false).ExitCode != 1060, () => false);
+        }
+
+        private bool ServiceRunning()
+        {
+            return this.Try(() => { using (var sc = new ServiceController(serviceName)) return sc.Status == ServiceControllerStatus.Running; }, () => false);
         }
 
         private void RunServiceCommand(string cmdArgs)

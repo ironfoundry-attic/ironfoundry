@@ -19,7 +19,7 @@
         };
         private static readonly int targetBase = chars.Length;
 
-        private string value;
+        private readonly string value;
 
         public ContainerHandle(string handle)
         {
