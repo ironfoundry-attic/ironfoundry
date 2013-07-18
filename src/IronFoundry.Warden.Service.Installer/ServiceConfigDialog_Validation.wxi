@@ -45,22 +45,8 @@
 
     <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
     <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
-      <Condition Action="disable">
-          <![CDATA[
-            !(wix.ServiceTcpPortProperty) = "" OR !(wix.ServiceContainerBaseDirProperty) = "" OR !(wix.ServiceCredentialsUserProperty) = "" OR (
-                (!(wix.ServiceCredentialsPasswordProperty) =  "" AND !(wix.ServiceCredentialsUserProperty) <> "LocalSystem") OR
-                (!(wix.ServiceCredentialsPasswordProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) =  "LocalSystem")
-             )
-          ]]>
-      </Condition>
-      <Condition Action="enable">
-          <![CDATA[
-            !(wix.ServiceTcpPortProperty) <> "" AND !(wix.ServiceContainerBaseDirProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) <> "" AND (
-                (!(wix.ServiceCredentialsPasswordProperty) =  "" AND !(wix.ServiceCredentialsUserProperty) =  "LocalSystem") OR
-                (!(wix.ServiceCredentialsPasswordProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) <> "LocalSystem")
-            )
-          ]]>
-      </Condition>
+      <Condition Action="disable"><![CDATA[!(wix.ServiceTcpPortProperty) = "" OR !(wix.ServiceContainerBaseDirProperty) = "" OR !(wix.ServiceCredentialsUserProperty) = "" OR ((!(wix.ServiceCredentialsPasswordProperty) = "" AND !(wix.ServiceCredentialsUserProperty) <> "LocalSystem") OR (!(wix.ServiceCredentialsPasswordProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) = "LocalSystem"))]]></Condition>
+      <Condition Action="enable"><![CDATA[!(wix.ServiceTcpPortProperty) <> "" AND !(wix.ServiceContainerBaseDirProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) <> "" AND ((!(wix.ServiceCredentialsPasswordProperty) = "" AND !(wix.ServiceCredentialsUserProperty) = "LocalSystem") OR (!(wix.ServiceCredentialsPasswordProperty) <> "" AND !(wix.ServiceCredentialsUserProperty) <> "LocalSystem"))]]></Condition>
     </Control>
     <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
       <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
