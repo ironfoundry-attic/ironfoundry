@@ -101,6 +101,10 @@
         {
             try
             {
+                /*
+                 * NB: using sc.exe to install/uninstall and query service rather than ServiceController
+                 * because using ServiceController causes issues.
+                 */
                 if (ServiceInstalled())
                 {
                     log.Trace("Service '{0}' already installed, skipping.", serviceName);
@@ -165,7 +169,7 @@
 
             if (credential != null)
             {
-                RunServiceCommand(String.Format(@"create {0} binPath= ""{1}"" start= auto obj= {2} password= {3}",
+                RunServiceCommand(String.Format(@"create {0} binPath= ""{1}"" start= auto obj= .\\{2} password= {3}",
                                                 serviceName, binPath, credential.UserName, credential.Password));
             }
             else

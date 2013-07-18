@@ -80,6 +80,7 @@
     <Compile Include="Jobs\JobStatusEventArgs.cs" />
     <Compile Include="PInvoke\CloseHandle.cs" />
     <Compile Include="PInvoke\Constants.cs" />
+    <Compile Include="PInvoke\LsaMethods.cs" />
     <Compile Include="PInvoke\Structs.cs" />
     <Compile Include="PInvoke\LookupAccountSid.cs" />
     <Compile Include="PInvoke\GetTokenInformation.cs" />

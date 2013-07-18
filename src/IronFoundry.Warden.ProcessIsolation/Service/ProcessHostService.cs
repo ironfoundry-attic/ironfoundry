@@ -6,8 +6,8 @@
     using System.Linq;
     using System.ServiceModel;
     using System.Threading.Tasks;
-    using NLog;
     using Native;
+    using NLog;
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class ProcessHostService : IProcessHostService, IDisposable
@@ -19,6 +19,7 @@
 
         public ProcessHostService()
         {
+            // TODO: if we want the service to be in the job object, add it here.
             parentJobObject.KillProcessesOnJobClose = true;
         }
 

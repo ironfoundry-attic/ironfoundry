@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace IronFoundry.Warden.ProcessIsolation
 {
@@ -25,6 +22,7 @@ namespace IronFoundry.Warden.ProcessIsolation
 
         public static Binding Binding()
         {
+            // TODO: transport security
             return new NetNamedPipeBinding(NetNamedPipeSecurityMode.None);
         }
     }

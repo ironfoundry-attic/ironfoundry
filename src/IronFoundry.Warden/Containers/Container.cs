@@ -7,8 +7,6 @@
     using System.Threading;
     using NLog;
     using ProcessIsolation.Client;
-    using ProcessIsolation.Service;
-    using Protocol;
     using Utilities;
     using ResourceLimits = ProcessIsolation.Service.ResourceLimits;
 
@@ -44,7 +42,7 @@
             directory = new ContainerDirectory(this.handle, user);
 
             processHostManager = CreateProcessHostManager();
-            processHostClient = new ProcessHostClient(this.handle.ToString());
+            processHostClient = new ProcessHostClient(user);
             processIORouter = new ContainerProcessIORouter(processHostClient);
 
             if (state == ContainerState.Active)
@@ -61,7 +59,7 @@
             state = ContainerState.Born;
 
             processHostManager = CreateProcessHostManager();
-            processHostClient = new ProcessHostClient(this.handle.ToString());
+            processHostClient = new ProcessHostClient(user);
             processIORouter = new ContainerProcessIORouter(processHostClient);
         }
 
@@ -118,6 +116,7 @@
 
         public void AfterCreate()
         {
+            processHostManager.RunService();
             ChangeState(ContainerState.Active);
         }
 
@@ -248,9 +247,15 @@
             Action<string> onOutput, Action<string> onError, Action<int> onExit)
         {
             processHostClient.Register();
+
             var pid = processHostClient.StartProcess(fileName, workingDirectory, args);
             processIORouter.AddProcessIO(pid, onOutput, onError, onExit);
-            processHostClient.SetProcessLimits(pid, new ResourceLimits { MemoryMB = (uint)resourceLimits.JobMemoryLimit });
+
+            if (resourceLimits != null)
+            {
+                processHostClient.SetProcessLimits(pid, new ResourceLimits { MemoryMB = (uint)resourceLimits.JobMemoryLimit });
+            }
+
             return pid;
         }
 

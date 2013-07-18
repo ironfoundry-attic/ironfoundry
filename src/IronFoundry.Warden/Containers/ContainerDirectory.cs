@@ -59,7 +59,7 @@
 
             var inheritanceFlags = InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit;
             var accessRule = new FileSystemAccessRule(user, FileSystemRights.FullControl, inheritanceFlags,
-                PropagationFlags.InheritOnly, AccessControlType.Allow);
+                PropagationFlags.None, AccessControlType.Allow);
 
             DirectoryInfo containerBaseInfo = dirInfo.Item1;
             DirectorySecurity security = containerBaseInfo.GetAccessControl();

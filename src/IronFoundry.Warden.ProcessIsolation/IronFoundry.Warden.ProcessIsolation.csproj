@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\shared\ExtensionMethods.cs">
+      <Link>ExtensionMethods.cs</Link>
+    </Compile>
     <Compile Include="BackgroundProcess.cs" />
     <Compile Include="Client\IProcessHostClient.cs" />
     <Compile Include="Client\ProcessHostClient.cs" />

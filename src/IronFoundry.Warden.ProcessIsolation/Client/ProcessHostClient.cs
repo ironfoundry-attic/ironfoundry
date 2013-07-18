@@ -25,6 +25,10 @@
         
         public ProcessHostClient(string uniquePipeName)
         {
+            if (uniquePipeName.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentNullException("uniquePipeName");
+            }
             this.uniquePipeName = uniquePipeName;
         }
 
