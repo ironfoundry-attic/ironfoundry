@@ -14,13 +14,13 @@
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private static readonly Dictionary<int, IProcessHostClientCallback> clients = new Dictionary<int, IProcessHostClientCallback>();
-        private readonly JobObject parentJobObject = new JobObject(Environment.UserName);
-        private readonly List<JobProcess> childProcesses = new List<JobProcess>();
+        private readonly JobObject jobObject = new JobObject(Environment.UserName);
+        private readonly List<Process> processes = new List<Process>();
 
         public ProcessHostService()
         {
-            // TODO: if we want the service to be in the job object, add it here.
-            parentJobObject.KillProcessesOnJobClose = true;
+            jobObject.KillProcessesOnJobClose = true;
+            jobObject.AddProcess(Process.GetCurrentProcess());
         }
 
         #region Client Management
@@ -128,12 +128,8 @@
         {
             try
             {
-                var processJob = childProcesses.FirstOrDefault(pbj => pbj.Process.Id == processID);
-                if (processJob != null)
-                {
-                    processJob.JobObject.JobMemoryLimit = limits.MemoryMB * 1024 * 1024;
-                    processJob.JobObject.JobCpuLimit = limits.CpuPercent;
-                }
+                jobObject.JobMemoryLimit = limits.MemoryMB * 1024 * 1024; // bytes
+                jobObject.JobCpuLimit = limits.CpuPercent;
             }
             catch (Exception ex)
             {
@@ -146,8 +142,8 @@
         {
             try
             {
-                parentJobObject.JobMemoryLimit = limits.MemoryMB * 1024 * 1024;
-                parentJobObject.JobCpuLimit = limits.CpuPercent;
+                jobObject.JobMemoryLimit = limits.MemoryMB * 1024 * 1024;
+                jobObject.JobCpuLimit = limits.CpuPercent;
             }
             catch (Exception ex)
             {
@@ -169,17 +165,12 @@
                 process.Exited += ProcessOnExited;
                 process.Start();
 
+                pid = process.Id;
+                processes.Add(process);
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
-
-                pid = process.Id;
-                var jobProcess = new JobProcess
-                {
-                    JobObject = new JobObject(String.Concat(Environment.UserName, "_", pid.ToString())),
-                    Process = process
-                };
-                parentJobObject.AddProcess(process); // add to parent job object first
-                jobProcess.JobObject.AddProcess(process); // add to child job to create hierarchy
+                
+                jobObject.AddProcess(process);
             }
             catch (Exception ex)
             {
@@ -193,8 +184,8 @@
 
         public void StopProcess(int processID)
         {
-            var processJob = childProcesses.FirstOrDefault(p => p.Process.Id == processID);
-            if (processJob == null)
+            var process = processes.FirstOrDefault(p => p.Id == processID);
+            if (process == null)
             {
                 MulticastClientNotify(NotifyServiceMessage, String.Format("Process ID {0} is not controlled by this job.", processID));
             }
@@ -202,9 +193,9 @@
             {
                 try
                 {
-                    if (!processJob.Process.HasExited)
+                    if (!process.HasExited)
                     {
-                        processJob.Process.Kill();
+                        process.Kill();
                     }
                 }
                 catch (Exception ex)
@@ -219,7 +210,7 @@
         {
             try
             {
-                return childProcesses.Select(pbj => pbj.Process).Select(p => new ProcessInfo
+                return processes.Select(p => new ProcessInfo
                 {
                     ID = p.Id,
                     Name = p.ProcessName
@@ -242,7 +233,7 @@
                 process.OutputDataReceived -= ProcessOnOutputDataReceived;
                 process.Exited -= ProcessOnExited;
                 MulticastClientNotify(NotifyProcessExited, process.Id, process.ExitCode);
-                childProcesses.RemoveAll(pbj => pbj.Process.Id == process.Id);
+                processes.RemoveAll(p => p.Id == process.Id);
             }
         }
 
@@ -329,7 +320,7 @@
 
         public void Dispose()
         {
-            foreach (var process in childProcesses.Select(pbj => pbj.Process))
+            foreach (var process in processes)
             {
                 try
                 {
@@ -345,16 +336,10 @@
                 }
             }
 
-            if (parentJobObject != null)
+            if (jobObject != null)
             {
-                parentJobObject.Dispose();
+                jobObject.Dispose();
             }
-        }
-
-        private class JobProcess
-        {
-            public Process Process { get; set; }
-            public JobObject JobObject { get; set; }
         }
     }
 }

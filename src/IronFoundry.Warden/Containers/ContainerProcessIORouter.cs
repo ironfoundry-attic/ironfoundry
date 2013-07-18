@@ -3,11 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using NLog;
     using ProcessIsolation;
     using ProcessIsolation.Client;
 
     public class ContainerProcessIORouter : IDisposable
     {
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         private readonly List<ContainerProcessIOHandler> ioHandlers = new List<ContainerProcessIOHandler>();
         private IProcessHostClient jobObjectClient;
 
@@ -23,7 +26,7 @@
 
         private void ClientOnServiceMessageReceived(object sender, EventArgs<string> processEventArgs)
         {
-            ioHandlers.All(h => { h.OnAdminMessage(processEventArgs.Value); return true; });
+            log.Info("ProcessHost Message: {0}", processEventArgs.Value);
         }
 
         private void ClientOnProcessExited(object sender, ProcessEventArgs<int> processEventArgs)

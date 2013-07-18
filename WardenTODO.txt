@@ -1,4 +1,4 @@
 Process Isolation Work:
 
-4) Wire up global resource containts (CPU/Memory) as necessary
-5) Wire up the ProcessIsolation.DiskQuota.DiskQuotaManager
+1) Wire up CPU Throttling (if necessary)
+2) Wire up the ProcessIsolation.DiskQuota.DiskQuotaManager
