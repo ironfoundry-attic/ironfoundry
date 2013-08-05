@@ -21,7 +21,15 @@
         private ContainerPort port;
         private ContainerState state;
 
-        public Container(string handle, ContainerState containerState)
+        public static Container Restore(string handle, ContainerState containerState)
+        {
+            return new Container(handle, containerState);
+        }
+
+        /// <summary>
+        /// Used for restore.
+        /// </summary>
+        private Container(string handle, ContainerState containerState)
         {
             if (handle.IsNullOrWhiteSpace())
             {

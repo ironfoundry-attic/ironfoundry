@@ -13,10 +13,11 @@
 
         private readonly string uniqueId;
         private readonly string userName;
+        private readonly string password;
 
         public NetworkCredential GetCredential()
         {
-            return new NetworkCredential(userName, uniqueId);
+            return new NetworkCredential(userName, password);
         }
 
         public ContainerUser(string uniqueId, bool shouldCreate = false)
@@ -36,10 +37,18 @@
                 throw new ArgumentException("uniqueId must be 8 or more word characters.");
             }
 
+            /*
+             * TODO: this means that we can't retrieve a user's password if restoring a container.
+             * This should be OK when we move to the "separate process for container" model since the separate
+             * process will be installed as a service and the password will only need to be known at install
+             * time.
+             */
+            this.password = System.Web.Security.Membership.GeneratePassword(16, 8);
+
             var principalManager = new LocalPrincipalManager();
             if (shouldCreate)
             {
-                principalManager.CreateUser(this.userName, this.uniqueId);
+                principalManager.CreateUser(this.userName, this.password);
             }
             else
             {
