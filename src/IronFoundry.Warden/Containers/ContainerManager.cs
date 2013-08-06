@@ -53,7 +53,7 @@
                             var handle = Path.GetFileName(dirPath);
                             try
                             {
-                                var container = new Container(handle, ContainerState.Active);
+                                var container = Container.Restore(handle, ContainerState.Active);
                                 containers.TryAdd(container.Handle, container);
                             }
                             catch (Exception ex)
