@@ -37,18 +37,25 @@
                 throw new ArgumentException("uniqueId must be 8 or more word characters.");
             }
 
-            /*
-             * TODO: this means that we can't retrieve a user's password if restoring a container.
-             * This should be OK when we move to the "separate process for container" model since the separate
-             * process will be installed as a service and the password will only need to be known at install
-             * time.
-             */
-            this.password = System.Web.Security.Membership.GeneratePassword(16, 8);
-
             var principalManager = new LocalPrincipalManager();
             if (shouldCreate)
             {
-                principalManager.CreateUser(this.userName, this.password);
+                /*
+                 * TODO: this means that we can't retrieve a user's password if restoring a container.
+                 * This should be OK when we move to the "separate process for container" model since the separate
+                 * process will be installed as a service and the password will only need to be known at install
+                 * time.
+                 */
+                var userData = principalManager.CreateUser(this.userName);
+                if (userData == null)
+                {
+                    throw new ArgumentException(String.Format("Could not create user '{0}'", this.userName));
+                }
+                else
+                {
+                    this.userName = userData.UserName;
+                    this.password = userData.Password;
+                }
             }
             else
             {

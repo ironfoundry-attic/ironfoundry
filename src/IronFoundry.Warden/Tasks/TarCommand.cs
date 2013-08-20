@@ -73,6 +73,11 @@
 
         private void CreateTarArchive()
         {
+            if (File.Exists(tarFile))
+            {
+                File.Delete(tarFile);
+            }
+
             using (var fs = File.Open(tarFile, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             {
                 using (var gzipStream = new GZipOutputStream(fs))

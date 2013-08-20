@@ -7,6 +7,7 @@
     using Microsoft.VisualBasic.FileIO;
     using NLog;
     using Protocol;
+    using Utilities;
 
     public abstract class CopyRequestHandler : ContainerRequestHandler
     {
@@ -33,13 +34,25 @@
 
         public override Task<Response> HandleAsync()
         {
+            var copyResponse = Task.FromResult<Response>(response);
+
             log.Trace("SrcPath: '{0}' DstPath: '{1}'", request.SrcPath, request.DstPath);
 
             Container container = GetContainer();
 
             string sourcePath = container.ConvertToPathWithin(request.SrcPath);
-            var sourceAttrs = File.GetAttributes(sourcePath);
-            bool sourceIsDir = sourceAttrs.HasFlag(FileAttributes.Directory);
+
+            bool sourceIsDir = false;
+            try
+            {
+                var sourceAttrs = File.GetAttributes(sourcePath);
+                sourceIsDir = sourceAttrs.HasFlag(FileAttributes.Directory);
+            }
+            catch (FileNotFoundException ex)
+            {
+                log.DebugException(ex);
+                return copyResponse;
+            }
 
             string destinationPath = container.ConvertToPathWithin(request.DstPath);
             var destinationAttrs = File.GetAttributes(destinationPath);
@@ -59,7 +72,7 @@
                 File.Copy(sourcePath, destinationPath, true);
             }
 
-            return Task.FromResult<Response>(response);
+            return copyResponse;
         }
     }
 }
