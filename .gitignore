@@ -7,3 +7,4 @@ packages/
 _ReSharper.IronFoundry/
 /_ReSharper.IronFoundry/
 *.Publish.xml
+/.JustCode/
