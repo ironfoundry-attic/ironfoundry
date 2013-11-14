@@ -31,21 +31,24 @@
                 return Task.Run<Response>(() =>
                     {
                         Container container = GetContainer();
-                        if (container.State != ContainerState.Stopped)
+                        if (container != null)
                         {
-                            try
+                            if (container.State != ContainerState.Stopped)
                             {
-                                var stopRequest = new StopRequest { Handle = request.Handle };
-                                var stopRequestHandler = new StopRequestHandler(containerManager, stopRequest);
-                                var stopTask = stopRequestHandler.HandleAsync();
-                                Response stopResponse = stopTask.Result;
+                                try
+                                {
+                                    var stopRequest = new StopRequest { Handle = request.Handle };
+                                    var stopRequestHandler = new StopRequestHandler(containerManager, stopRequest);
+                                    var stopTask = stopRequestHandler.HandleAsync();
+                                    Response stopResponse = stopTask.Result;
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.WarnException(ex);
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                log.WarnException(ex);
-                            }
+                            containerManager.DestroyContainer(container);
                         }
-                        containerManager.DestroyContainer(container);
                         return new DestroyResponse();
                     });
             }
