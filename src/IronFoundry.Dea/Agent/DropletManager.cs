@@ -1,15 +1,15 @@
-﻿namespace IronFoundry.Dea.Agent
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using IronFoundry.Dea.Types;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using IronFoundry.Dea.Types;
 
+namespace IronFoundry.Dea.Agent
+{
     public class DropletManager : IDropletManager
     {
-        private readonly IDictionary<uint, IDictionary<Guid, Instance>> droplets = new Dictionary<uint, IDictionary<Guid, Instance>>();
+        private readonly IDictionary<Guid, IDictionary<Guid, Instance>> droplets = new Dictionary<Guid, IDictionary<Guid, Instance>>();
 
-        public void Add(uint dropletID, IEnumerable<Instance> instances)
+        public void Add(Guid dropletID, IEnumerable<Instance> instances)
         {
             lock (droplets)
             {
@@ -20,7 +20,7 @@
             }
         }
 
-        public void Add(uint dropletID, Instance instance)
+        public void Add(Guid dropletID, Instance instance)
         {
             lock (droplets)
             {
@@ -32,9 +32,9 @@
                 else
                 {
                     instances = new Dictionary<Guid, Instance>
-                    {
-                        { instance.InstanceID, instance }
-                    };
+                                {
+                                    {instance.InstanceID, instance}
+                                };
                     droplets.Add(dropletID, instances);
                 }
             }
@@ -56,11 +56,11 @@
             ForAllInstances(null, instanceAction);
         }
 
-        public void ForAllInstances(uint dropletID, Action<Instance> instanceAction)
+        public void ForAllInstances(Guid dropletID, Action<Instance> instanceAction)
         {
             lock (droplets)
             {
-                if (this.IsEmpty)
+                if (IsEmpty)
                 {
                     return;
                 }
@@ -82,34 +82,6 @@
             }
         }
 
-        public void ForAllInstances(Action<uint> dropletAction, Action<Instance> instanceAction)
-        {
-            lock (droplets)
-            {
-                if (this.IsEmpty)
-                {
-                    return;
-                }
-                var dropletList = new List<KeyValuePair<uint, IDictionary<Guid, Instance>>>(droplets);
-                foreach (KeyValuePair<uint, IDictionary<Guid, Instance>> kvp in dropletList)
-                {
-                    if (droplets.ContainsKey(kvp.Key))
-                    {
-                        uint dropletID = kvp.Key;
-                        if (null != dropletAction)
-                        {
-                            dropletAction(dropletID);
-                        }
-                        var instances = new List<Instance>(kvp.Value.Values);
-                        foreach (Instance instance in instances)
-                        {
-                            instanceAction(instance);
-                        }
-                    }
-                }
-            }
-        }
-
         public void FromSnapshot(Snapshot snapshot)
         {
             lock (droplets)
@@ -118,7 +90,7 @@
                 {
                     foreach (InstanceEntry instanceEntry in dropletEntry.Instances)
                     {
-                        this.Add(dropletEntry.DropletID, instanceEntry.Instance);
+                        Add(dropletEntry.DropletID, instanceEntry.Instance);
                     }
                 }
             }
@@ -130,7 +102,7 @@
 
             lock (droplets)
             {
-                if (false == this.IsEmpty)
+                if (false == IsEmpty)
                 {
                     foreach (var droplet in droplets)
                     {
@@ -139,33 +111,33 @@
                         foreach (var instance in droplet.Value)
                         {
                             var instanceEntry = new InstanceEntry
-                            {
-                                InstanceID = instance.Key,
-                                Instance = instance.Value
-                            };
+                                                {
+                                                    InstanceID = instance.Key,
+                                                    Instance = instance.Value
+                                                };
                             instanceEntries.Add(instanceEntry);
                         }
 
                         var d = new DropletEntry
-                        {
-                            DropletID = droplet.Key,
-                            Instances = instanceEntries.ToArray()
-                        };
+                                {
+                                    DropletID = droplet.Key,
+                                    Instances = instanceEntries.ToArray()
+                                };
 
                         dropletEntries.Add(d);
                     }
                 }
             }
 
-            return new Snapshot()
-            {
-                Entries = dropletEntries.ToArrayOrNull()
-            };
+            return new Snapshot
+                   {
+                       Entries = dropletEntries.ToArrayOrNull()
+                   };
         }
 
         public void InstanceStopped(Instance instance)
         {
-            uint dropletID = instance.DropletID;
+            Guid dropletID = instance.DropletID;
 
             lock (droplets)
             {
@@ -191,22 +163,52 @@
                 return;
             }
 
-            ForAllInstances((inst) =>
-                {
-                    string appPoolName = inst.Staged; // TODO: we have to "know" that this is the app pool name
-                    IList<int> tmp;
-                    if (iisWorkerProcessData.TryGetValue(appPoolName, out tmp))
-                    {
-                        foreach (int pid in tmp)
-                        {
-                            try
+            ForAllInstances(inst =>
                             {
-                                inst.AddWorkerProcess(Process.GetProcessById(pid));
-                            }
-                            catch { }
+                                string appPoolName = inst.Staged; // TODO: we have to "know" that this is the app pool name
+                                IList<int> tmp;
+                                if (iisWorkerProcessData.TryGetValue(appPoolName, out tmp))
+                                {
+                                    foreach (int pid in tmp)
+                                    {
+                                        try
+                                        {
+                                            inst.AddWorkerProcess(Process.GetProcessById(pid));
+                                        }
+                                        catch
+                                        {
+                                        }
+                                    }
+                                }
+                            });
+        }
+
+        public void ForAllInstances(Action<Guid> dropletAction, Action<Instance> instanceAction)
+        {
+            lock (droplets)
+            {
+                if (IsEmpty)
+                {
+                    return;
+                }
+                var dropletList = new List<KeyValuePair<Guid, IDictionary<Guid, Instance>>>(droplets);
+                foreach (KeyValuePair<Guid, IDictionary<Guid, Instance>> kvp in dropletList)
+                {
+                    if (droplets.ContainsKey(kvp.Key))
+                    {
+                        Guid dropletID = kvp.Key;
+                        if (null != dropletAction)
+                        {
+                            dropletAction(dropletID);
+                        }
+                        var instances = new List<Instance>(kvp.Value.Values);
+                        foreach (Instance instance in instances)
+                        {
+                            instanceAction(instance);
                         }
                     }
-                });
+                }
+            }
         }
     }
 }

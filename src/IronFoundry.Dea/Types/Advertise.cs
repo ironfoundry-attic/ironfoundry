@@ -1,45 +1,54 @@
-﻿namespace IronFoundry.Dea.Types
-{
-    using System;
-    using IronFoundry.Dea.JsonConverters;
-    using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using IronFoundry.Dea.JsonConverters;
+using Newtonsoft.Json;
 
+namespace IronFoundry.Dea.Types
+{
     public class Advertise : Message
     {
-        private const string publishSubject = "dea.advertise";
+        public Advertise(Guid id, uint availableMemory)
+        {
+            ID = id;
+            AvailableMemory = availableMemory;
+            AvailableDisk = 16*1024;
+            AppIdToCount = new Dictionary<Guid, uint>();
+        }
 
         [JsonIgnore]
         public override string PublishSubject
         {
-            get { return publishSubject; }
+            get { return "dea.advertise"; }
         }
 
-        [JsonProperty(PropertyName="id"), JsonConverter(typeof(VcapGuidConverter))]
+        [JsonProperty(PropertyName = "id"), JsonConverter(typeof (VcapGuidConverter))]
         public Guid ID { get; private set; }
 
         [JsonProperty(PropertyName = "available_memory")]
         public uint AvailableMemory { get; private set; }
 
-        [JsonProperty(PropertyName = "runtimes")]
-        public string[] Runtimes
+        [JsonProperty(PropertyName = "available_disk")]
+        public uint AvailableDisk { get; private set; }
+
+        [JsonProperty(PropertyName = "app_id_to_count")]
+        public Dictionary<Guid, uint> AppIdToCount { get; private set; }
+
+        [JsonProperty(PropertyName = "stacks")]
+        public string[] Stacks
         {
             get { return Constants.SupportedRuntimes; }
         }
 
-        [JsonProperty(PropertyName = "prod")]
-        public bool Prod { get; private set; }
-
-        [JsonProperty(PropertyName = "ready")]
-        public bool Ready { get { return true; } }
-
-        [JsonProperty(PropertyName = "currently_pending")]
-        public ushort CurrentlyPending { get { return 0; } }
-
-        public Advertise(Guid id, uint availableMemory, bool prod)
+        [JsonProperty(PropertyName = "placement_properties")]
+        public Dictionary<string, string> PlacementProperties
         {
-            this.ID              = id;
-            this.AvailableMemory = availableMemory;
-            this.Prod            = prod;
+            get 
+            { 
+                return new Dictionary<string, string>()
+                         {
+                             {"zone", "default"}
+                         }; 
+            }
         }
     }
 }

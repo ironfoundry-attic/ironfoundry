@@ -74,7 +74,7 @@
         }
 
         [JsonProperty(PropertyName = "droplet_id")]
-        public uint DropletID { get; set; }
+        public Guid DropletID { get; set; }
 
         [JsonProperty(PropertyName = "instance_id"), JsonConverter(typeof(VcapGuidConverter))]
         public Guid InstanceID { get; set; }

@@ -120,6 +120,7 @@
     <Compile Include="Types\EntityBase.cs" />
     <Compile Include="Types\FindDroplet.cs" />
     <Compile Include="Types\FindDropletResponse.cs" />
+    <Compile Include="Types\Goodbye.cs" />
     <Compile Include="Types\Heartbeat.cs" />
     <Compile Include="Types\Hello.cs" />
     <Compile Include="Types\Instance.cs" />

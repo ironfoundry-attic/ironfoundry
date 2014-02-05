@@ -26,7 +26,7 @@
         [JsonIgnore]
         public override string PublishSubject
         {
-            get { return REPLY_OK; } // Find Droplet has no message specific subject.
+            get { return ReplyOk; } // Find Droplet has no message specific subject.
         }
 
         [JsonProperty(PropertyName = "dea"), JsonConverter(typeof(VcapGuidConverter))]
@@ -35,8 +35,8 @@
         [JsonProperty(PropertyName = "version")]
         public string Version { get; set; }
 
-        [JsonProperty(PropertyName = "droplet")]
-        public uint Droplet { get; set; }
+        [JsonProperty(PropertyName = "droplet"), JsonConverter(typeof(VcapGuidConverter))]
+        public Guid Droplet { get; set; }
 
         [JsonProperty(PropertyName = "instance"), JsonConverter(typeof(VcapGuidConverter))]
         public Guid InstanceID { get; set; }

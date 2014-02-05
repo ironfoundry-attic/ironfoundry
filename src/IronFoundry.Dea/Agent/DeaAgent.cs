@@ -1,4 +1,6 @@
-﻿namespace IronFoundry.Dea.Agent
+﻿using System.Net;
+
+namespace IronFoundry.Dea.Agent
 {
     using System;
     using System.Collections.Generic;
@@ -32,6 +34,7 @@
         private readonly IVarzProvider varzProvider;
 
         private readonly Hello helloMessage;
+        private readonly Goodbye goodbyeMessage;
 
         private readonly Task processTask;
         private readonly Task heartbeatTask;
@@ -39,9 +42,9 @@
         private readonly Task varzTask;
         private readonly Task monitorAppsTask;
 
-        private bool shutting_down = false;
+        private bool shuttingDown = false;
 
-        private ushort maxMemoryMB;
+        private readonly ushort maxMemoryMB;
         private ushort reservedMemoryMB;
 
         private VcapComponentDiscover discoverMessage;
@@ -63,7 +66,8 @@
             this.webServerProvider = webServerAdministrationProvider;
             this.varzProvider      = varzProvider;
 
-            helloMessage = new Hello(natsClient.UniqueIdentifier, config.LocalIPAddress, config.FilesServicePort);
+            helloMessage = new Hello(natsClient.UniqueIdentifier, config.LocalIPAddress);
+            goodbyeMessage = new Goodbye(natsClient.UniqueIdentifier, config.LocalIPAddress);
 
             processTask     = new Task(ProcessLoop);
             heartbeatTask   = new Task(HeartbeatLoop);
@@ -136,12 +140,12 @@
 
         public void Stop()
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
 
-            shutting_down = true;
+            shuttingDown = true;
 
             log.Info(Resources.Agent_ShuttingDown_Message);
 
@@ -156,6 +160,8 @@
 
             TakeSnapshot();
 
+            natsClient.Publish(goodbyeMessage);
+
             natsClient.Dispose();
 
             log.Info(Resources.Agent_Shutdown_Message);
@@ -163,7 +169,7 @@
 
         private void ProcessLoop()
         {
-            while (false == shutting_down)
+            while (false == shuttingDown)
             {
                 var iisWorkerProcesses = webServerProvider.GetIIsWorkerProcesses();
                 dropletManager.SetProcessInformationFrom(iisWorkerProcesses);
@@ -173,7 +179,7 @@
 
         private void HeartbeatLoop()
         {
-            while (false == shutting_down)
+            while (false == shuttingDown)
             {
                 SendHeartbeat();
                 Thread.Sleep(TenSecondsInterval);
@@ -182,7 +188,7 @@
 
         private void AdvertiseLoop()
         {
-            while (false == shutting_down)
+            while (false == shuttingDown)
             {
                 SendAdvertise();
                 Thread.Sleep(FiveSecondsInterval);
@@ -191,7 +197,7 @@
 
         private void ProcessDeaStart(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -226,7 +232,7 @@
 
                     instance.OnDeaStart();
 
-                    if (false == shutting_down)
+                    if (false == shuttingDown)
                     {
                         SendSingleHeartbeat(new Heartbeat(instance));
 
@@ -244,7 +250,7 @@
 
         private void ProcessDeaUpdate(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -273,7 +279,7 @@
 
         private void ProcessDeaLocate(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -286,7 +292,7 @@
             const ushort TaintMsForMem = 100;
             const ushort TaintMaxDelay = 250;
 
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -314,7 +320,7 @@
 
         private void ProcessDeaStop(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -323,7 +329,7 @@
 
             StopDroplet stopDropletMsg = Message.FromJson<StopDroplet>(message);
 
-            uint dropletID = stopDropletMsg.DropletID;
+            Guid dropletID = stopDropletMsg.DropletID;
 
             dropletManager.ForAllInstances(dropletID, (instance) =>
                 {
@@ -379,7 +385,7 @@
 
         private void ProcessDeaStatus(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -398,7 +404,7 @@
 
         private void ProcessDeaFindDroplet(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -435,7 +441,7 @@
 
         private void ProcessDropletStatus(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -454,7 +460,7 @@
 
         private void ProcessRouterStart(string message, string reply)
         {
-            if (shutting_down)
+            if (shuttingDown)
             {
                 return;
             }
@@ -478,7 +484,7 @@
 
         private void RegisterWithRouter(Instance instance, string[] uris)
         {
-            if (shutting_down || instance.Uris.IsNullOrEmpty())
+            if (shuttingDown || instance.Uris.IsNullOrEmpty())
             {
                 return;
             }
@@ -529,7 +535,7 @@
 
         private void SendHeartbeat()
         {
-            if (shutting_down || dropletManager.IsEmpty)
+            if (shuttingDown || dropletManager.IsEmpty)
             {
                 return;
             }
@@ -553,12 +559,12 @@
 
         private void SendAdvertise()
         {
-            if (shutting_down) // || no resources
+            if (shuttingDown) // || no resources
             {
                 return;
             }
             ushort availableMemoryMB = (ushort)(maxMemoryMB - reservedMemoryMB);
-            var message = new Advertise(natsClient.UniqueIdentifier, availableMemoryMB, true);
+            var message = new Advertise(natsClient.UniqueIdentifier, availableMemoryMB);
             natsClient.Publish(message);
         }
 
@@ -623,13 +629,13 @@
 
         private void SnapshotVarz()
         {
-            while (false == shutting_down)
+            while (false == shuttingDown)
             {
                 varzProvider.MaxMemoryMB = this.maxMemoryMB;
                 varzProvider.MemoryReservedMB = 0; // TODO
                 varzProvider.MemoryUsedMB = 0; // TODO
                 varzProvider.MaxClients = 1024;
-                if (shutting_down)
+                if (shuttingDown)
                 {
                     varzProvider.State = VcapStates.SHUTTING_DOWN;
                 }
@@ -639,7 +645,7 @@
 
         private void MonitorLoop()
         {
-            while (false == shutting_down)
+            while (false == shuttingDown)
             {
                 Thread.Sleep(TwoSecondsInterval);
 

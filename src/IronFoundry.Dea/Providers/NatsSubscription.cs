@@ -40,7 +40,7 @@
             return new DeaInstanceStartSubscription(String.Format(Subscriptions.deaInstanceStart, argUuid));
         }
 
-        public NatsSubscription()
+        protected NatsSubscription()
         {
             lock (sync)
             {

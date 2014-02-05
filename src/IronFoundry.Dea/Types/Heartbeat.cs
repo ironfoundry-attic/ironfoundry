@@ -16,8 +16,8 @@
             StateTimestamp = instance.StateTimestamp;
         }
 
-        [JsonProperty(PropertyName = "droplet")]
-        public uint Droplet { get; private set; }
+        [JsonProperty(PropertyName = "droplet"), JsonConverter(typeof(VcapGuidConverter))]
+        public Guid Droplet { get; private set; }
 
         [JsonProperty(PropertyName = "version")]
         public string Version { get; private set; }

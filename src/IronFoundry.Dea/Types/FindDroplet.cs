@@ -1,12 +1,13 @@
-﻿namespace IronFoundry.Dea.Types
-{
-    using System;
-    using Newtonsoft.Json;
+﻿using System;
+using IronFoundry.Dea.JsonConverters;
+using Newtonsoft.Json;
 
+namespace IronFoundry.Dea.Types
+{
     public class FindDroplet : Message
     {
-        [JsonProperty(PropertyName = "droplet")]
-        public uint DropletID { get; set; }
+        [JsonProperty(PropertyName = "droplet"), JsonConverter(typeof (VcapGuidConverter))]
+        public Guid DropletID { get; set; }
 
         [JsonProperty(PropertyName = "version")]
         public string Version { get; set; }

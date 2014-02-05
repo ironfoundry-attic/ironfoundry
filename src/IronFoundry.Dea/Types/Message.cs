@@ -1,27 +1,27 @@
-﻿namespace IronFoundry.Dea.Types
-{
-    using IronFoundry.Nats.Client;
-    using Newtonsoft.Json;
+﻿using IronFoundry.Nats.Client;
+using Newtonsoft.Json;
 
+namespace IronFoundry.Dea.Types
+{
     public abstract class Message : EntityBase, INatsMessage
     {
-        public const string RECEIVE_ONLY = "RECEIVE_ONLY";
-        public const string REPLY_OK = "REPLY_OK";
+        public const string ReceiveOnly = "ReceiveOnly";
+        public const string ReplyOk = "ReplyOk";
+
+        [JsonIgnore]
+        public string RawJson { get; set; }
 
         [JsonIgnore]
         public virtual string PublishSubject
         {
-            get { return RECEIVE_ONLY; }
+            get { return ReceiveOnly; }
         }
 
         [JsonIgnore]
         public bool IsReceiveOnly
         {
-            get { return PublishSubject == RECEIVE_ONLY; } // TODO 201207
+            get { return PublishSubject == ReceiveOnly; }
         }
-
-        [JsonIgnore]
-        public string RawJson { get; set; }
 
         public virtual bool CanPublishWithSubject(string subject)
         {

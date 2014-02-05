@@ -1,54 +1,52 @@
-﻿namespace IronFoundry.Dea.Configuration
-{
-    using System;
-    using System.Configuration;
-    using System.Globalization;
-    using System.IO;
-    using System.Net;
-    using IronFoundry.Misc;
-    using IronFoundry.Nats.Configuration;
-    using Microsoft.Win32;
+﻿using System;
+using System.Configuration;
+using System.Globalization;
+using System.IO;
+using System.Net;
+using IronFoundry.Misc;
+using IronFoundry.Nats.Configuration;
+using Microsoft.Win32;
 
+namespace IronFoundry.Dea.Configuration
+{
     public class DeaConfig : IDeaConfig
     {
+        private readonly string appCmdPath;
         private readonly DeaSection deaSection;
-        private readonly IPAddress localIPAddress;
-
-        private readonly Uri filesServiceUri;
-        private readonly Uri monitoringServiceUri;
 
         private readonly ServiceCredential filesCredentials;
+        private readonly Uri filesServiceUri;
+        private readonly bool hasAppCmd;
+        private readonly IPAddress localIPAddress;
         private readonly ServiceCredential monitoringCredentials;
 
-        private readonly ushort monitoringServicePort;
         private readonly string monitoringServiceHostStr;
-
-        private readonly string appCmdPath = null;
-        private readonly bool hasAppCmd = false;
+        private readonly ushort monitoringServicePort;
+        private readonly Uri monitoringServiceUri;
 
         public DeaConfig(INatsConfig natsConfig)
         {
-            this.deaSection = (DeaSection)ConfigurationManager.GetSection(DeaSection.SectionName);
-            this.localIPAddress = Utility.GetLocalIPAddress(deaSection.LocalRoute, natsConfig.Host);
+            deaSection = (DeaSection) ConfigurationManager.GetSection(DeaSection.SectionName);
+            localIPAddress = Utility.GetLocalIPAddress(deaSection.LocalRoute, natsConfig.Host);
 
-            this.filesServiceUri = new Uri(String.Format("http://localhost:{0}", FilesServicePort));
+            filesServiceUri = new Uri(String.Format("http://localhost:{0}", FilesServicePort));
 
-            this.monitoringServicePort = Utility.RandomFreePort();
-            this.monitoringServiceUri = new Uri(String.Format("http://localhost:{0}", MonitoringServicePort));
-            this.monitoringServiceHostStr = String.Format(CultureInfo.InvariantCulture,
+            monitoringServicePort = Utility.RandomFreePort();
+            monitoringServiceUri = new Uri(String.Format("http://localhost:{0}", MonitoringServicePort));
+            monitoringServiceHostStr = String.Format(CultureInfo.InvariantCulture,
                 "{0}:{1}", localIPAddress, monitoringServicePort);
 
-            this.filesCredentials = new ServiceCredential();
-            this.monitoringCredentials = new ServiceCredential();
+            filesCredentials = new ServiceCredential();
+            monitoringCredentials = new ServiceCredential();
 
             try
             {
-                string iisInstallPath = null;
+                string iisInstallPath = string.Empty;
                 using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default))
                 {
                     using (RegistryKey subKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\InetStp"))
                     {
-                        iisInstallPath = subKey.GetValue("InstallPath").ToString();
+                        if (subKey != null) iisInstallPath = subKey.GetValue("InstallPath").ToString();
                     }
                 }
                 appCmdPath = Path.Combine(iisInstallPath, "appcmd.exe");
