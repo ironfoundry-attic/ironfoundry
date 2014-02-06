@@ -66,6 +66,9 @@
                 case Message.Type.LimitDisk:
                     handler = new LimitDiskRequestHandler(request);
                     break;
+                case Message.Type.LimitCpu:
+                    handler = new LimitCpuRequestHandler(request);
+                    break;
                 case Message.Type.LimitMemory:
                     handler = new LimitMemoryRequestHandler(request);
                     break;

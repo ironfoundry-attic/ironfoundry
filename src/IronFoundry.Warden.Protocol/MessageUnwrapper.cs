@@ -49,6 +49,9 @@
                 case Message.Type.LimitDisk:
                     request = Deserialize<LimitDiskRequest>(message.Payload);
                     break;
+                case Message.Type.LimitCpu:
+                    request = Deserialize<LimitCpuRequest>(message.Payload);
+                    break;
                 case Message.Type.LimitMemory:
                     request = Deserialize<LimitMemoryRequest>(message.Payload);
                     break;

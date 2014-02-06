@@ -1,9 +1,9 @@
-﻿namespace IronFoundry.Warden.Handlers
-{
-    using System.Threading.Tasks;
-    using IronFoundry.Warden.Protocol;
-    using NLog;
+﻿using System.Threading.Tasks;
+using IronFoundry.Warden.Protocol;
+using NLog;
 
+namespace IronFoundry.Warden.Handlers
+{
     public class LimitDiskRequestHandler : RequestHandler
     {
         private readonly Logger log = LogManager.GetCurrentClassLogger();
@@ -12,7 +12,7 @@
         public LimitDiskRequestHandler(Request request)
             : base(request)
         {
-            this.request = (LimitDiskRequest)request;
+            this.request = (LimitDiskRequest) request;
         }
 
         public override Task<Response> HandleAsync()
